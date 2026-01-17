@@ -78,7 +78,8 @@ async function enforceRateLimit(ip: string): Promise<void> {
 
 function buildBaseUrl(req: express.Request): string {
   const proto = req.header("x-forwarded-proto") || req.protocol;
-  return `${proto}://${req.get("host")}`;
+  const host = req.header("x-forwarded-host") || req.get("host");
+  return `${proto}://${host}`;
 }
 
 function coerceOrigin(raw: string): string {
@@ -318,6 +319,7 @@ app.get("/v1/evaluations/:domain/:runId.json", async (req, res) => {
 export const api = onRequest(
   {
     region: "us-central1",
+    invoker: "public",
   },
   app
 );
