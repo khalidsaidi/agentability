@@ -1,0 +1,33 @@
+{
+  "spec_version": "1.0",
+  "product": {
+    "name": "Agentability",
+    "description": "Public-mode agent readiness evaluator: discoverability, callable surface quality, ingestion quality, trust, reliability.",
+    "home_url": "https://agentability.org"
+  },
+  "entrypoints": {
+    "web_app": "https://agentability.org",
+    "report_ui": "https://agentability.org/reports/{domain}",
+    "api_base": "https://agentability.org/v1"
+  },
+  "openapi": {
+    "json": "https://agentability.org/.well-known/openapi.json",
+    "yaml": "https://agentability.org/.well-known/openapi.yaml"
+  },
+  "llm_ingestion": {
+    "llms_txt": "https://agentability.org/llms.txt",
+    "llms_full_txt": "https://agentability.org/llms-full.txt",
+    "docs_md": "https://agentability.org/docs.md",
+    "spec_md": "https://agentability.org/spec.md"
+  },
+  "verification": {
+    "discovery_audit_latest": "https://agentability.org/discovery/audit/latest.json",
+    "discovery_audit_html": "https://agentability.org/discovery/audit"
+  },
+  "limits": {
+    "public_mode_only": true,
+    "max_pages_crawled": 25,
+    "max_bytes_per_fetch": 2097152,
+    "max_fetch_seconds": 15
+  }
+}

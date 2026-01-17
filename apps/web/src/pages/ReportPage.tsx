@@ -1,12 +1,246 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { fetchLatest } from "@/lib/api";
+import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
+import type { EvaluationProfile } from "@agentability/shared";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { PillarBreakdown } from "@/components/PillarBreakdown";
 import { FailuresList } from "@/components/FailuresList";
 import { EvidenceLinks } from "@/components/EvidenceLinks";
 import { CopyLinks } from "@/components/CopyLinks";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const PILLAR_LABELS = {
+  discovery: "Discovery",
+  callableSurface: "Callable Surface",
+  llmIngestion: "LLM Ingestion",
+  trust: "Trust",
+  reliability: "Reliability",
+} as const;
+
+type PillarKey = keyof typeof PILLAR_LABELS;
+
+const STATUS_RANK = {
+  fail: 2,
+  warn: 1,
+  pass: 0,
+} as const;
+
+const SEVERITY_RANK = {
+  high: 3,
+  medium: 2,
+  low: 1,
+} as const;
+
+const STATUS_SCORE = {
+  pass: 1,
+  warn: 0.5,
+  fail: 0,
+} as const;
+
+const PILLAR_DETAILS: Record<
+  PillarKey,
+  { description: string; signals: string; fixes: string }
+> = {
+  discovery: {
+    description: "How easy it is for an agent to find your public entrypoints and docs.",
+    signals: "Machine entrypoint files, clear links, and crawlable paths.",
+    fixes: "Publish /.well-known/air.json and link it to your docs and API.",
+  },
+  callableSurface: {
+    description: "Whether your API is described clearly enough for tools to call.",
+    signals: "A valid API description file with endpoints and examples.",
+    fixes: "Publish an OpenAPI file with clear endpoints and examples.",
+  },
+  llmIngestion: {
+    description: "Whether your docs are easy for AI to read and keep in memory.",
+    signals: "A public docs page with real text and stable URLs.",
+    fixes: "Keep docs text-first, stable, and linked from the manifest.",
+  },
+  trust: {
+    description: "Signals that the site is official and safe to use.",
+    signals: "Verification files, contact info, and legal links.",
+    fixes: "Publish a simple verification file and contact info.",
+  },
+  reliability: {
+    description: "Whether important pages respond consistently over time.",
+    signals: "Same status, content type, and body on repeat requests.",
+    fixes: "Remove flaky redirects and random output.",
+  },
+};
+
+const PROFILE_WEIGHTS: Record<EvaluationProfile, Record<PillarKey, number>> = {
+  auto: {
+    discovery: 0.3,
+    callableSurface: 0.2,
+    llmIngestion: 0.2,
+    trust: 0.1,
+    reliability: 0.2,
+  },
+  api_product: {
+    discovery: 0.35,
+    callableSurface: 0.3,
+    llmIngestion: 0.15,
+    trust: 0.1,
+    reliability: 0.1,
+  },
+  docs_platform: {
+    discovery: 0.25,
+    callableSurface: 0.15,
+    llmIngestion: 0.35,
+    trust: 0.1,
+    reliability: 0.15,
+  },
+  content: {
+    discovery: 0.3,
+    callableSurface: 0.05,
+    llmIngestion: 0.35,
+    trust: 0.1,
+    reliability: 0.2,
+  },
+  hybrid: {
+    discovery: 0.3,
+    callableSurface: 0.2,
+    llmIngestion: 0.25,
+    trust: 0.1,
+    reliability: 0.15,
+  },
+};
+
+const CHECK_DETAILS: Record<
+  string,
+  { title: string; why: string; impact: string; fix: string }
+> = {
+  D1: {
+    title: "Machine entrypoints exist",
+    why: "Agents need a clear place to start.",
+    impact: "Without it, they may never find your API or docs.",
+    fix: "Publish /.well-known/air.json and link to your API and docs.",
+  },
+  D2: {
+    title: "Entrypoints are reachable and stable",
+    why: "The entrypoints must load reliably every time.",
+    impact: "Flaky responses confuse agents and break automation.",
+    fix: "Make entrypoints return 200 with the right content type every time.",
+  },
+  D3: {
+    title: "Discovery coherence",
+    why: "All your files should point to the same places.",
+    impact: "Conflicting links make agents give up or call the wrong thing.",
+    fix: "Align URLs across air.json, OpenAPI, and docs.",
+  },
+  D4: {
+    title: "Robots and crawling sanity",
+    why: "Robots rules should not block important public files.",
+    impact: "Agents might be blocked from reading your entrypoints.",
+    fix: "Allow /.well-known, /openapi.*, and docs paths in robots.txt.",
+  },
+  C2: {
+    title: "OpenAPI is parsable and callable",
+    why: "Tools rely on a clear API description.",
+    impact: "Incomplete specs cause bad requests.",
+    fix: "Publish a valid OpenAPI file with endpoints, parameters, and examples.",
+  },
+  L1: {
+    title: "Canonical docs entrypoint exists",
+    why: "Docs explain how to use the product safely.",
+    impact: "Without docs, agents guess and get it wrong.",
+    fix: "Publish a public /docs page and link it from air.json.",
+  },
+  L4: {
+    title: "Docs link integrity",
+    why: "Docs should not send agents to dead ends.",
+    impact: "Broken links reduce confidence and completeness.",
+    fix: "Fix or remove broken docs links.",
+  },
+  R3: {
+    title: "Repeat-request consistency",
+    why: "Agents expect the same input to return the same output.",
+    impact: "Random changes reduce trust and break caching.",
+    fix: "Remove random output (timestamps, IDs) from critical pages.",
+  },
+  T1: {
+    title: "Attestation presence",
+    why: "A simple proof helps confirm ownership.",
+    impact: "Without it, agents are less confident.",
+    fix: "Publish a simple verification file and link it in air.json.",
+  },
+  T2: {
+    title: "Attestation integrity",
+    why: "The verification file should be trustworthy.",
+    impact: "Invalid proofs are ignored.",
+    fix: "Sign the verification file or include clear ownership metadata.",
+  },
+};
+
+const PILLAR_ACTIONS: Record<PillarKey, string[]> = {
+  discovery: [
+    "Add /.well-known/air.json with links to your API and docs.",
+    "Mirror your API description at /.well-known/openapi.json and /openapi.json.",
+  ],
+  callableSurface: [
+    "Publish a clear API description file (OpenAPI) with endpoints and examples.",
+    "Add example requests and responses so tools can call correctly.",
+  ],
+  llmIngestion: [
+    "Publish a stable docs page with clear headings and examples.",
+    "Add llms.txt so agents can find the docs quickly.",
+  ],
+  trust: [
+    "Host a public verification file and link it from air.json.",
+    "Add contact and legal URLs in the ai-plugin file.",
+  ],
+  reliability: [
+    "Keep critical pages stable for the same inputs.",
+    "Avoid redirects that change behavior across retries.",
+  ],
+};
+
+const CHECK_PILLAR_BY_ID: Record<string, PillarKey> = {
+  D1: "discovery",
+  D2: "discovery",
+  D3: "discovery",
+  D4: "discovery",
+  C2: "callableSurface",
+  L1: "llmIngestion",
+  L4: "llmIngestion",
+  T1: "trust",
+  T2: "trust",
+  R3: "reliability",
+};
+
+const CHECK_PILLAR_BY_PREFIX: Record<string, PillarKey> = {
+  D: "discovery",
+  C: "callableSurface",
+  L: "llmIngestion",
+  T: "trust",
+  R: "reliability",
+};
+
+function pluralize(count: number, word: string): string {
+  return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+function formatWeight(value: number): string {
+  return `${Math.round(value * 100)}%`;
+}
+
+function formatProfile(profile: EvaluationProfile): string {
+  return profile.split("_").join(" ");
+}
+
+function inferPillar(checkId: string): PillarKey | undefined {
+  if (CHECK_PILLAR_BY_ID[checkId]) return CHECK_PILLAR_BY_ID[checkId];
+  const prefix = checkId.trim().charAt(0).toUpperCase();
+  return CHECK_PILLAR_BY_PREFIX[prefix];
+}
+
+function formatPoints(value: number | undefined): string {
+  if (!value || Number.isNaN(value)) return "n/a";
+  return `${value.toFixed(1)} pts`;
+}
 
 export function ReportPage() {
   const params = useParams();
@@ -16,6 +250,21 @@ export function ReportPage() {
     queryKey: ["report", domain],
     queryFn: () => fetchLatest(domain),
     enabled: Boolean(domain),
+  });
+  const reportTitle = query.data?.domain
+    ? `Report: ${query.data.domain}`
+    : domain
+    ? `Report: ${domain}`
+    : "Agentability report";
+  const reportDescription = query.data
+    ? `Agentability report for ${query.data.domain}. Score ${query.data.score}/100 in public mode.`
+    : DEFAULT_DESCRIPTION;
+  const reportPath = domain ? `/reports/${encodeURIComponent(domain)}` : "/reports";
+  useSeo({
+    title: reportTitle,
+    description: reportDescription,
+    path: reportPath,
+    type: "article",
   });
 
   if (query.isLoading) {
@@ -34,6 +283,80 @@ export function ReportPage() {
   }
 
   const report = query.data;
+  const pillarEntries = Object.entries(report.pillarScores) as [PillarKey, number][];
+  const sortedPillars = [...pillarEntries].sort((a, b) => b[1] - a[1]);
+  const strongest = sortedPillars.slice(0, 2);
+  const weakest = [...sortedPillars].reverse().slice(0, 2);
+
+  const failCount = report.checks.filter((check) => check.status === "fail").length;
+  const warnCount = report.checks.filter((check) => check.status === "warn").length;
+
+  const issueChecks = report.checks
+    .filter((check) => check.status !== "pass")
+    .sort((a, b) => {
+      const statusDelta = STATUS_RANK[b.status] - STATUS_RANK[a.status];
+      if (statusDelta !== 0) return statusDelta;
+      return SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity];
+    });
+  const weights = PROFILE_WEIGHTS[report.profile];
+  const weightSummary = (Object.entries(weights) as [PillarKey, number][])
+    .map(([key, value]) => `${PILLAR_LABELS[key]} ${formatWeight(value)}`)
+    .join(", ");
+  const pillarCounts = pillarEntries.reduce(
+    (acc, [key]) => {
+      acc[key] = 0;
+      return acc;
+    },
+    {
+      discovery: 0,
+      callableSurface: 0,
+      llmIngestion: 0,
+      trust: 0,
+      reliability: 0,
+    } as Record<PillarKey, number>
+  );
+  for (const check of report.checks) {
+    const pillar = inferPillar(check.id);
+    if (pillar) pillarCounts[pillar] += 1;
+  }
+  const issueInsights = issueChecks
+    .map((check) => {
+      const pillar = inferPillar(check.id);
+      const max = pillar ? pillarCounts[pillar] : 0;
+      const weight = pillar ? weights[pillar] : 0;
+      const impact =
+        pillar && max
+          ? (1 - STATUS_SCORE[check.status]) * (100 / max) * weight
+          : undefined;
+      return {
+        check,
+        pillar,
+        impact,
+        detail: CHECK_DETAILS[check.id],
+      };
+    })
+    .sort((a, b) => {
+      const impactDelta = (b.impact ?? 0) - (a.impact ?? 0);
+      if (impactDelta !== 0) return impactDelta;
+      const statusDelta = STATUS_RANK[b.check.status] - STATUS_RANK[a.check.status];
+      if (statusDelta !== 0) return statusDelta;
+      return SEVERITY_RANK[b.check.severity] - SEVERITY_RANK[a.check.severity];
+    });
+  const priorityFixes = issueInsights.slice(0, 3);
+  const estimatedLoss = issueInsights.reduce((sum, item) => sum + (item.impact ?? 0), 0);
+  const scoreGap = Math.max(0, 100 - report.score);
+  const coverageGaps = (Object.keys(weights) as PillarKey[]).filter(
+    (pillar) => weights[pillar] > 0 && pillarCounts[pillar] === 0
+  );
+  const coverageLoss = coverageGaps.reduce((sum, pillar) => sum + weights[pillar] * 100, 0);
+  const coverageSummary = coverageGaps
+    .map((pillar) => `${PILLAR_LABELS[pillar]} (${formatWeight(weights[pillar])})`)
+    .join(", ");
+  const improvementActions = [
+    ...priorityFixes.flatMap((item) => (item.detail?.fix ? [item.detail.fix] : [])),
+    ...coverageGaps.flatMap((pillar) => PILLAR_ACTIONS[pillar] ?? []),
+  ];
+  const uniqueActions = Array.from(new Set(improvementActions)).slice(0, 6);
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -61,6 +384,207 @@ export function ReportPage() {
         </TabsList>
         <TabsContent value="overview" className="space-y-6">
           <PillarBreakdown pillarScores={report.pillarScores} />
+          <Card className="border-border/60 bg-white/70">
+            <CardHeader>
+              <CardTitle>What this means</CardTitle>
+              <CardDescription>Plain-language summary of the score and priorities.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                Score {report.score} ({report.grade}).{" "}
+                {failCount === 0 && warnCount === 0
+                  ? "All public-mode checks passed."
+                  : `${pluralize(failCount, "fail")} and ${pluralize(
+                      warnCount,
+                      "warning"
+                    )} across ${report.checks.length} checks.`}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Strongest pillars:</span>{" "}
+                {strongest.map(([key, value]) => `${PILLAR_LABELS[key]} ${value}`).join(", ")}.
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Most to improve:</span>{" "}
+                {weakest.map(([key, value]) => `${PILLAR_LABELS[key]} ${value}`).join(", ")}.
+              </p>
+              {priorityFixes.length ? (
+                <div className="space-y-2">
+                  <div className="font-medium text-foreground">Priority fixes</div>
+                  <ul className="space-y-1">
+                    {priorityFixes.map(({ check, impact, detail }) => (
+                      <li key={check.id}>
+                        <span className="font-semibold text-foreground">{check.id}</span> —{" "}
+                        {detail?.fix ?? check.summary}
+                        {impact ? (
+                          <span className="text-xs text-muted-foreground">
+                            {" "}
+                            (est. -{impact.toFixed(1)} pts)
+                          </span>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p>Keep the current surfaces stable as you expand public documentation and entrypoints.</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="border-border/60 bg-white/70">
+            <CardHeader>
+              <CardTitle>How to reach 100</CardTitle>
+              <CardDescription>Plain-language reasons and concrete next steps.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <div className="space-y-1">
+                <p>
+                  Score gap: {scoreGap} points.{" "}
+                  {issueInsights.length
+                    ? `Failed or warned checks account for about ${estimatedLoss.toFixed(1)} points.`
+                    : "All checks in this run passed."}{" "}
+                  {coverageGaps.length
+                    ? `Public mode v1 does not score ${coverageSummary} yet, so the highest possible score right now is about ${Math.round(
+                        100 - coverageLoss
+                      )}.`
+                    : null}
+                </p>
+                <p className="text-xs">
+                  We only count what can be verified from public URLs with strict safety limits.
+                </p>
+              </div>
+              {issueInsights.length ? (
+                <div className="space-y-3">
+                  {issueInsights.map(({ check, pillar, impact, detail }) => (
+                    <div
+                      key={check.id}
+                      className="rounded-lg border border-border/60 bg-white/60 p-3"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline">{check.id}</Badge>
+                        <Badge>{check.severity}</Badge>
+                        {pillar ? (
+                          <Badge variant="outline">{PILLAR_LABELS[pillar]}</Badge>
+                        ) : null}
+                        <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                          {check.status}
+                        </span>
+                        {impact !== undefined ? (
+                          <span className="text-xs text-foreground">-{formatPoints(impact)}</span>
+                        ) : null}
+                      </div>
+                      <div className="mt-2 text-sm font-semibold text-foreground">
+                        {detail?.title ?? check.summary}
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Why it matters: {detail?.why ?? "This check verifies core agent access."}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Impact: {detail?.impact ?? "Agents may fail to discover or use the surface."}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        What to do: {detail?.fix ?? check.summary}
+                      </p>
+                      {check.evidence.length ? (
+                        <div className="mt-2 flex flex-col gap-1 text-[0.7rem] text-muted-foreground">
+                          {check.evidence.slice(0, 3).map((item) => (
+                            <a
+                              key={item}
+                              href={item}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="truncate hover:text-foreground"
+                            >
+                              {item}
+                            </a>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {coverageGaps.length ? (
+                <div className="space-y-3">
+                  <div className="text-sm font-medium text-foreground">Unscored areas to prepare now</div>
+                  {coverageGaps.map((pillar) => (
+                    <div
+                      key={pillar}
+                      className="rounded-lg border border-border/60 bg-white/60 p-3 text-xs text-muted-foreground"
+                    >
+                      <div className="text-sm font-semibold text-foreground">
+                        {PILLAR_LABELS[pillar]}
+                      </div>
+                      <p className="mt-1">{PILLAR_DETAILS[pillar].description}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {PILLAR_ACTIONS[pillar].map((action) => (
+                          <li key={action}>{action}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {uniqueActions.length ? (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-foreground">Concrete recommendations</div>
+                  <ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+                    {uniqueActions.map((action) => (
+                      <li key={action}>{action}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {!issueInsights.length && !coverageGaps.length ? (
+                <p>All checks passed. Maintain stability as you expand public surfaces.</p>
+              ) : null}
+            </CardContent>
+          </Card>
+          <Card className="border-border/60 bg-white/70">
+            <CardHeader>
+              <CardTitle>Detailed explanation</CardTitle>
+              <CardDescription>How the score was computed and why the issues matter.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 text-sm text-muted-foreground">
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-foreground">How scoring works</div>
+                <ul className="list-disc space-y-1 pl-5">
+                  <li>Each check can pass, warn, or fail. Pass gets full credit, warn gets half.</li>
+                  <li>Pillar scores are the average of checks inside that pillar.</li>
+                  <li>Total score is a weighted average based on the profile used for this run.</li>
+                  <li>Grades: A 90-100, B 80-89, C 70-79, below 70 is Not AI-Native.</li>
+                  <li>Public mode uses only public URLs with strict time and size limits.</li>
+                </ul>
+                <p className="text-xs text-muted-foreground">
+                  Profile: {formatProfile(report.profile)}. Focus: {weightSummary}.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-foreground">Pillars explained</div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {(Object.entries(PILLAR_DETAILS) as [PillarKey, (typeof PILLAR_DETAILS)[PillarKey]][]).map(
+                    ([key, detail]) => (
+                      <div key={key} className="rounded-lg border border-border/60 bg-white/60 p-3">
+                        <div className="text-sm font-semibold text-foreground">
+                          {PILLAR_LABELS[key]}
+                        </div>
+                        <p className="mt-1 text-xs">{detail.description}</p>
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Signals: {detail.signals}
+                        </p>
+                        <p className="mt-2 text-xs text-muted-foreground">Typical fix: {detail.fixes}</p>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-foreground">Why the flagged checks matter</div>
+                <p className="text-xs">
+                  Use the "Why not 100" section for per-check deductions, fixes, and evidence.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
           <div className="rounded-2xl border border-border/60 bg-white/70 p-4 text-sm text-muted-foreground">
             Latest run completed {new Date(report.completedAt ?? report.createdAt).toLocaleString()}.
           </div>

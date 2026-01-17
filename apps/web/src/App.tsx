@@ -42,7 +42,31 @@ function App() {
         </main>
 
         <footer className="border-t border-border/50 pt-6 text-xs text-muted-foreground">
-          Built for public-mode audits. Evidence bundles are stored in Cloud Storage for traceability.
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              Built for public-mode audits. Evidence bundles are stored in Cloud Storage for traceability.
+            </div>
+            <div>
+              <div className="text-[0.65rem] uppercase tracking-[0.3em] text-muted-foreground">AI Integration</div>
+              <div className="mt-2 flex flex-wrap gap-3">
+                <a className="hover:text-foreground" href="/.well-known/air.json">
+                  air.json
+                </a>
+                <a className="hover:text-foreground" href="/.well-known/openapi.json">
+                  openapi.json
+                </a>
+                <a className="hover:text-foreground" href="/llms.txt">
+                  llms.txt
+                </a>
+                <a className="hover:text-foreground" href="/discovery/audit/latest.json">
+                  audit
+                </a>
+                <a className="hover:text-foreground" href="https://github.com/khalidsaidi/agentability">
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </div>
         </footer>
       </div>
     </div>

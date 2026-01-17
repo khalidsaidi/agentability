@@ -1,13 +1,20 @@
 {
   "name": "agentability",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "packageManager": "pnpm@9.15.1",
   "scripts": {
     "dev": "pnpm --filter web dev",
     "lint": "pnpm -r --if-present lint",
     "format": "pnpm -r --if-present format",
     "test": "pnpm -r --if-present test",
-    "build": "pnpm -r --if-present build"
+    "build:artifacts": "tsx scripts/build-artifacts.ts",
+    "build:ssr-assets": "tsx scripts/build-ssr-assets.ts",
+    "check:ai": "tsx scripts/check-ai-surfaces.ts",
+    "build": "pnpm build:artifacts && pnpm -C apps/web build && pnpm build:ssr-assets && pnpm -C apps/functions build"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "yaml": "^2.8.1"
   }
 }

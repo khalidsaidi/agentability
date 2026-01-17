@@ -19,5 +19,7 @@ jobs:
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm test
+      - run: pnpm build:artifacts
       - run: pnpm -C apps/web build
+      - run: pnpm check:ai
       - run: pnpm -C apps/functions build

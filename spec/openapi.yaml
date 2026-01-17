@@ -1,0 +1,692 @@
+openapi: 3.1.0
+info:
+  title: Agentability Public API
+  version: 0.1.0
+  description: Public-mode agent readiness evaluator API.
+servers:
+  - url: https://agentability.org
+paths:
+  /v1/evaluate:
+    post:
+      summary: Run a public-mode evaluation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationInput"
+            examples:
+              basic:
+                value:
+                  origin: "https://example.com"
+                  profile: "auto"
+      responses:
+        "200":
+          description: Evaluation accepted or completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateResponse"
+              examples:
+                running:
+                  value:
+                    runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    status: "running"
+                    jsonUrl: "https://agentability.org/v1/evaluations/example.com/latest.json"
+                    reportUrl: "https://agentability.org/reports/example.com"
+                    statusUrl: "https://agentability.org/v1/runs/b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    domain: "example.com"
+                complete:
+                  value:
+                    runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    status: "complete"
+                    jsonUrl: "https://agentability.org/v1/evaluations/example.com/latest.json"
+                    reportUrl: "https://agentability.org/reports/example.com"
+                    statusUrl: "https://agentability.org/v1/runs/b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    domain: "example.com"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalid:
+                  value:
+                    message: "Invalid request"
+                    code: "invalid_request"
+                    details:
+                      fields:
+                        origin: "Origin must be a valid URL"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                rate_limit:
+                  value:
+                    message: "Rate limit exceeded"
+                    code: "rate_limited"
+        "500":
+          description: Evaluation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                failed:
+                  value:
+                    message: "Evaluation failed"
+                    code: "evaluation_failed"
+  /mcp:
+    post:
+      summary: MCP JSON-RPC endpoint
+      description: JSON-RPC 2.0 endpoint for initialize, tools/list, and tools/call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JsonRpcRequest"
+            examples:
+              initialize:
+                value:
+                  jsonrpc: "2.0"
+                  id: 1
+                  method: "initialize"
+                  params:
+                    protocolVersion: "2024-11-05"
+                    clientInfo:
+                      name: "agent"
+                      version: "1.0"
+                    capabilities: {}
+              tools_list:
+                value:
+                  jsonrpc: "2.0"
+                  id: 2
+                  method: "tools/list"
+              tools_call:
+                value:
+                  jsonrpc: "2.0"
+                  id: 3
+                  method: "tools/call"
+                  params:
+                    name: "evaluate_site"
+                    arguments:
+                      origin: "https://example.com"
+                      profile: "auto"
+      responses:
+        "200":
+          description: JSON-RPC response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonRpcResponse"
+              examples:
+                initialize:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result:
+                      protocolVersion: "2024-11-05"
+                      serverInfo:
+                        name: "agentability"
+                        version: "0.1.0"
+                      capabilities:
+                        tools: {}
+                tools_list:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 2
+                    result:
+                      tools:
+                        - name: "evaluate_site"
+                          description: "Run a public-mode agent readiness evaluation for a site origin."
+                          inputSchema:
+                            type: "object"
+                            required:
+                              - "origin"
+                            properties:
+                              origin:
+                                type: "string"
+                                format: "uri"
+                              profile:
+                                type: "string"
+                                enum: ["auto", "api_product", "docs_platform", "content", "hybrid"]
+                tools_call:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 3
+                    result:
+                      content:
+                        - type: "text"
+                          text: "{\"runId\":\"...\",\"status\":\"running\"}"
+  /v1/runs/{runId}:
+    get:
+      summary: Fetch a run by ID
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Run status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunStatus"
+              examples:
+                running:
+                  value:
+                    runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    domain: "example.com"
+                    mode: "public"
+                    status: "running"
+                    input:
+                      origin: "https://example.com"
+                    createdAt: "2026-01-17T00:00:00Z"
+                complete:
+                  value:
+                    runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    domain: "example.com"
+                    mode: "public"
+                    status: "complete"
+                    profile: "auto"
+                    input:
+                      origin: "https://example.com"
+                    score: 86
+                    grade: "B"
+                    pillarScores:
+                      discovery: 22
+                      callableSurface: 18
+                      llmIngestion: 24
+                      trust: 12
+                      reliability: 10
+                    checks:
+                      - id: "D1"
+                        status: "pass"
+                        severity: "high"
+                        summary: "Machine entrypoints discovered"
+                        evidence:
+                          - "https://example.com/.well-known/openapi.json"
+                    evidenceIndex:
+                      entrypoints:
+                        - "https://example.com/.well-known/openapi.json"
+                      docs:
+                        - "https://example.com/docs"
+                      attestations: []
+                    artifacts:
+                      jsonUrl: "https://agentability.org/v1/evaluations/example.com/latest.json"
+                      reportUrl: "https://agentability.org/reports/example.com"
+                    engine:
+                      version: "0.1.0"
+                      rulesetHash: "public-v1"
+                    createdAt: "2026-01-17T00:00:00Z"
+                    completedAt: "2026-01-17T00:01:12Z"
+        "404":
+          description: Run not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                not_found:
+                  value:
+                    message: "Run not found"
+                    code: "not_found"
+  /v1/evaluations/{domain}/latest.json:
+    get:
+      summary: Fetch the latest evaluation for a domain
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Latest evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationResult"
+        "404":
+          description: Domain not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                not_found:
+                  value:
+                    message: "Domain not found"
+                    code: "not_found"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                failed:
+                  value:
+                    message: "Evaluation failed"
+                    code: "evaluation_failed"
+components:
+  schemas:
+    EvaluationInput:
+      type: object
+      required:
+        - origin
+      properties:
+        origin:
+          type: string
+          format: uri
+        profile:
+          type: string
+          enum:
+            - auto
+            - api_product
+            - docs_platform
+            - content
+            - hybrid
+    EvaluateResponse:
+      type: object
+      required:
+        - runId
+        - status
+        - reportUrl
+        - jsonUrl
+        - statusUrl
+        - domain
+      properties:
+        runId:
+          type: string
+        status:
+          type: string
+          enum:
+            - complete
+            - running
+        reportUrl:
+          type: string
+          format: uri
+        jsonUrl:
+          type: string
+          format: uri
+        statusUrl:
+          type: string
+          format: uri
+        domain:
+          type: string
+    RunStatus:
+      type: object
+      required:
+        - runId
+        - domain
+        - status
+        - input
+        - createdAt
+      properties:
+        runId:
+          type: string
+        domain:
+          type: string
+        mode:
+          type: string
+          enum:
+            - public
+        profile:
+          type: string
+          enum:
+            - auto
+            - api_product
+            - docs_platform
+            - content
+            - hybrid
+        input:
+          type: object
+          required:
+            - origin
+          properties:
+            origin:
+              type: string
+              format: uri
+        status:
+          type: string
+          enum:
+            - running
+            - complete
+            - failed
+        score:
+          type: number
+        grade:
+          type: string
+        pillarScores:
+          $ref: "#/components/schemas/PillarScores"
+        checks:
+          type: array
+          items:
+            $ref: "#/components/schemas/CheckResult"
+        evidenceIndex:
+          $ref: "#/components/schemas/EvidenceIndex"
+        artifacts:
+          $ref: "#/components/schemas/Artifacts"
+        engine:
+          $ref: "#/components/schemas/EngineInfo"
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        error:
+          type: string
+    EvaluationResult:
+      type: object
+      required:
+        - runId
+        - domain
+        - mode
+        - profile
+        - input
+        - status
+        - score
+        - grade
+        - pillarScores
+        - checks
+        - evidenceIndex
+        - artifacts
+        - engine
+        - createdAt
+      properties:
+        runId:
+          type: string
+        domain:
+          type: string
+        mode:
+          type: string
+          enum:
+            - public
+        profile:
+          type: string
+          enum:
+            - auto
+            - api_product
+            - docs_platform
+            - content
+            - hybrid
+        input:
+          type: object
+          required:
+            - origin
+          properties:
+            origin:
+              type: string
+              format: uri
+        status:
+          type: string
+          enum:
+            - complete
+            - running
+            - failed
+        score:
+          type: number
+        grade:
+          type: string
+        pillarScores:
+          $ref: "#/components/schemas/PillarScores"
+        checks:
+          type: array
+          items:
+            $ref: "#/components/schemas/CheckResult"
+        evidenceIndex:
+          $ref: "#/components/schemas/EvidenceIndex"
+        artifacts:
+          $ref: "#/components/schemas/Artifacts"
+        engine:
+          $ref: "#/components/schemas/EngineInfo"
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        error:
+          type: string
+    CheckResult:
+      type: object
+      required:
+        - id
+        - status
+        - severity
+        - summary
+        - evidence
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - pass
+            - warn
+            - fail
+        severity:
+          type: string
+          enum:
+            - high
+            - medium
+            - low
+        summary:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        recommendationId:
+          type: string
+    EvidenceIndex:
+      type: object
+      required:
+        - entrypoints
+        - docs
+        - attestations
+      properties:
+        entrypoints:
+          type: array
+          items:
+            type: string
+        docs:
+          type: array
+          items:
+            type: string
+        attestations:
+          type: array
+          items:
+            type: string
+    PillarScores:
+      type: object
+      required:
+        - discovery
+        - callableSurface
+        - llmIngestion
+        - trust
+        - reliability
+      properties:
+        discovery:
+          type: number
+        callableSurface:
+          type: number
+        llmIngestion:
+          type: number
+        trust:
+          type: number
+        reliability:
+          type: number
+    Artifacts:
+      type: object
+      properties:
+        jsonUrl:
+          type: string
+          format: uri
+        reportUrl:
+          type: string
+          format: uri
+        evidenceBundleUrl:
+          type: string
+          format: uri
+    EngineInfo:
+      type: object
+      required:
+        - version
+        - rulesetHash
+      properties:
+        version:
+          type: string
+        rulesetHash:
+          type: string
+    JsonRpcRequest:
+      type: object
+      required:
+        - jsonrpc
+        - method
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+            - "2.0"
+        id:
+          oneOf:
+            - type: string
+            - type: number
+            - type: "null"
+        method:
+          type: string
+        params:
+          type: object
+          additionalProperties: true
+    JsonRpcResponse:
+      type: object
+      required:
+        - jsonrpc
+        - id
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+            - "2.0"
+        id:
+          oneOf:
+            - type: string
+            - type: number
+            - type: "null"
+        result:
+          $ref: "#/components/schemas/JsonRpcResult"
+        error:
+          $ref: "#/components/schemas/JsonRpcError"
+      oneOf:
+        - required:
+            - result
+        - required:
+            - error
+    JsonRpcResult:
+      oneOf:
+        - $ref: "#/components/schemas/McpInitializeResult"
+        - $ref: "#/components/schemas/McpToolsListResult"
+        - $ref: "#/components/schemas/McpToolCallResult"
+    JsonRpcError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+    McpToolDefinition:
+      type: object
+      required:
+        - name
+        - description
+        - inputSchema
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        inputSchema:
+          type: object
+          additionalProperties: true
+    McpInitializeResult:
+      type: object
+      required:
+        - protocolVersion
+        - serverInfo
+        - capabilities
+      properties:
+        protocolVersion:
+          type: string
+        serverInfo:
+          type: object
+          required:
+            - name
+            - version
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+        capabilities:
+          type: object
+          additionalProperties: true
+    McpToolsListResult:
+      type: object
+      required:
+        - tools
+      properties:
+        tools:
+          type: array
+          items:
+            $ref: "#/components/schemas/McpToolDefinition"
+    McpToolCallResult:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/McpContent"
+        isError:
+          type: boolean
+    McpContent:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - text
+        text:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - message
+        - code
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+        details:
+          type: object
+          additionalProperties: true

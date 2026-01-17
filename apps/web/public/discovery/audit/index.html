@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agentability Discovery Audit</title>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; margin: 2rem; color: #0f172a; }
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
+    h1 { margin: 0 0 0.5rem; }
+    a { color: #0f766e; }
+    pre { white-space: pre-wrap; word-break: break-word; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Discovery Audit</h1>
+    <p>Machine-readable JSON: <a href="./latest.json">latest.json</a></p>
+    <pre id="audit"></pre>
+  </div>
+  <script>
+    fetch("./latest.json")
+      .then((response) => response.json())
+      .then((audit) => {
+        document.getElementById("audit").textContent = JSON.stringify(audit, null, 2);
+      })
+      .catch((error) => {
+        document.getElementById("audit").textContent = "Failed to load audit JSON.";
+      });
+  </script>
+</body>
+</html>

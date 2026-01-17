@@ -2,9 +2,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { URLInputCard } from "@/components/URLInputCard";
 import { evaluateOrigin } from "@/lib/api";
+import { useSeo } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function HomePage() {
+  useSeo({
+    title: "Agent readiness evaluator",
+    description:
+      "Agentability audits public machine entrypoints, docs, and reliability to score agent readiness.",
+    path: "/",
+  });
+
   const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: (origin: string) => evaluateOrigin(origin),
@@ -63,6 +72,35 @@ export function HomePage() {
           scored.
         </AlertDescription>
       </Alert>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>AI Integration</CardTitle>
+          <CardDescription>Stable machine surfaces for agents and crawlers.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 text-sm md:grid-cols-2">
+            <a className="text-muted-foreground hover:text-foreground" href="/.well-known/air.json">
+              /.well-known/air.json
+            </a>
+            <a className="text-muted-foreground hover:text-foreground" href="/.well-known/openapi.json">
+              /.well-known/openapi.json
+            </a>
+            <a className="text-muted-foreground hover:text-foreground" href="/llms.txt">
+              /llms.txt
+            </a>
+            <a className="text-muted-foreground hover:text-foreground" href="/discovery/audit/latest.json">
+              /discovery/audit/latest.json
+            </a>
+            <a
+              className="text-muted-foreground hover:text-foreground"
+              href="https://github.com/khalidsaidi/agentability"
+            >
+              GitHub repo
+            </a>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

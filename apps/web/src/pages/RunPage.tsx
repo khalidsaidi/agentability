@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { fetchRun } from "@/lib/api";
+import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { PillarBreakdown } from "@/components/PillarBreakdown";
 import { FailuresList } from "@/components/FailuresList";
@@ -17,6 +18,21 @@ export function RunPage() {
     enabled: Boolean(runId),
     refetchInterval: (query) =>
       query.state.data?.status === "running" ? 2000 : false,
+  });
+  const runTitle = query.data?.domain
+    ? `Run status: ${query.data.domain}`
+    : runId
+    ? "Run status"
+    : "Agentability run status";
+  const runDescription = query.data?.domain
+    ? `Live evaluation status for ${query.data.domain}.`
+    : DEFAULT_DESCRIPTION;
+  const runPath = runId ? `/runs/${encodeURIComponent(runId)}` : "/runs";
+  useSeo({
+    title: runTitle,
+    description: runDescription,
+    path: runPath,
+    noIndex: true,
   });
 
   if (query.isLoading) {

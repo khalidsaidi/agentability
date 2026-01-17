@@ -1,0 +1,41 @@
+Product: Agentability
+What it does: Public-mode agent readiness evaluator.
+Start here: https://agentability.org
+API: https://agentability.org/v1
+MCP: https://agentability.org/mcp
+OpenAPI: https://agentability.org/.well-known/openapi.json
+Manifest: https://agentability.org/.well-known/air.json
+
+Verification:
+- https://agentability.org/discovery/audit/latest.json
+
+Reports:
+- https://agentability.org/reports/{domain}
+- https://agentability.org/v1/evaluations/{domain}/latest.json
+
+Spec:
+- https://agentability.org/spec.md
+
+How to use the API:
+- POST https://agentability.org/v1/evaluate
+  {"origin":"https://example.com","profile":"auto"}
+- Poll https://agentability.org/v1/runs/{runId} until status is complete
+- POST https://agentability.org/mcp (JSON-RPC)
+
+Pillars:
+- Discovery: machine entrypoints and canonical docs.
+- Callable Surface: usable OpenAPI and callable signals.
+- LLM Ingestion: clear, linkable documentation.
+- Trust: attestations and provenance signals.
+- Reliability: repeatability across fetches.
+
+Failures:
+- fail means missing or broken surface.
+- warn means partial coverage or unstable responses.
+
+SSRF and abuse protections:
+- Only http/https.
+- Private IP ranges blocked after DNS resolution.
+- Redirects re-checked for private IPs.
+- Timeouts and size limits enforced (15s, 2 MB).
+- Rate limits apply to public evaluate requests.

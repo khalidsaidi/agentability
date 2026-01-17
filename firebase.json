@@ -4,16 +4,341 @@
       "source": "apps/functions",
       "codebase": "default",
       "runtime": "nodejs20",
-      "predeploy": ["pnpm -C apps/functions build"]
+      "predeploy": [
+        "pnpm -C apps/web build",
+        "pnpm build:ssr-assets",
+        "pnpm -C apps/functions build"
+      ]
     }
   ],
   "hosting": {
     "public": "apps/web/dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "predeploy": ["pnpm -C apps/web build"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "predeploy": [
+      "pnpm build:artifacts",
+      "pnpm -C apps/web build"
+    ],
+    "headers": [
+      {
+        "source": "/.well-known/*.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/.well-known/*.yaml",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/yaml; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/openapi.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/openapi.yaml",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/yaml; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/llms*.txt",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/docs.md",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/markdown; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/docs/*.md",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/markdown; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/spec.md",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/markdown; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/status.md",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/markdown; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/discovery/audit/latest.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/discovery/audit/index.html",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/html; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/sitemap.xml",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/rss.xml",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/rss+xml; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      },
+      {
+        "source": "/robots.txt",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          },
+          {
+            "key": "X-Agentability-Spec-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "X-Agentability-Build",
+            "value": "93ce2f6"
+          }
+        ]
+      }
+    ],
     "rewrites": [
-      { "source": "/v1/**", "function": "api" },
-      { "source": "**", "destination": "/index.html" }
+      {
+        "source": "/mcp",
+        "function": "api"
+      },
+      {
+        "source": "/mcp/**",
+        "function": "api"
+      },
+      {
+        "source": "/v1/**",
+        "function": "api"
+      },
+      {
+        "source": "/reports/**",
+        "function": "api"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   },
   "firestore": {
@@ -24,11 +349,21 @@
     "rules": "storage.rules"
   },
   "emulators": {
-    "functions": { "port": 5001 },
-    "firestore": { "port": 8080 },
-    "hosting": { "port": 5000 },
-    "storage": { "port": 9199 },
-    "ui": { "enabled": true },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "storage": {
+      "port": 9199
+    },
+    "ui": {
+      "enabled": true
+    },
     "singleProjectMode": true
   }
 }

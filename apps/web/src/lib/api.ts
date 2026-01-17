@@ -21,7 +21,7 @@ export async function evaluateOrigin(origin: string, profile?: string): Promise<
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || "Evaluation failed");
+    throw new Error(error.message || error.error || "Evaluation failed");
   }
   return response.json();
 }
@@ -29,7 +29,8 @@ export async function evaluateOrigin(origin: string, profile?: string): Promise<
 export async function fetchRun(runId: string): Promise<EvaluationResult> {
   const response = await fetch(`${API_BASE}/v1/runs/${runId}`);
   if (!response.ok) {
-    throw new Error("Run not found");
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Run not found");
   }
   return response.json();
 }
@@ -37,7 +38,8 @@ export async function fetchRun(runId: string): Promise<EvaluationResult> {
 export async function fetchLatest(domain: string): Promise<EvaluationResult> {
   const response = await fetch(`${API_BASE}/v1/evaluations/${domain}/latest.json`);
   if (!response.ok) {
-    throw new Error("Evaluation not found");
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Evaluation not found");
   }
   return response.json();
 }
