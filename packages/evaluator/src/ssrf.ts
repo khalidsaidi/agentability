@@ -19,6 +19,7 @@ export type FetchResult = {
 export type SafeFetchOptions = {
   method?: string;
   headers?: Record<string, string>;
+  body?: string;
   timeoutMs?: number;
   maxBytes?: number;
   maxRedirects?: number;
@@ -154,6 +155,7 @@ export async function safeFetch(
     response = await fetch(url, {
       method: options.method ?? "GET",
       headers: options.headers,
+      body: options.body,
       redirect: "manual",
       signal: controller.signal,
     });

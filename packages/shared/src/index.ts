@@ -76,6 +76,7 @@ export const EvaluationResultSchema = z.object({
   checks: z.array(CheckResultSchema),
   evidenceIndex: z.object({
     entrypoints: z.array(z.string()),
+    callable: z.array(z.string()),
     docs: z.array(z.string()),
     attestations: z.array(z.string()),
   }),

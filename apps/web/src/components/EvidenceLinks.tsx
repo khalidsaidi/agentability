@@ -6,12 +6,13 @@ const emptyLabel = "No evidence captured.";
 export function EvidenceLinks({ evidenceIndex }: { evidenceIndex: EvaluationResult["evidenceIndex"] }) {
   const sections = [
     { label: "Entrypoints", items: evidenceIndex.entrypoints },
-    { label: "Docs", items: evidenceIndex.docs },
-    { label: "Attestations", items: evidenceIndex.attestations },
+    { label: "Callable Surface", items: evidenceIndex.callable ?? [] },
+    { label: "Docs", items: evidenceIndex.docs ?? [] },
+    { label: "Attestations", items: evidenceIndex.attestations ?? [] },
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-4">
       {sections.map((section) => (
         <Card key={section.label} className="bg-white/70">
           <CardHeader>

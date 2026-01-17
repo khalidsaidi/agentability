@@ -731,11 +731,18 @@
         "type": "object",
         "required": [
           "entrypoints",
+          "callable",
           "docs",
           "attestations"
         ],
         "properties": {
           "entrypoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "callable": {
             "type": "array",
             "items": {
               "type": "string"

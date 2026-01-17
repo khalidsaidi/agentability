@@ -143,6 +143,12 @@ const CHECK_DETAILS: Record<
     impact: "Incomplete specs cause bad requests.",
     fix: "Publish a valid OpenAPI file with endpoints, parameters, and examples.",
   },
+  C3: {
+    title: "MCP endpoint responds correctly",
+    why: "Agents use MCP for tool discovery and calls.",
+    impact: "Missing MCP responses block automated access.",
+    fix: "Ensure /mcp returns an explainer on GET and a JSON-RPC initialize response on POST.",
+  },
   L1: {
     title: "Canonical docs entrypoint exists",
     why: "Docs explain how to use the product safely.",
@@ -162,16 +168,16 @@ const CHECK_DETAILS: Record<
     fix: "Remove random output (timestamps, IDs) from critical pages.",
   },
   T1: {
-    title: "Attestation presence",
-    why: "A simple proof helps confirm ownership.",
-    impact: "Without it, agents are less confident.",
-    fix: "Publish a simple verification file and link it in air.json.",
+    title: "air.json completeness",
+    why: "Agents need a complete manifest to trust and route correctly.",
+    impact: "Missing fields block discovery, legal review, or tool routing.",
+    fix: "Fill required fields in air.json, including contact and legal URLs.",
   },
   T2: {
-    title: "Attestation integrity",
-    why: "The verification file should be trustworthy.",
-    impact: "Invalid proofs are ignored.",
-    fix: "Sign the verification file or include clear ownership metadata.",
+    title: "AI plugin metadata is complete",
+    why: "Legal and contact metadata helps agents and humans trust the surface.",
+    impact: "Missing fields reduce trust and may block integrations.",
+    fix: "Ensure ai-plugin.json includes contact_email and a legal_info_url with /terms.",
   },
 };
 
@@ -183,14 +189,15 @@ const PILLAR_ACTIONS: Record<PillarKey, string[]> = {
   callableSurface: [
     "Publish a clear API description file (OpenAPI) with endpoints and examples.",
     "Add example requests and responses so tools can call correctly.",
+    "Expose /mcp so agents can discover and initialize tools.",
   ],
   llmIngestion: [
     "Publish a stable docs page with clear headings and examples.",
     "Add llms.txt so agents can find the docs quickly.",
   ],
   trust: [
-    "Host a public verification file and link it from air.json.",
-    "Add contact and legal URLs in the ai-plugin file.",
+    "Complete air.json with contact, legal, and verification fields.",
+    "Add contact and legal URLs in ai-plugin.json.",
   ],
   reliability: [
     "Keep critical pages stable for the same inputs.",
@@ -204,6 +211,7 @@ const CHECK_PILLAR_BY_ID: Record<string, PillarKey> = {
   D3: "discovery",
   D4: "discovery",
   C2: "callableSurface",
+  C3: "callableSurface",
   L1: "llmIngestion",
   L4: "llmIngestion",
   T1: "trust",

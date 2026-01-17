@@ -7,7 +7,7 @@ import {
   EvaluationResult,
   EvidenceRecord,
 } from "@agentability/shared";
-import { FetchResult, safeFetch } from "./ssrf";
+import { FetchResult, safeFetch, SafeFetchOptions } from "./ssrf";
 
 const ENGINE_VERSION = "0.1.0";
 
@@ -34,10 +34,34 @@ const CHECKS: CheckDefinition[] = [
     summary: "Entrypoints are reachable, correct, and stable",
   },
   {
+    id: "C2",
+    pillar: "callableSurface",
+    severity: "high",
+    summary: "Public OpenAPI surface is valid and example-rich",
+  },
+  {
+    id: "C3",
+    pillar: "callableSurface",
+    severity: "high",
+    summary: "MCP endpoint responds to discovery and initialize",
+  },
+  {
     id: "L1",
     pillar: "llmIngestion",
     severity: "high",
     summary: "Canonical docs entrypoint exists with meaningful text",
+  },
+  {
+    id: "T1",
+    pillar: "trust",
+    severity: "high",
+    summary: "air.json is complete and well-formed",
+  },
+  {
+    id: "T2",
+    pillar: "trust",
+    severity: "high",
+    summary: "AI plugin metadata includes legal and contact fields",
   },
   {
     id: "R3",
@@ -85,20 +109,25 @@ const PROFILE_WEIGHTS: Record<EvaluationProfile, Record<Pillar, number>> = {
   },
 };
 
-const DISCOVERY_ENDPOINTS = [
-  "/.well-known/openapi.json",
-  "/openapi.json",
-  "/openapi.yaml",
-  "/swagger.json",
-];
+const DISCOVERY_ENDPOINTS = ["/.well-known/openapi.yaml", "/openapi.yaml", "/swagger.json"];
 
 const DOCS_ENDPOINTS = ["/docs", "/documentation", "/developers"];
 
 type DiscoveryState = {
   origin: string;
   domain: string;
+  airRootUrl?: string;
+  airWellKnownUrl?: string;
+  airRoot?: FetchResult;
+  airWellKnown?: FetchResult;
   airUrl?: string;
+  openApiRootUrl?: string;
+  openApiWellKnownUrl?: string;
+  openApiRoot?: FetchResult;
+  openApiWellKnown?: FetchResult;
   openApiUrl?: string;
+  aiPluginUrl?: string;
+  aiPlugin?: FetchResult;
   serviceDescUrl?: string;
   llmsUrl?: string;
   robotsUrl?: string;
@@ -136,11 +165,12 @@ function normalizeOrigin(raw: string): { origin: string; domain: string } {
 function recordEvidence(
   evidence: EvidenceRecord[],
   result: FetchResult,
+  method: "GET" | "POST" = "GET",
   error?: string
 ): void {
   evidence.push({
     url: result.url,
-    method: "GET",
+    method,
     status: result.status,
     headers: result.headers,
     contentType: result.contentType,
@@ -194,9 +224,48 @@ function extractMeaningfulText(html?: string): string {
   return stripped;
 }
 
-async function fetchOnce(url: string): Promise<FetchResult> {
+function isSuccessStatus(result?: FetchResult): result is FetchResult {
+  return Boolean(result && result.status >= 200 && result.status < 300);
+}
+
+function isSuccessJson(result?: FetchResult): boolean {
+  return isSuccessStatus(result) && isJsonLike(result.contentType);
+}
+
+function parseJsonBody(result?: FetchResult): Record<string, unknown> | null {
+  if (!result?.bodyText) return null;
+  try {
+    const parsed = JSON.parse(result.bodyText) as Record<string, unknown>;
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function getNestedString(
+  record: Record<string, unknown> | null,
+  path: string[]
+): string | undefined {
+  let current: unknown = record ?? undefined;
+  for (const key of path) {
+    if (!current || typeof current !== "object") {
+      return undefined;
+    }
+    current = (current as Record<string, unknown>)[key];
+  }
+  return typeof current === "string" && current.trim() ? current : undefined;
+}
+
+function uniqueUrls(values: Array<string | undefined>): string[] {
+  const filtered = values.filter(Boolean) as string[];
+  return Array.from(new Set(filtered));
+}
+
+async function fetchOnce(url: string, options: SafeFetchOptions = {}): Promise<FetchResult> {
+  const headers = { "user-agent": USER_AGENT, ...(options.headers ?? {}) };
   return safeFetch(url, {
-    headers: { "user-agent": USER_AGENT },
+    ...options,
+    headers,
   });
 }
 
@@ -227,29 +296,57 @@ async function discover(origin: string): Promise<DiscoveryState> {
     notes: [],
   };
 
-  const airUrl = `${origin}/.well-known/air.json`;
+  const airRootUrl = `${origin}/air.json`;
   try {
-    const airResult = await fetchOnce(airUrl);
-    recordEvidence(state.evidence, airResult);
-    if (airResult.status >= 200 && airResult.status < 300 && isJsonLike(airResult.contentType)) {
-      state.airUrl = airUrl;
-      state.entrypoints.push(airUrl);
-      if (airResult.bodyText) {
-        try {
-          const manifest = JSON.parse(airResult.bodyText) as Record<string, unknown>;
-          const docs =
-            (typeof manifest.docs === "string" && manifest.docs) ||
-            (typeof manifest.documentation === "string" && manifest.documentation);
-          if (docs) {
-            state.docsUrl = new URL(docs, origin).toString();
-          }
-        } catch {
-          state.notes.push("Failed to parse air.json");
-        }
+    const airRootResult = await fetchOnce(airRootUrl);
+    recordEvidence(state.evidence, airRootResult);
+    state.airRoot = airRootResult;
+    if (isSuccessJson(airRootResult)) {
+      state.airRootUrl = airRootUrl;
+      state.entrypoints.push(airRootUrl);
+      if (!state.airUrl) {
+        state.airUrl = airRootUrl;
       }
     }
   } catch (error) {
     state.notes.push(`air.json fetch failed: ${String(error)}`);
+  }
+
+  const airWellKnownUrl = `${origin}/.well-known/air.json`;
+  try {
+    const airWellKnownResult = await fetchOnce(airWellKnownUrl);
+    recordEvidence(state.evidence, airWellKnownResult);
+    state.airWellKnown = airWellKnownResult;
+    if (isSuccessJson(airWellKnownResult)) {
+      state.airWellKnownUrl = airWellKnownUrl;
+      state.entrypoints.push(airWellKnownUrl);
+      state.airUrl = airWellKnownUrl;
+    }
+  } catch (error) {
+    state.notes.push(`air.json (well-known) fetch failed: ${String(error)}`);
+  }
+
+  const manifestSource = parseJsonBody(state.airRoot) ?? parseJsonBody(state.airWellKnown);
+  if (manifestSource) {
+    const docs =
+      getNestedString(manifestSource, ["docs"]) ||
+      getNestedString(manifestSource, ["documentation"]) ||
+      getNestedString(manifestSource, ["llm_entrypoints", "docs_md"]);
+    if (docs) {
+      state.docsUrl = new URL(docs, origin).toString();
+    }
+  }
+
+  const aiPluginUrl = `${origin}/.well-known/ai-plugin.json`;
+  try {
+    const aiPluginResult = await fetchOnce(aiPluginUrl);
+    recordEvidence(state.evidence, aiPluginResult);
+    state.aiPlugin = aiPluginResult;
+    if (isSuccessJson(aiPluginResult)) {
+      state.aiPluginUrl = aiPluginUrl;
+    }
+  } catch (error) {
+    state.notes.push(`ai-plugin.json fetch failed: ${String(error)}`);
   }
 
   try {
@@ -267,9 +364,42 @@ async function discover(origin: string): Promise<DiscoveryState> {
     state.notes.push(`Root fetch failed: ${String(error)}`);
   }
 
+  const openApiRootUrl = `${origin}/openapi.json`;
+  try {
+    const openApiRootResult = await fetchOnce(openApiRootUrl);
+    recordEvidence(state.evidence, openApiRootResult);
+    state.openApiRoot = openApiRootResult;
+    if (isSuccessJson(openApiRootResult)) {
+      state.openApiRootUrl = openApiRootUrl;
+      state.entrypoints.push(openApiRootUrl);
+      if (!state.openApiUrl) {
+        state.openApiUrl = openApiRootUrl;
+      }
+    }
+  } catch (error) {
+    state.notes.push(`openapi.json fetch failed: ${String(error)}`);
+  }
+
+  const openApiWellKnownUrl = `${origin}/.well-known/openapi.json`;
+  try {
+    const openApiWellKnownResult = await fetchOnce(openApiWellKnownUrl);
+    recordEvidence(state.evidence, openApiWellKnownResult);
+    state.openApiWellKnown = openApiWellKnownResult;
+    if (isSuccessJson(openApiWellKnownResult)) {
+      state.openApiWellKnownUrl = openApiWellKnownUrl;
+      state.entrypoints.push(openApiWellKnownUrl);
+      if (!state.openApiUrl) {
+        state.openApiUrl = openApiWellKnownUrl;
+      }
+    }
+  } catch (error) {
+    state.notes.push(`openapi.json (well-known) fetch failed: ${String(error)}`);
+  }
+
   for (const path of DISCOVERY_ENDPOINTS) {
-    if (state.openApiUrl) break;
     const candidate = `${origin}${path}`;
+    if (candidate === openApiRootUrl || candidate === openApiWellKnownUrl) continue;
+    if (state.openApiUrl) break;
     try {
       const apiResult = await fetchOnce(candidate);
       recordEvidence(state.evidence, apiResult);
@@ -398,7 +528,12 @@ export async function evaluatePublic(
   const evidence = discovery.evidence;
 
   const primaryEntrypoint =
-    discovery.airUrl || discovery.serviceDescUrl || discovery.openApiUrl;
+    discovery.airRootUrl ||
+    discovery.airWellKnownUrl ||
+    discovery.serviceDescUrl ||
+    discovery.openApiRootUrl ||
+    discovery.openApiWellKnownUrl ||
+    discovery.openApiUrl;
   const docsUrl = discovery.docsUrl;
 
   let entrypointRepeat: RepeatFetchResult | undefined;
@@ -421,6 +556,130 @@ export async function evaluatePublic(
     }
   }
 
+  const airRootOk = isSuccessJson(discovery.airRoot);
+  const airWellKnownOk = isSuccessJson(discovery.airWellKnown);
+  const airManifest = parseJsonBody(discovery.airRoot) ?? parseJsonBody(discovery.airWellKnown);
+  const airMissingFields: string[] = [];
+  if (!getNestedString(airManifest, ["canonical_base_url"])) {
+    airMissingFields.push("canonical_base_url");
+  }
+  if (!getNestedString(airManifest, ["contact", "email"])) {
+    airMissingFields.push("contact.email");
+  }
+  if (!getNestedString(airManifest, ["legal", "terms_url"])) {
+    airMissingFields.push("legal.terms_url");
+  }
+  if (!getNestedString(airManifest, ["legal", "privacy_url"])) {
+    airMissingFields.push("legal.privacy_url");
+  }
+  if (!getNestedString(airManifest, ["verification", "discovery_audit_json"])) {
+    airMissingFields.push("verification.discovery_audit_json");
+  }
+  if (!getNestedString(airManifest, ["verification", "discovery_audit_html"])) {
+    airMissingFields.push("verification.discovery_audit_html");
+  }
+  if (!getNestedString(airManifest, ["callable_surface", "openapi"])) {
+    airMissingFields.push("callable_surface.openapi");
+  }
+  if (!getNestedString(airManifest, ["callable_surface", "mcp_endpoint"])) {
+    airMissingFields.push("callable_surface.mcp_endpoint");
+  }
+  if (!getNestedString(airManifest, ["llm_entrypoints", "llms_txt"])) {
+    airMissingFields.push("llm_entrypoints.llms_txt");
+  }
+  if (!getNestedString(airManifest, ["llm_entrypoints", "llms_full_txt"])) {
+    airMissingFields.push("llm_entrypoints.llms_full_txt");
+  }
+
+  const aiPluginOk = isSuccessJson(discovery.aiPlugin);
+  const aiPluginData = parseJsonBody(discovery.aiPlugin);
+  const aiPluginContact = getNestedString(aiPluginData, ["contact_email"]);
+  const aiPluginLegal = getNestedString(aiPluginData, ["legal_info_url"]);
+  const aiPluginLegalOk = aiPluginLegal
+    ? aiPluginLegal.toLowerCase().includes("/terms")
+    : false;
+
+  const openApiRootOk = isSuccessJson(discovery.openApiRoot);
+  const openApiWellKnownOk = isSuccessJson(discovery.openApiWellKnown);
+  const openApiData = parseJsonBody(discovery.openApiRoot);
+  const openApiVersion =
+    openApiData && typeof openApiData.openapi === "string" ? openApiData.openapi : "";
+  const openApiVersionOk = openApiVersion.startsWith("3.");
+  const requiredExamplePaths = [
+    "/api/public/v1/status/summary",
+    "/api/public/v1/incidents",
+    "/api/public/v1/providers",
+    "/api/public/v1/casual/status",
+  ];
+  const missingExamples: string[] = [];
+  if (openApiData && typeof openApiData === "object") {
+    const paths = (openApiData as Record<string, unknown>).paths as
+      | Record<string, unknown>
+      | undefined;
+    for (const path of requiredExamplePaths) {
+      const pathItem = paths ? (paths[path] as Record<string, unknown> | undefined) : undefined;
+      const getOp = pathItem ? (pathItem.get as Record<string, unknown> | undefined) : undefined;
+      const responses = getOp ? (getOp.responses as Record<string, unknown> | undefined) : undefined;
+      const okResponse = responses ? (responses["200"] as Record<string, unknown> | undefined) : undefined;
+      const content = okResponse ? (okResponse.content as Record<string, unknown> | undefined) : undefined;
+      let hasExample = false;
+      if (content) {
+        for (const [contentType, value] of Object.entries(content)) {
+          if (!contentType.includes("json") || !value || typeof value !== "object") {
+            continue;
+          }
+          const exampleValue = (value as Record<string, unknown>).example;
+          const examplesValue = (value as Record<string, unknown>).examples;
+          if (exampleValue || (examplesValue && Object.keys(examplesValue).length > 0)) {
+            hasExample = true;
+            break;
+          }
+        }
+      }
+      if (!hasExample) {
+        missingExamples.push(path);
+      }
+    }
+  } else {
+    missingExamples.push(...requiredExamplePaths);
+  }
+
+  const mcpUrl = `${origin}/mcp`;
+  let mcpGetResult: FetchResult | undefined;
+  let mcpInitResult: FetchResult | undefined;
+  try {
+    mcpGetResult = await fetchOnce(mcpUrl);
+    recordEvidence(evidence, mcpGetResult);
+  } catch (error) {
+    discovery.notes.push(`mcp GET failed: ${String(error)}`);
+  }
+  try {
+    const initPayload = JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {},
+    });
+    mcpInitResult = await fetchOnce(mcpUrl, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: initPayload,
+    });
+    recordEvidence(evidence, mcpInitResult, "POST");
+  } catch (error) {
+    discovery.notes.push(`mcp initialize failed: ${String(error)}`);
+  }
+  const mcpGetOk =
+    isSuccessStatus(mcpGetResult) && Boolean(mcpGetResult.bodyText?.trim());
+  const mcpInitData = parseJsonBody(mcpInitResult);
+  const mcpInitOk =
+    isSuccessStatus(mcpInitResult) &&
+    mcpInitData?.jsonrpc === "2.0" &&
+    typeof (mcpInitData as Record<string, unknown>).result === "object" &&
+    Boolean(
+      getNestedString(mcpInitData as Record<string, unknown>, ["result", "protocolVersion"])
+    );
+
   const checks: CheckResult[] = [];
 
   const hasEntrypoint = Boolean(primaryEntrypoint);
@@ -431,7 +690,7 @@ export async function evaluatePublic(
     summary: hasEntrypoint
       ? "Found at least one machine-readable entrypoint."
       : "No machine-readable entrypoints discovered.",
-    evidence: primaryEntrypoint ? [primaryEntrypoint] : [],
+    evidence: discovery.entrypoints.length ? discovery.entrypoints : [],
   });
 
   const entrypointStable = entrypointRepeat?.stable ?? false;
@@ -459,6 +718,42 @@ export async function evaluatePublic(
     evidence: primaryEntrypoint ? [primaryEntrypoint] : [],
   });
 
+  const openApiStatus =
+    openApiRootOk && openApiWellKnownOk && openApiVersionOk && missingExamples.length === 0
+      ? "pass"
+      : "fail";
+  const openApiSummary = openApiRootOk
+    ? openApiWellKnownOk
+      ? openApiVersionOk
+        ? missingExamples.length === 0
+          ? "OpenAPI is valid and includes required examples."
+          : `OpenAPI missing examples for: ${missingExamples.join(", ")}.`
+        : "OpenAPI is present but not version 3.x."
+      : "OpenAPI root found but /.well-known/openapi.json is missing."
+    : "OpenAPI root endpoint missing or invalid.";
+  const openApiEvidence = [`${origin}/openapi.json`, `${origin}/.well-known/openapi.json`];
+  checks.push({
+    id: "C2",
+    status: openApiStatus,
+    severity: "high",
+    summary: openApiSummary,
+    evidence: openApiEvidence,
+  });
+
+  const mcpStatus = mcpGetOk && mcpInitOk ? "pass" : "fail";
+  const mcpSummary = mcpGetOk
+    ? mcpInitOk
+      ? "MCP endpoint responds to GET and initialize."
+      : "MCP initialize did not return a valid JSON-RPC response."
+    : "MCP endpoint did not return explainer text.";
+  checks.push({
+    id: "C3",
+    status: mcpStatus,
+    severity: "high",
+    summary: mcpSummary,
+    evidence: [mcpUrl],
+  });
+
   let l1Status: CheckResult["status"] = "fail";
   if (docsRepeat) {
     if (!docsRepeat.ok) {
@@ -481,6 +776,35 @@ export async function evaluatePublic(
     evidence: docsUrl ? [docsUrl] : [],
   });
 
+  const airStatus = airRootOk && airWellKnownOk && airMissingFields.length === 0 ? "pass" : "fail";
+  const airSummary = airRootOk && airWellKnownOk
+    ? airMissingFields.length
+      ? `air.json missing required fields: ${airMissingFields.join(", ")}.`
+      : "air.json is present with required fields."
+    : "air.json endpoints missing or invalid.";
+  const airEvidence = [`${origin}/air.json`, `${origin}/.well-known/air.json`];
+  checks.push({
+    id: "T1",
+    status: airStatus,
+    severity: "high",
+    summary: airSummary,
+    evidence: airEvidence,
+  });
+
+  const aiPluginStatus = aiPluginOk && aiPluginContact && aiPluginLegalOk ? "pass" : "fail";
+  const aiPluginSummary = aiPluginOk
+    ? aiPluginContact && aiPluginLegalOk
+      ? "AI plugin metadata includes legal and contact fields."
+      : "AI plugin metadata missing legal or contact fields."
+    : "AI plugin manifest missing or invalid.";
+  checks.push({
+    id: "T2",
+    status: aiPluginStatus,
+    severity: "high",
+    summary: aiPluginSummary,
+    evidence: [`${origin}/.well-known/ai-plugin.json`],
+  });
+
   const entrypointConsistent = entrypointRepeat
     ? entrypointRepeat.ok && entrypointRepeat.stable
     : true;
@@ -500,6 +824,19 @@ export async function evaluatePublic(
 
   const profile = input.profile ?? "auto";
   const scores = aggregateScores(checks, profile);
+  const entrypoints = uniqueUrls([
+    `${origin}/air.json`,
+    `${origin}/.well-known/air.json`,
+    `${origin}/openapi.json`,
+    `${origin}/.well-known/openapi.json`,
+    discovery.serviceDescUrl,
+  ]);
+  const callable = uniqueUrls([
+    `${origin}/openapi.json`,
+    `${origin}/.well-known/openapi.json`,
+    mcpUrl,
+    `${origin}/.well-known/ai-plugin.json`,
+  ]);
 
   const result: EvaluationResult = {
     runId: "",
@@ -519,7 +856,8 @@ export async function evaluatePublic(
     },
     checks,
     evidenceIndex: {
-      entrypoints: discovery.entrypoints,
+      entrypoints,
+      callable,
       docs: docsUrl ? [docsUrl] : [],
       attestations: [],
     },

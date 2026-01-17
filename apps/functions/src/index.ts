@@ -207,11 +207,12 @@ const CHECK_FIXES: Record<string, string> = {
   D3: "Align URLs across air.json, OpenAPI, and docs.",
   D4: "Allow /.well-known, /openapi.*, and docs paths in robots.txt.",
   C2: "Publish a clear API description file with endpoints and examples.",
+  C3: "Ensure /mcp returns explainer text on GET and JSON-RPC initialize on POST.",
   L1: "Publish a public /docs page and link it from air.json.",
   L4: "Fix or remove broken docs links.",
   R3: "Remove random output (timestamps, IDs) from critical pages.",
-  T1: "Publish a simple verification file and link it in air.json.",
-  T2: "Sign the verification file or include clear ownership metadata.",
+  T1: "Fill all required fields in air.json (contact, legal, verification, callable).",
+  T2: "Ensure ai-plugin.json includes contact_email and a legal_info_url with /terms.",
 };
 
 const PILLAR_ACTIONS: Record<PillarKey, string[]> = {
@@ -228,8 +229,8 @@ const PILLAR_ACTIONS: Record<PillarKey, string[]> = {
     "Add llms.txt so agents can find the docs quickly.",
   ],
   trust: [
-    "Host a public verification file and link it from air.json.",
-    "Add contact and legal URLs in the ai-plugin file.",
+    "Complete air.json with contact, legal, and verification fields.",
+    "Add contact and legal URLs in ai-plugin.json.",
   ],
   reliability: [
     "Keep critical pages stable for the same inputs.",
