@@ -1,0 +1,90 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link, useParams } from "react-router-dom";
+import { fetchRun } from "@/lib/api";
+import { ScoreBadge } from "@/components/ScoreBadge";
+import { PillarBreakdown } from "@/components/PillarBreakdown";
+import { FailuresList } from "@/components/FailuresList";
+import { CopyLinks } from "@/components/CopyLinks";
+import { Badge } from "@/components/ui/badge";
+
+export function RunPage() {
+  const params = useParams();
+  const runId = params.runId ?? "";
+
+  const query = useQuery({
+    queryKey: ["run", runId],
+    queryFn: () => fetchRun(runId),
+    enabled: Boolean(runId),
+    refetchInterval: (query) =>
+      query.state.data?.status === "running" ? 2000 : false,
+  });
+
+  if (query.isLoading) {
+    return <div className="animate-fade-up text-sm text-muted-foreground">Loading run…</div>;
+  }
+
+  if (query.isError || !query.data) {
+    return (
+      <div className="animate-fade-up">
+        <p className="text-sm text-destructive">Run not found.</p>
+        <Link className="text-sm text-emerald-700" to="/">
+          Back to home
+        </Link>
+      </div>
+    );
+  }
+
+  const run = query.data;
+
+  return (
+    <div className="space-y-8 animate-fade-up">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-sm text-muted-foreground">Run</p>
+          <h1 className="text-3xl">{run.domain}</h1>
+        </div>
+        <Badge variant="outline">{run.status}</Badge>
+      </div>
+
+      {run.status === "running" ? (
+        <div className="rounded-2xl border border-border/60 bg-white/70 p-6 text-sm">
+          Evaluation in progress. We will refresh this page until it completes.
+        </div>
+      ) : null}
+      {run.status === "failed" ? (
+        <div className="rounded-2xl border border-destructive/40 bg-white/70 p-6 text-sm text-destructive">
+          Evaluation failed. Please retry or check the input URL.
+        </div>
+      ) : null}
+
+      {run.status === "complete" ? (
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-border/60 bg-white/70 p-6">
+              <ScoreBadge score={run.score} grade={run.grade} />
+              <p className="mt-2 text-sm text-muted-foreground">Public mode score for {run.domain}.</p>
+            </div>
+            <FailuresList checks={run.checks} />
+          </div>
+          <div className="space-y-6">
+            <PillarBreakdown pillarScores={run.pillarScores} />
+            <div className="rounded-2xl border border-border/60 bg-white/70 p-4">
+              <CopyLinks
+                reportUrl={run.artifacts?.reportUrl}
+                jsonUrl={run.artifacts?.jsonUrl}
+                evidenceUrl={run.artifacts?.evidenceBundleUrl}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="text-sm text-muted-foreground">
+        <span>View report:</span>{" "}
+        <Link className="text-emerald-700" to={`/reports/${run.domain}`}>
+          /reports/{run.domain}
+        </Link>
+      </div>
+    </div>
+  );
+}
