@@ -908,7 +908,7 @@ app.get("/reports/:domain", async (req, res) => {
   const html = renderReportHtml(baseUrl, domain, report);
   res.set("Content-Type", "text/html; charset=utf-8");
   res.set("Cache-Control", "public, max-age=300");
-  res.status(report ? 200 : 404).send(html);
+  res.status(200).send(html);
 });
 
 app.get("/v1/runs/:runId", async (req, res) => {
