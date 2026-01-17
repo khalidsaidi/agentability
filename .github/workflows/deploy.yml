@@ -1,0 +1,28 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.1
+      - run: pnpm install
+      - run: pnpm -C apps/web build
+      - run: pnpm -C apps/functions build
+      - name: Deploy to Firebase
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase.json
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" > "$GOOGLE_APPLICATION_CREDENTIALS"
+          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID"
