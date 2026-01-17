@@ -13,6 +13,9 @@ initializeApp();
 
 const db = getFirestore();
 const storage = getStorage();
+const evidenceBucketName =
+  process.env.EVIDENCE_BUCKET ||
+  (process.env.GCLOUD_PROJECT ? `${process.env.GCLOUD_PROJECT}-evidence` : undefined);
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
@@ -98,7 +101,7 @@ async function uploadEvidenceBundle(
   runId: string,
   evidence: unknown[]
 ): Promise<{ evidenceBundleUrl?: string; storagePath?: string }> {
-  const bucket = storage.bucket();
+  const bucket = evidenceBucketName ? storage.bucket(evidenceBucketName) : storage.bucket();
   const path = `evidence/${domain}/${runId}.jsonl`;
   const payload = evidence.map((record) => JSON.stringify(record)).join("\n");
   await bucket.file(path).save(payload, {
