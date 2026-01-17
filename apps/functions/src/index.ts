@@ -23,6 +23,8 @@ app.use(express.json({ limit: "1mb" }));
 const allowedPostOrigins = new Set([
   "https://agentability.org",
   "https://www.agentability.org",
+  "https://agentability-prod-jenfjn.web.app",
+  "https://agentability-prod-jenfjn.firebaseapp.com",
   "http://localhost:5173",
   "http://localhost:3000",
 ]);
@@ -149,15 +151,19 @@ app.post("/v1/evaluate", async (req, res) => {
       .doc(domain)
       .collection("runs")
       .doc(runId);
+    const runRootRef = db.collection("runs").doc(runId);
 
-    await runRef.set({
+    const baseRun = {
       runId,
       domain,
       mode: "public",
       status: "running",
       input: { origin },
       createdAt: new Date().toISOString(),
-    });
+    };
+
+    await runRef.set(baseRun);
+    await runRootRef.set(baseRun);
 
     const finalizeEvaluation = async (result: EvaluationResult, evidence: unknown[]) => {
       evaluation = { ...result, runId };
@@ -179,6 +185,7 @@ app.post("/v1/evaluate", async (req, res) => {
       };
 
       await runRef.set(evaluation, { merge: true });
+      await runRootRef.set(evaluation, { merge: true });
 
       await db.collection("evaluations").doc(result.domain).set(
         {
@@ -209,6 +216,16 @@ app.post("/v1/evaluate", async (req, res) => {
         .catch(async (error) => {
           logger.error("Evaluation failed (async)", error);
           await runRef.set(
+            {
+              runId,
+              domain,
+              status: "failed",
+              error: String(error),
+              completedAt: new Date().toISOString(),
+            },
+            { merge: true }
+          );
+          await runRootRef.set(
             {
               runId,
               domain,
@@ -259,23 +276,30 @@ app.post("/v1/evaluate", async (req, res) => {
       },
       { merge: true }
     );
+    await db
+      .collection("runs")
+      .doc(runId)
+      .set(
+        {
+          ...(evaluation ?? {}),
+          runId,
+          domain,
+          status: "failed",
+          error: String(error),
+          completedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
     return res.status(500).json({ error: "Evaluation failed" });
   }
 });
 
 app.get("/v1/runs/:runId", async (req, res) => {
   const runId = req.params.runId;
-  const snap = await db
-    .collectionGroup("runs")
-    .where("runId", "==", runId)
-    .limit(1)
-    .get();
-
-  if (snap.empty) {
+  const doc = await db.collection("runs").doc(runId).get();
+  if (!doc.exists) {
     return res.status(404).json({ error: "Run not found" });
   }
-
-  const doc = snap.docs[0];
   return res.json(doc.data());
 });
 
