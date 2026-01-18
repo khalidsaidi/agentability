@@ -253,6 +253,9 @@ function formatPoints(value: number | undefined): string {
 export function ReportPage() {
   const params = useParams();
   const domain = params.domain ?? "";
+  const normalizedDomain = domain.trim().toLowerCase();
+  const isShowcase =
+    normalizedDomain === "aistatusdashboard.com" || normalizedDomain === "www.aistatusdashboard.com";
 
   const query = useQuery({
     queryKey: ["report", domain],
@@ -371,10 +374,19 @@ export function ReportPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-muted-foreground">Report</p>
-          <h1 className="text-3xl">{report.domain}</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-3xl">{report.domain}</h1>
+            {isShowcase ? <Badge variant="outline">Showcase example</Badge> : null}
+          </div>
         </div>
         <ScoreBadge score={report.score} grade={report.grade} />
       </div>
+
+      {isShowcase ? (
+        <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4 text-sm text-emerald-900">
+          This report is a public demo to showcase Agentability scoring and recommendations.
+        </div>
+      ) : null}
 
       <div className="rounded-2xl border border-border/60 bg-white/70 p-4">
         <CopyLinks

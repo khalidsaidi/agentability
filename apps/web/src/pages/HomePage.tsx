@@ -65,6 +65,21 @@ export function HomePage() {
         error={mutation.isError ? (mutation.error instanceof Error ? mutation.error.message : "Request failed") : null}
       />
 
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>Showcase evaluation</CardTitle>
+          <CardDescription>See the public demo report for aistatusdashboard.com.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <a
+            className="text-sm font-medium text-emerald-700 hover:text-emerald-900"
+            href="/reports/aistatusdashboard.com"
+          >
+            View the example report →
+          </a>
+        </CardContent>
+      </Card>
+
       <Alert className="border-border/60 bg-white/70">
         <AlertTitle>Public mode only</AlertTitle>
         <AlertDescription>

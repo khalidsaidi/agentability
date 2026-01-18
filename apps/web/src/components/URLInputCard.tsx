@@ -21,6 +21,13 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Want a quick demo? Try{" "}
+          <a className="font-medium text-emerald-700 hover:text-emerald-900" href="/reports/aistatusdashboard.com">
+            the showcase report
+          </a>
+          .
+        </p>
         <form
           className="flex flex-col gap-4 sm:flex-row"
           onSubmit={(event) => {
