@@ -25,7 +25,7 @@ async function main(): Promise<void> {
   }
 
   const scriptSrc =
-    matchFirst(html, /<script[^>]+src="([^"]+)"[^>]*><\/script>/) ?? "";
+    matchFirst(html, /<script[^>]+type="module"[^>]+src="([^"]+)"[^>]*><\/script>/) ?? "";
   const cssHref =
     matchFirst(html, /<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/) ?? null;
 
