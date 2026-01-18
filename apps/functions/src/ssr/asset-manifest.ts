@@ -1,4 +1,4 @@
 export const SSR_ASSETS = {
-  "scriptSrc": "https://www.googletagmanager.com/gtag/js?id=G-55RKNLGPNT",
+  "scriptSrc": "/assets/index-BwWXd1jY.js",
   "cssHref": "/assets/index-DXsQJ1HL.css"
 } as const;
