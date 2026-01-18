@@ -261,6 +261,9 @@ function escapeHtml(value: string): string {
 }
 
 function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationResult): string {
+  const normalizedDomain = domain.trim().toLowerCase();
+  const isShowcase =
+    normalizedDomain === "aistatusdashboard.com" || normalizedDomain === "www.aistatusdashboard.com";
   const canonicalUrl = `${baseUrl}/reports/${encodeURIComponent(domain)}`;
   const ogImage = `${baseUrl}/og.png`;
   const status = report?.status ?? "missing";
@@ -392,7 +395,10 @@ function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationRe
     <style>
       body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 32px; background: #f8fafc; color: #0f172a; }
       .card { max-width: 880px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08); }
+      .headline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
       h1 { margin: 0 0 8px; font-size: 28px; }
+      .badge { display: inline-flex; align-items: center; border: 1px solid #cbd5f5; color: #1e293b; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; background: #f8fafc; }
+      .notice { margin: 12px 0 0; border: 1px solid #bbf7d0; background: #ecfdf3; color: #065f46; padding: 12px 14px; border-radius: 12px; font-size: 14px; }
       h2 { margin: 24px 0 8px; font-size: 18px; }
       p { margin: 6px 0; line-height: 1.5; }
       ul { padding-left: 20px; }
@@ -409,7 +415,15 @@ function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationRe
     <div id="root">
       <div class="card">
         <p class="meta">${SITE_NAME} report</p>
-        <h1>${escapeHtml(domain)}</h1>
+        <div class="headline">
+          <h1>${escapeHtml(domain)}</h1>
+          ${isShowcase ? '<span class="badge">Showcase example</span>' : ""}
+        </div>
+        ${
+          isShowcase
+            ? "<div class=\"notice\">This report is a public demo to showcase Agentability scoring and recommendations.</div>"
+            : ""
+        }
         ${
           hasReport
             ? `<p class="score">Score ${score}/100 (${escapeHtml(grade || "N/A")})</p>`
