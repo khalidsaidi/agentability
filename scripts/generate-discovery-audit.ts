@@ -70,6 +70,21 @@ function toSha256(buffer: Buffer): string {
   return crypto.createHash("sha256").update(buffer).digest("hex");
 }
 
+function contentTypeMatches(expected: string, actual: string | null | undefined): boolean {
+  if (!actual) return false;
+  const expectedLower = expected.toLowerCase();
+  const actualLower = actual.toLowerCase();
+  if (expectedLower === actualLower) return true;
+  const expectedType = expectedLower.split(";")[0]?.trim();
+  const actualType = actualLower.split(";")[0]?.trim();
+  if (!expectedType || expectedType !== actualType) return false;
+  if (expectedLower.includes("charset=")) {
+    const expectedCharset = expectedLower.split("charset=")[1]?.trim();
+    return expectedCharset ? actualLower.includes(`charset=${expectedCharset}`) : true;
+  }
+  return true;
+}
+
 async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -153,11 +168,12 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         baseUrls.map(async (baseUrl) => {
           try {
             const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
+            const contentType = response.headers.get("content-type") ?? undefined;
             return {
               base_url: baseUrl,
               status: response.status,
-              content_type: response.headers.get("content-type") ?? undefined,
-              ok: response.ok,
+              content_type: contentType,
+              ok: response.ok && contentTypeMatches(surface.expectedContentType, contentType),
             };
           } catch (error) {
             return {
@@ -193,11 +209,12 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         baseUrls.map(async (baseUrl) => {
           try {
             const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
+            const contentType = response.headers.get("content-type") ?? undefined;
             return {
               base_url: baseUrl,
               status: response.status,
-              content_type: response.headers.get("content-type") ?? undefined,
-              ok: response.ok,
+              content_type: contentType,
+              ok: response.ok && contentTypeMatches(surface.expectedContentType, contentType),
             };
           } catch (error) {
             return {
