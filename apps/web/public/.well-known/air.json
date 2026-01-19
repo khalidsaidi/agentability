@@ -1,14 +1,30 @@
 {
   "spec_version": "1.0",
+  "canonical_base_url": "https://agentability.org",
   "product": {
     "name": "Agentability",
     "description": "Public-mode agent readiness evaluator: discoverability, callable surface quality, ingestion quality, trust, reliability.",
     "home_url": "https://agentability.org"
   },
+  "contact": {
+    "email": "hello@agentability.org"
+  },
+  "legal": {
+    "terms_url": "https://agentability.org/legal/terms.md",
+    "privacy_url": "https://agentability.org/legal/privacy.md"
+  },
   "entrypoints": {
     "web_app": "https://agentability.org",
     "report_ui": "https://agentability.org/reports/{domain}",
     "api_base": "https://agentability.org/v1"
+  },
+  "callable_surface": {
+    "openapi": "https://agentability.org/.well-known/openapi.json",
+    "mcp_endpoint": "https://agentability.org/mcp"
+  },
+  "llm_entrypoints": {
+    "llms_txt": "https://agentability.org/llms.txt",
+    "llms_full_txt": "https://agentability.org/llms-full.txt"
   },
   "openapi": {
     "json": "https://agentability.org/.well-known/openapi.json",
@@ -22,7 +38,8 @@
   },
   "verification": {
     "discovery_audit_latest": "https://agentability.org/discovery/audit/latest.json",
-    "discovery_audit_html": "https://agentability.org/discovery/audit"
+    "discovery_audit_html": "https://agentability.org/discovery/audit",
+    "discovery_audit_json": "https://agentability.org/discovery/audit/latest.json"
   },
   "limits": {
     "public_mode_only": true,

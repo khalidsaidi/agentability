@@ -16,6 +16,13 @@ type AuditFile = {
   live_content_type?: string;
   live_ok?: boolean;
   live_error?: string;
+  live_checks?: {
+    base_url: string;
+    status: number;
+    content_type?: string;
+    ok: boolean;
+    error?: string;
+  }[];
 };
 
 type DiscoveryAudit = {
@@ -32,6 +39,7 @@ type DiscoveryAudit = {
     missing: string[];
     unreachable: string[];
   };
+  live_sources: string[];
   files: AuditFile[];
 };
 
@@ -48,6 +56,8 @@ const requiredSurfaces: Surface[] = [
   { path: "/docs/api.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/spec.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/status.md", expectedContentType: "text/markdown; charset=utf-8" },
+  { path: "/legal/terms.md", expectedContentType: "text/markdown; charset=utf-8" },
+  { path: "/legal/privacy.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/discovery/audit/index.html", expectedContentType: "text/html; charset=utf-8" },
   { path: "/robots.txt", expectedContentType: "text/plain; charset=utf-8" },
   { path: "/sitemap.xml", expectedContentType: "application/xml; charset=utf-8" },
@@ -110,7 +120,10 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   const publicDir = path.join(repoRoot, "apps/web/public");
   const auditDir = path.join(publicDir, "discovery/audit");
   await fs.mkdir(auditDir, { recursive: true });
-  const baseUrl = process.env.DISCOVERY_AUDIT_BASE_URL ?? "https://agentability.org";
+  const baseUrls = (process.env.DISCOVERY_AUDIT_BASE_URLS ?? "https://agentability.org,https://agentability-prod-jenfjn.web.app,https://agentability-prod-jenfjn.firebaseapp.com")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
 
   const htmlPath = path.join(auditDir, "index.html");
   await fs.writeFile(htmlPath, buildIndexHtml(), "utf8");
@@ -136,18 +149,35 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         bytes: buffer.byteLength,
         sha256: toSha256(buffer),
       };
-      try {
-        const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
-        entry.live_status = response.status;
-        entry.live_content_type = response.headers.get("content-type") ?? undefined;
-        entry.live_ok = response.ok;
-        if (!response.ok) {
-          unreachable.push(surface.path);
-        }
-      } catch (error) {
-        entry.live_status = 0;
-        entry.live_ok = false;
-        entry.live_error = error instanceof Error ? error.message : "fetch_failed";
+      const checks = await Promise.all(
+        baseUrls.map(async (baseUrl) => {
+          try {
+            const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
+            return {
+              base_url: baseUrl,
+              status: response.status,
+              content_type: response.headers.get("content-type") ?? undefined,
+              ok: response.ok,
+            };
+          } catch (error) {
+            return {
+              base_url: baseUrl,
+              status: 0,
+              ok: false,
+              error: error instanceof Error ? error.message : "fetch_failed",
+            };
+          }
+        })
+      );
+      entry.live_checks = checks;
+      const primary = checks[0];
+      if (primary) {
+        entry.live_status = primary.status;
+        entry.live_content_type = primary.content_type;
+        entry.live_ok = primary.ok;
+        entry.live_error = primary.error;
+      }
+      if (checks.some((check) => !check.ok)) {
         unreachable.push(surface.path);
       }
       files.push(entry);
@@ -159,18 +189,35 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         bytes: 0,
         sha256: "",
       };
-      try {
-        const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
-        entry.live_status = response.status;
-        entry.live_content_type = response.headers.get("content-type") ?? undefined;
-        entry.live_ok = response.ok;
-        if (!response.ok) {
-          unreachable.push(surface.path);
-        }
-      } catch (error) {
-        entry.live_status = 0;
-        entry.live_ok = false;
-        entry.live_error = error instanceof Error ? error.message : "fetch_failed";
+      const checks = await Promise.all(
+        baseUrls.map(async (baseUrl) => {
+          try {
+            const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
+            return {
+              base_url: baseUrl,
+              status: response.status,
+              content_type: response.headers.get("content-type") ?? undefined,
+              ok: response.ok,
+            };
+          } catch (error) {
+            return {
+              base_url: baseUrl,
+              status: 0,
+              ok: false,
+              error: error instanceof Error ? error.message : "fetch_failed",
+            };
+          }
+        })
+      );
+      entry.live_checks = checks;
+      const primary = checks[0];
+      if (primary) {
+        entry.live_status = primary.status;
+        entry.live_content_type = primary.content_type;
+        entry.live_ok = primary.ok;
+        entry.live_error = primary.error;
+      }
+      if (checks.some((check) => !check.ok)) {
         unreachable.push(surface.path);
       }
       files.push(entry);
@@ -191,6 +238,7 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
       missing,
       unreachable,
     },
+    live_sources: baseUrls,
     files,
   };
 

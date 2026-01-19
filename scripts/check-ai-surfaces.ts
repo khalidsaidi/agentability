@@ -24,6 +24,8 @@ const requiredPaths = [
   "/docs/api.md",
   "/spec.md",
   "/status.md",
+  "/legal/terms.md",
+  "/legal/privacy.md",
   "/discovery/audit/index.html",
   "/robots.txt",
   "/sitemap.xml",
