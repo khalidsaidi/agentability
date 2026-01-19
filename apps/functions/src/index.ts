@@ -782,6 +782,18 @@ app.get("/v1/evaluate", (_req, res) => {
   });
 });
 
+app.get("/v1", (_req, res) => {
+  return res.json({
+    endpoints: {
+      evaluate: { method: "POST", path: "/v1/evaluate" },
+      runStatus: { method: "GET", path: "/v1/runs/{runId}" },
+      latest: { method: "GET", path: "/v1/evaluations/{domain}/latest.json" },
+      report: { method: "GET", path: "/reports/{domain}" },
+      mcp: { method: "POST", path: "/mcp" },
+    },
+  });
+});
+
 app.get("/mcp", (_req, res) => {
   res.set("Content-Type", "text/plain; charset=utf-8");
   return res.status(200).send(
