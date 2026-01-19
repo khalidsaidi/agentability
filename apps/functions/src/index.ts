@@ -775,6 +775,20 @@ app.post("/v1/evaluate", async (req, res) => {
   return res.json(outcome.result);
 });
 
+app.get("/v1/evaluate", (_req, res) => {
+  return res.json({
+    message: "Use POST /v1/evaluate with a JSON body.",
+    example: { origin: "https://example.com", profile: "auto" },
+  });
+});
+
+app.get("/mcp", (_req, res) => {
+  res.set("Content-Type", "text/plain; charset=utf-8");
+  return res.status(200).send(
+    "Agentability MCP endpoint. POST JSON-RPC to /mcp to initialize and call tools."
+  );
+});
+
 app.post("/mcp", async (req, res) => {
   const payload = req.body ?? {};
   if (!isJsonRpcRequest(payload)) {
