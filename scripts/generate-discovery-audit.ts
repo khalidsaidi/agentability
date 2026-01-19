@@ -22,7 +22,12 @@ type AuditFile = {
     content_type?: string;
     ok: boolean;
     error?: string;
+    sha256?: string;
+    bytes?: number;
   }[];
+  live_sha256?: string;
+  live_bytes?: number;
+  live_hash_match?: boolean;
 };
 
 type DiscoveryAudit = {
@@ -38,6 +43,7 @@ type DiscoveryAudit = {
     status: "pass" | "fail";
     missing: string[];
     unreachable: string[];
+    hash_mismatch: string[];
   };
   live_sources: string[];
   files: AuditFile[];
@@ -150,6 +156,7 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   const files: AuditFile[] = [];
   const missing: string[] = [];
   const unreachable: string[] = [];
+  const hashMismatch: string[] = [];
   const liveCheckedAt = new Date().toISOString();
 
   for (const surface of requiredSurfaces) {
@@ -169,11 +176,16 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
           try {
             const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
             const contentType = response.headers.get("content-type") ?? undefined;
+            const body = await response.arrayBuffer();
+            const bytes = body.byteLength;
+            const sha256 = toSha256(Buffer.from(body));
             return {
               base_url: baseUrl,
               status: response.status,
               content_type: contentType,
               ok: response.ok && contentTypeMatches(surface.expectedContentType, contentType),
+              sha256,
+              bytes,
             };
           } catch (error) {
             return {
@@ -192,9 +204,18 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         entry.live_content_type = primary.content_type;
         entry.live_ok = primary.ok;
         entry.live_error = primary.error;
+        entry.live_sha256 = primary.sha256;
+        entry.live_bytes = primary.bytes;
       }
       if (checks.some((check) => !check.ok)) {
         unreachable.push(surface.path);
+      }
+      const liveHashes = checks.map((check) => check.sha256).filter(Boolean) as string[];
+      if (liveHashes.length && new Set(liveHashes).size > 1) {
+        entry.live_hash_match = false;
+        hashMismatch.push(surface.path);
+      } else if (liveHashes.length) {
+        entry.live_hash_match = true;
       }
       files.push(entry);
     } catch (error) {
@@ -210,11 +231,16 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
           try {
             const response = await fetchWithTimeout(`${baseUrl}${surface.path}`, 8000);
             const contentType = response.headers.get("content-type") ?? undefined;
+            const body = await response.arrayBuffer();
+            const bytes = body.byteLength;
+            const sha256 = toSha256(Buffer.from(body));
             return {
               base_url: baseUrl,
               status: response.status,
               content_type: contentType,
               ok: response.ok && contentTypeMatches(surface.expectedContentType, contentType),
+              sha256,
+              bytes,
             };
           } catch (error) {
             return {
@@ -233,9 +259,18 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         entry.live_content_type = primary.content_type;
         entry.live_ok = primary.ok;
         entry.live_error = primary.error;
+        entry.live_sha256 = primary.sha256;
+        entry.live_bytes = primary.bytes;
       }
       if (checks.some((check) => !check.ok)) {
         unreachable.push(surface.path);
+      }
+      const liveHashes = checks.map((check) => check.sha256).filter(Boolean) as string[];
+      if (liveHashes.length && new Set(liveHashes).size > 1) {
+        entry.live_hash_match = false;
+        hashMismatch.push(surface.path);
+      } else if (liveHashes.length) {
+        entry.live_hash_match = true;
       }
       files.push(entry);
     }
@@ -254,6 +289,7 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
       status: missing.length === 0 && unreachable.length === 0 ? "pass" : "fail",
       missing,
       unreachable,
+      hash_mismatch: hashMismatch,
     },
     live_sources: baseUrls,
     files,
