@@ -40,10 +40,11 @@ type DiscoveryAudit = {
   };
   score_target: number;
   discoverability_health: {
-    status: "pass" | "fail";
+    status: "pass" | "degraded" | "fail";
     missing: string[];
     unreachable: string[];
-    hash_mismatch: string[];
+    hash_mismatch_required: string[];
+    hash_mismatch_optional: string[];
   };
   live_sources: string[];
   files: AuditFile[];
@@ -68,6 +69,9 @@ const requiredSurfaces: Surface[] = [
   { path: "/robots.txt", expectedContentType: "text/plain; charset=utf-8" },
   { path: "/sitemap.xml", expectedContentType: "application/xml; charset=utf-8" },
   { path: "/rss.xml", expectedContentType: "application/rss+xml; charset=utf-8" },
+];
+
+const optionalSurfaces: Surface[] = [
   { path: "/logo.png", expectedContentType: "image/png" },
   { path: "/og.png", expectedContentType: "image/png" },
 ];
@@ -156,10 +160,14 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   const files: AuditFile[] = [];
   const missing: string[] = [];
   const unreachable: string[] = [];
-  const hashMismatch: string[] = [];
+  const hashMismatchRequired: string[] = [];
+  const hashMismatchOptional: string[] = [];
   const liveCheckedAt = new Date().toISOString();
 
-  for (const surface of requiredSurfaces) {
+  const allSurfaces = [...requiredSurfaces, ...optionalSurfaces];
+  const optionalPaths = new Set(optionalSurfaces.map((surface) => surface.path));
+
+  for (const surface of allSurfaces) {
     const relativePath = surface.path.replace(/^\//, "");
     const absolutePath = path.join(publicDir, relativePath);
 
@@ -213,7 +221,11 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
       const liveHashes = checks.map((check) => check.sha256).filter(Boolean) as string[];
       if (liveHashes.length && new Set(liveHashes).size > 1) {
         entry.live_hash_match = false;
-        hashMismatch.push(surface.path);
+        if (optionalPaths.has(surface.path)) {
+          hashMismatchOptional.push(surface.path);
+        } else {
+          hashMismatchRequired.push(surface.path);
+        }
       } else if (liveHashes.length) {
         entry.live_hash_match = true;
       }
@@ -268,13 +280,26 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
       const liveHashes = checks.map((check) => check.sha256).filter(Boolean) as string[];
       if (liveHashes.length && new Set(liveHashes).size > 1) {
         entry.live_hash_match = false;
-        hashMismatch.push(surface.path);
+        if (optionalPaths.has(surface.path)) {
+          hashMismatchOptional.push(surface.path);
+        } else {
+          hashMismatchRequired.push(surface.path);
+        }
       } else if (liveHashes.length) {
         entry.live_hash_match = true;
       }
       files.push(entry);
     }
   }
+
+  const baseStatus = missing.length === 0 && unreachable.length === 0;
+  const hasRequiredDrift = hashMismatchRequired.length > 0;
+  const hasOptionalDrift = hashMismatchOptional.length > 0;
+  const status: DiscoveryAudit["discoverability_health"]["status"] = !baseStatus || hasRequiredDrift
+    ? "fail"
+    : hasOptionalDrift
+    ? "degraded"
+    : "pass";
 
   const audit: DiscoveryAudit = {
     generated_at: new Date().toISOString(),
@@ -286,10 +311,11 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
     },
     score_target: 100,
     discoverability_health: {
-      status: missing.length === 0 && unreachable.length === 0 ? "pass" : "fail",
+      status,
       missing,
       unreachable,
-      hash_mismatch: hashMismatch,
+      hash_mismatch_required: hashMismatchRequired,
+      hash_mismatch_optional: hashMismatchOptional,
     },
     live_sources: baseUrls,
     files,
