@@ -33,6 +33,7 @@ type AuditFile = {
 type DiscoveryAudit = {
   generated_at: string;
   live_checked_at?: string;
+  strict_pretty: boolean;
   spec_version: string;
   engine: {
     name: string;
@@ -46,6 +47,8 @@ type DiscoveryAudit = {
     hash_mismatch_required: string[];
     hash_mismatch_optional: string[];
   };
+  required_surfaces: string[];
+  optional_surfaces: string[];
   live_sources: string[];
   files: AuditFile[];
 };
@@ -151,6 +154,14 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
+  const strictPretty = (process.env.DISCOVERY_AUDIT_STRICT_PRETTY ?? "0") === "1";
+  const prettyAuditPath = "/discovery/audit/latest.pretty.json";
+  const effectiveRequired = strictPretty
+    ? [...requiredSurfaces, ...optionalSurfaces.filter((surface) => surface.path === prettyAuditPath)]
+    : requiredSurfaces;
+  const effectiveOptional = strictPretty
+    ? optionalSurfaces.filter((surface) => surface.path !== prettyAuditPath)
+    : optionalSurfaces;
 
   const htmlPath = path.join(auditDir, "index.html");
   await fs.writeFile(htmlPath, buildIndexHtml(), "utf8");
@@ -166,8 +177,8 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   const hashMismatchOptional: string[] = [];
   const liveCheckedAt = new Date().toISOString();
 
-  const allSurfaces = [...requiredSurfaces, ...optionalSurfaces];
-  const optionalPaths = new Set(optionalSurfaces.map((surface) => surface.path));
+  const allSurfaces = [...effectiveRequired, ...effectiveOptional];
+  const optionalPaths = new Set(effectiveOptional.map((surface) => surface.path));
 
   for (const surface of allSurfaces) {
     const relativePath = surface.path.replace(/^\//, "");
@@ -306,6 +317,7 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   const audit: DiscoveryAudit = {
     generated_at: new Date().toISOString(),
     live_checked_at: liveCheckedAt,
+    strict_pretty: strictPretty,
     spec_version: "1.0",
     engine: {
       name: "agentability",
@@ -319,6 +331,8 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
       hash_mismatch_required: hashMismatchRequired,
       hash_mismatch_optional: hashMismatchOptional,
     },
+    required_surfaces: effectiveRequired.map((surface) => surface.path),
+    optional_surfaces: effectiveOptional.map((surface) => surface.path),
     live_sources: baseUrls,
     files,
   };
