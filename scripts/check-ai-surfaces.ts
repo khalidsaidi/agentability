@@ -26,6 +26,7 @@ const requiredPaths = [
   "/status.md",
   "/legal/terms.md",
   "/legal/privacy.md",
+  "/discovery/audit/latest.pretty.json",
   "/discovery/audit/index.html",
   "/robots.txt",
   "/sitemap.xml",

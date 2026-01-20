@@ -65,6 +65,7 @@ const requiredSurfaces: Surface[] = [
   { path: "/status.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/legal/terms.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/legal/privacy.md", expectedContentType: "text/markdown; charset=utf-8" },
+  { path: "/discovery/audit/latest.pretty.json", expectedContentType: "application/json; charset=utf-8" },
   { path: "/discovery/audit/index.html", expectedContentType: "text/html; charset=utf-8" },
   { path: "/robots.txt", expectedContentType: "text/plain; charset=utf-8" },
   { path: "/sitemap.xml", expectedContentType: "application/xml; charset=utf-8" },
@@ -124,6 +125,7 @@ function buildIndexHtml(): string {
   <div class="card">
     <h1>Discovery Audit</h1>
     <p>Machine-readable JSON: <a href="./latest.json">latest.json</a></p>
+    <p>Human-readable JSON: <a href="./latest.pretty.json">latest.pretty.json</a></p>
     <pre id="audit"></pre>
   </div>
   <script>
@@ -322,7 +324,9 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   };
 
   const auditPath = path.join(auditDir, "latest.json");
-  await fs.writeFile(auditPath, JSON.stringify(audit, null, 2) + "\n", "utf8");
+  const prettyPath = path.join(auditDir, "latest.pretty.json");
+  await fs.writeFile(auditPath, JSON.stringify(audit) + "\n", "utf8");
+  await fs.writeFile(prettyPath, JSON.stringify(audit, null, 2) + "\n", "utf8");
 
   return audit;
 }
