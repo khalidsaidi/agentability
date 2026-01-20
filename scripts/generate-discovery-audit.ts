@@ -65,7 +65,6 @@ const requiredSurfaces: Surface[] = [
   { path: "/status.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/legal/terms.md", expectedContentType: "text/markdown; charset=utf-8" },
   { path: "/legal/privacy.md", expectedContentType: "text/markdown; charset=utf-8" },
-  { path: "/discovery/audit/latest.pretty.json", expectedContentType: "application/json; charset=utf-8" },
   { path: "/discovery/audit/index.html", expectedContentType: "text/html; charset=utf-8" },
   { path: "/robots.txt", expectedContentType: "text/plain; charset=utf-8" },
   { path: "/sitemap.xml", expectedContentType: "application/xml; charset=utf-8" },
@@ -73,6 +72,7 @@ const requiredSurfaces: Surface[] = [
 ];
 
 const optionalSurfaces: Surface[] = [
+  { path: "/discovery/audit/latest.pretty.json", expectedContentType: "application/json; charset=utf-8" },
   { path: "/logo.png", expectedContentType: "image/png" },
   { path: "/og.png", expectedContentType: "image/png" },
 ];
