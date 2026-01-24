@@ -318,7 +318,7 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
     generated_at: new Date().toISOString(),
     live_checked_at: liveCheckedAt,
     strict_pretty: strictPretty,
-    spec_version: "1.0",
+    spec_version: "1.2",
     engine: {
       name: "agentability",
       version: engineVersion,

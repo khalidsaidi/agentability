@@ -10,6 +10,7 @@ import {
 import { FetchResult, safeFetch, SafeFetchOptions } from "./ssrf";
 
 const ENGINE_VERSION = "0.1.0";
+const SPEC_VERSION = "1.2";
 
 type Pillar = "discovery" | "callableSurface" | "llmIngestion" | "trust" | "reliability";
 
@@ -865,6 +866,7 @@ export async function evaluatePublic(
     engine: {
       version: ENGINE_VERSION,
       rulesetHash: buildRulesetHash(),
+      specVersion: SPEC_VERSION,
     },
     createdAt,
     completedAt: new Date().toISOString(),

@@ -12,12 +12,15 @@ Agentability evaluates public-facing agent readiness signals: discovery, callabl
 
 - Report UI: https://agentability.org/reports/{domain}
 - Latest JSON: https://agentability.org/v1/evaluations/{domain}/latest.json
+- Badge: https://agentability.org/badge/{domain}.svg
+- Certificate: https://agentability.org/cert/{domain}
 
 ## API
 
 - POST https://agentability.org/v1/evaluate
 - GET  https://agentability.org/v1/runs/{runId}
 - POST https://agentability.org/mcp (MCP JSON-RPC)
+- GET  https://agentability.org/badge/{domain}.svg
 
 See https://agentability.org/docs/api.md for full request and response details.
 
