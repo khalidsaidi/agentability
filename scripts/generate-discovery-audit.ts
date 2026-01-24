@@ -72,10 +72,18 @@ const requiredSurfaces: Surface[] = [
   { path: "/robots.txt", expectedContentType: "text/plain; charset=utf-8" },
   { path: "/sitemap.xml", expectedContentType: "application/xml; charset=utf-8" },
   { path: "/rss.xml", expectedContentType: "application/rss+xml; charset=utf-8" },
+  { path: "/logo.svg", expectedContentType: "image/svg+xml" },
 ];
 
 const optionalSurfaces: Surface[] = [
   { path: "/discovery/audit/latest.pretty.json", expectedContentType: "application/json; charset=utf-8" },
+  { path: "/logo-mark.svg", expectedContentType: "image/svg+xml" },
+  { path: "/favicon.svg", expectedContentType: "image/svg+xml" },
+  { path: "/brand/logo.svg", expectedContentType: "image/svg+xml" },
+  { path: "/brand/logo-mark.svg", expectedContentType: "image/svg+xml" },
+  { path: "/brand/favicon.svg", expectedContentType: "image/svg+xml" },
+  { path: "/brand/seal.svg", expectedContentType: "image/svg+xml" },
+  { path: "/cert-seal.svg", expectedContentType: "image/svg+xml" },
   { path: "/logo.png", expectedContentType: "image/png" },
   { path: "/og.png", expectedContentType: "image/png" },
 ];

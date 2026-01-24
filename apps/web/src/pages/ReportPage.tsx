@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { BadgeEmbed } from "@/components/share/BadgeEmbed";
 
 const PILLAR_LABELS = {
   discovery: "Discovery",
@@ -383,10 +384,7 @@ export function ReportPage() {
   ];
   const uniqueActions = Array.from(new Set(improvementActions)).slice(0, 6);
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://agentability.org";
-  const badgeUrl = `${baseUrl}/badge/${report.domain}.svg`;
   const certUrl = `${baseUrl}/cert/${report.domain}`;
-  const reportUrl = report.artifacts?.reportUrl ?? `${baseUrl}/reports/${report.domain}`;
-  const badgeEmbedSnippet = `<a href="${reportUrl}"><img src="${badgeUrl}" alt="Agentability score for ${report.domain}" /></a>`;
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -421,24 +419,12 @@ export function ReportPage() {
           <CardDescription>Embed your Agentability score anywhere.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <img src={badgeUrl} alt={`Agentability badge for ${report.domain}`} className="h-10" />
-            <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" size="sm" asChild>
-                <a href={certUrl}>View certificate</a>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void navigator.clipboard?.writeText(badgeEmbedSnippet)}
-              >
-                Copy embed HTML
-              </Button>
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Button variant="secondary" size="sm" asChild>
+              <a href={certUrl}>View certificate</a>
+            </Button>
           </div>
-          <code className="block rounded-lg border border-border/60 bg-white/70 p-3 text-xs text-foreground">
-            {badgeEmbedSnippet}
-          </code>
+          <BadgeEmbed domain={report.domain} />
         </CardContent>
       </Card>
 

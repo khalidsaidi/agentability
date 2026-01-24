@@ -14,13 +14,13 @@ function App() {
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-foreground text-background">
-              A
-            </div>
+          <Link to="/" className="flex items-center gap-3 text-foreground">
+            <img src="/logo-mark.svg" alt="Agentability" className="h-10 w-10" />
             <div>
-              <div className="text-lg font-semibold">Agentability</div>
-              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Readiness Lab</div>
+              <div className="text-lg font-semibold tracking-tight">agentability</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Verified readiness standard
+              </div>
             </div>
           </Link>
           <div className="flex items-center gap-3">
