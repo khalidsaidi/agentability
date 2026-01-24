@@ -75,7 +75,9 @@ export async function fetchLatest(domain: string): Promise<LatestEvaluation> {
 
 export async function fetchDiscoveryAudit(): Promise<DiscoveryAudit> {
   const base =
-    SITE_BASE || (typeof window !== "undefined" ? window.location.origin : "");
+    typeof window !== "undefined" && window.location.origin
+      ? window.location.origin
+      : SITE_BASE;
   const response = await fetch(`${base}/discovery/audit/latest.pretty.json`);
   if (!response.ok) {
     throw new Error("Audit not available");
