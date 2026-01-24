@@ -31,6 +31,21 @@ export const CheckResultSchema = z.object({
 });
 export type CheckResult = z.infer<typeof CheckResultSchema>;
 
+export const DiffIssueSchema = z.object({
+  checkId: z.string(),
+  from: CheckStatusSchema.nullable(),
+  to: CheckStatusSchema,
+  severity: CheckSeveritySchema,
+});
+export type DiffIssue = z.infer<typeof DiffIssueSchema>;
+
+export const DiffChangeSchema = z.object({
+  checkId: z.string(),
+  from: CheckStatusSchema.nullable(),
+  to: CheckStatusSchema,
+});
+export type DiffChange = z.infer<typeof DiffChangeSchema>;
+
 export const EvidenceRecordSchema = z.object({
   url: z.string().url(),
   method: z.string(),
@@ -61,6 +76,22 @@ export const PillarScoresSchema = z.object({
 });
 export type PillarScores = z.infer<typeof PillarScoresSchema>;
 
+export const DiffSummarySchema = z.object({
+  scoreDelta: z.number(),
+  gradeFrom: z.string().optional(),
+  gradeTo: z.string().optional(),
+  pillarDelta: PillarScoresSchema,
+  newIssues: z.array(DiffIssueSchema),
+  fixedIssues: z.array(DiffIssueSchema),
+  changed: z.array(DiffChangeSchema),
+  counts: z.object({
+    pass: z.number(),
+    warn: z.number(),
+    fail: z.number(),
+  }),
+});
+export type DiffSummary = z.infer<typeof DiffSummarySchema>;
+
 export const EvaluationResultSchema = z.object({
   runId: z.string(),
   domain: z.string(),
@@ -85,9 +116,12 @@ export const EvaluationResultSchema = z.object({
     reportUrl: z.string().optional(),
     evidenceBundleUrl: z.string().optional(),
   }),
+  previousRunId: z.string().optional(),
+  diffSummary: DiffSummarySchema.optional(),
   engine: z.object({
     version: z.string(),
     rulesetHash: z.string(),
+    specVersion: z.string().optional(),
   }),
   createdAt: z.string(),
   completedAt: z.string().optional(),
@@ -96,3 +130,6 @@ export const EvaluationResultSchema = z.object({
 export type EvaluationResult = z.infer<typeof EvaluationResultSchema>;
 
 export type EvaluationMode = "public";
+
+export * from "./diff";
+export * from "./recommendations";

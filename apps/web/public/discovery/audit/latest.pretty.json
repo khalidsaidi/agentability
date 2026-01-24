@@ -1,17 +1,26 @@
 {
-  "generated_at": "2026-01-20T02:38:34.870Z",
-  "live_checked_at": "2026-01-20T02:38:32.263Z",
+  "generated_at": "2026-01-24T01:30:36.792Z",
+  "live_checked_at": "2026-01-24T01:30:33.448Z",
   "strict_pretty": false,
-  "spec_version": "1.0",
+  "spec_version": "1.2",
   "engine": {
     "name": "agentability",
     "version": "0.1.0"
   },
   "score_target": 100,
   "discoverability_health": {
-    "status": "pass",
+    "status": "fail",
     "missing": [],
-    "unreachable": [],
+    "unreachable": [
+      "/logo.svg",
+      "/logo-mark.svg",
+      "/favicon.svg",
+      "/brand/logo.svg",
+      "/brand/logo-mark.svg",
+      "/brand/favicon.svg",
+      "/brand/seal.svg",
+      "/cert-seal.svg"
+    ],
     "hash_mismatch_required": [],
     "hash_mismatch_optional": []
   },
@@ -33,10 +42,18 @@
     "/discovery/audit/index.html",
     "/robots.txt",
     "/sitemap.xml",
-    "/rss.xml"
+    "/rss.xml",
+    "/logo.svg"
   ],
   "optional_surfaces": [
     "/discovery/audit/latest.pretty.json",
+    "/logo-mark.svg",
+    "/favicon.svg",
+    "/brand/logo.svg",
+    "/brand/logo-mark.svg",
+    "/brand/favicon.svg",
+    "/brand/seal.svg",
+    "/cert-seal.svg",
     "/logo.png",
     "/og.png"
   ],
@@ -50,14 +67,14 @@
       "path": "/.well-known/air.json",
       "expected_content_type": "application/json; charset=utf-8",
       "bytes": 1779,
-      "sha256": "fe3faf0b7b508c73ce4513b420eabf8ec009cc09defa481406ff13556f6f46aa",
+      "sha256": "0d12e087ea5ba916782c6b88edbeb4b03132cb885d6a5bd48b8cb0027ad830fe",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "fe3faf0b7b508c73ce4513b420eabf8ec009cc09defa481406ff13556f6f46aa",
+          "sha256": "0d12e087ea5ba916782c6b88edbeb4b03132cb885d6a5bd48b8cb0027ad830fe",
           "bytes": 1779
         },
         {
@@ -65,7 +82,7 @@
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "fe3faf0b7b508c73ce4513b420eabf8ec009cc09defa481406ff13556f6f46aa",
+          "sha256": "0d12e087ea5ba916782c6b88edbeb4b03132cb885d6a5bd48b8cb0027ad830fe",
           "bytes": 1779
         },
         {
@@ -73,98 +90,98 @@
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "fe3faf0b7b508c73ce4513b420eabf8ec009cc09defa481406ff13556f6f46aa",
+          "sha256": "0d12e087ea5ba916782c6b88edbeb4b03132cb885d6a5bd48b8cb0027ad830fe",
           "bytes": 1779
         }
       ],
       "live_status": 200,
       "live_content_type": "application/json; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "fe3faf0b7b508c73ce4513b420eabf8ec009cc09defa481406ff13556f6f46aa",
+      "live_sha256": "0d12e087ea5ba916782c6b88edbeb4b03132cb885d6a5bd48b8cb0027ad830fe",
       "live_bytes": 1779,
       "live_hash_match": true
     },
     {
       "path": "/.well-known/openapi.json",
       "expected_content_type": "application/json; charset=utf-8",
-      "bytes": 27796,
-      "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
+      "bytes": 32934,
+      "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-          "bytes": 27796
+          "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+          "bytes": 32934
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-          "bytes": 27796
+          "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+          "bytes": 32934
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-          "bytes": 27796
+          "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+          "bytes": 32934
         }
       ],
       "live_status": 200,
       "live_content_type": "application/json; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-      "live_bytes": 27796,
+      "live_sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+      "live_bytes": 32934,
       "live_hash_match": true
     },
     {
       "path": "/.well-known/openapi.yaml",
       "expected_content_type": "text/yaml; charset=utf-8",
-      "bytes": 18645,
-      "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
+      "bytes": 22044,
+      "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/yaml; charset=utf-8",
           "ok": true,
-          "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-          "bytes": 18645
+          "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+          "bytes": 22044
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/yaml; charset=utf-8",
           "ok": true,
-          "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-          "bytes": 18645
+          "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+          "bytes": 22044
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/yaml; charset=utf-8",
           "ok": true,
-          "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-          "bytes": 18645
+          "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+          "bytes": 22044
         }
       ],
       "live_status": 200,
       "live_content_type": "text/yaml; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-      "live_bytes": 18645,
+      "live_sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+      "live_bytes": 22044,
       "live_hash_match": true
     },
     {
       "path": "/.well-known/ai-plugin.json",
       "expected_content_type": "application/json; charset=utf-8",
       "bytes": 633,
-      "sha256": "2a4e369d246092e7f0fcef92acb80bc1dfe4896142e8be7fafd39d94e181a92d",
+      "sha256": "9538a87c56b652f6fea86a2f0b5fe3391268cb0cea37ec7af908ebd6e0b24e2e",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
@@ -201,267 +218,267 @@
     {
       "path": "/openapi.json",
       "expected_content_type": "application/json; charset=utf-8",
-      "bytes": 27796,
-      "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
+      "bytes": 32934,
+      "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-          "bytes": 27796
+          "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+          "bytes": 32934
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-          "bytes": 27796
+          "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+          "bytes": 32934
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-          "bytes": 27796
+          "sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+          "bytes": 32934
         }
       ],
       "live_status": 200,
       "live_content_type": "application/json; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "2d27a0f5d2636af3f485529d24a611827aaf3237b23558bcaca5838fb47aa757",
-      "live_bytes": 27796,
+      "live_sha256": "43af9b0067b2e4237082fa9894d6002b3cb05f5081f017f6ad39bd0ec7b99c59",
+      "live_bytes": 32934,
       "live_hash_match": true
     },
     {
       "path": "/openapi.yaml",
       "expected_content_type": "text/yaml; charset=utf-8",
-      "bytes": 18645,
-      "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
+      "bytes": 22044,
+      "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/yaml; charset=utf-8",
           "ok": true,
-          "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-          "bytes": 18645
+          "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+          "bytes": 22044
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/yaml; charset=utf-8",
           "ok": true,
-          "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-          "bytes": 18645
+          "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+          "bytes": 22044
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/yaml; charset=utf-8",
           "ok": true,
-          "sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-          "bytes": 18645
+          "sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+          "bytes": 22044
         }
       ],
       "live_status": 200,
       "live_content_type": "text/yaml; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "0349dba03ad9ea9fc22041fdbde2d2136dd99ea8be9879da9012339103a304e8",
-      "live_bytes": 18645,
+      "live_sha256": "d8faad57c24b16c87ff3602252bdf49e8445e7450319ebb50cb47a936c82c24c",
+      "live_bytes": 22044,
       "live_hash_match": true
     },
     {
       "path": "/llms.txt",
       "expected_content_type": "text/plain; charset=utf-8",
-      "bytes": 523,
-      "sha256": "a8f42d7f1de4635c316e9256b0f091c87a99cf2596fb6259240f607f44a4c46d",
+      "bytes": 610,
+      "sha256": "66616aefcc5504b3f00e3db612553dcf712fdf8cd21d4a8a5f8f0d9d7543d881",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/plain; charset=utf-8",
           "ok": true,
-          "sha256": "a8f42d7f1de4635c316e9256b0f091c87a99cf2596fb6259240f607f44a4c46d",
-          "bytes": 523
+          "sha256": "66616aefcc5504b3f00e3db612553dcf712fdf8cd21d4a8a5f8f0d9d7543d881",
+          "bytes": 610
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/plain; charset=utf-8",
           "ok": true,
-          "sha256": "a8f42d7f1de4635c316e9256b0f091c87a99cf2596fb6259240f607f44a4c46d",
-          "bytes": 523
+          "sha256": "66616aefcc5504b3f00e3db612553dcf712fdf8cd21d4a8a5f8f0d9d7543d881",
+          "bytes": 610
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/plain; charset=utf-8",
           "ok": true,
-          "sha256": "a8f42d7f1de4635c316e9256b0f091c87a99cf2596fb6259240f607f44a4c46d",
-          "bytes": 523
+          "sha256": "66616aefcc5504b3f00e3db612553dcf712fdf8cd21d4a8a5f8f0d9d7543d881",
+          "bytes": 610
         }
       ],
       "live_status": 200,
       "live_content_type": "text/plain; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "a8f42d7f1de4635c316e9256b0f091c87a99cf2596fb6259240f607f44a4c46d",
-      "live_bytes": 523,
+      "live_sha256": "66616aefcc5504b3f00e3db612553dcf712fdf8cd21d4a8a5f8f0d9d7543d881",
+      "live_bytes": 610,
       "live_hash_match": true
     },
     {
       "path": "/llms-full.txt",
       "expected_content_type": "text/plain; charset=utf-8",
-      "bytes": 1359,
-      "sha256": "2653cd7805922cc01a957b1d1bf1235f97ec98f7ef5dcbb96294352810617d49",
+      "bytes": 1559,
+      "sha256": "98227e875df65e4f7c7529f7ff956264cc226765bf89a3d55f9bced58773d498",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/plain; charset=utf-8",
           "ok": true,
-          "sha256": "2653cd7805922cc01a957b1d1bf1235f97ec98f7ef5dcbb96294352810617d49",
-          "bytes": 1359
+          "sha256": "98227e875df65e4f7c7529f7ff956264cc226765bf89a3d55f9bced58773d498",
+          "bytes": 1559
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/plain; charset=utf-8",
           "ok": true,
-          "sha256": "2653cd7805922cc01a957b1d1bf1235f97ec98f7ef5dcbb96294352810617d49",
-          "bytes": 1359
+          "sha256": "98227e875df65e4f7c7529f7ff956264cc226765bf89a3d55f9bced58773d498",
+          "bytes": 1559
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/plain; charset=utf-8",
           "ok": true,
-          "sha256": "2653cd7805922cc01a957b1d1bf1235f97ec98f7ef5dcbb96294352810617d49",
-          "bytes": 1359
+          "sha256": "98227e875df65e4f7c7529f7ff956264cc226765bf89a3d55f9bced58773d498",
+          "bytes": 1559
         }
       ],
       "live_status": 200,
       "live_content_type": "text/plain; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "2653cd7805922cc01a957b1d1bf1235f97ec98f7ef5dcbb96294352810617d49",
-      "live_bytes": 1359,
+      "live_sha256": "98227e875df65e4f7c7529f7ff956264cc226765bf89a3d55f9bced58773d498",
+      "live_bytes": 1559,
       "live_hash_match": true
     },
     {
       "path": "/docs.md",
       "expected_content_type": "text/markdown; charset=utf-8",
-      "bytes": 729,
-      "sha256": "f710e1bea6456226efb44f05bca695cbea5a37dc6cd4fe75f537265069c55736",
+      "bytes": 887,
+      "sha256": "863ad525cc90d752a67238afbe1929a30bfcedcc83c002c82f908dd55c9c11f4",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "f710e1bea6456226efb44f05bca695cbea5a37dc6cd4fe75f537265069c55736",
-          "bytes": 729
+          "sha256": "863ad525cc90d752a67238afbe1929a30bfcedcc83c002c82f908dd55c9c11f4",
+          "bytes": 887
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "f710e1bea6456226efb44f05bca695cbea5a37dc6cd4fe75f537265069c55736",
-          "bytes": 729
+          "sha256": "863ad525cc90d752a67238afbe1929a30bfcedcc83c002c82f908dd55c9c11f4",
+          "bytes": 887
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "f710e1bea6456226efb44f05bca695cbea5a37dc6cd4fe75f537265069c55736",
-          "bytes": 729
+          "sha256": "863ad525cc90d752a67238afbe1929a30bfcedcc83c002c82f908dd55c9c11f4",
+          "bytes": 887
         }
       ],
       "live_status": 200,
       "live_content_type": "text/markdown; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "f710e1bea6456226efb44f05bca695cbea5a37dc6cd4fe75f537265069c55736",
-      "live_bytes": 729,
+      "live_sha256": "863ad525cc90d752a67238afbe1929a30bfcedcc83c002c82f908dd55c9c11f4",
+      "live_bytes": 887,
       "live_hash_match": true
     },
     {
       "path": "/docs/api.md",
       "expected_content_type": "text/markdown; charset=utf-8",
-      "bytes": 1203,
-      "sha256": "1a8e2ea6fa640856a30afa2d2280bc8caddcb1916d25a7c457c9b16c9083a7d1",
+      "bytes": 1436,
+      "sha256": "6b789d6c6dd39bcb44cb9526e213fa4043ff8902fec96a55c6f0497fb403b810",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "1a8e2ea6fa640856a30afa2d2280bc8caddcb1916d25a7c457c9b16c9083a7d1",
-          "bytes": 1203
+          "sha256": "6b789d6c6dd39bcb44cb9526e213fa4043ff8902fec96a55c6f0497fb403b810",
+          "bytes": 1436
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "1a8e2ea6fa640856a30afa2d2280bc8caddcb1916d25a7c457c9b16c9083a7d1",
-          "bytes": 1203
+          "sha256": "6b789d6c6dd39bcb44cb9526e213fa4043ff8902fec96a55c6f0497fb403b810",
+          "bytes": 1436
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "1a8e2ea6fa640856a30afa2d2280bc8caddcb1916d25a7c457c9b16c9083a7d1",
-          "bytes": 1203
+          "sha256": "6b789d6c6dd39bcb44cb9526e213fa4043ff8902fec96a55c6f0497fb403b810",
+          "bytes": 1436
         }
       ],
       "live_status": 200,
       "live_content_type": "text/markdown; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "1a8e2ea6fa640856a30afa2d2280bc8caddcb1916d25a7c457c9b16c9083a7d1",
-      "live_bytes": 1203,
+      "live_sha256": "6b789d6c6dd39bcb44cb9526e213fa4043ff8902fec96a55c6f0497fb403b810",
+      "live_bytes": 1436,
       "live_hash_match": true
     },
     {
       "path": "/spec.md",
       "expected_content_type": "text/markdown; charset=utf-8",
-      "bytes": 1131,
-      "sha256": "dda46c80b79cdffe43e26ff429aacb2e56159a0d264825dcdc5dcb9eda560c82",
+      "bytes": 1363,
+      "sha256": "329c0bddc5daf9e40d475a60f0b423f4dc244460050b4d63ac3bb2b3bdf8f1bb",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "dda46c80b79cdffe43e26ff429aacb2e56159a0d264825dcdc5dcb9eda560c82",
-          "bytes": 1131
+          "sha256": "329c0bddc5daf9e40d475a60f0b423f4dc244460050b4d63ac3bb2b3bdf8f1bb",
+          "bytes": 1363
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "dda46c80b79cdffe43e26ff429aacb2e56159a0d264825dcdc5dcb9eda560c82",
-          "bytes": 1131
+          "sha256": "329c0bddc5daf9e40d475a60f0b423f4dc244460050b4d63ac3bb2b3bdf8f1bb",
+          "bytes": 1363
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "text/markdown; charset=utf-8",
           "ok": true,
-          "sha256": "dda46c80b79cdffe43e26ff429aacb2e56159a0d264825dcdc5dcb9eda560c82",
-          "bytes": 1131
+          "sha256": "329c0bddc5daf9e40d475a60f0b423f4dc244460050b4d63ac3bb2b3bdf8f1bb",
+          "bytes": 1363
         }
       ],
       "live_status": 200,
       "live_content_type": "text/markdown; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "dda46c80b79cdffe43e26ff429aacb2e56159a0d264825dcdc5dcb9eda560c82",
-      "live_bytes": 1131,
+      "live_sha256": "329c0bddc5daf9e40d475a60f0b423f4dc244460050b4d63ac3bb2b3bdf8f1bb",
+      "live_bytes": 1363,
       "live_hash_match": true
     },
     {
@@ -657,39 +674,39 @@
     {
       "path": "/sitemap.xml",
       "expected_content_type": "application/xml; charset=utf-8",
-      "bytes": 2305,
-      "sha256": "a4383fd9eafcc70838487f02c800865ef78635d841105c7eaff070e4946859f3",
+      "bytes": 2740,
+      "sha256": "34f1b6410884d178cbfbf570f03afeb2e17c9f7147fb8dd2d4c1c6e257a9b119",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "application/xml; charset=utf-8",
           "ok": true,
-          "sha256": "a4383fd9eafcc70838487f02c800865ef78635d841105c7eaff070e4946859f3",
-          "bytes": 2305
+          "sha256": "34f1b6410884d178cbfbf570f03afeb2e17c9f7147fb8dd2d4c1c6e257a9b119",
+          "bytes": 2740
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "application/xml; charset=utf-8",
           "ok": true,
-          "sha256": "a4383fd9eafcc70838487f02c800865ef78635d841105c7eaff070e4946859f3",
-          "bytes": 2305
+          "sha256": "34f1b6410884d178cbfbf570f03afeb2e17c9f7147fb8dd2d4c1c6e257a9b119",
+          "bytes": 2740
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "application/xml; charset=utf-8",
           "ok": true,
-          "sha256": "a4383fd9eafcc70838487f02c800865ef78635d841105c7eaff070e4946859f3",
-          "bytes": 2305
+          "sha256": "34f1b6410884d178cbfbf570f03afeb2e17c9f7147fb8dd2d4c1c6e257a9b119",
+          "bytes": 2740
         }
       ],
       "live_status": 200,
       "live_content_type": "application/xml; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "a4383fd9eafcc70838487f02c800865ef78635d841105c7eaff070e4946859f3",
-      "live_bytes": 2305,
+      "live_sha256": "34f1b6410884d178cbfbf570f03afeb2e17c9f7147fb8dd2d4c1c6e257a9b119",
+      "live_bytes": 2740,
       "live_hash_match": true
     },
     {
@@ -731,41 +748,345 @@
       "live_hash_match": true
     },
     {
+      "path": "/logo.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 1259,
+      "sha256": "989ec23791b6c4ece64be610b988044d4f2813e7d1c8d7f8a040942fbe141fd7",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
       "path": "/discovery/audit/latest.pretty.json",
       "expected_content_type": "application/json; charset=utf-8",
-      "bytes": 29822,
-      "sha256": "f3b8bc9cc14731b6fdb35d5ceea7bd42364f73cdb7eecd11c482cefe6ffff5d0",
+      "bytes": 30400,
+      "sha256": "265a8731dd300f99a3c7654718b4f211379987bf5c93b450f95ba46149013faf",
       "live_checks": [
         {
           "base_url": "https://agentability.org",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "f3b8bc9cc14731b6fdb35d5ceea7bd42364f73cdb7eecd11c482cefe6ffff5d0",
-          "bytes": 29822
+          "sha256": "265a8731dd300f99a3c7654718b4f211379987bf5c93b450f95ba46149013faf",
+          "bytes": 30400
         },
         {
           "base_url": "https://agentability-prod-jenfjn.web.app",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "f3b8bc9cc14731b6fdb35d5ceea7bd42364f73cdb7eecd11c482cefe6ffff5d0",
-          "bytes": 29822
+          "sha256": "265a8731dd300f99a3c7654718b4f211379987bf5c93b450f95ba46149013faf",
+          "bytes": 30400
         },
         {
           "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
           "status": 200,
           "content_type": "application/json; charset=utf-8",
           "ok": true,
-          "sha256": "f3b8bc9cc14731b6fdb35d5ceea7bd42364f73cdb7eecd11c482cefe6ffff5d0",
-          "bytes": 29822
+          "sha256": "265a8731dd300f99a3c7654718b4f211379987bf5c93b450f95ba46149013faf",
+          "bytes": 30400
         }
       ],
       "live_status": 200,
       "live_content_type": "application/json; charset=utf-8",
       "live_ok": true,
-      "live_sha256": "f3b8bc9cc14731b6fdb35d5ceea7bd42364f73cdb7eecd11c482cefe6ffff5d0",
-      "live_bytes": 29822,
+      "live_sha256": "265a8731dd300f99a3c7654718b4f211379987bf5c93b450f95ba46149013faf",
+      "live_bytes": 30400,
+      "live_hash_match": true
+    },
+    {
+      "path": "/logo-mark.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 565,
+      "sha256": "4c67dbf4b305c31c0c451f679cd7c1d477def3fb6b7009809c5078b838d979ea",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
+      "path": "/favicon.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 391,
+      "sha256": "b1e14396016eecdbb52bc8bfdffa198c90c475e73aed4027186702832525aae1",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
+      "path": "/brand/logo.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 1259,
+      "sha256": "989ec23791b6c4ece64be610b988044d4f2813e7d1c8d7f8a040942fbe141fd7",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
+      "path": "/brand/logo-mark.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 565,
+      "sha256": "4c67dbf4b305c31c0c451f679cd7c1d477def3fb6b7009809c5078b838d979ea",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
+      "path": "/brand/favicon.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 391,
+      "sha256": "b1e14396016eecdbb52bc8bfdffa198c90c475e73aed4027186702832525aae1",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
+      "path": "/brand/seal.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 1837,
+      "sha256": "7f1c385d96314a7d931c897c4aa4cb10e4b87bdb29ee7faef9d24d2312162497",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
+      "live_hash_match": true
+    },
+    {
+      "path": "/cert-seal.svg",
+      "expected_content_type": "image/svg+xml",
+      "bytes": 1837,
+      "sha256": "7f1c385d96314a7d931c897c4aa4cb10e4b87bdb29ee7faef9d24d2312162497",
+      "live_checks": [
+        {
+          "base_url": "https://agentability.org",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.web.app",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        },
+        {
+          "base_url": "https://agentability-prod-jenfjn.firebaseapp.com",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "ok": false,
+          "sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+          "bytes": 4315
+        }
+      ],
+      "live_status": 200,
+      "live_content_type": "text/html; charset=utf-8",
+      "live_ok": false,
+      "live_sha256": "2921fd77561313ec03771fa24edcfd3fd60343cd4a588f36b01109cb07cffc66",
+      "live_bytes": 4315,
       "live_hash_match": true
     },
     {

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { fetchLatest } from "@/lib/api";
 import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
+import { getFixIt } from "@agentability/shared";
 import type { EvaluationProfile } from "@agentability/shared";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { PillarBreakdown } from "@/components/PillarBreakdown";
@@ -9,8 +10,11 @@ import { FailuresList } from "@/components/FailuresList";
 import { EvidenceLinks } from "@/components/EvidenceLinks";
 import { CopyLinks } from "@/components/CopyLinks";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { BadgeEmbed } from "@/components/share/BadgeEmbed";
 
 const PILLAR_LABELS = {
   discovery: "Discovery",
@@ -294,6 +298,8 @@ export function ReportPage() {
   }
 
   const report = query.data;
+  const diff = report.diff;
+  const previousSummary = report.previousSummary;
   const pillarEntries = Object.entries(report.pillarScores) as [PillarKey, number][];
   const sortedPillars = [...pillarEntries].sort((a, b) => b[1] - a[1]);
   const strongest = sortedPillars.slice(0, 2);
@@ -301,6 +307,15 @@ export function ReportPage() {
 
   const failCount = report.checks.filter((check) => check.status === "fail").length;
   const warnCount = report.checks.filter((check) => check.status === "warn").length;
+  const fixItChecks = report.checks.filter((check) => check.status !== "pass");
+  const scoreDelta = diff?.scoreDelta ?? 0;
+  const scoreDeltaLabel = diff
+    ? scoreDelta === 0
+      ? "No change"
+      : scoreDelta > 0
+      ? `▲ +${scoreDelta.toFixed(1)}`
+      : `▼ ${scoreDelta.toFixed(1)}`
+    : null;
 
   const issueChecks = report.checks
     .filter((check) => check.status !== "pass")
@@ -368,6 +383,8 @@ export function ReportPage() {
     ...coverageGaps.flatMap((pillar) => PILLAR_ACTIONS[pillar] ?? []),
   ];
   const uniqueActions = Array.from(new Set(improvementActions)).slice(0, 6);
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://agentability.org";
+  const certUrl = `${baseUrl}/cert/${report.domain}`;
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -396,6 +413,21 @@ export function ReportPage() {
         />
       </div>
 
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>Badge & certificate</CardTitle>
+          <CardDescription>Embed your Agentability score anywhere.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Button variant="secondary" size="sm" asChild>
+              <a href={certUrl}>View certificate</a>
+            </Button>
+          </div>
+          <BadgeEmbed domain={report.domain} />
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="bg-white/70">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -403,6 +435,95 @@ export function ReportPage() {
           <TabsTrigger value="evidence">Evidence</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-6">
+          <Card className="border-border/60 bg-white/70">
+            <CardHeader>
+              <CardTitle>What changed since last run</CardTitle>
+              <CardDescription>Run-to-run delta and stability signals.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              {!diff ? (
+                <p>First run — no previous comparison.</p>
+              ) : (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-white/80 px-3 py-2">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Score delta</span>
+                    <span className="font-semibold text-foreground">{scoreDeltaLabel}</span>
+                  </div>
+                  {previousSummary ? (
+                    <p>
+                      Previous:{" "}
+                      <span className="font-medium text-foreground">
+                        {previousSummary.score} ({previousSummary.grade})
+                      </span>
+                      {previousSummary.completedAt ? ` • ${previousSummary.completedAt}` : null}
+                    </p>
+                  ) : null}
+                  <div className="grid gap-2 md:grid-cols-2">
+                    {Object.entries(diff.pillarDelta).map(([pillar, delta]) => (
+                      <div key={pillar} className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2">
+                        <span className="text-xs uppercase tracking-wide">
+                          {PILLAR_LABELS[pillar as PillarKey] ?? pillar}
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {delta === 0 ? "0" : delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">New issues</div>
+                      {diff.newIssues.length ? (
+                        <ul className="mt-2 space-y-1">
+                          {diff.newIssues.map((issue) => (
+                            <li key={`${issue.checkId}-${issue.to}`}>
+                              <span className="font-semibold text-foreground">{issue.checkId}</span> →{" "}
+                              {issue.to} ({issue.severity})
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="mt-2">No new issues detected.</p>
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Fixed</div>
+                      {diff.fixedIssues.length ? (
+                        <ul className="mt-2 space-y-1">
+                          {diff.fixedIssues.map((issue) => (
+                            <li key={`${issue.checkId}-${issue.to}`}>
+                              <span className="font-semibold text-foreground">{issue.checkId}</span> →{" "}
+                              {issue.to} ({issue.severity})
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="mt-2">No fixes detected.</p>
+                      )}
+                    </div>
+                  </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="changed">
+                      <AccordionTrigger>Changed details</AccordionTrigger>
+                      <AccordionContent>
+                        {diff.changed.length ? (
+                          <ul className="space-y-1">
+                            {diff.changed.map((issue) => (
+                              <li key={`${issue.checkId}-${issue.to}`}>
+                                <span className="font-semibold text-foreground">{issue.checkId}</span> → {issue.to}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p>No additional changes.</p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </>
+              )}
+            </CardContent>
+          </Card>
           <PillarBreakdown pillarScores={report.pillarScores} />
           <Card className="border-border/60 bg-white/70">
             <CardHeader>
@@ -611,6 +732,65 @@ export function ReportPage() {
         </TabsContent>
         <TabsContent value="findings">
           <FailuresList checks={report.checks} />
+          <Card className="mt-6 border-border/60 bg-white/70">
+            <CardHeader>
+              <CardTitle>Fix-it snippets</CardTitle>
+              <CardDescription>Copy/paste remediations for failed or warned checks.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {fixItChecks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No fixes needed. All checks passed.</p>
+              ) : (
+                <Accordion type="multiple" className="space-y-3">
+                  {fixItChecks.map((check) => {
+                    const fix = getFixIt(check.id, check.recommendationId);
+                    if (!fix) return null;
+                    return (
+                      <AccordionItem key={check.id} value={check.id} className="border border-border/60 px-4">
+                        <AccordionTrigger>
+                          {fix.title} ({check.id})
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3 text-sm text-muted-foreground">
+                          <p>{fix.whyItMatters}</p>
+                          <ul className="list-disc space-y-1 pl-5">
+                            {fix.steps.map((step) => (
+                              <li key={step}>{step}</li>
+                            ))}
+                          </ul>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                                Snippet
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => void navigator.clipboard?.writeText(fix.snippet)}
+                              >
+                                Copy
+                              </Button>
+                            </div>
+                            <pre className="whitespace-pre-wrap rounded-lg border border-border/60 bg-white/80 p-3 text-xs text-foreground">
+                              {fix.snippet}
+                            </pre>
+                          </div>
+                          {fix.links?.length ? (
+                            <div className="space-y-1">
+                              {fix.links.map((link) => (
+                                <a key={link} className="text-emerald-700 hover:text-emerald-900" href={link}>
+                                  {link}
+                                </a>
+                              ))}
+                            </div>
+                          ) : null}
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="evidence">
           <EvidenceLinks evidenceIndex={report.evidenceIndex} />

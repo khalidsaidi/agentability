@@ -31,6 +31,8 @@ const requiredPaths = [
   "/robots.txt",
   "/sitemap.xml",
   "/rss.xml",
+  "/logo.svg",
+  "/favicon.svg",
   "/logo.png",
   "/og.png",
 ];

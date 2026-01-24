@@ -9,8 +9,14 @@ import { getStorage } from "firebase-admin/storage";
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
 import { evaluatePublic } from "@agentability/evaluator";
-import { EvaluationInputSchema, EvaluationProfile, EvaluationResult } from "@agentability/shared";
+import {
+  EvaluationInputSchema,
+  EvaluationProfile,
+  EvaluationResult,
+  computeDiff,
+} from "@agentability/shared";
 import { SSR_ASSETS } from "./ssr/asset-manifest";
+import { renderBadgeSvg } from "./brand/renderBadgeSvg";
 
 initializeApp();
 
@@ -588,11 +594,13 @@ async function runEvaluation(
   let evaluation: EvaluationResult | null = null;
 
   try {
-    const runRef = db
-      .collection("evaluations")
-      .doc(domain)
-      .collection("runs")
-      .doc(runId);
+    const domainRef = db.collection("evaluations").doc(domain);
+    const domainSnap = await domainRef.get();
+    const previousRunId = domainSnap.exists
+      ? (domainSnap.data()?.latestRunId as string | undefined)
+      : undefined;
+
+    const runRef = domainRef.collection("runs").doc(runId);
     const runRootRef = db.collection("runs").doc(runId);
 
     const baseRun = {
@@ -602,13 +610,14 @@ async function runEvaluation(
       status: "running",
       input: { origin },
       createdAt: new Date().toISOString(),
+      previousRunId,
     };
 
     await runRef.set(baseRun);
     await runRootRef.set(baseRun);
 
     const finalizeEvaluation = async (result: EvaluationResult, evidence: unknown[]) => {
-      evaluation = { ...result, runId };
+      evaluation = { ...result, runId, previousRunId };
       const artifacts = {
         reportUrl: `${baseUrl}/reports/${result.domain}`,
         jsonUrl: `${baseUrl}/v1/evaluations/${result.domain}/latest.json`,
@@ -619,17 +628,40 @@ async function runEvaluation(
         artifacts.evidenceBundleUrl = evidenceUpload.evidenceBundleUrl;
       }
 
+      let diffSummary = null;
+      if (previousRunId) {
+        const previousSnap = await runRef.parent.doc(previousRunId).get();
+        if (previousSnap.exists) {
+          const previous = previousSnap.data() as EvaluationResult;
+          diffSummary = computeDiff(
+            {
+              score: previous.score,
+              grade: previous.grade,
+              pillarScores: previous.pillarScores,
+              checks: previous.checks,
+            },
+            {
+              score: evaluation.score,
+              grade: evaluation.grade,
+              pillarScores: evaluation.pillarScores,
+              checks: evaluation.checks,
+            }
+          );
+        }
+      }
+
       evaluation = {
         ...evaluation,
         status: "complete",
         artifacts,
         completedAt: new Date().toISOString(),
+        diffSummary: diffSummary ?? undefined,
       };
 
       await runRef.set(evaluation, { merge: true });
       await runRootRef.set(evaluation, { merge: true });
 
-      await db.collection("evaluations").doc(result.domain).set(
+      await domainRef.set(
         {
           domain: result.domain,
           latestRunId: runId,
@@ -980,7 +1012,38 @@ app.get("/v1/evaluations/:domain/latest.json", async (req, res) => {
   if (!run.exists) {
     return sendError(res, 404, "Run not found", "not_found");
   }
-  return res.json(run.data());
+  const runData = run.data() as EvaluationResult;
+  let previousSummary: {
+    score: number;
+    grade: string;
+    pillarScores: EvaluationResult["pillarScores"];
+    completedAt?: string;
+  } | null = null;
+
+  if (runData.previousRunId) {
+    const previousRun = await db
+      .collection("evaluations")
+      .doc(domain)
+      .collection("runs")
+      .doc(runData.previousRunId)
+      .get();
+    if (previousRun.exists) {
+      const previous = previousRun.data() as EvaluationResult;
+      previousSummary = {
+        score: previous.score,
+        grade: previous.grade,
+        pillarScores: previous.pillarScores,
+        completedAt: previous.completedAt ?? previous.createdAt,
+      };
+    }
+  }
+
+  return res.json({
+    ...runData,
+    previousRunId: runData.previousRunId,
+    diff: runData.diffSummary ?? undefined,
+    previousSummary: previousSummary ?? undefined,
+  });
 });
 
 app.get("/v1/evaluations/:domain/:runId.json", async (req, res) => {
@@ -996,6 +1059,50 @@ app.get("/v1/evaluations/:domain/:runId.json", async (req, res) => {
     return sendError(res, 404, "Run not found", "not_found");
   }
   return res.json(run.data());
+});
+
+app.get("/badge/:domain.svg", async (req, res) => {
+  const domain = req.params.domain.toLowerCase();
+  if (!/^[a-z0-9.-]+$/.test(domain)) {
+    const svg = renderBadgeSvg({ domain, statusLabel: "Invalid domain" });
+    res.set("Content-Type", "image/svg+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    return res.status(400).send(svg);
+  }
+
+  const parent = await db.collection("evaluations").doc(domain).get();
+  const latestRunId = parent.exists ? (parent.data()?.latestRunId as string | undefined) : undefined;
+  if (!latestRunId) {
+    const svg = renderBadgeSvg({ domain, statusLabel: "Not evaluated" });
+    res.set("Content-Type", "image/svg+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    return res.status(404).send(svg);
+  }
+
+  const run = await db
+    .collection("evaluations")
+    .doc(domain)
+    .collection("runs")
+    .doc(latestRunId)
+    .get();
+  if (!run.exists) {
+    const svg = renderBadgeSvg({ domain, statusLabel: "Not evaluated" });
+    res.set("Content-Type", "image/svg+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    return res.status(404).send(svg);
+  }
+
+  const data = run.data() as EvaluationResult;
+  const updatedAt = data.completedAt ?? data.createdAt;
+  const svg = renderBadgeSvg({
+    domain,
+    score: data.status === "complete" ? data.score : null,
+    grade: data.status === "complete" ? data.grade : null,
+    updatedAtISO: updatedAt,
+  });
+  res.set("Content-Type", "image/svg+xml; charset=utf-8");
+  res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+  return res.status(data.status === "complete" ? 200 : 404).send(svg);
 });
 
 export const api = onRequest(

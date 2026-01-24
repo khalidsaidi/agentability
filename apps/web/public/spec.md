@@ -1,6 +1,6 @@
-# Agentability Spec (Public Mode v1.0)
+# Agentability Spec (Public Mode v1.2)
 
-Spec version: 1.0
+Spec version: 1.2
 
 ## Scope
 
@@ -30,6 +30,13 @@ Each check yields pass/warn/fail with weights per profile. Pillar scores sum int
 Evaluation results are published at:
 - https://agentability.org/v1/evaluations/{domain}/latest.json
 - https://agentability.org/reports/{domain}
+- https://agentability.org/badge/{domain}.svg
+- https://agentability.org/cert/{domain}
+
+Latest evaluation responses may include:
+- previousRunId
+- diff (score + pillar deltas, issue changes)
+- previousSummary (prior score snapshot)
 
 ## SSRF Policy (Public Mode)
 

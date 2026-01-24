@@ -45,6 +45,15 @@ Returns the latest run state. When complete, it returns a full evaluation result
 ## GET /v1/evaluations/{domain}/latest.json
 
 Returns the most recent evaluation for a domain.
+May include:
+- previousRunId
+- diff (score + pillar deltas, issue changes)
+- previousSummary (prior score snapshot)
+
+## GET /badge/{domain}.svg
+
+Returns a shareable SVG badge for the latest score.
+Cache-Control: public, max-age=300.
 
 ## POST /mcp
 

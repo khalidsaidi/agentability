@@ -12,6 +12,8 @@ Verification:
 Reports:
 - https://agentability.org/reports/{domain}
 - https://agentability.org/v1/evaluations/{domain}/latest.json
+- https://agentability.org/badge/{domain}.svg
+- https://agentability.org/cert/{domain}
 
 Spec:
 - https://agentability.org/spec.md
@@ -21,6 +23,8 @@ How to use the API:
   {"origin":"https://example.com","profile":"auto"}
 - Poll https://agentability.org/v1/runs/{runId} until status is complete
 - POST https://agentability.org/mcp (JSON-RPC)
+- Embed badge: https://agentability.org/badge/{domain}.svg
+- Certificate: https://agentability.org/cert/{domain}
 
 Pillars:
 - Discovery: machine entrypoints and canonical docs.
