@@ -2,6 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import { HomePage } from "@/pages/HomePage";
 import { ReportPage } from "@/pages/ReportPage";
 import { RunPage } from "@/pages/RunPage";
+import { CertificatePage } from "@/pages/CertificatePage";
 import { Badge } from "@/components/ui/badge";
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/reports/:domain" element={<ReportPage />} />
+            <Route path="/cert/:domain" element={<CertificatePage />} />
             <Route path="/runs/:runId" element={<RunPage />} />
           </Routes>
         </main>

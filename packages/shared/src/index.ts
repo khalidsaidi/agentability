@@ -132,3 +132,4 @@ export type EvaluationResult = z.infer<typeof EvaluationResultSchema>;
 export type EvaluationMode = "public";
 
 export * from "./diff";
+export * from "./recommendations";
