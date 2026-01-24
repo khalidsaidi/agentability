@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Agentability Public API",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Public-mode agent readiness evaluator API."
   },
   "servers": [
@@ -390,7 +390,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EvaluationResult"
+                  "$ref": "#/components/schemas/LatestEvaluation"
                 }
               }
             }
@@ -427,6 +427,43 @@
                       "code": "evaluation_failed"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/badge/{domain}.svg": {
+      "get": {
+        "summary": "Fetch a shareable badge for a domain",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG badge",
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No evaluation found",
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -570,6 +607,12 @@
           "artifacts": {
             "$ref": "#/components/schemas/Artifacts"
           },
+          "previousRunId": {
+            "type": "string"
+          },
+          "diffSummary": {
+            "$ref": "#/components/schemas/DiffSummary"
+          },
           "engine": {
             "$ref": "#/components/schemas/EngineInfo"
           },
@@ -668,6 +711,12 @@
           "artifacts": {
             "$ref": "#/components/schemas/Artifacts"
           },
+          "previousRunId": {
+            "type": "string"
+          },
+          "diffSummary": {
+            "$ref": "#/components/schemas/DiffSummary"
+          },
           "engine": {
             "$ref": "#/components/schemas/EngineInfo"
           },
@@ -683,6 +732,27 @@
             "type": "string"
           }
         }
+      },
+      "LatestEvaluation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EvaluationResult"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "diff": {
+                "$ref": "#/components/schemas/DiffSummary"
+              },
+              "previousRunId": {
+                "type": "string"
+              },
+              "previousSummary": {
+                "$ref": "#/components/schemas/PreviousSummary"
+              }
+            }
+          }
+        ]
       },
       "CheckResult": {
         "type": "object",
@@ -818,6 +888,161 @@
           },
           "rulesetHash": {
             "type": "string"
+          },
+          "specVersion": {
+            "type": "string"
+          }
+        }
+      },
+      "PreviousSummary": {
+        "type": "object",
+        "required": [
+          "score",
+          "grade",
+          "pillarScores"
+        ],
+        "properties": {
+          "score": {
+            "type": "number"
+          },
+          "grade": {
+            "type": "string"
+          },
+          "pillarScores": {
+            "$ref": "#/components/schemas/PillarScores"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DiffIssue": {
+        "type": "object",
+        "required": [
+          "checkId",
+          "to",
+          "severity"
+        ],
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ],
+            "nullable": true
+          },
+          "to": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          }
+        }
+      },
+      "DiffChange": {
+        "type": "object",
+        "required": [
+          "checkId",
+          "to"
+        ],
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ],
+            "nullable": true
+          },
+          "to": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ]
+          }
+        }
+      },
+      "DiffSummary": {
+        "type": "object",
+        "required": [
+          "scoreDelta",
+          "pillarDelta",
+          "newIssues",
+          "fixedIssues",
+          "changed",
+          "counts"
+        ],
+        "properties": {
+          "scoreDelta": {
+            "type": "number"
+          },
+          "gradeFrom": {
+            "type": "string"
+          },
+          "gradeTo": {
+            "type": "string"
+          },
+          "pillarDelta": {
+            "$ref": "#/components/schemas/PillarScores"
+          },
+          "newIssues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiffIssue"
+            }
+          },
+          "fixedIssues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiffIssue"
+            }
+          },
+          "changed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiffChange"
+            }
+          },
+          "counts": {
+            "type": "object",
+            "required": [
+              "pass",
+              "warn",
+              "fail"
+            ],
+            "properties": {
+              "pass": {
+                "type": "number"
+              },
+              "warn": {
+                "type": "number"
+              },
+              "fail": {
+                "type": "number"
+              }
+            }
           }
         }
       },
