@@ -265,6 +265,35 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function renderBadgeSvg(params: {
+  label: string;
+  value: string;
+  specVersion?: string;
+  updated?: string;
+}): string {
+  const label = escapeHtml(params.label);
+  const value = escapeHtml(params.value);
+  const spec = params.specVersion ? `spec v${escapeHtml(params.specVersion)}` : "spec v1.2";
+  const updated = params.updated ? `updated ${escapeHtml(params.updated)}` : "updated n/a";
+  const meta = `${spec} • ${updated}`;
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="64" role="img" aria-label="${label} ${value}">
+  <title>${label} ${value}</title>
+  <defs>
+    <linearGradient id="badgeBg" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="340" height="64" rx="12" fill="url(#badgeBg)"/>
+  <rect x="6" y="6" width="328" height="52" rx="10" fill="#ffffff" opacity="0.08"/>
+  <text x="18" y="26" fill="#ffffff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="14" font-weight="600">${label}</text>
+  <text x="18" y="48" fill="#e2e8f0" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="11">${meta}</text>
+  <text x="320" y="34" fill="#ffffff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" text-anchor="end">${value}</text>
+</svg>`;
+}
+
 function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationResult): string {
   const normalizedDomain = domain.trim().toLowerCase();
   const isShowcase =
@@ -1058,6 +1087,55 @@ app.get("/v1/evaluations/:domain/:runId.json", async (req, res) => {
     return sendError(res, 404, "Run not found", "not_found");
   }
   return res.json(run.data());
+});
+
+app.get("/badge/:domain.svg", async (req, res) => {
+  const domain = req.params.domain.toLowerCase();
+  if (!/^[a-z0-9.-]+$/.test(domain)) {
+    const svg = renderBadgeSvg({
+      label: "Agentability",
+      value: "Invalid domain",
+    });
+    res.set("Content-Type", "image/svg+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    return res.status(400).send(svg);
+  }
+
+  const parent = await db.collection("evaluations").doc(domain).get();
+  const latestRunId = parent.exists ? (parent.data()?.latestRunId as string | undefined) : undefined;
+  if (!latestRunId) {
+    const svg = renderBadgeSvg({ label: "Agentability", value: "Not evaluated" });
+    res.set("Content-Type", "image/svg+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    return res.status(404).send(svg);
+  }
+
+  const run = await db
+    .collection("evaluations")
+    .doc(domain)
+    .collection("runs")
+    .doc(latestRunId)
+    .get();
+  if (!run.exists) {
+    const svg = renderBadgeSvg({ label: "Agentability", value: "Not evaluated" });
+    res.set("Content-Type", "image/svg+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    return res.status(404).send(svg);
+  }
+
+  const data = run.data() as EvaluationResult;
+  const updatedAt = data.completedAt ?? data.createdAt;
+  const updated = updatedAt ? updatedAt.split("T")[0] : undefined;
+  const value = data.status === "complete" ? `Score ${data.score} (${data.grade})` : "Not evaluated";
+  const svg = renderBadgeSvg({
+    label: "Agentability",
+    value,
+    specVersion: data.engine?.specVersion ?? "1.2",
+    updated,
+  });
+  res.set("Content-Type", "image/svg+xml; charset=utf-8");
+  res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+  return res.status(data.status === "complete" ? 200 : 404).send(svg);
 });
 
 export const api = onRequest(
