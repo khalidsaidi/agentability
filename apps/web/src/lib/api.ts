@@ -28,9 +28,11 @@ export type LatestEvaluation = EvaluationResult & {
 };
 
 export type DiscoveryAudit = {
+  spec_version?: string;
   live_checked_at?: string;
   strict_pretty?: boolean;
   live_sources?: string[];
+  files?: Array<{ path?: string }>;
   discoverability_health?: {
     status: "pass" | "degraded" | "fail";
     missing?: string[];

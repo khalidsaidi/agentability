@@ -27,6 +27,31 @@ export function HomePage() {
     },
   });
 
+  const audit = auditQuery.data;
+  const status = audit?.discoverability_health?.status ?? "unknown";
+  const statusLabel = status.toUpperCase();
+  const statusTone =
+    status === "pass"
+      ? "border-emerald-200/70 bg-emerald-50 text-emerald-700"
+      : status === "degraded"
+        ? "border-amber-200/70 bg-amber-50 text-amber-700"
+        : status === "fail"
+          ? "border-rose-200/70 bg-rose-50 text-rose-700"
+          : "border-border/60 bg-white/80 text-muted-foreground";
+  const sourcesCount = audit?.live_sources?.length ?? 0;
+  const surfacesCount = audit?.files?.length ?? 0;
+  const missingCount = audit?.discoverability_health?.missing?.length ?? 0;
+  const unreachableCount = audit?.discoverability_health?.unreachable?.length ?? 0;
+  const driftRequired = audit?.discoverability_health?.hash_mismatch_required?.length ?? 0;
+  const driftOptional = audit?.discoverability_health?.hash_mismatch_optional?.length ?? 0;
+  const driftTotal = driftRequired + driftOptional;
+
+  const lastCheckedLabel = (() => {
+    if (!audit?.live_checked_at) return "n/a";
+    const parsed = new Date(audit.live_checked_at);
+    return Number.isNaN(parsed.getTime()) ? audit.live_checked_at : parsed.toLocaleString();
+  })();
+
   return (
     <div className="space-y-10 animate-fade-up">
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
@@ -62,32 +87,50 @@ export function HomePage() {
         <Card className="border-border/60 bg-white/70">
           <CardHeader>
             <CardTitle>Verification proof</CardTitle>
-            <CardDescription>Live discovery audit across apex + Firebase hosting.</CardDescription>
+            <CardDescription>Live discovery audit across apex + hosting mirrors.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <CardContent className="space-y-4 text-sm text-muted-foreground">
             {auditQuery.isLoading ? <p>Loading audit…</p> : null}
             {auditQuery.isError ? <p>Audit unavailable.</p> : null}
-            {auditQuery.data ? (
+            {audit ? (
               <>
-                <div className="flex items-center justify-between rounded-xl border border-border/60 bg-white/80 px-3 py-2 text-xs uppercase tracking-wide">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-white/80 px-3 py-2 text-xs uppercase tracking-wide">
                   <span>Status</span>
-                  <span className="font-semibold text-foreground">
-                    {auditQuery.data.discoverability_health?.status ?? "unknown"}
+                  <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${statusTone}`}>
+                    {statusLabel}
                   </span>
                 </div>
-                <div className="space-y-1">
-                  <p>
-                    Last checked:{" "}
-                    <span className="font-medium text-foreground">
-                      {auditQuery.data.live_checked_at ?? "n/a"}
-                    </span>
-                  </p>
-                  <p>
-                    Sources:{" "}
-                    <span className="font-medium text-foreground">
-                      {(auditQuery.data.live_sources ?? []).join(" + ") || "n/a"}
-                    </span>
-                  </p>
+                <div className="grid gap-3 text-xs sm:grid-cols-2">
+                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                    <p className="uppercase tracking-wide text-muted-foreground">Sources verified</p>
+                    <p className="text-lg font-semibold text-foreground">{sourcesCount || "—"}</p>
+                    <p className="text-[0.7rem] text-muted-foreground">Apex + hosting mirrors</p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                    <p className="uppercase tracking-wide text-muted-foreground">Surfaces checked</p>
+                    <p className="text-lg font-semibold text-foreground">{surfacesCount || "—"}</p>
+                    <p className="text-[0.7rem] text-muted-foreground">Required + optional</p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                    <p className="uppercase tracking-wide text-muted-foreground">Hash drift</p>
+                    <p className="text-lg font-semibold text-foreground">{driftTotal}</p>
+                    <p className="text-[0.7rem] text-muted-foreground">
+                      req {driftRequired} · opt {driftOptional}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                    <p className="uppercase tracking-wide text-muted-foreground">Live errors</p>
+                    <p className="text-lg font-semibold text-foreground">{missingCount + unreachableCount}</p>
+                    <p className="text-[0.7rem] text-muted-foreground">
+                      missing {missingCount} · unreachable {unreachableCount}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <span className="text-muted-foreground">
+                    Last checked: <span className="font-medium text-foreground">{lastCheckedLabel}</span> · Spec v
+                    {audit.spec_version ?? "1.2"}
+                  </span>
                   <a className="text-emerald-700 hover:text-emerald-900" href="/discovery/audit/latest.pretty.json">
                     View latest.pretty.json →
                   </a>
