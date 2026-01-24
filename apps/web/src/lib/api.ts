@@ -1,6 +1,9 @@
 import type { DiffSummary, EvaluationResult, PillarScores } from "@agentability/shared";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+const SITE_BASE =
+  import.meta.env.VITE_SITE_URL ??
+  (API_BASE ? API_BASE.replace(/\/v1\/?$/, "") : "");
 
 export type EvaluateResponse = {
   runId: string;
@@ -71,7 +74,9 @@ export async function fetchLatest(domain: string): Promise<LatestEvaluation> {
 }
 
 export async function fetchDiscoveryAudit(): Promise<DiscoveryAudit> {
-  const response = await fetch(`${API_BASE}/discovery/audit/latest.pretty.json`);
+  const base =
+    SITE_BASE || (typeof window !== "undefined" ? window.location.origin : "");
+  const response = await fetch(`${base}/discovery/audit/latest.pretty.json`);
   if (!response.ok) {
     throw new Error("Audit not available");
   }
