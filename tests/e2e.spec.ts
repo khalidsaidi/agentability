@@ -7,6 +7,16 @@ test.describe("Agentability e2e", () => {
     await page.addInitScript(() => {
       window.localStorage.setItem("agentability.tour.v1", "seen");
     });
+    page.on("pageerror", (error) => {
+      // eslint-disable-next-line no-console
+      console.error("PAGEERROR:", error.message);
+    });
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        // eslint-disable-next-line no-console
+        console.error("CONSOLE:", msg.text());
+      }
+    });
   });
 
   test("landing renders and shows proof panel", async ({ page }) => {
