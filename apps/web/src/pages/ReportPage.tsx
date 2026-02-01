@@ -283,6 +283,83 @@ export function ReportPage() {
     type: "article",
   });
 
+  const report = query.data;
+  const score = report?.score ?? 0;
+  const diff = report?.diff;
+  const previousSummary = report?.previousSummary;
+  const [displayScore, setDisplayScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  useEffect(() => {
+    if (!report) return;
+    let frame = 0;
+    const start = performance.now();
+    const duration = 800;
+    const from = 0;
+    const to = report.score;
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayScore(Number((from + (to - from) * eased).toFixed(1)));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [report]);
+
+  useEffect(() => {
+    if (!report) return;
+    const isCelebration = report.grade.toUpperCase().startsWith("A");
+    if (!isCelebration) return;
+    setShowConfetti(true);
+    const timer = window.setTimeout(() => setShowConfetti(false), 1800);
+    return () => window.clearTimeout(timer);
+  }, [report]);
+
+  useEffect(() => {
+    if (!report || !soundEnabled) return;
+    const isCelebration = report.grade.toUpperCase().startsWith("A");
+    if (!isCelebration) return;
+    const audio = new Audio(
+      "data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVQAAAAA////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh"
+    );
+    audio.volume = 0.2;
+    audio.play().catch(() => null);
+  }, [report, soundEnabled]);
+
+  const scoreMessage = useMemo(() => {
+    if (score >= 90) {
+      return "Outstanding — your public surfaces are ready for AI agents.";
+    }
+    if (score >= 80) {
+      return "Strong foundation — a few improvements unlock an A.";
+    }
+    if (score >= 70) {
+      return "Solid start — tighten a few key surfaces to level up.";
+    }
+    return "Early stage — fix the highlighted gaps to become agent‑ready.";
+  }, [score]);
+
+  const estimatedPercentile = useMemo(() => {
+    const raw = Math.round(score * 0.85 + 10);
+    return Math.max(5, Math.min(95, raw));
+  }, [score]);
+
+  const achievementChips = useMemo(() => {
+    const chips: string[] = ["Public‑mode verified"];
+    if (report && !report.previousRunId) chips.push("First audit");
+    if (diff && diff.scoreDelta > 0) chips.push("Improved score");
+    if (diff && diff.scoreDelta === 0) chips.push("Stable run");
+    if (report) {
+      const failCount = report.checks.filter((check) => check.status === "fail").length;
+      const warnCount = report.checks.filter((check) => check.status === "warn").length;
+      if (failCount === 0 && warnCount === 0) chips.push("Clean pass");
+    }
+    return chips;
+  }, [diff, report]);
+
   if (query.isLoading) {
     return <div className="animate-fade-up text-sm text-muted-foreground">Loading report…</div>;
   }
@@ -298,9 +375,17 @@ export function ReportPage() {
     );
   }
 
-  const report = query.data;
-  const diff = report.diff;
-  const previousSummary = report.previousSummary;
+  if (!report) {
+    return (
+      <div className="animate-fade-up">
+        <p className="text-sm text-destructive">Report not found.</p>
+        <Link className="text-sm text-emerald-700" to="/">
+          Back to home
+        </Link>
+      </div>
+    );
+  }
+
   const pillarEntries = Object.entries(report.pillarScores) as [PillarKey, number][];
   const sortedPillars = [...pillarEntries].sort((a, b) => b[1] - a[1]);
   const strongest = sortedPillars.slice(0, 2);
@@ -386,72 +471,6 @@ export function ReportPage() {
   const uniqueActions = Array.from(new Set(improvementActions)).slice(0, 6);
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://agentability.org";
   const certUrl = `${baseUrl}/cert/${report.domain}`;
-  const [displayScore, setDisplayScore] = useState(0);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(false);
-
-  useEffect(() => {
-    let frame = 0;
-    const start = performance.now();
-    const duration = 800;
-    const from = 0;
-    const to = report.score;
-
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayScore(Number((from + (to - from) * eased).toFixed(1)));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [report.score]);
-
-  useEffect(() => {
-    const isCelebration = report.grade.toUpperCase().startsWith("A");
-    if (!isCelebration) return;
-    setShowConfetti(true);
-    const timer = window.setTimeout(() => setShowConfetti(false), 1800);
-    return () => window.clearTimeout(timer);
-  }, [report.grade]);
-
-  useEffect(() => {
-    if (!soundEnabled) return;
-    const isCelebration = report.grade.toUpperCase().startsWith("A");
-    if (!isCelebration) return;
-    const audio = new Audio(
-      "data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVQAAAAA////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh"
-    );
-    audio.volume = 0.2;
-    audio.play().catch(() => null);
-  }, [report.grade, soundEnabled]);
-
-  const scoreMessage = useMemo(() => {
-    if (report.score >= 90) {
-      return "Outstanding — your public surfaces are ready for AI agents.";
-    }
-    if (report.score >= 80) {
-      return "Strong foundation — a few improvements unlock an A.";
-    }
-    if (report.score >= 70) {
-      return "Solid start — tighten a few key surfaces to level up.";
-    }
-    return "Early stage — fix the highlighted gaps to become agent‑ready.";
-  }, [report.score]);
-
-  const estimatedPercentile = useMemo(() => {
-    const raw = Math.round(report.score * 0.85 + 10);
-    return Math.max(5, Math.min(95, raw));
-  }, [report.score]);
-
-  const achievementChips = useMemo(() => {
-    const chips: string[] = ["Public‑mode verified"];
-    if (!report.previousRunId) chips.push("First audit");
-    if (diff && diff.scoreDelta > 0) chips.push("Improved score");
-    if (diff && diff.scoreDelta === 0) chips.push("Stable run");
-    if (failCount === 0 && warnCount === 0) chips.push("Clean pass");
-    return chips;
-  }, [diff, failCount, report.previousRunId, warnCount]);
 
   const aiView = {
     entrypoints: report.evidenceIndex?.entrypoints?.slice(0, 3) ?? [],
