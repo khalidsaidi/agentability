@@ -1,11 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { URLInputCard } from "@/components/URLInputCard";
-import { evaluateOrigin, fetchDiscoveryAudit } from "@/lib/api";
+import { evaluateOrigin, fetchDiscoveryAudit, fetchLeaderboard } from "@/lib/api";
 import { useSeo } from "@/lib/seo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { OnboardingTour } from "@/components/OnboardingTour";
 
 export function HomePage() {
   useSeo({
@@ -16,9 +18,14 @@ export function HomePage() {
   });
 
   const navigate = useNavigate();
+  const [showTour, setShowTour] = useState(false);
   const auditQuery = useQuery({
     queryKey: ["discovery-audit"],
     queryFn: fetchDiscoveryAudit,
+  });
+  const leaderboardQuery = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: fetchLeaderboard,
   });
   const mutation = useMutation({
     mutationFn: (origin: string) => evaluateOrigin(origin),
@@ -54,6 +61,7 @@ export function HomePage() {
 
   return (
     <div className="space-y-10 animate-fade-up">
+      <OnboardingTour forceOpen={showTour} />
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white/70 px-3 py-1 text-xs font-medium uppercase tracking-wider">
@@ -75,6 +83,9 @@ export function HomePage() {
             </Button>
             <Button asChild variant="secondary">
               <a href="/reports/aistatusdashboard.com">View showcase report</a>
+            </Button>
+            <Button variant="outline" onClick={() => setShowTour(true)}>
+              Take the 30s tour
             </Button>
           </div>
           <URLInputCard
@@ -218,6 +229,64 @@ export function HomePage() {
             >
               GitHub repo
             </a>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>Community showcase</CardTitle>
+          <CardDescription>Opt‑in leaderboard of AI‑ready sites.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm text-muted-foreground">
+          <p>
+            This list is curated and opt‑in only. Want to be featured?{" "}
+            <a className="text-emerald-700 hover:text-emerald-900" href="mailto:hello@agentability.org">
+              Submit your site
+            </a>
+            .
+          </p>
+          {leaderboardQuery.isLoading ? <p>Loading showcase…</p> : null}
+          {leaderboardQuery.isError ? <p>Showcase unavailable.</p> : null}
+          {leaderboardQuery.data ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {leaderboardQuery.data.entries.map((entry, index) => (
+                <div key={entry.domain} className="rounded-2xl border border-border/60 bg-white/80 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    #{index + 1}
+                  </p>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="font-semibold text-foreground">{entry.domain}</span>
+                    <span className="text-sm font-semibold text-foreground">
+                      {entry.score.toFixed(1)} ({entry.grade})
+                    </span>
+                  </div>
+                  <a className="mt-2 block text-xs text-emerald-700" href={entry.reportUrl}>
+                    View report →
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>Meet Ada</CardTitle>
+          <CardDescription>Your guide to AI‑native readiness.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-[0.35fr_0.65fr]">
+          <img src="/mascot.svg" alt="Agentability mascot" className="w-40 mascot-float" />
+          <div className="space-y-3">
+            <p>
+              Ada is our verification guide. She keeps the audit strict, and the fixes actionable.
+            </p>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>Explains what agents need in plain language.</li>
+              <li>Highlights the highest‑impact fixes first.</li>
+              <li>Celebrates progress every time you improve.</li>
+            </ul>
           </div>
         </CardContent>
       </Card>

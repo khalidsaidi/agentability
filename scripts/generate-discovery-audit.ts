@@ -86,6 +86,9 @@ const optionalSurfaces: Surface[] = [
   { path: "/cert-seal.svg", expectedContentType: "image/svg+xml" },
   { path: "/logo.png", expectedContentType: "image/png" },
   { path: "/og.png", expectedContentType: "image/png" },
+  { path: "/leaderboard.json", expectedContentType: "application/json; charset=utf-8" },
+  { path: "/mascot.svg", expectedContentType: "image/svg+xml" },
+  { path: "/brand/mascot.svg", expectedContentType: "image/svg+xml" },
 ];
 
 function toSha256(buffer: Buffer): string {

@@ -42,6 +42,20 @@ export type DiscoveryAudit = {
   };
 };
 
+export type LeaderboardEntry = {
+  domain: string;
+  score: number;
+  grade: string;
+  reportUrl: string;
+  badgeUrl?: string;
+  verifiedAt?: string;
+};
+
+export type LeaderboardResponse = {
+  updatedAt?: string;
+  entries: LeaderboardEntry[];
+};
+
 export async function evaluateOrigin(origin: string, profile?: string): Promise<EvaluateResponse> {
   const response = await fetch(`${API_BASE}/v1/evaluate`, {
     method: "POST",
@@ -83,6 +97,18 @@ export async function fetchDiscoveryAudit(): Promise<DiscoveryAudit> {
   const response = await fetch(`${base}/discovery/audit/latest.pretty.json`);
   if (!response.ok) {
     throw new Error("Audit not available");
+  }
+  return response.json();
+}
+
+export async function fetchLeaderboard(): Promise<LeaderboardResponse> {
+  const base =
+    typeof window !== "undefined" && window.location.origin
+      ? window.location.origin
+      : SITE_BASE;
+  const response = await fetch(`${base}/leaderboard.json`);
+  if (!response.ok) {
+    throw new Error("Leaderboard not available");
   }
   return response.json();
 }

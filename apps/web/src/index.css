@@ -103,3 +103,19 @@
     transform: translate3d(var(--x), 220px, 0) rotate(calc(var(--rotate) + 180deg));
   }
 }
+
+@keyframes mascot-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.mascot-float {
+  animation: mascot-float 4s ease-in-out infinite;
+}
