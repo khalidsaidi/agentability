@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BadgeEmbed } from "@/components/share/BadgeEmbed";
+import { ConfettiBurst } from "@/components/ConfettiBurst";
 
 const PILLAR_LABELS = {
   discovery: "Discovery",
@@ -386,6 +387,8 @@ export function ReportPage() {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://agentability.org";
   const certUrl = `${baseUrl}/cert/${report.domain}`;
   const [displayScore, setDisplayScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
 
   useEffect(() => {
     let frame = 0;
@@ -404,6 +407,25 @@ export function ReportPage() {
     return () => cancelAnimationFrame(frame);
   }, [report.score]);
 
+  useEffect(() => {
+    const isCelebration = report.grade.toUpperCase().startsWith("A");
+    if (!isCelebration) return;
+    setShowConfetti(true);
+    const timer = window.setTimeout(() => setShowConfetti(false), 1800);
+    return () => window.clearTimeout(timer);
+  }, [report.grade]);
+
+  useEffect(() => {
+    if (!soundEnabled) return;
+    const isCelebration = report.grade.toUpperCase().startsWith("A");
+    if (!isCelebration) return;
+    const audio = new Audio(
+      "data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVQAAAAA////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh"
+    );
+    audio.volume = 0.2;
+    audio.play().catch(() => null);
+  }, [report.grade, soundEnabled]);
+
   const scoreMessage = useMemo(() => {
     if (report.score >= 90) {
       return "Outstanding — your public surfaces are ready for AI agents.";
@@ -415,6 +437,11 @@ export function ReportPage() {
       return "Solid start — tighten a few key surfaces to level up.";
     }
     return "Early stage — fix the highlighted gaps to become agent‑ready.";
+  }, [report.score]);
+
+  const estimatedPercentile = useMemo(() => {
+    const raw = Math.round(report.score * 0.85 + 10);
+    return Math.max(5, Math.min(95, raw));
   }, [report.score]);
 
   const achievementChips = useMemo(() => {
@@ -447,7 +474,8 @@ export function ReportPage() {
       </div>
 
       <Card className="border-border/60 bg-white/70">
-        <CardContent className="grid gap-6 p-6 md:grid-cols-[1.1fr_0.9fr]">
+        <CardContent className="relative grid gap-6 p-6 md:grid-cols-[1.1fr_0.9fr]">
+          <ConfettiBurst active={showConfetti} />
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 px-4 py-3">
@@ -468,10 +496,53 @@ export function ReportPage() {
                 </Badge>
               ))}
             </div>
-            <div className="rounded-2xl border border-border/60 bg-white/80 p-4 text-sm text-muted-foreground">
-              Score gap: {scoreGap} points. {issueInsights.length
-                ? "Top issues below account for most of the gap."
-                : "All public checks passed in this run."}
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl border border-border/60 bg-white/80 p-4 text-sm text-muted-foreground">
+                Score gap: {scoreGap} points.{" "}
+                {issueInsights.length
+                  ? "Top issues below account for most of the gap."
+                  : "All public checks passed in this run."}
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-white/80 p-4 text-sm text-muted-foreground">
+                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Benchmark (beta)</span>
+                <div className="mt-2 text-lg font-semibold text-foreground">
+                  Better than ~{estimatedPercentile}% of sites
+                </div>
+                <p className="text-xs">
+                  Estimated from a public‑mode baseline while we collect more data.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant={soundEnabled ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setSoundEnabled((prev) => !prev)}
+              >
+                Sound: {soundEnabled ? "On" : "Off"}
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                    `Agentability score for ${report.domain}: ${report.score}/100 (${report.grade}).`
+                  )}&url=${encodeURIComponent(`${baseUrl}/reports/${report.domain}`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Share on X
+                </a>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  void navigator.clipboard?.writeText(
+                    `Agentability score for ${report.domain}: ${report.score}/100 (${report.grade}) ${baseUrl}/reports/${report.domain}`
+                  )
+                }
+              >
+                Copy share text
+              </Button>
             </div>
           </div>
           <div className="space-y-4 rounded-2xl border border-border/60 bg-white/80 p-4">

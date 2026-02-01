@@ -1,4 +1,5 @@
 import type { PillarScores } from "@agentability/shared";
+import { useEffect, useState } from "react";
 
 const PILLARS: { key: keyof PillarScores; label: string }[] = [
   { key: "discovery", label: "Discovery" },
@@ -9,6 +10,21 @@ const PILLARS: { key: keyof PillarScores; label: string }[] = [
 ];
 
 export function PillarBreakdown({ pillarScores }: { pillarScores: PillarScores }) {
+  const [animated, setAnimated] = useState<Record<keyof PillarScores, number>>({
+    discovery: 0,
+    callableSurface: 0,
+    llmIngestion: 0,
+    trust: 0,
+    reliability: 0,
+  });
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setAnimated(pillarScores);
+    }, 50);
+    return () => window.clearTimeout(timer);
+  }, [pillarScores]);
+
   return (
     <div className="grid gap-4">
       {PILLARS.map((pillar) => (
@@ -19,8 +35,8 @@ export function PillarBreakdown({ pillarScores }: { pillarScores: PillarScores }
           </div>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-emerald-500"
-              style={{ width: `${pillarScores[pillar.key]}%` }}
+              className="h-full rounded-full bg-emerald-500 transition-all duration-700 ease-out"
+              style={{ width: `${animated[pillar.key]}%` }}
             />
           </div>
         </div>

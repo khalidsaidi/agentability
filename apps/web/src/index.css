@@ -79,3 +79,27 @@
     @apply font-display;
   }
 }
+
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate3d(var(--x), -12px, 0) rotate(var(--rotate));
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fall var(--duration) ease-out var(--delay) forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--x), -12px, 0) rotate(var(--rotate));
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--x), 220px, 0) rotate(calc(var(--rotate) + 180deg));
+  }
+}
