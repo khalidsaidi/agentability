@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchLatest } from "@/lib/api";
 import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
 import { getFixIt } from "@agentability/shared";
 import type { EvaluationProfile } from "@agentability/shared";
-import { ScoreBadge } from "@/components/ScoreBadge";
 import { PillarBreakdown } from "@/components/PillarBreakdown";
 import { FailuresList } from "@/components/FailuresList";
 import { EvidenceLinks } from "@/components/EvidenceLinks";
@@ -385,6 +385,53 @@ export function ReportPage() {
   const uniqueActions = Array.from(new Set(improvementActions)).slice(0, 6);
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://agentability.org";
   const certUrl = `${baseUrl}/cert/${report.domain}`;
+  const [displayScore, setDisplayScore] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    const start = performance.now();
+    const duration = 800;
+    const from = 0;
+    const to = report.score;
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayScore(Number((from + (to - from) * eased).toFixed(1)));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [report.score]);
+
+  const scoreMessage = useMemo(() => {
+    if (report.score >= 90) {
+      return "Outstanding — your public surfaces are ready for AI agents.";
+    }
+    if (report.score >= 80) {
+      return "Strong foundation — a few improvements unlock an A.";
+    }
+    if (report.score >= 70) {
+      return "Solid start — tighten a few key surfaces to level up.";
+    }
+    return "Early stage — fix the highlighted gaps to become agent‑ready.";
+  }, [report.score]);
+
+  const achievementChips = useMemo(() => {
+    const chips: string[] = ["Public‑mode verified"];
+    if (!report.previousRunId) chips.push("First audit");
+    if (diff && diff.scoreDelta > 0) chips.push("Improved score");
+    if (diff && diff.scoreDelta === 0) chips.push("Stable run");
+    if (failCount === 0 && warnCount === 0) chips.push("Clean pass");
+    return chips;
+  }, [diff, failCount, report.previousRunId, warnCount]);
+
+  const aiView = {
+    entrypoints: report.evidenceIndex?.entrypoints?.slice(0, 3) ?? [],
+    callable: report.evidenceIndex?.callable?.slice(0, 3) ?? [],
+    docs: report.evidenceIndex?.docs?.slice(0, 3) ?? [],
+    attestations: report.evidenceIndex?.attestations?.slice(0, 3) ?? [],
+  };
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -396,8 +443,80 @@ export function ReportPage() {
             {isShowcase ? <Badge variant="outline">Showcase example</Badge> : null}
           </div>
         </div>
-        <ScoreBadge score={report.score} grade={report.grade} />
+        <Badge variant="outline">{report.profile}</Badge>
       </div>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardContent className="grid gap-6 p-6 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-emerald-700">Score</p>
+                <div className="text-3xl font-semibold text-emerald-900">
+                  {displayScore.toFixed(1)}
+                </div>
+              </div>
+              <div>
+                <div className="text-2xl font-semibold text-foreground">{report.grade}</div>
+                <p className="text-sm text-muted-foreground">{scoreMessage}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {achievementChips.map((chip) => (
+                <Badge key={chip} variant="outline">
+                  {chip}
+                </Badge>
+              ))}
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-white/80 p-4 text-sm text-muted-foreground">
+              Score gap: {scoreGap} points. {issueInsights.length
+                ? "Top issues below account for most of the gap."
+                : "All public checks passed in this run."}
+            </div>
+          </div>
+          <div className="space-y-4 rounded-2xl border border-border/60 bg-white/80 p-4">
+            <div className="text-sm font-semibold text-foreground">What an AI agent sees</div>
+            <div className="space-y-3 text-xs text-muted-foreground">
+              <div>
+                <p className="uppercase tracking-wide">Entrypoints</p>
+                {aiView.entrypoints.length ? (
+                  <ul className="mt-1 space-y-1">
+                    {aiView.entrypoints.map((url) => (
+                      <li key={url} className="truncate">{url}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1">No entrypoints detected.</p>
+                )}
+              </div>
+              <div>
+                <p className="uppercase tracking-wide">Callable</p>
+                {aiView.callable.length ? (
+                  <ul className="mt-1 space-y-1">
+                    {aiView.callable.map((url) => (
+                      <li key={url} className="truncate">{url}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1">No callable surface detected.</p>
+                )}
+              </div>
+              <div>
+                <p className="uppercase tracking-wide">Docs</p>
+                {aiView.docs.length ? (
+                  <ul className="mt-1 space-y-1">
+                    {aiView.docs.map((url) => (
+                      <li key={url} className="truncate">{url}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1">Docs entrypoint missing.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {isShowcase ? (
         <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4 text-sm text-emerald-900">

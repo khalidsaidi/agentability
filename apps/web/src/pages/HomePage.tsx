@@ -60,11 +60,11 @@ export function HomePage() {
             Agentability · Authority Mode
           </div>
           <h1 className="text-4xl leading-tight md:text-5xl">
-            Agentability Standard for AI‑Native Web Apps
+            Make your site instantly usable by AI agents
           </h1>
           <p className="max-w-xl text-base text-muted-foreground">
-            Publish verifiable discovery surfaces, callable tools, and evidence‑backed trust signals. Agentability
-            grades how ready your web app is for autonomous agents.
+            Run a public audit that translates AI‑readiness into plain language, concrete fixes, and a shareable
+            score your team can improve.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild variant="outline">
@@ -82,6 +82,20 @@ export function HomePage() {
             loading={mutation.isPending}
             error={mutation.isError ? (mutation.error instanceof Error ? mutation.error.message : "Request failed") : null}
           />
+          <div className="grid gap-3 rounded-2xl border border-border/60 bg-white/70 p-4 text-sm text-muted-foreground md:grid-cols-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">What you get</p>
+              <p className="mt-2 text-sm text-foreground">A score, a report, and copy‑paste fixes.</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Time to value</p>
+              <p className="mt-2 text-sm text-foreground">Most audits finish in under 60 seconds.</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Built for trust</p>
+              <p className="mt-2 text-sm text-foreground">Evidence‑backed, verifiable, and public‑only.</p>
+            </div>
+          </div>
         </div>
 
         <Card className="border-border/60 bg-white/70">
@@ -140,6 +154,27 @@ export function HomePage() {
           </CardContent>
         </Card>
       </section>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>How it works</CardTitle>
+          <CardDescription>Three steps to agent‑ready visibility.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">1. Scan</p>
+            <p className="mt-2 text-sm text-foreground">We discover your public AI entrypoints.</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">2. Score</p>
+            <p className="mt-2 text-sm text-foreground">We check callability, docs, and trust.</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">3. Improve</p>
+            <p className="mt-2 text-sm text-foreground">You get fixes, evidence, and shareable proof.</p>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border-border/60 bg-white/70">
         <CardContent className="flex flex-wrap items-center gap-3 py-5 text-xs uppercase tracking-wider text-muted-foreground">
