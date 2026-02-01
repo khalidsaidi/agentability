@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchRun } from "@/lib/api";
 import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
@@ -8,6 +8,29 @@ import { PillarBreakdown } from "@/components/PillarBreakdown";
 import { FailuresList } from "@/components/FailuresList";
 import { CopyLinks } from "@/components/CopyLinks";
 import { Badge } from "@/components/ui/badge";
+
+const STEPS = [
+  {
+    title: "Discovery sweep",
+    detail: "Finding entrypoints and manifests.",
+  },
+  {
+    title: "Callable surface check",
+    detail: "Validating OpenAPI and tool endpoints.",
+  },
+  {
+    title: "Docs & ingestion",
+    detail: "Checking docs and LLM entrypoints.",
+  },
+  {
+    title: "Trust signals",
+    detail: "Verifying legal, contact, and attestations.",
+  },
+  {
+    title: "Reliability pass",
+    detail: "Repeating key fetches for stability.",
+  },
+];
 
 export function RunPage() {
   const params = useParams();
@@ -36,6 +59,17 @@ export function RunPage() {
     noIndex: true,
   });
 
+  const [activeStep, setActiveStep] = useState(0);
+  const runStatus = query.data?.status;
+
+  useEffect(() => {
+    if (runStatus !== "running") return;
+    const timer = window.setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % STEPS.length);
+    }, 1600);
+    return () => window.clearInterval(timer);
+  }, [runStatus]);
+
   if (query.isLoading) {
     return <div className="animate-fade-up text-sm text-muted-foreground">Loading run…</div>;
   }
@@ -52,40 +86,6 @@ export function RunPage() {
   }
 
   const run = query.data;
-  const steps = useMemo(
-    () => [
-      {
-        title: "Discovery sweep",
-        detail: "Finding entrypoints and manifests.",
-      },
-      {
-        title: "Callable surface check",
-        detail: "Validating OpenAPI and tool endpoints.",
-      },
-      {
-        title: "Docs & ingestion",
-        detail: "Checking docs and LLM entrypoints.",
-      },
-      {
-        title: "Trust signals",
-        detail: "Verifying legal, contact, and attestations.",
-      },
-      {
-        title: "Reliability pass",
-        detail: "Repeating key fetches for stability.",
-      },
-    ],
-    []
-  );
-  const [activeStep, setActiveStep] = useState(0);
-
-  useEffect(() => {
-    if (run.status !== "running") return;
-    const timer = window.setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % steps.length);
-    }, 1600);
-    return () => window.clearInterval(timer);
-  }, [run.status, steps.length]);
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -115,7 +115,7 @@ export function RunPage() {
             <div className="h-full w-1/2 animate-pulse rounded-full bg-emerald-500/70" />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {steps.map((step, index) => {
+            {STEPS.map((step, index) => {
               const isActive = index === activeStep;
               return (
                 <div

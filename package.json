@@ -11,9 +11,11 @@
     "build:artifacts": "tsx scripts/build-artifacts.ts",
     "build:ssr-assets": "tsx scripts/build-ssr-assets.ts",
     "check:ai": "tsx scripts/check-ai-surfaces.ts",
-    "build": "pnpm build:artifacts && pnpm -C apps/web build && pnpm build:ssr-assets && pnpm -C apps/functions build"
+    "build": "pnpm build:artifacts && pnpm -C apps/web build && pnpm build:ssr-assets && pnpm -C apps/functions build",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.1",
     "tsx": "^4.20.0",
     "yaml": "^2.8.1"
   }
