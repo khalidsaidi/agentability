@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { trackEvent } from "@/lib/analytics";
 
 type CopyLinksProps = {
   reportUrl?: string;
@@ -23,6 +24,9 @@ function LinkRow({ label, value }: LinkRowProps) {
         onClick={() => {
           if (value) {
             void navigator.clipboard.writeText(value);
+            trackEvent("copy_link", { label, value });
+          } else {
+            trackEvent("copy_link_empty", { label });
           }
         }}
       >

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchRun } from "@/lib/api";
 import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
@@ -8,6 +8,7 @@ import { PillarBreakdown } from "@/components/PillarBreakdown";
 import { FailuresList } from "@/components/FailuresList";
 import { CopyLinks } from "@/components/CopyLinks";
 import { Badge } from "@/components/ui/badge";
+import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
 
 const STEPS = [
   {
@@ -61,14 +62,71 @@ export function RunPage() {
 
   const [activeStep, setActiveStep] = useState(0);
   const runStatus = query.data?.status;
+  const lastStatus = useRef<string | null>(null);
+  const viewedRun = useRef<string | null>(null);
 
   useEffect(() => {
     if (runStatus !== "running") return;
     const timer = window.setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % STEPS.length);
+      setActiveStep((prev) => {
+        const next = (prev + 1) % STEPS.length;
+        trackEvent("run_progress_step", { run_id: runId, step_index: next, step_title: STEPS[next]?.title });
+        return next;
+      });
     }, 1600);
     return () => window.clearInterval(timer);
   }, [runStatus]);
+
+  useEffect(() => {
+    if (query.isError) {
+      trackError("run_fetch_error", query.error, { run_id: runId });
+    }
+  }, [query.isError, query.error, runId]);
+
+  useEffect(() => {
+    if (!query.data) return;
+    if (viewedRun.current !== query.data.runId) {
+      viewedRun.current = query.data.runId;
+      trackEvent("run_view", {
+        run_id: query.data.runId,
+        domain: query.data.domain,
+        status: query.data.status,
+        score: query.data.score,
+        grade: query.data.grade,
+        profile: query.data.profile,
+      });
+    }
+    const status = query.data.status;
+    if (lastStatus.current !== status) {
+      trackEvent("run_status", {
+        run_id: query.data.runId,
+        domain: query.data.domain,
+        status,
+        score: query.data.score,
+        grade: query.data.grade,
+        profile: query.data.profile,
+      });
+      lastStatus.current = status;
+    }
+    if (status === "complete") {
+      trackEvent("run_complete", {
+        run_id: query.data.runId,
+        domain: query.data.domain,
+        score: query.data.score,
+        grade: query.data.grade,
+        profile: query.data.profile,
+        fail_count: query.data.checks.filter((check) => check.status === "fail").length,
+        warn_count: query.data.checks.filter((check) => check.status === "warn").length,
+      });
+    }
+    if (status === "failed") {
+      trackEvent("run_failed", {
+        run_id: query.data.runId,
+        domain: query.data.domain,
+        error: query.data.error,
+      });
+    }
+  }, [query.data]);
 
   if (query.isLoading) {
     return <div className="animate-fade-up text-sm text-muted-foreground">Loading run…</div>;
@@ -167,7 +225,11 @@ export function RunPage() {
 
       <div className="text-sm text-muted-foreground">
         <span>View report:</span>{" "}
-        <Link className="text-emerald-700" to={`/reports/${run.domain}`}>
+        <Link
+          className="text-emerald-700"
+          to={`/reports/${run.domain}`}
+          onClick={() => trackLinkClick("run_view_report", `/reports/${run.domain}`, { run_id: run.runId })}
+        >
           /reports/{run.domain}
         </Link>
       </div>

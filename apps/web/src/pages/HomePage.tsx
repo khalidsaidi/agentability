@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { URLInputCard } from "@/components/URLInputCard";
 import { evaluateOrigin, fetchDiscoveryAudit, fetchLeaderboard } from "@/lib/api";
 import { useSeo } from "@/lib/seo";
@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
 
 export function HomePage() {
   useSeo({
@@ -30,9 +31,44 @@ export function HomePage() {
   const mutation = useMutation({
     mutationFn: (origin: string) => evaluateOrigin(origin),
     onSuccess: (data) => {
+      trackEvent("audit_start", {
+        run_id: data.runId,
+        status: data.status,
+        report_url: data.reportUrl,
+        json_url: data.jsonUrl,
+        domain: data.domain,
+      });
       navigate(`/runs/${data.runId}`);
     },
+    onError: (error) => {
+      trackError("audit_request_error", error);
+    },
   });
+
+  useEffect(() => {
+    if (auditQuery.isError) {
+      trackError("audit_proof_error", auditQuery.error);
+    }
+    if (auditQuery.data) {
+      trackEvent("audit_proof_loaded", {
+        status: auditQuery.data.discoverability_health?.status,
+        sources_count: auditQuery.data.live_sources?.length ?? 0,
+        surfaces_count: auditQuery.data.files?.length ?? 0,
+      });
+    }
+  }, [auditQuery.isError, auditQuery.data]);
+
+  useEffect(() => {
+    if (leaderboardQuery.isError) {
+      trackError("leaderboard_error", leaderboardQuery.error);
+    }
+    if (leaderboardQuery.data) {
+      trackEvent("leaderboard_loaded", {
+        entries: leaderboardQuery.data.entries?.length ?? 0,
+        updated_at: leaderboardQuery.data.updatedAt,
+      });
+    }
+  }, [leaderboardQuery.isError, leaderboardQuery.data]);
 
   const audit = auditQuery.data;
   const status = audit?.discoverability_health?.status ?? "unknown";
@@ -87,15 +123,30 @@ export function HomePage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild variant="outline">
-              <a href="/spec.md">Read the Spec</a>
+              <a href="/spec.md" onClick={() => trackLinkClick("home_spec", "/spec.md")}>
+                Read the Spec
+              </a>
             </Button>
             <Button asChild variant="outline">
-              <a href="/discovery/audit">See Verification</a>
+              <a href="/discovery/audit" onClick={() => trackLinkClick("home_verification", "/discovery/audit")}>
+                See Verification
+              </a>
             </Button>
             <Button asChild variant="secondary">
-              <a href="/reports/aistatusdashboard.com">View showcase report</a>
+              <a
+                href="/reports/aistatusdashboard.com"
+                onClick={() => trackLinkClick("home_showcase", "/reports/aistatusdashboard.com")}
+              >
+                View showcase report
+              </a>
             </Button>
-            <Button variant="outline" onClick={() => setShowTour(true)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                trackEvent("tour_open_click");
+                setShowTour(true);
+              }}
+            >
               Take the 30s tour
             </Button>
           </div>
@@ -179,7 +230,15 @@ export function HomePage() {
                     Last checked: <span className="font-medium text-foreground">{lastCheckedLabel}</span> · Spec v
                     {audit.spec_version ?? "1.2"}
                   </span>
-                  <a className="text-emerald-700 hover:text-emerald-900" href="/discovery/audit/latest.pretty.json">
+                  <a
+                    className="text-emerald-700 hover:text-emerald-900"
+                    href="/discovery/audit/latest.pretty.json"
+                    onClick={() =>
+                      trackLinkClick("audit_latest_pretty", "/discovery/audit/latest.pretty.json", {
+                        status: audit.discoverability_health?.status,
+                      })
+                    }
+                  >
                     View latest.pretty.json →
                   </a>
                 </div>
@@ -234,16 +293,32 @@ export function HomePage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 text-sm md:grid-cols-2">
-            <a className="text-muted-foreground hover:text-foreground" href="/.well-known/air.json">
+            <a
+              className="text-muted-foreground hover:text-foreground"
+              href="/.well-known/air.json"
+              onClick={() => trackLinkClick("ai_air_json", "/.well-known/air.json")}
+            >
               /.well-known/air.json
             </a>
-            <a className="text-muted-foreground hover:text-foreground" href="/.well-known/openapi.json">
+            <a
+              className="text-muted-foreground hover:text-foreground"
+              href="/.well-known/openapi.json"
+              onClick={() => trackLinkClick("ai_openapi_json", "/.well-known/openapi.json")}
+            >
               /.well-known/openapi.json
             </a>
-            <a className="text-muted-foreground hover:text-foreground" href="/llms.txt">
+            <a
+              className="text-muted-foreground hover:text-foreground"
+              href="/llms.txt"
+              onClick={() => trackLinkClick("ai_llms_txt", "/llms.txt")}
+            >
               /llms.txt
             </a>
-            <a className="text-muted-foreground hover:text-foreground" href="/discovery/audit/latest.json">
+            <a
+              className="text-muted-foreground hover:text-foreground"
+              href="/discovery/audit/latest.json"
+              onClick={() => trackLinkClick("ai_audit_latest", "/discovery/audit/latest.json")}
+            >
               /discovery/audit/latest.json
             </a>
             <a
@@ -264,7 +339,11 @@ export function HomePage() {
         <CardContent className="space-y-4 text-sm text-muted-foreground">
           <p>
             This list is curated and opt‑in only. Want to be featured?{" "}
-            <a className="text-emerald-700 hover:text-emerald-900" href="mailto:hello@agentability.org">
+            <a
+              className="text-emerald-700 hover:text-emerald-900"
+              href="mailto:hello@agentability.org"
+              onClick={() => trackLinkClick("leaderboard_submit", "mailto:hello@agentability.org")}
+            >
               Submit your site
             </a>
             .
@@ -284,7 +363,13 @@ export function HomePage() {
                       {entry.score.toFixed(1)} ({entry.grade})
                     </span>
                   </div>
-                  <a className="mt-2 block text-xs text-emerald-700" href={entry.reportUrl}>
+                  <a
+                    className="mt-2 block text-xs text-emerald-700"
+                    href={entry.reportUrl}
+                    onClick={() =>
+                      trackLinkClick("leaderboard_report", entry.reportUrl, { domain: entry.domain, rank: index + 1 })
+                    }
+                  >
                     View report →
                   </a>
                 </div>

@@ -1,5 +1,6 @@
 import type { EvaluationResult } from "@agentability/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { trackLinkClick } from "@/lib/analytics";
 
 const emptyLabel = "No evidence captured.";
 
@@ -28,6 +29,7 @@ export function EvidenceLinks({ evidenceIndex }: { evidenceIndex: EvaluationResu
                       target="_blank"
                       rel="noreferrer"
                       className="break-words text-foreground hover:text-emerald-700"
+                      onClick={() => trackLinkClick("evidence_link", item, { section: section.label })}
                     >
                       {item}
                     </a>

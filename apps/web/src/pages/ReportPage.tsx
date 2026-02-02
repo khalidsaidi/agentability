@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchLatest } from "@/lib/api";
 import { DEFAULT_DESCRIPTION, useSeo } from "@/lib/seo";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BadgeEmbed } from "@/components/share/BadgeEmbed";
 import { ConfettiBurst } from "@/components/ConfettiBurst";
+import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
 
 const PILLAR_LABELS = {
   discovery: "Discovery",
@@ -290,6 +291,7 @@ export function ReportPage() {
   const [displayScore, setDisplayScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const viewKey = useRef<string | null>(null);
 
   useEffect(() => {
     if (!report) return;
@@ -315,6 +317,7 @@ export function ReportPage() {
     if (!isCelebration) return;
     setShowConfetti(true);
     const timer = window.setTimeout(() => setShowConfetti(false), 1800);
+    trackEvent("report_confetti", { run_id: report.runId, grade: report.grade, score: report.score });
     return () => window.clearTimeout(timer);
   }, [report]);
 
@@ -328,6 +331,31 @@ export function ReportPage() {
     audio.volume = 0.2;
     audio.play().catch(() => null);
   }, [report, soundEnabled]);
+
+  useEffect(() => {
+    if (query.isError) {
+      trackError("report_fetch_error", query.error, { domain });
+    }
+  }, [query.isError, query.error, domain]);
+
+  useEffect(() => {
+    if (!report) return;
+    if (viewKey.current === report.runId) return;
+    viewKey.current = report.runId;
+    trackEvent("report_view", {
+      run_id: report.runId,
+      domain: report.domain,
+      score: report.score,
+      grade: report.grade,
+      profile: report.profile,
+      fail_count: report.checks.filter((check) => check.status === "fail").length,
+      warn_count: report.checks.filter((check) => check.status === "warn").length,
+      entrypoints_count: report.evidenceIndex?.entrypoints?.length ?? 0,
+      callable_count: report.evidenceIndex?.callable?.length ?? 0,
+      docs_count: report.evidenceIndex?.docs?.length ?? 0,
+      attestations_count: report.evidenceIndex?.attestations?.length ?? 0,
+    });
+  }, [report]);
 
   const scoreMessage = useMemo(() => {
     if (score >= 90) {
@@ -536,7 +564,14 @@ export function ReportPage() {
               <Button
                 variant={soundEnabled ? "secondary" : "outline"}
                 size="sm"
-                onClick={() => setSoundEnabled((prev) => !prev)}
+                onClick={() => {
+                  setSoundEnabled((prev) => !prev);
+                  trackEvent("sound_toggle", {
+                    enabled: !soundEnabled,
+                    run_id: report.runId,
+                    domain: report.domain,
+                  });
+                }}
               >
                 Sound: {soundEnabled ? "On" : "Off"}
               </Button>
@@ -547,6 +582,14 @@ export function ReportPage() {
                   )}&url=${encodeURIComponent(`${baseUrl}/reports/${report.domain}`)}`}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() =>
+                    trackEvent("share_x_click", {
+                      run_id: report.runId,
+                      domain: report.domain,
+                      score: report.score,
+                      grade: report.grade,
+                    })
+                  }
                 >
                   Share on X
                 </a>
@@ -554,11 +597,17 @@ export function ReportPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() =>
+                onClick={() => {
                   void navigator.clipboard?.writeText(
                     `Agentability score for ${report.domain}: ${report.score}/100 (${report.grade}) ${baseUrl}/reports/${report.domain}`
-                  )
-                }
+                  );
+                  trackEvent("share_copy_text", {
+                    run_id: report.runId,
+                    domain: report.domain,
+                    score: report.score,
+                    grade: report.grade,
+                  });
+                }}
               >
                 Copy share text
               </Button>
@@ -630,7 +679,12 @@ export function ReportPage() {
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Button variant="secondary" size="sm" asChild>
-              <a href={certUrl}>View certificate</a>
+              <a
+                href={certUrl}
+                onClick={() => trackLinkClick("view_certificate", certUrl, { domain: report.domain })}
+              >
+                View certificate
+              </a>
             </Button>
           </div>
           <BadgeEmbed domain={report.domain} />
@@ -639,9 +693,24 @@ export function ReportPage() {
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="bg-white/70">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="findings">Findings</TabsTrigger>
-          <TabsTrigger value="evidence">Evidence</TabsTrigger>
+          <TabsTrigger
+            value="overview"
+            onClick={() => trackEvent("report_tab", { tab: "overview", run_id: report.runId, domain: report.domain })}
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="findings"
+            onClick={() => trackEvent("report_tab", { tab: "findings", run_id: report.runId, domain: report.domain })}
+          >
+            Findings
+          </TabsTrigger>
+          <TabsTrigger
+            value="evidence"
+            onClick={() => trackEvent("report_tab", { tab: "evidence", run_id: report.runId, domain: report.domain })}
+          >
+            Evidence
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-6">
           <Card className="border-border/60 bg-white/70">
@@ -974,7 +1043,15 @@ export function ReportPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => void navigator.clipboard?.writeText(fix.snippet)}
+                                onClick={() => {
+                                  void navigator.clipboard?.writeText(fix.snippet);
+                                  trackEvent("fixit_copy", {
+                                    check_id: check.id,
+                                    recommendation_id: check.recommendationId,
+                                    domain: report.domain,
+                                    run_id: report.runId,
+                                  });
+                                }}
                               >
                                 Copy
                               </Button>

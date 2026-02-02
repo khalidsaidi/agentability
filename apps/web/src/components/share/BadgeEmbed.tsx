@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 
 type Props = {
   domain: string;
@@ -32,18 +33,43 @@ export function BadgeEmbed({ domain }: Props) {
     <div className="space-y-3">
       <div className="flex items-center gap-3">
         <img src={badgeUrl} alt="Agentability badge" className="h-6" />
-        <a href={reportUrl} className="text-sm underline opacity-90">
+        <a
+          href={reportUrl}
+          className="text-sm underline opacity-90"
+          onClick={() => trackEvent("badge_report_click", { domain, report_url: reportUrl })}
+        >
           View report
         </a>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" size="sm" onClick={() => void copy(html)}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            void copy(html);
+            trackEvent("badge_copy_html", { domain, badge_url: badgeUrl, report_url: reportUrl });
+          }}
+        >
           Copy HTML
         </Button>
-        <Button variant="secondary" size="sm" onClick={() => void copy(md)}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            void copy(md);
+            trackEvent("badge_copy_markdown", { domain, badge_url: badgeUrl, report_url: reportUrl });
+          }}
+        >
           Copy Markdown
         </Button>
-        <Button variant="secondary" size="sm" onClick={() => void copy(badgeUrl)}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            void copy(badgeUrl);
+            trackEvent("badge_copy_url", { domain, badge_url: badgeUrl });
+          }}
+        >
           Copy badge URL
         </Button>
       </div>

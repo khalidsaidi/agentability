@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { fetchLatest } from "@/lib/api";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CertSeal } from "@/components/brand/CertSeal";
 import { BadgeEmbed } from "@/components/share/BadgeEmbed";
+import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
 
 export function CertificatePage() {
   const params = useParams();
@@ -25,6 +27,28 @@ export function CertificatePage() {
     type: "article",
   });
 
+  const viewKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (query.isError) {
+      trackError("certificate_fetch_error", query.error, { domain });
+    }
+  }, [query.isError, query.error, domain]);
+
+  useEffect(() => {
+    if (!query.data) return;
+    if (viewKey.current === query.data.runId) return;
+    viewKey.current = query.data.runId;
+    trackEvent("certificate_view", {
+      run_id: query.data.runId,
+      domain: query.data.domain,
+      score: query.data.score,
+      grade: query.data.grade,
+      spec_version: query.data.engine?.specVersion ?? "1.2",
+      engine_version: query.data.engine?.version,
+    });
+  }, [query.data]);
+
   if (query.isLoading) {
     return <div className="animate-fade-up text-sm text-muted-foreground">Loading certificate…</div>;
   }
@@ -33,7 +57,7 @@ export function CertificatePage() {
     return (
       <div className="animate-fade-up">
         <p className="text-sm text-destructive">Certificate not found.</p>
-        <Link className="text-sm text-emerald-700" to="/">
+        <Link className="text-sm text-emerald-700" to="/" onClick={() => trackLinkClick("cert_back_home", "/")}>
           Back to home
         </Link>
       </div>
@@ -44,6 +68,7 @@ export function CertificatePage() {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://agentability.org";
   const reportUrl = report.artifacts?.reportUrl ?? `${baseUrl}/reports/${report.domain}`;
   const jsonUrl = report.artifacts?.jsonUrl ?? `${baseUrl}/v1/evaluations/${report.domain}/latest.json`;
+  const evidenceUrl = report.artifacts?.evidenceBundleUrl;
   const verifiedOn = (report.completedAt ?? report.createdAt).split("T")[0];
   const specVersion = report.engine?.specVersion ?? "1.2";
 
@@ -90,14 +115,30 @@ export function CertificatePage() {
               </div>
               <div className="flex flex-wrap gap-3">
                 <Button asChild variant="secondary" size="sm">
-                  <a href={reportUrl}>View report</a>
+                  <a
+                    href={reportUrl}
+                    onClick={() => trackLinkClick("cert_view_report", reportUrl, { domain: report.domain })}
+                  >
+                    View report
+                  </a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <a href={jsonUrl}>View JSON</a>
+                  <a href={jsonUrl} onClick={() => trackLinkClick("cert_view_json", jsonUrl, { domain: report.domain })}>
+                    View JSON
+                  </a>
                 </Button>
-                {report.artifacts?.evidenceBundleUrl ? (
+                {evidenceUrl ? (
                   <Button asChild variant="outline" size="sm">
-                    <a href={report.artifacts.evidenceBundleUrl}>View evidence</a>
+                    <a
+                      href={evidenceUrl}
+                      onClick={() =>
+                        trackLinkClick("cert_view_evidence", evidenceUrl, {
+                          domain: report.domain,
+                        })
+                      }
+                    >
+                      View evidence
+                    </a>
                   </Button>
                 ) : null}
               </div>

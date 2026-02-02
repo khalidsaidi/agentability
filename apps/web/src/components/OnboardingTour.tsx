@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 
 const STORAGE_KEY = "agentability.tour.v1";
 
@@ -26,18 +27,21 @@ export function OnboardingTour({ forceOpen }: { forceOpen?: boolean }) {
     if (forceOpen) {
       setOpen(true);
       setStep(0);
+      trackEvent("tour_open", { source: "manual" });
       return;
     }
     const seen = window.localStorage.getItem(STORAGE_KEY);
     if (!seen) {
       setOpen(true);
       setStep(0);
+      trackEvent("tour_open", { source: "auto" });
     }
   }, [forceOpen]);
 
   const close = () => {
     window.localStorage.setItem(STORAGE_KEY, "seen");
     setOpen(false);
+    trackEvent("tour_close", { step });
   };
 
   if (!open) return null;
@@ -52,7 +56,10 @@ export function OnboardingTour({ forceOpen }: { forceOpen?: boolean }) {
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Quick tour</p>
           <button
             className="text-xs text-muted-foreground hover:text-foreground"
-            onClick={close}
+            onClick={() => {
+              trackEvent("tour_skip", { step });
+              close();
+            }}
           >
             Skip
           </button>
@@ -70,11 +77,29 @@ export function OnboardingTour({ forceOpen }: { forceOpen?: boolean }) {
           </div>
           <div className="flex gap-2">
             {step > 0 ? (
-              <Button variant="outline" size="sm" onClick={() => setStep(step - 1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  trackEvent("tour_back", { step });
+                  setStep(step - 1);
+                }}
+              >
                 Back
               </Button>
             ) : null}
-            <Button size="sm" onClick={() => (isLast ? close() : setStep(step + 1))}>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (isLast) {
+                  trackEvent("tour_complete", { step });
+                  close();
+                } else {
+                  trackEvent("tour_next", { step });
+                  setStep(step + 1);
+                }
+              }}
+            >
               {isLast ? "Done" : "Next"}
             </Button>
           </div>
