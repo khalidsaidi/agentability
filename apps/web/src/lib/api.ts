@@ -37,6 +37,8 @@ export type DiscoveryAudit = {
     status: "pass" | "degraded" | "fail";
     missing?: string[];
     unreachable?: string[];
+    optional_missing?: string[];
+    optional_unreachable?: string[];
     hash_mismatch_required?: string[];
     hash_mismatch_optional?: string[];
   };

@@ -44,6 +44,8 @@ type DiscoveryAudit = {
     status: "pass" | "degraded" | "fail";
     missing: string[];
     unreachable: string[];
+    optional_missing?: string[];
+    optional_unreachable?: string[];
     hash_mismatch_required: string[];
     hash_mismatch_optional: string[];
   };
@@ -182,8 +184,10 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
   const engineVersion = typeof packageJson.version === "string" ? packageJson.version : "0.0.0";
 
   const files: AuditFile[] = [];
-  const missing: string[] = [];
-  const unreachable: string[] = [];
+  const missingRequired: string[] = [];
+  const missingOptional: string[] = [];
+  const unreachableRequired: string[] = [];
+  const unreachableOptional: string[] = [];
   const hashMismatchRequired: string[] = [];
   const hashMismatchOptional: string[] = [];
   const liveCheckedAt = new Date().toISOString();
@@ -240,7 +244,11 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         entry.live_bytes = primary.bytes;
       }
       if (checks.some((check) => !check.ok)) {
-        unreachable.push(surface.path);
+        if (optionalPaths.has(surface.path)) {
+          unreachableOptional.push(surface.path);
+        } else {
+          unreachableRequired.push(surface.path);
+        }
       }
       const liveHashes = checks.map((check) => check.sha256).filter(Boolean) as string[];
       if (liveHashes.length && new Set(liveHashes).size > 1) {
@@ -255,7 +263,11 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
       }
       files.push(entry);
     } catch (error) {
-      missing.push(surface.path);
+      if (optionalPaths.has(surface.path)) {
+        missingOptional.push(surface.path);
+      } else {
+        missingRequired.push(surface.path);
+      }
       const entry: AuditFile = {
         path: surface.path,
         expected_content_type: surface.expectedContentType,
@@ -316,14 +328,16 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
     }
   }
 
-  const baseStatus = missing.length === 0 && unreachable.length === 0;
+  const baseStatus = missingRequired.length === 0 && unreachableRequired.length === 0;
   const hasRequiredDrift = hashMismatchRequired.length > 0;
   const hasOptionalDrift = hashMismatchOptional.length > 0;
-  const status: DiscoveryAudit["discoverability_health"]["status"] = !baseStatus || hasRequiredDrift
-    ? "fail"
-    : hasOptionalDrift
-    ? "degraded"
-    : "pass";
+  const hasOptionalIssues = missingOptional.length > 0 || unreachableOptional.length > 0;
+  const status: DiscoveryAudit["discoverability_health"]["status"] =
+    !baseStatus || hasRequiredDrift
+      ? "fail"
+      : hasOptionalIssues || hasOptionalDrift
+        ? "degraded"
+        : "pass";
 
   const audit: DiscoveryAudit = {
     generated_at: new Date().toISOString(),
@@ -337,8 +351,10 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
     score_target: 100,
     discoverability_health: {
       status,
-      missing,
-      unreachable,
+      missing: missingRequired,
+      unreachable: unreachableRequired,
+      optional_missing: missingOptional,
+      optional_unreachable: unreachableOptional,
       hash_mismatch_required: hashMismatchRequired,
       hash_mismatch_optional: hashMismatchOptional,
     },

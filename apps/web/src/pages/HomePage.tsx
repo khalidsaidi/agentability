@@ -47,11 +47,22 @@ export function HomePage() {
           : "border-border/60 bg-white/80 text-muted-foreground";
   const sourcesCount = audit?.live_sources?.length ?? 0;
   const surfacesCount = audit?.files?.length ?? 0;
-  const missingCount = audit?.discoverability_health?.missing?.length ?? 0;
-  const unreachableCount = audit?.discoverability_health?.unreachable?.length ?? 0;
+  const missingRequired = audit?.discoverability_health?.missing?.length ?? 0;
+  const unreachableRequired = audit?.discoverability_health?.unreachable?.length ?? 0;
+  const missingOptional = audit?.discoverability_health?.optional_missing?.length ?? 0;
+  const unreachableOptional = audit?.discoverability_health?.optional_unreachable?.length ?? 0;
   const driftRequired = audit?.discoverability_health?.hash_mismatch_required?.length ?? 0;
   const driftOptional = audit?.discoverability_health?.hash_mismatch_optional?.length ?? 0;
   const driftTotal = driftRequired + driftOptional;
+  const liveErrorsTotal = missingRequired + unreachableRequired + missingOptional + unreachableOptional;
+
+  const sourceLabels =
+    audit?.live_sources?.map((source) => {
+      if (source.includes("agentability.org")) return "Apex domain";
+      if (source.includes("web.app")) return "Hosting mirror (web.app)";
+      if (source.includes("firebaseapp.com")) return "Hosting mirror (firebaseapp)";
+      return "Hosting mirror";
+    }) ?? [];
 
   const lastCheckedLabel = (() => {
     if (!audit?.live_checked_at) return "n/a";
@@ -130,6 +141,18 @@ export function HomePage() {
                     <p className="uppercase tracking-wide text-muted-foreground">Sources verified</p>
                     <p className="text-lg font-semibold text-foreground">{sourcesCount || "—"}</p>
                     <p className="text-[0.7rem] text-muted-foreground">Apex + hosting mirrors</p>
+                    {sourceLabels.length ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {sourceLabels.map((label, index) => (
+                          <span
+                            key={`${label}-${index}`}
+                            className="rounded-full border border-border/60 bg-white/80 px-2 py-0.5 text-[0.65rem] text-muted-foreground"
+                          >
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                   <div className="rounded-xl border border-border/60 bg-white/80 p-3">
                     <p className="uppercase tracking-wide text-muted-foreground">Surfaces checked</p>
@@ -145,9 +168,9 @@ export function HomePage() {
                   </div>
                   <div className="rounded-xl border border-border/60 bg-white/80 p-3">
                     <p className="uppercase tracking-wide text-muted-foreground">Live errors</p>
-                    <p className="text-lg font-semibold text-foreground">{missingCount + unreachableCount}</p>
+                    <p className="text-lg font-semibold text-foreground">{liveErrorsTotal}</p>
                     <p className="text-[0.7rem] text-muted-foreground">
-                      missing {missingCount} · unreachable {unreachableCount}
+                      req {missingRequired + unreachableRequired} · opt {missingOptional + unreachableOptional}
                     </p>
                   </div>
                 </div>
