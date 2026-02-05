@@ -291,6 +291,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /v1/evaluations/{domain}/latest.json:
     get:
       summary: Fetch the latest evaluation for a domain

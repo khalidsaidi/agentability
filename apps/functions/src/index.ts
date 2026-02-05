@@ -102,6 +102,33 @@ async function enforceRateLimit(ip: string): Promise<void> {
   });
 }
 
+async function enforceCommunityFixRateLimit(ip: string): Promise<void> {
+  const windowMs = 5 * 60 * 1000;
+  const maxRequests = 30;
+  const windowId = Math.floor(Date.now() / windowMs);
+  const docId = `${ip.replace(/[:.]/g, "_")}_${windowId}`;
+  const ref = db.collection("rateLimitsCommunityFix").doc(docId);
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const count = snap.exists ? (snap.data()?.count as number) || 0 : 0;
+    if (count >= maxRequests) {
+      throw new Error("Rate limit exceeded");
+    }
+    tx.set(
+      ref,
+      {
+        ip,
+        count: count + 1,
+        windowId,
+        updatedAt: FieldValue.serverTimestamp(),
+        expiresAt: new Date(Date.now() + windowMs * 2).toISOString(),
+      },
+      { merge: true }
+    );
+  });
+}
+
 function buildBaseUrl(req: express.Request): string {
   const proto = req.header("x-forwarded-proto") || req.protocol;
   const host = req.header("x-forwarded-host") || req.get("host");
@@ -1071,6 +1098,12 @@ app.get("/v1/community-fix", async (req, res) => {
 
   if (!runId || !issueId) {
     return sendError(res, 400, "Missing runId or issueId", "invalid_request");
+  }
+
+  try {
+    await enforceCommunityFixRateLimit(getRequestIp(req));
+  } catch (error) {
+    return sendError(res, 429, "Rate limit exceeded", "rate_limited");
   }
 
   const runDoc = await db.collection("runs").doc(runId).get();
