@@ -133,3 +133,4 @@ export type EvaluationMode = "public";
 
 export * from "./diff";
 export * from "./recommendations";
+export * from "./communityFix";

@@ -371,6 +371,89 @@
         }
       }
     },
+    "/v1/community-fix": {
+      "get": {
+        "summary": "Fetch community fixes for a failing check",
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issueId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Community fix response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityFixResponse"
+                },
+                "examples": {
+                  "ok": {
+                    "value": {
+                      "status": "ok",
+                      "runId": "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1",
+                      "issueId": "T1",
+                      "query": "Agentability T1 Complete air.json with legal + verification fix ...",
+                      "mode": "rag",
+                      "answerMd": "1. Add contact.email...",
+                      "citations": [
+                        {
+                          "title": "Agentability Spec",
+                          "url": "https://agentability.org/spec.md"
+                        }
+                      ],
+                      "searchUrl": "https://a2abench-api.web.app/search?q=Agentability%20T1"
+                    }
+                  },
+                  "unavailable": {
+                    "value": {
+                      "status": "unavailable",
+                      "runId": "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1",
+                      "issueId": "T1",
+                      "query": "Agentability T1 Complete air.json with legal + verification fix ...",
+                      "searchUrl": "https://a2abench-api.web.app/search?q=Agentability%20T1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/evaluations/{domain}/latest.json": {
       "get": {
         "summary": "Fetch the latest evaluation for a domain",
@@ -1255,6 +1338,73 @@
             ]
           },
           "text": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunityFixResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "runId",
+          "issueId",
+          "query"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "runId": {
+            "type": "string"
+          },
+          "issueId": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "rag",
+              "retrieve_only"
+            ]
+          },
+          "answerMd": {
+            "type": "string"
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "searchUrl": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
             "type": "string"
           }
         }

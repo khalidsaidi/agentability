@@ -14,6 +14,10 @@ import {
   EvaluationProfile,
   EvaluationResult,
   computeDiff,
+  buildCommunityFixQuery,
+  buildA2ABenchSearchUrl,
+  normalizeCommunityFixResponse,
+  getFixIt,
 } from "@agentability/shared";
 import { SSR_ASSETS } from "./ssr/asset-manifest";
 import { renderBadgeSvg } from "./brand/renderBadgeSvg";
@@ -25,6 +29,7 @@ const storage = getStorage();
 const evidenceBucketName =
   process.env.EVIDENCE_BUCKET ||
   (process.env.GCLOUD_PROJECT ? `${process.env.GCLOUD_PROJECT}-evidence` : undefined);
+const A2ABENCH_BASE_URL = process.env.A2ABENCH_BASE_URL || "https://a2abench-api.web.app";
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
@@ -151,6 +156,73 @@ function sendError(
   details?: unknown
 ) {
   return res.status(status).json({ message, code, details });
+}
+
+type CommunityFixCitation = { title?: string; url: string };
+type CommunityFixPayload = {
+  status: "ok" | "unavailable";
+  runId: string;
+  issueId: string;
+  query: string;
+  mode?: "rag" | "retrieve_only";
+  answerMd?: string;
+  citations?: CommunityFixCitation[];
+  cached?: boolean;
+  searchUrl?: string;
+  createdAt?: string;
+  error?: string;
+};
+
+async function postJsonWithTimeout(
+  url: string,
+  payload: Record<string, unknown>,
+  timeoutMs = 8000
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchA2ABenchAnswer(query: string, mode: "rag" | "retrieve_only") {
+  const base = A2ABENCH_BASE_URL.replace(/\/+$/, "");
+  const response = await postJsonWithTimeout(`${base}/api/v1/answer`, {
+    query,
+    topK: 5,
+    mode,
+    style: "concise",
+  });
+  if (!response.ok) {
+    throw new Error(`A2ABench ${mode} failed (${response.status})`);
+  }
+  const data = await response.json();
+  const normalized = normalizeCommunityFixResponse(data);
+  return {
+    answerMd: normalized.answerMd,
+    citations: normalized.citations,
+  };
+}
+
+async function resolveCommunityFix(query: string): Promise<{
+  answerMd?: string;
+  citations?: CommunityFixCitation[];
+  mode: "rag" | "retrieve_only";
+}> {
+  try {
+    const result = await fetchA2ABenchAnswer(query, "rag");
+    return { ...result, mode: "rag" };
+  } catch (error) {
+    const fallback = await fetchA2ABenchAnswer(query, "retrieve_only");
+    return { ...fallback, mode: "retrieve_only" };
+  }
 }
 
 type PillarKey = "discovery" | "callableSurface" | "llmIngestion" | "trust" | "reliability";
@@ -991,6 +1063,73 @@ app.get("/v1/runs/:runId", async (req, res) => {
     return sendError(res, 404, "Run not found", "not_found");
   }
   return res.json(doc.data());
+});
+
+app.get("/v1/community-fix", async (req, res) => {
+  const runId = typeof req.query.runId === "string" ? req.query.runId : "";
+  const issueId = typeof req.query.issueId === "string" ? req.query.issueId : "";
+
+  if (!runId || !issueId) {
+    return sendError(res, 400, "Missing runId or issueId", "invalid_request");
+  }
+
+  const runDoc = await db.collection("runs").doc(runId).get();
+  if (!runDoc.exists) {
+    return sendError(res, 404, "Run not found", "not_found");
+  }
+
+  const runData = runDoc.data() as EvaluationResult;
+  const check = runData.checks?.find((item) => item.id === issueId);
+  if (!check) {
+    return sendError(res, 404, "Issue not found", "not_found");
+  }
+
+  const cacheRef = db.collection("runs").doc(runId).collection("communityFixes").doc(issueId);
+  const cacheSnap = await cacheRef.get();
+  if (cacheSnap.exists) {
+    const cached = cacheSnap.data() as CommunityFixPayload;
+    return res.json({ ...cached, cached: true });
+  }
+
+  const fixIt = getFixIt(check.id, check.recommendationId);
+  const query = buildCommunityFixQuery({
+    issueId: check.id,
+    summary: check.summary,
+    recommendation: fixIt ?? undefined,
+  });
+  const searchUrl = buildA2ABenchSearchUrl(A2ABENCH_BASE_URL, query);
+
+  try {
+    const result = await resolveCommunityFix(query);
+    const payload: CommunityFixPayload = {
+      status: "ok",
+      runId,
+      issueId: check.id,
+      query,
+      mode: result.mode,
+      answerMd: result.answerMd,
+      citations: result.citations ?? [],
+      cached: false,
+      searchUrl,
+      createdAt: new Date().toISOString(),
+    };
+    await cacheRef.set(payload, { merge: true });
+    return res.json(payload);
+  } catch (error) {
+    logger.warn("A2ABench fetch failed", error);
+    const payload: CommunityFixPayload = {
+      status: "unavailable",
+      runId,
+      issueId: check.id,
+      query,
+      searchUrl,
+      cached: false,
+      createdAt: new Date().toISOString(),
+      error: error instanceof Error ? error.message : "A2ABench unavailable",
+    };
+    await cacheRef.set(payload, { merge: true });
+    return res.json(payload);
+  }
 });
 
 app.get("/v1/evaluations/:domain/latest.json", async (req, res) => {

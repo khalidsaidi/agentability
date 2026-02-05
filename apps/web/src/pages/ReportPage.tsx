@@ -1009,7 +1009,7 @@ export function ReportPage() {
           </div>
         </TabsContent>
         <TabsContent value="findings">
-          <FailuresList checks={report.checks} />
+          <FailuresList checks={report.checks} runId={report.runId} showCommunityFixes />
           <Card className="mt-6 border-border/60 bg-white/70">
             <CardHeader>
               <CardTitle>Fix-it snippets</CardTitle>

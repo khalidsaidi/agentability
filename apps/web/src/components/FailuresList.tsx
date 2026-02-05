@@ -1,9 +1,18 @@
 import type { CheckResult } from "@agentability/shared";
 import { Badge } from "@/components/ui/badge";
+import { CommunityFixPanel } from "@/components/CommunityFixPanel";
 
 const severityOrder = { high: 0, medium: 1, low: 2 } as const;
 
-export function FailuresList({ checks }: { checks: CheckResult[] }) {
+export function FailuresList({
+  checks,
+  runId,
+  showCommunityFixes,
+}: {
+  checks: CheckResult[];
+  runId?: string;
+  showCommunityFixes?: boolean;
+}) {
   const items = checks
     .filter((check) => check.status !== "pass")
     .sort((a, b) => {
@@ -46,6 +55,9 @@ export function FailuresList({ checks }: { checks: CheckResult[] }) {
                 </a>
               ))}
             </div>
+          ) : null}
+          {showCommunityFixes && runId && check.status === "fail" ? (
+            <CommunityFixPanel runId={runId} issueId={check.id} />
           ) : null}
         </div>
       ))}

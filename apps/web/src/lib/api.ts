@@ -4,6 +4,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 const SITE_BASE =
   import.meta.env.VITE_SITE_URL ??
   (API_BASE ? API_BASE.replace(/\/v1\/?$/, "") : "");
+const A2ABENCH_BASE_URL = import.meta.env.VITE_A2ABENCH_BASE_URL ?? "https://a2abench-api.web.app";
 
 export type EvaluateResponse = {
   runId: string;
@@ -56,6 +57,25 @@ export type LeaderboardEntry = {
 export type LeaderboardResponse = {
   updatedAt?: string;
   entries: LeaderboardEntry[];
+};
+
+export type CommunityFixCitation = {
+  title?: string;
+  url: string;
+};
+
+export type CommunityFixResponse = {
+  status: "ok" | "unavailable";
+  runId: string;
+  issueId: string;
+  query: string;
+  mode?: "rag" | "retrieve_only";
+  answerMd?: string;
+  citations?: CommunityFixCitation[];
+  cached?: boolean;
+  searchUrl?: string;
+  createdAt?: string;
+  error?: string;
 };
 
 export async function evaluateOrigin(origin: string, profile?: string): Promise<EvaluateResponse> {
@@ -111,6 +131,19 @@ export async function fetchLeaderboard(): Promise<LeaderboardResponse> {
   const response = await fetch(`${base}/leaderboard.json`);
   if (!response.ok) {
     throw new Error("Leaderboard not available");
+  }
+  return response.json();
+}
+
+export function buildA2ABenchSearchUrl(query: string): string {
+  const trimmed = A2ABENCH_BASE_URL.replace(/\/+$/, "");
+  return `${trimmed}/search?q=${encodeURIComponent(query)}`;
+}
+
+export async function fetchCommunityFix(runId: string, issueId: string): Promise<CommunityFixResponse> {
+  const response = await fetch(`${API_BASE}/v1/community-fix?runId=${encodeURIComponent(runId)}&issueId=${encodeURIComponent(issueId)}`);
+  if (!response.ok) {
+    throw new Error("Community fixes unavailable");
   }
   return response.json();
 }
