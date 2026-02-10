@@ -52,6 +52,9 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
       : "That doesn't look like a valid public domain or URL."
     : null;
 
+  const serverError = !localError && error ? error.trim() : null;
+  const showAuditFailedHelp = Boolean(serverError && /evaluation failed/i.test(serverError));
+
   return (
     <Card className="border-border/60 bg-white/80 shadow-sm backdrop-blur transition-transform duration-200 hover:scale-[1.01]">
       <div className="p-5 md:p-6">
@@ -146,7 +149,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
               <span className="opacity-50">•</span>
               <span>Usually done in 30–60s</span>
               <span className="opacity-50">•</span>
-              <span>Free during beta</span>
+              <span>Free</span>
             </div>
 
             {!trimmed.length ? (
@@ -177,7 +180,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
             disabled={loading}
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {loading ? "Running audit" : "Run free audit"}
+            {loading ? "Running..." : "Run free audit"}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </form>
@@ -186,10 +189,42 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
           <p className={`mt-3 text-sm ${normalized ? "text-primary" : "text-amber-700"}`}>{liveHint}</p>
         ) : null}
 
-        {localError || error ? (
+        {localError ? (
           <p id="audit-origin-error" className="mt-3 text-sm text-destructive">
-            {localError ?? error}
+            {localError}
           </p>
+        ) : null}
+
+        {!localError && serverError ? (
+          showAuditFailedHelp ? (
+            <div
+              id="audit-origin-error"
+              className="mt-3 space-y-2 rounded-2xl border border-destructive/30 bg-white/80 p-4 text-sm text-muted-foreground"
+            >
+              <p className="font-semibold text-destructive">We couldn’t complete this audit.</p>
+              <ul className="list-disc space-y-1 pl-5">
+                <li>The domain may block automated checks (WAF/bot protection).</li>
+                <li>The site may be timing out or returning oversized responses.</li>
+                <li>A redirect may lead to a blocked or private destination.</li>
+              </ul>
+              <p className="text-xs text-muted-foreground">
+                Try again, or try a known working example like{" "}
+                <button
+                  type="button"
+                  className="font-medium text-primary hover:text-primary/80"
+                  onClick={() => setOrigin("aistatusdashboard.com")}
+                >
+                  aistatusdashboard.com
+                </button>
+                .
+              </p>
+              <p className="text-xs text-muted-foreground">Details: {serverError}</p>
+            </div>
+          ) : (
+            <p id="audit-origin-error" className="mt-3 text-sm text-destructive">
+              {serverError}
+            </p>
+          )
         ) : null}
       </div>
     </Card>

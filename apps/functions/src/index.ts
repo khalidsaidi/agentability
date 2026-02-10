@@ -129,6 +129,33 @@ async function enforceCommunityFixRateLimit(ip: string): Promise<void> {
   });
 }
 
+async function enforceSubscribeRateLimit(ip: string): Promise<void> {
+  const windowMs = 5 * 60 * 1000;
+  const maxRequests = 20;
+  const windowId = Math.floor(Date.now() / windowMs);
+  const docId = `${ip.replace(/[:.]/g, "_")}_${windowId}`;
+  const ref = db.collection("rateLimitsSubscribe").doc(docId);
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const count = snap.exists ? (snap.data()?.count as number) || 0 : 0;
+    if (count >= maxRequests) {
+      throw new Error("Rate limit exceeded");
+    }
+    tx.set(
+      ref,
+      {
+        ip,
+        count: count + 1,
+        windowId,
+        updatedAt: FieldValue.serverTimestamp(),
+        expiresAt: new Date(Date.now() + windowMs * 2).toISOString(),
+      },
+      { merge: true }
+    );
+  });
+}
+
 function buildBaseUrl(req: express.Request): string {
   const proto = req.header("x-forwarded-proto") || req.protocol;
   const host = req.header("x-forwarded-host") || req.get("host");
@@ -183,6 +210,12 @@ function sendError(
   details?: unknown
 ) {
   return res.status(status).json({ message, code, details });
+}
+
+function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  if (email.length > 254) return false;
+  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 }
 
 type CommunityFixCitation = { title?: string; url: string };
@@ -1177,6 +1210,60 @@ app.get("/v1/community-fix", async (req, res) => {
     await cacheRef.set(payload, { merge: true });
     return res.json(payload);
   }
+});
+
+app.post("/v1/subscribe", async (req, res) => {
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const rawEmail = typeof payload.email === "string" ? payload.email : "";
+  const email = rawEmail.trim().toLowerCase();
+  if (!isValidEmail(email)) {
+    return sendError(res, 400, "Invalid email address", "invalid_email");
+  }
+
+  const rawDomain = typeof payload.domain === "string" ? payload.domain : "";
+  const domain = rawDomain.trim() ? normalizeOrigin(rawDomain).domain : undefined;
+  const runId = typeof payload.runId === "string" ? payload.runId.trim() : "";
+
+  try {
+    await enforceSubscribeRateLimit(getRequestIp(req));
+  } catch (error) {
+    return sendError(res, 429, "Rate limit exceeded", "rate_limited");
+  }
+
+  const id = crypto.createHash("sha256").update(email).digest("hex").slice(0, 32);
+  const ref = db.collection("subscriptions").doc(id);
+  const ip = getRequestIp(req);
+  const userAgent = req.header("user-agent") || "";
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const update: Record<string, unknown> = {
+      email,
+      lastIp: ip,
+      userAgent,
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    if (!snap.exists) {
+      update.createdAt = FieldValue.serverTimestamp();
+    }
+    if (domain) {
+      update.domains = FieldValue.arrayUnion(domain);
+      update.lastDomain = domain;
+    }
+    if (runId) {
+      update.runIds = FieldValue.arrayUnion(runId);
+      update.lastRunId = runId;
+    }
+
+    tx.set(ref, update, { merge: true });
+  });
+
+  return res.json({
+    status: "ok",
+    email,
+    domain: domain ?? null,
+  });
 });
 
 app.get("/v1/evaluations/:domain/latest.json", async (req, res) => {

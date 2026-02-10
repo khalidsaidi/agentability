@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BadgeEmbed } from "@/components/share/BadgeEmbed";
 import { ConfettiBurst } from "@/components/ConfettiBurst";
+import { ScoreUpdatesCard } from "@/components/ScoreUpdatesCard";
 import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
 
 const PILLAR_LABELS = {
@@ -1077,6 +1078,8 @@ export function ReportPage() {
               </CardContent>
             </Card>
           ) : null}
+
+          <ScoreUpdatesCard domain={report.domain} runId={report.runId} />
 
           <div className="rounded-2xl border border-border/60 bg-white/70 p-4 text-sm text-muted-foreground">
             Latest run completed {new Date(report.completedAt ?? report.createdAt).toLocaleString()}.

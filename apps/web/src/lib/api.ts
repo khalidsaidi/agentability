@@ -78,6 +78,12 @@ export type CommunityFixResponse = {
   error?: string;
 };
 
+export type SubscribeResponse = {
+  status: "ok";
+  email: string;
+  domain: string | null;
+};
+
 export async function evaluateOrigin(origin: string, profile?: string): Promise<EvaluateResponse> {
   const response = await fetch(`${API_BASE}/v1/evaluate`, {
     method: "POST",
@@ -89,6 +95,21 @@ export async function evaluateOrigin(origin: string, profile?: string): Promise<
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || error.error || "Evaluation failed");
+  }
+  return response.json();
+}
+
+export async function subscribeEmail(email: string, domain?: string, runId?: string): Promise<SubscribeResponse> {
+  const response = await fetch(`${API_BASE}/v1/subscribe`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, domain, runId }),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || error.error || "Subscription failed");
   }
   return response.json();
 }

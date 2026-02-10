@@ -51,21 +51,49 @@ export function CommunityFixPanel({ runId, issueId }: Props) {
   const fallbackSearch = data.searchUrl ?? buildA2ABenchSearchUrl(data.query);
   const hasSources = Boolean(data.citations && data.citations.length);
 
+  if (data.status !== "ok") {
+    return (
+      <div className="mt-4 space-y-2 rounded-xl border border-border/60 bg-white/80 p-3 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between">
+          <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+            Community fixes
+          </span>
+          <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+            Coming soon
+          </span>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          We’re building a library of real-world implementation recipes. For now, you can{" "}
+          <a
+            className="text-primary hover:text-primary/80"
+            href={fallbackSearch}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() =>
+              trackLinkClick("community_fix_search", fallbackSearch, { run_id: runId, issue_id: issueId })
+            }
+          >
+            search public examples
+          </a>
+          .
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 space-y-3 rounded-xl border border-border/60 bg-white/80 p-3 text-xs text-muted-foreground">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
           Community fixes
         </span>
-        <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-          {data.status === "ok" ? "A2ABench" : "Unavailable"}
-        </span>
+        <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">A2ABench</span>
       </div>
       {data.answerMd ? (
         <div className="whitespace-pre-wrap text-sm text-foreground">{data.answerMd}</div>
       ) : (
         <div className="text-sm text-muted-foreground">
-          Suggested fix plan unavailable.{" "}
+          No community recipe found yet.{" "}
           <a
             className="text-primary hover:text-primary/80"
             href={fallbackSearch}
