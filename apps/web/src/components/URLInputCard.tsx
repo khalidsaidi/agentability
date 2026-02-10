@@ -117,7 +117,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
                   changeTimer.current = window.setTimeout(() => emitInputChange(value), 500);
                 }}
                 placeholder="your-site.com or url/api"
-                className="peer h-16 w-full rounded-2xl border border-input bg-white/80 px-4 pb-3 pt-7 text-lg shadow-sm transition-all duration-200 placeholder:text-muted-foreground/70 hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 focus-visible:border-primary/60 md:text-2xl"
+                className="peer min-h-[76px] w-full rounded-2xl border border-input bg-white/80 px-4 pb-3 pt-7 text-lg shadow-sm transition-all duration-200 placeholder:text-muted-foreground/70 hover:border-primary/30 hover:shadow-md focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 md:text-2xl"
                 inputMode="url"
                 autoComplete="url"
                 onFocus={() => trackEvent("audit_input_focus")}
@@ -180,7 +180,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
 
           <Button
             type="submit"
-            className="h-16 w-full rounded-2xl bg-gradient-to-br from-primary to-primary/80 px-7 text-base shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 active:translate-y-0 min-[1200px]:mt-0 min-[1200px]:w-auto"
+            className="h-[76px] w-full rounded-2xl bg-gradient-to-br from-primary to-primary/80 px-7 text-base shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 active:translate-y-0 min-[1200px]:mt-0 min-[1200px]:w-auto"
             disabled={loading}
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
