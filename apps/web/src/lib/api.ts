@@ -109,6 +109,12 @@ export async function subscribeEmail(email: string, domain?: string, runId?: str
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+    if (response.status === 404) {
+      throw new Error("Score updates are coming soon. Check back later.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please wait a minute and try again.");
+    }
     throw new Error(error.message || error.error || "Subscription failed");
   }
   return response.json();
