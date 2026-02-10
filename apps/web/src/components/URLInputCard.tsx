@@ -117,7 +117,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
                   changeTimer.current = window.setTimeout(() => emitInputChange(value), 500);
                 }}
                 placeholder="your-site.com or url/api"
-                className="peer min-h-[76px] w-full rounded-2xl border border-input bg-white/80 px-4 pb-3 pt-7 text-lg shadow-sm transition-all duration-200 placeholder:text-transparent focus:placeholder:text-muted-foreground/70 hover:border-primary/30 hover:shadow-md focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 md:text-2xl"
+                className="peer min-h-[76px] w-full rounded-2xl border border-input bg-white/80 px-4 pb-3 pt-8 text-lg shadow-sm transition-all duration-200 placeholder:text-transparent focus:placeholder:text-muted-foreground/70 hover:border-primary/30 hover:shadow-md focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 md:text-2xl"
                 inputMode="url"
                 autoComplete="url"
                 onFocus={() => trackEvent("audit_input_focus")}
@@ -127,7 +127,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
               />
               <label
                 htmlFor="audit-origin"
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm leading-none text-muted-foreground transition-all duration-200 peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary peer-[&:not(:placeholder-shown)]:top-3 peer-[&:not(:placeholder-shown)]:translate-y-0 peer-[&:not(:placeholder-shown)]:text-xs"
+                className="pointer-events-none absolute left-4 top-3 z-10 translate-y-0 rounded-md bg-white/90 px-2 py-0.5 text-xs leading-tight text-muted-foreground transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:bg-transparent peer-placeholder-shown:px-0 peer-placeholder-shown:py-0 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:translate-y-0 peer-focus:bg-white/90 peer-focus:px-2 peer-focus:py-0.5 peer-focus:text-xs peer-focus:text-primary"
               >
                 Website or API URL
               </label>
