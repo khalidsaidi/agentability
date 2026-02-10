@@ -136,7 +136,7 @@ export function RunPage() {
     return (
       <div className="animate-fade-up">
         <p className="text-sm text-destructive">Run not found.</p>
-        <Link className="text-sm text-emerald-700" to="/">
+        <Link className="text-sm text-primary hover:text-primary/80" to="/">
           Back to home
         </Link>
       </div>
@@ -165,12 +165,12 @@ export function RunPage() {
                 Most audits finish in under a minute. We’ll refresh this page automatically.
               </p>
             </div>
-            <div className="rounded-full border border-emerald-200/70 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <div className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
               Live
             </div>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-emerald-100/60">
-            <div className="h-full w-1/2 animate-pulse rounded-full bg-emerald-500/70" />
+          <div className="h-2 w-full overflow-hidden rounded-full bg-primary/10">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-primary/70" />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {STEPS.map((step, index) => {
@@ -180,7 +180,7 @@ export function RunPage() {
                   key={step.title}
                   className={`rounded-2xl border px-4 py-3 transition ${
                     isActive
-                      ? "border-emerald-200 bg-emerald-50/70 text-emerald-900"
+                      ? "border-primary/20 bg-primary/5 text-foreground"
                       : "border-border/60 bg-white/80 text-muted-foreground"
                   }`}
                 >
@@ -196,8 +196,41 @@ export function RunPage() {
         </div>
       ) : null}
       {run.status === "failed" ? (
-        <div className="rounded-2xl border border-destructive/40 bg-white/70 p-6 text-sm text-destructive">
-          Evaluation failed. Please retry or check the input URL.
+        <div className="space-y-3 rounded-3xl border border-destructive/40 bg-white/70 p-6 text-sm text-destructive">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-destructive/80">Audit failed</p>
+            <p className="text-base font-semibold text-destructive">
+              We couldn’t complete this audit.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              This is usually caused by bot protection, timeouts, oversized responses, or redirects to blocked/private
+              destinations.
+            </p>
+          </div>
+
+          {run.error ? (
+            <div className="rounded-2xl border border-destructive/30 bg-white/80 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Reason</p>
+              <p className="mt-2 break-words font-mono text-xs text-foreground">{run.error}</p>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              className="text-sm font-medium text-primary hover:text-primary/80"
+              to="/"
+              onClick={() => trackLinkClick("run_retry_home", "/", { run_id: run.runId })}
+            >
+              Try another domain →
+            </Link>
+            <a
+              className="text-sm font-medium text-primary hover:text-primary/80"
+              href="/reports/aistatusdashboard.com"
+              onClick={() => trackLinkClick("run_example_report", "/reports/aistatusdashboard.com", { run_id: run.runId })}
+            >
+              See an example report →
+            </a>
+          </div>
         </div>
       ) : null}
 
@@ -226,7 +259,7 @@ export function RunPage() {
       <div className="text-sm text-muted-foreground">
         <span>View report:</span>{" "}
         <Link
-          className="text-emerald-700"
+          className="text-primary hover:text-primary/80"
           to={`/reports/${run.domain}`}
           onClick={() => trackLinkClick("run_view_report", `/reports/${run.domain}`, { run_id: run.runId })}
         >

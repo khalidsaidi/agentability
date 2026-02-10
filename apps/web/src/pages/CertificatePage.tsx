@@ -57,7 +57,7 @@ export function CertificatePage() {
     return (
       <div className="animate-fade-up">
         <p className="text-sm text-destructive">Certificate not found.</p>
-        <Link className="text-sm text-emerald-700" to="/" onClick={() => trackLinkClick("cert_back_home", "/")}>
+        <Link className="text-sm text-primary hover:text-primary/80" to="/" onClick={() => trackLinkClick("cert_back_home", "/")}>
           Back to home
         </Link>
       </div>

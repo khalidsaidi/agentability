@@ -39,9 +39,9 @@ function App() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute -left-32 top-10 h-64 w-64 rounded-full bg-amber-200/40 blur-3xl animate-float" />
-      <div className="pointer-events-none absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-200/40 blur-3xl animate-float" />
-      <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-teal-200/30 blur-3xl" />
+      <div className="pointer-events-none absolute -left-32 top-10 h-64 w-64 rounded-full bg-primary/20 blur-3xl animate-float" />
+      <div className="pointer-events-none absolute right-0 top-40 h-80 w-80 rounded-full bg-cyan-200/40 blur-3xl animate-float" />
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-orange-200/30 blur-3xl" />
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
@@ -52,21 +52,14 @@ function App() {
           >
             <img src="/logo-mark.svg" alt="Agentability" className="h-10 w-10" />
             <div>
-              <div className="text-lg font-semibold tracking-tight">agentability</div>
+              <div className="text-lg font-semibold italic tracking-tight">agentability</div>
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Verified readiness standard
+                AI readiness score
               </div>
             </div>
           </Link>
           <div className="flex items-center gap-3">
-            <Badge variant="outline">Public Beta</Badge>
-            <a
-              href="https://github.com/khalidsaidi/agentability"
-              className="text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => trackLinkClick("nav_github", "https://github.com/khalidsaidi/agentability")}
-            >
-              GitHub
-            </a>
+            <Badge variant="outline">Open methodology</Badge>
           </div>
         </header>
 
@@ -79,49 +72,111 @@ function App() {
           </Routes>
         </main>
 
-        <footer className="border-t border-border/50 pt-6 text-xs text-muted-foreground">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              Built for public-mode audits. Evidence bundles are stored in Cloud Storage for traceability.
+        <footer className="border-t border-border/60 pt-8 text-xs text-muted-foreground">
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="space-y-2 md:pr-8">
+              <div className="text-sm font-semibold text-foreground">Agentability</div>
+              <p>
+                Public-mode audits for discoverability, callability, docs, trust, and reliability.
+              </p>
+              <p>Evidence bundles are stored in Cloud Storage for traceability.</p>
             </div>
-            <div>
-              <div className="text-[0.65rem] uppercase tracking-[0.3em] text-muted-foreground">AI Integration</div>
-              <div className="mt-2 flex flex-wrap gap-3">
-                <a
-                  className="hover:text-foreground"
-                  href="/.well-known/air.json"
-                  onClick={() => trackLinkClick("footer_air_json", "/.well-known/air.json")}
-                >
-                  air.json
-                </a>
-                <a
-                  className="hover:text-foreground"
-                  href="/.well-known/openapi.json"
-                  onClick={() => trackLinkClick("footer_openapi_json", "/.well-known/openapi.json")}
-                >
-                  openapi.json
-                </a>
-                <a
-                  className="hover:text-foreground"
-                  href="/llms.txt"
-                  onClick={() => trackLinkClick("footer_llms_txt", "/llms.txt")}
-                >
-                  llms.txt
-                </a>
-                <a
-                  className="hover:text-foreground"
-                  href="/discovery/audit/latest.json"
-                  onClick={() => trackLinkClick("footer_audit", "/discovery/audit/latest.json")}
-                >
-                  audit
-                </a>
-                <a
-                  className="hover:text-foreground"
-                  href="https://github.com/khalidsaidi/agentability"
-                  onClick={() => trackLinkClick("footer_github", "https://github.com/khalidsaidi/agentability")}
-                >
-                  GitHub
-                </a>
+
+            <div className="grid gap-6 sm:grid-cols-2 md:col-span-2">
+              <div>
+                <div className="text-[0.65rem] uppercase tracking-[0.3em] text-muted-foreground">
+                  Technical resources
+                </div>
+                <div className="mt-3 space-y-3">
+                  <a
+                    className="group block"
+                    href="/.well-known/openapi.json"
+                    onClick={() => trackLinkClick("footer_openapi_json", "/.well-known/openapi.json")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">OpenAPI spec</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      See what our API can do (openapi.json)
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="/.well-known/air.json"
+                    onClick={() => trackLinkClick("footer_air_json", "/.well-known/air.json")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">AI manifest</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Integration metadata (air.json)
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="/llms.txt"
+                    onClick={() => trackLinkClick("footer_llms_txt", "/llms.txt")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">LLM entrypoint</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Docs discovery for agents (llms.txt)
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="/discovery/audit/latest.json"
+                    onClick={() => trackLinkClick("footer_audit", "/discovery/audit/latest.json")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Raw audit data</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Latest verification snapshot (latest.json)
+                    </span>
+                  </a>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[0.65rem] uppercase tracking-[0.3em] text-muted-foreground">
+                  Project
+                </div>
+                <div className="mt-3 space-y-3">
+                  <a
+                    className="group block"
+                    href="/spec.md"
+                    onClick={() => trackLinkClick("footer_spec", "/spec.md")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Methodology spec</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Versioned checks and scoring (spec.md)
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="/discovery/audit"
+                    onClick={() => trackLinkClick("footer_verification", "/discovery/audit")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Verification log</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Evidence-backed self-audit (public)
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="https://github.com/khalidsaidi/agentability"
+                    onClick={() => trackLinkClick("footer_github", "https://github.com/khalidsaidi/agentability")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Source code</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Open source on GitHub
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="mailto:hello@agentability.org"
+                    onClick={() => trackLinkClick("footer_contact", "mailto:hello@agentability.org")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Contact</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Questions or submissions
+                    </span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

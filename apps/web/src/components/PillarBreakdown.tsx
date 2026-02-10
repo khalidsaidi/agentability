@@ -1,12 +1,12 @@
 import type { PillarScores } from "@agentability/shared";
 import { useEffect, useState } from "react";
 
-const PILLARS: { key: keyof PillarScores; label: string }[] = [
-  { key: "discovery", label: "Discovery" },
-  { key: "callableSurface", label: "Callable Surface" },
-  { key: "llmIngestion", label: "LLM Ingestion" },
-  { key: "trust", label: "Trust" },
-  { key: "reliability", label: "Reliability" },
+const PILLARS: { key: keyof PillarScores; label: string; hint: string }[] = [
+  { key: "discovery", label: "Can agents find you?", hint: "Entrypoints + crawlable docs" },
+  { key: "callableSurface", label: "Can agents call you?", hint: "OpenAPI + tool surfaces" },
+  { key: "llmIngestion", label: "Can AI read your docs?", hint: "Text-first docs + llms.txt" },
+  { key: "trust", label: "Should agents trust you?", hint: "Legal + contact + verification" },
+  { key: "reliability", label: "Are responses consistent?", hint: "Stable behavior across retries" },
 ];
 
 export function PillarBreakdown({ pillarScores }: { pillarScores: PillarScores }) {
@@ -33,11 +33,23 @@ export function PillarBreakdown({ pillarScores }: { pillarScores: PillarScores }
             <span>{pillar.label}</span>
             <span>{pillarScores[pillar.key]}</span>
           </div>
+          <p className="mt-1 text-xs text-muted-foreground">{pillar.hint}</p>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-emerald-500 transition-all duration-700 ease-out"
-              style={{ width: `${animated[pillar.key]}%` }}
-            />
+            <div className="relative h-full w-full">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-700 ease-out"
+                style={{ width: `${animated[pillar.key]}%` }}
+              />
+              <div
+                className="absolute top-0 h-full w-0.5 bg-foreground/20"
+                style={{ left: "95%" }}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+          <div className="mt-2 flex items-center justify-between text-[0.7rem] text-muted-foreground">
+            <span>You</span>
+            <span>Target: 95</span>
           </div>
         </div>
       ))}

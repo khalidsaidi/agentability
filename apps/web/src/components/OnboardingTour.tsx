@@ -19,32 +19,18 @@ const STEPS = [
   },
 ];
 
-export function OnboardingTour({ forceOpen }: { forceOpen?: boolean }) {
-  const [open, setOpen] = useState(false);
+export function OnboardingTour({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (forceOpen) {
-      setOpen(true);
-      setStep(0);
-      trackEvent("tour_open", { source: "manual" });
-      return;
-    }
-    const seen = window.localStorage.getItem(STORAGE_KEY);
-    if (!seen) {
-      setOpen(true);
-      setStep(0);
-      trackEvent("tour_open", { source: "auto" });
-    }
-  }, [forceOpen]);
+    trackEvent("tour_open", { source: "manual" });
+  }, []);
 
   const close = () => {
     window.localStorage.setItem(STORAGE_KEY, "seen");
-    setOpen(false);
     trackEvent("tour_close", { step });
+    onClose();
   };
-
-  if (!open) return null;
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
@@ -71,7 +57,7 @@ export function OnboardingTour({ forceOpen }: { forceOpen?: boolean }) {
             {STEPS.map((_, index) => (
               <span
                 key={index}
-                className={`h-2 w-2 rounded-full ${index === step ? "bg-emerald-500" : "bg-muted"}`}
+                className={`h-2 w-2 rounded-full ${index === step ? "bg-primary" : "bg-muted"}`}
               />
             ))}
           </div>

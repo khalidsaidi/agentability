@@ -4,22 +4,24 @@ import { useEffect, useState } from "react";
 import { URLInputCard } from "@/components/URLInputCard";
 import { evaluateOrigin, fetchDiscoveryAudit, fetchLeaderboard } from "@/lib/api";
 import { useSeo } from "@/lib/seo";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
+import { Code2, FileSearch, ListChecks, ShieldCheck, Sparkles } from "lucide-react";
 
 export function HomePage() {
   useSeo({
-    title: "Agentability Standard for AI-Native Web Apps",
+    title: "Agentability: Free AI Readiness Audit for Your Website & API",
     description:
-      "Agentability is the standard for AI-native web surfaces: discovery, callability, ingestion, trust, and reliability.",
+      "Run a public AI-readiness audit in ~60 seconds. Get a score, ranked fixes, and copy-paste instructions to make your site usable by AI tools.",
     path: "/",
   });
 
   const navigate = useNavigate();
-  const [showTour, setShowTour] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
+  const [tourInstance, setTourInstance] = useState(0);
   const auditQuery = useQuery({
     queryKey: ["discovery-audit"],
     queryFn: fetchDiscoveryAudit,
@@ -106,241 +108,306 @@ export function HomePage() {
     return Number.isNaN(parsed.getTime()) ? audit.live_checked_at : parsed.toLocaleString();
   })();
 
+  const exampleReport =
+    leaderboardQuery.data?.entries.find((entry) => entry.domain === "aistatusdashboard.com") ??
+    leaderboardQuery.data?.entries[0] ??
+    null;
+  const exampleDomain = exampleReport?.domain ?? "aistatusdashboard.com";
+  const exampleScore = exampleReport?.score ?? 70.0;
+  const exampleGrade = exampleReport?.grade ?? "C";
+  const exampleReportUrl = exampleReport?.reportUrl ?? "/reports/aistatusdashboard.com";
+
   return (
-    <div className="space-y-10 animate-fade-up">
-      <OnboardingTour forceOpen={showTour} />
-      <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-white/70 px-3 py-1 text-xs font-medium uppercase tracking-wider">
-            Agentability · Authority Mode
+    <div className="space-y-14 animate-fade-up">
+      {tourOpen ? (
+        <OnboardingTour key={tourInstance} onClose={() => setTourOpen(false)} />
+      ) : null}
+
+      <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+        <div className="space-y-7">
+          <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-border/60 bg-white/80 px-3 py-1 text-xs font-semibold tracking-wide text-muted-foreground shadow-sm">
+            <span className="text-primary">Audits in ~60s</span>
+            <span className="opacity-50">•</span>
+            <span>Copy‑paste fixes</span>
+            <span className="opacity-50">•</span>
+            <span>No sign-up</span>
           </div>
-          <h1 className="text-4xl leading-tight md:text-5xl">
-            Make your site instantly usable by AI agents
-          </h1>
-          <p className="max-w-xl text-base text-muted-foreground">
-            Run a public audit that translates AI‑readiness into plain language, concrete fixes, and a shareable
-            score your team can improve.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="outline">
-              <a href="/spec.md" onClick={() => trackLinkClick("home_spec", "/spec.md")}>
-                Read the Spec
-              </a>
-            </Button>
-            <Button asChild variant="outline">
-              <a href="/discovery/audit" onClick={() => trackLinkClick("home_verification", "/discovery/audit")}>
-                See Verification
-              </a>
-            </Button>
-            <Button asChild variant="secondary">
-              <a
-                href="/reports/aistatusdashboard.com"
-                onClick={() => trackLinkClick("home_showcase", "/reports/aistatusdashboard.com")}
-              >
-                View showcase report
-              </a>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                trackEvent("tour_open_click");
-                setShowTour(true);
-              }}
-            >
-              Take the 30s tour
-            </Button>
+
+          <div className="space-y-4">
+            <h1 className="text-5xl leading-[1.05] tracking-tight md:text-6xl">
+              Get AI-ready in 60 seconds.
+              <span className="block text-foreground/80">See what breaks automation, then fix it.</span>
+            </h1>
+            <p className="max-w-xl text-lg text-muted-foreground">
+              Run a public audit that turns agent-readiness into a clear score, a ranked checklist, and code you can
+              paste into your docs or APIs today.
+            </p>
           </div>
+
           <URLInputCard
             onSubmit={(origin) => mutation.mutate(origin)}
             loading={mutation.isPending}
             error={mutation.isError ? (mutation.error instanceof Error ? mutation.error.message : "Request failed") : null}
           />
-          <div className="grid gap-3 rounded-2xl border border-border/60 bg-white/70 p-4 text-sm text-muted-foreground md:grid-cols-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">What you get</p>
-              <p className="mt-2 text-sm text-foreground">A score, a report, and copy‑paste fixes.</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Time to value</p>
-              <p className="mt-2 text-sm text-foreground">Most audits finish in under 60 seconds.</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Built for trust</p>
-              <p className="mt-2 text-sm text-foreground">Evidence‑backed, verifiable, and public‑only.</p>
-            </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              className="text-sm font-medium text-muted-foreground transition hover:text-foreground"
+              onClick={() => {
+                trackEvent("tour_open_click");
+                setTourInstance((prev) => prev + 1);
+                setTourOpen(true);
+              }}
+            >
+              Need a walkthrough? Take the 30s tour
+            </button>
           </div>
         </div>
 
-        <Card className="border-border/60 bg-white/70">
+        <Card className="border-border/60 bg-white/80 shadow-sm backdrop-blur">
           <CardHeader>
-            <CardTitle>Verification proof</CardTitle>
-            <CardDescription>Live discovery audit across apex + hosting mirrors.</CardDescription>
+            <CardTitle>Preview: score + ranked fixes</CardTitle>
+            <CardDescription>3 min read · Real audit for {exampleDomain}.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-muted-foreground">
-            {auditQuery.isLoading ? <p>Loading audit…</p> : null}
-            {auditQuery.isError ? <p>Audit unavailable.</p> : null}
-            {audit ? (
-              <>
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-white/80 px-3 py-2 text-xs uppercase tracking-wide">
-                  <span>Status</span>
-                  <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${statusTone}`}>
-                    {statusLabel}
+            <div className="rounded-2xl border border-border/60 bg-white p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Example</p>
+                  <p className="mt-2 text-lg font-semibold text-foreground">{exampleDomain}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Public-mode audit</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Score</p>
+                  <p className="mt-1 text-3xl font-semibold text-foreground">{exampleScore.toFixed(1)}</p>
+                  <p className="text-xs text-muted-foreground">Grade {exampleGrade}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border/60 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">What you’ll get</p>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span>
+                    An A–F grade and a shareable report URL
                   </span>
                 </div>
-                <div className="grid gap-3 text-xs sm:grid-cols-2">
-                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
-                    <p className="uppercase tracking-wide text-muted-foreground">Sources verified</p>
-                    <p className="text-lg font-semibold text-foreground">{sourcesCount || "—"}</p>
-                    <p className="text-[0.7rem] text-muted-foreground">Apex + hosting mirrors</p>
-                    {sourceLabels.length ? (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {sourceLabels.map((label, index) => (
-                          <span
-                            key={`${label}-${index}`}
-                            className="rounded-full border border-border/60 bg-white/80 px-2 py-0.5 text-[0.65rem] text-muted-foreground"
-                          >
-                            {label}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
-                    <p className="uppercase tracking-wide text-muted-foreground">Surfaces checked</p>
-                    <p className="text-lg font-semibold text-foreground">{surfacesCount || "—"}</p>
-                    <p className="text-[0.7rem] text-muted-foreground">Required + optional</p>
-                  </div>
-                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
-                    <p className="uppercase tracking-wide text-muted-foreground">Hash drift</p>
-                    <p className="text-lg font-semibold text-foreground">{driftTotal}</p>
-                    <p className="text-[0.7rem] text-muted-foreground">
-                      req {driftRequired} · opt {driftOptional}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-border/60 bg-white/80 p-3">
-                    <p className="uppercase tracking-wide text-muted-foreground">Live errors</p>
-                    <p className="text-lg font-semibold text-foreground">{liveErrorsTotal}</p>
-                    <p className="text-[0.7rem] text-muted-foreground">
-                      req {missingRequired + unreachableRequired} · opt {missingOptional + unreachableOptional}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-                  <span className="text-muted-foreground">
-                    Last checked: <span className="font-medium text-foreground">{lastCheckedLabel}</span> · Spec v
-                    {audit.spec_version ?? "1.2"}
+                <div className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span>
+                    Ranked fixes (highest impact first)
                   </span>
-                  <a
-                    className="text-emerald-700 hover:text-emerald-900"
-                    href="/discovery/audit/latest.pretty.json"
-                    onClick={() =>
-                      trackLinkClick("audit_latest_pretty", "/discovery/audit/latest.pretty.json", {
-                        status: audit.discoverability_health?.status,
-                      })
-                    }
-                  >
-                    View latest.pretty.json →
-                  </a>
                 </div>
-              </>
-            ) : null}
+                <div className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span>
+                    Copy‑paste snippets + plain-language explanations
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <Button asChild className="h-11 w-full rounded-xl">
+              <a
+                href={exampleReportUrl}
+                onClick={() => trackLinkClick("home_example_report_preview_cta", exampleReportUrl)}
+              >
+                Open the example report →
+              </a>
+            </Button>
           </CardContent>
         </Card>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-border/60 bg-white/80 p-5 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md">
+          <div className="flex items-start gap-3">
+            <Sparkles className="mt-0.5 h-5 w-5 text-primary" />
+            <div>
+              <p className="font-semibold text-foreground">AI readiness score (A–F)</p>
+              <p className="mt-1 text-sm text-muted-foreground">A single number your team can track and improve.</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border/60 bg-white/80 p-5 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md">
+          <div className="flex items-start gap-3">
+            <ListChecks className="mt-0.5 h-5 w-5 text-primary" />
+            <div>
+              <p className="font-semibold text-foreground">Ranked fixes</p>
+              <p className="mt-1 text-sm text-muted-foreground">See the highest-impact gaps first, with evidence.</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border/60 bg-white/80 p-5 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md">
+          <div className="flex items-start gap-3">
+            <Code2 className="mt-0.5 h-5 w-5 text-primary" />
+            <div>
+              <p className="font-semibold text-foreground">Copy‑paste implementation</p>
+              <p className="mt-1 text-sm text-muted-foreground">Snippets and steps you can ship in minutes.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Card className="border-border/60 bg-white/70">
         <CardHeader>
-          <CardTitle>How it works</CardTitle>
-          <CardDescription>Three steps to agent‑ready visibility.</CardDescription>
+          <CardTitle>Perfect for</CardTitle>
+          <CardDescription>Who gets the most value from Agentability today.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
           <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">1. Scan</p>
-            <p className="mt-2 text-sm text-foreground">We discover your public AI entrypoints.</p>
+            <p className="text-sm font-semibold text-foreground">API & platform teams</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Make your API discoverable and callable by AI tools with a spec + examples.
+            </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">2. Score</p>
-            <p className="mt-2 text-sm text-foreground">We check callability, docs, and trust.</p>
+            <p className="text-sm font-semibold text-foreground">SaaS founders</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              See what blocks automation, then ship the top 2–5 fixes quickly.
+            </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">3. Improve</p>
-            <p className="mt-2 text-sm text-foreground">You get fixes, evidence, and shareable proof.</p>
+            <p className="text-sm font-semibold text-foreground">DevRel & docs owners</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Turn docs into agent-friendly entrypoints (llms.txt, canonical docs, stable links).
+            </p>
           </div>
         </CardContent>
       </Card>
-
-      <Card className="border-border/60 bg-white/70">
-        <CardContent className="flex flex-wrap items-center gap-3 py-5 text-xs uppercase tracking-wider text-muted-foreground">
-          <span>Open source</span>
-          <span>Evidence‑based</span>
-          <span>Versioned methodology</span>
-          <span>Hash drift enforcement</span>
-        </CardContent>
-      </Card>
-
-      <Alert className="border-border/60 bg-white/70">
-        <AlertTitle>Public mode only</AlertTitle>
-        <AlertDescription>
-          We currently evaluate public-facing endpoints and documentation. Authenticated and private surfaces are not yet
-          scored.
-        </AlertDescription>
-      </Alert>
 
       <Card className="border-border/60 bg-white/70">
         <CardHeader>
-          <CardTitle>AI Integration</CardTitle>
-          <CardDescription>Stable machine surfaces for agents and crawlers.</CardDescription>
+          <CardTitle>How it works</CardTitle>
+          <CardDescription>Specific outputs, not vague promises.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Step 1</p>
+            <p className="mt-2 text-sm font-semibold text-foreground">Paste your URL</p>
+            <p className="mt-1 text-sm text-muted-foreground">Domain or full URL. No credentials needed.</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Step 2</p>
+            <p className="mt-2 text-sm font-semibold text-foreground">We scan</p>
+            <p className="mt-1 text-sm text-muted-foreground">Entrypoints, docs, OpenAPI, and tool surfaces.</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Step 3</p>
+            <p className="mt-2 text-sm font-semibold text-foreground">You get a report</p>
+            <p className="mt-1 text-sm text-muted-foreground">Ranked fixes with evidence and copy‑paste code.</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>How we verify</CardTitle>
+          <CardDescription>Transparent checks you can reproduce.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Live checks</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              We run a discovery audit across the apex domain and hosting mirrors to catch drift and broken surfaces.
+            </p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/discovery/audit"
+              onClick={() => trackLinkClick("home_verification", "/discovery/audit")}
+            >
+              See verification log →
+            </a>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Evidence bundles</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Reports include evidence links so teams can review exactly what was fetched and why a check failed.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Open source methodology</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The checks and scoring are versioned and public, so you can verify the rules behind your score.
+            </p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/spec.md"
+              onClick={() => trackLinkClick("home_spec", "/spec.md")}
+            >
+              Read the spec →
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>What we check automatically</CardTitle>
+          <CardDescription>Human-readable checks tied to concrete fixes.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 text-sm md:grid-cols-2">
-            <a
-              className="text-muted-foreground hover:text-foreground"
-              href="/.well-known/air.json"
-              onClick={() => trackLinkClick("ai_air_json", "/.well-known/air.json")}
-            >
-              /.well-known/air.json
-            </a>
-            <a
-              className="text-muted-foreground hover:text-foreground"
-              href="/.well-known/openapi.json"
-              onClick={() => trackLinkClick("ai_openapi_json", "/.well-known/openapi.json")}
-            >
-              /.well-known/openapi.json
-            </a>
-            <a
-              className="text-muted-foreground hover:text-foreground"
-              href="/llms.txt"
-              onClick={() => trackLinkClick("ai_llms_txt", "/llms.txt")}
-            >
-              /llms.txt
-            </a>
-            <a
-              className="text-muted-foreground hover:text-foreground"
-              href="/discovery/audit/latest.json"
-              onClick={() => trackLinkClick("ai_audit_latest", "/discovery/audit/latest.json")}
-            >
-              /discovery/audit/latest.json
-            </a>
-            <a
-              className="text-muted-foreground hover:text-foreground"
-              href="https://github.com/khalidsaidi/agentability"
-            >
-              GitHub repo
-            </a>
+          <div className="grid gap-4 text-sm text-muted-foreground md:grid-cols-2">
+            <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+              <div className="flex items-start gap-3">
+                <FileSearch className="mt-0.5 h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-semibold text-foreground">API documentation</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    OpenAPI (/.well-known/openapi.json), endpoint discoverability, and examples.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-semibold text-foreground">Trust signals</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Contact + legal URLs, plus verification metadata (air.json, ai-plugin.json).
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+              <div className="flex items-start gap-3">
+                <ListChecks className="mt-0.5 h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-semibold text-foreground">Live endpoint status</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Do the public surfaces respond consistently with the right types?
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+              <div className="flex items-start gap-3">
+                <Code2 className="mt-0.5 h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-semibold text-foreground">Response quality</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Structured output, clear errors, and stable content across retries.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card className="border-border/60 bg-white/70">
         <CardHeader>
-          <CardTitle>Community showcase</CardTitle>
-          <CardDescription>Opt‑in leaderboard of AI‑ready sites.</CardDescription>
+          <CardTitle>Example reports</CardTitle>
+          <CardDescription>Real audits you can skim in a few minutes.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-muted-foreground">
           <p>
-            This list is curated and opt‑in only. Want to be featured?{" "}
+            Want your site featured?{" "}
             <a
-              className="text-emerald-700 hover:text-emerald-900"
+              className="text-primary hover:text-primary/80"
               href="mailto:hello@agentability.org"
               onClick={() => trackLinkClick("leaderboard_submit", "mailto:hello@agentability.org")}
             >
@@ -364,7 +431,7 @@ export function HomePage() {
                     </span>
                   </div>
                   <a
-                    className="mt-2 block text-xs text-emerald-700"
+                    className="mt-2 block text-xs text-primary"
                     href={entry.reportUrl}
                     onClick={() =>
                       trackLinkClick("leaderboard_report", entry.reportUrl, { domain: entry.domain, rank: index + 1 })
@@ -381,21 +448,126 @@ export function HomePage() {
 
       <Card className="border-border/60 bg-white/70">
         <CardHeader>
-          <CardTitle>Meet Ada</CardTitle>
-          <CardDescription>Your guide to AI‑native readiness.</CardDescription>
+          <CardTitle>FAQ</CardTitle>
+          <CardDescription>Quick answers before you run your first audit.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-[0.35fr_0.65fr]">
-          <img src="/mascot.svg" alt="Agentability mascot" className="w-40 mascot-float" />
-          <div className="space-y-3">
-            <p>
-              Ada is our verification guide. She keeps the audit strict, and the fixes actionable.
-            </p>
-            <ul className="list-disc space-y-1 pl-5">
-              <li>Explains what agents need in plain language.</li>
-              <li>Highlights the highest‑impact fixes first.</li>
-              <li>Celebrates progress every time you improve.</li>
-            </ul>
-          </div>
+        <CardContent>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="what">
+              <AccordionTrigger>What exactly do you check?</AccordionTrigger>
+              <AccordionContent>
+                We check agent discoverability (manifests and docs), callable surfaces (OpenAPI and tooling
+                endpoints), trust signals (contact and legal), and reliability (stable responses across retries).
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="privacy">
+              <AccordionTrigger>Is my data private?</AccordionTrigger>
+              <AccordionContent>
+                Agentability only evaluates public-facing URLs and never requires credentials. We store the report
+                and an evidence bundle so results are shareable and verifiable.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="nocode">
+              <AccordionTrigger>Can I fix issues if I’m not a developer?</AccordionTrigger>
+              <AccordionContent>
+                Many fixes are copy‑paste (publishing small files like OpenAPI, air.json, or llms.txt). For deeper
+                issues, we still describe the problem in plain language so you can hand it to an engineer.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="score">
+              <AccordionTrigger>What’s an “agentability score”?</AccordionTrigger>
+              <AccordionContent>
+                It’s a public-mode score for how usable your site is for AI tools: can they find the right
+                entrypoints, understand your docs, and call your APIs reliably.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>Verification (technical)</CardTitle>
+          <CardDescription>Live discovery audit across apex + hosting mirrors.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm text-muted-foreground">
+          {auditQuery.isLoading ? <p>Loading verification…</p> : null}
+          {auditQuery.isError ? <p>Verification unavailable.</p> : null}
+          {audit ? (
+            <>
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-white/80 px-4 py-3 text-xs uppercase tracking-wide">
+                <span>Status</span>
+                <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${statusTone}`}>
+                  {statusLabel}
+                </span>
+              </div>
+
+              <div className="text-xs text-muted-foreground">
+                Last checked: <span className="font-medium text-foreground">{lastCheckedLabel}</span> · Spec v
+                {audit.spec_version ?? "1.2"}
+              </div>
+
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="details">
+                  <AccordionTrigger>Show technical details</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="grid gap-3 text-xs sm:grid-cols-2">
+                      <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                        <p className="uppercase tracking-wide text-muted-foreground">Sources verified</p>
+                        <p className="text-lg font-semibold text-foreground">{sourcesCount || "—"}</p>
+                        <p className="text-[0.7rem] text-muted-foreground">Apex + hosting mirrors</p>
+                        {sourceLabels.length ? (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {sourceLabels.map((label, index) => (
+                              <span
+                                key={`${label}-${index}`}
+                                className="rounded-full border border-border/60 bg-white/80 px-2 py-0.5 text-[0.65rem] text-muted-foreground"
+                              >
+                                {label}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                        <p className="uppercase tracking-wide text-muted-foreground">Surfaces checked</p>
+                        <p className="text-lg font-semibold text-foreground">{surfacesCount || "—"}</p>
+                        <p className="text-[0.7rem] text-muted-foreground">Required + optional</p>
+                      </div>
+                      <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                        <p className="uppercase tracking-wide text-muted-foreground">Hash drift</p>
+                        <p className="text-lg font-semibold text-foreground">{driftTotal}</p>
+                        <p className="text-[0.7rem] text-muted-foreground">
+                          req {driftRequired} · opt {driftOptional}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-border/60 bg-white/80 p-3">
+                        <p className="uppercase tracking-wide text-muted-foreground">Live errors</p>
+                        <p className="text-lg font-semibold text-foreground">{liveErrorsTotal}</p>
+                        <p className="text-[0.7rem] text-muted-foreground">
+                          req {missingRequired + unreachableRequired} · opt {missingOptional + unreachableOptional}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <a
+                        className="text-primary hover:text-primary/80"
+                        href="/discovery/audit/latest.pretty.json"
+                        onClick={() =>
+                          trackLinkClick("audit_latest_pretty", "/discovery/audit/latest.pretty.json", {
+                            status: audit.discoverability_health?.status,
+                          })
+                        }
+                      >
+                        View latest.pretty.json →
+                      </a>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </>
+          ) : null}
         </CardContent>
       </Card>
     </div>

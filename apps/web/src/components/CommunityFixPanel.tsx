@@ -67,7 +67,7 @@ export function CommunityFixPanel({ runId, issueId }: Props) {
         <div className="text-sm text-muted-foreground">
           Suggested fix plan unavailable.{" "}
           <a
-            className="text-emerald-700 hover:text-emerald-900"
+            className="text-primary hover:text-primary/80"
             href={fallbackSearch}
             target="_blank"
             rel="noreferrer"
@@ -90,7 +90,7 @@ export function CommunityFixPanel({ runId, issueId }: Props) {
                   href={citation.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="break-words text-emerald-700 hover:text-emerald-900"
+                  className="break-words text-primary hover:text-primary/80"
                   onClick={() => trackLinkClick("community_fix_source", citation.url, { issue_id: issueId })}
                 >
                   {citation.title ?? citation.url}
@@ -102,7 +102,7 @@ export function CommunityFixPanel({ runId, issueId }: Props) {
           <div className="mt-2 text-xs text-muted-foreground">
             Sources unavailable.{" "}
             <a
-              className="text-emerald-700 hover:text-emerald-900"
+              className="text-primary hover:text-primary/80"
               href={fallbackSearch}
               target="_blank"
               rel="noreferrer"

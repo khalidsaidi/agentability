@@ -813,12 +813,12 @@ async function runEvaluation(
       return {
         ok: true,
         result: {
-        runId,
-        status: "running",
-        jsonUrl,
-        reportUrl,
-        statusUrl,
-        domain,
+          runId,
+          status: "running",
+          jsonUrl,
+          reportUrl,
+          statusUrl,
+          domain,
         },
       };
     }
@@ -869,7 +869,21 @@ async function runEvaluation(
         },
         { merge: true }
       );
-    return { ok: false, status: 500, message: "Evaluation failed", code: "evaluation_failed" };
+
+    // Treat internal evaluation errors like a job that failed fast: return the runId so the
+    // client can show the run page and error details, instead of a generic 500 with no context.
+    const baseUrl = buildBaseUrl(req);
+    return {
+      ok: true,
+      result: {
+        runId,
+        status: "failed",
+        jsonUrl: `${baseUrl}/v1/evaluations/${domain}/latest.json`,
+        reportUrl: `${baseUrl}/reports/${domain}`,
+        statusUrl: `${baseUrl}/v1/runs/${runId}`,
+        domain,
+      },
+    };
   }
 }
 

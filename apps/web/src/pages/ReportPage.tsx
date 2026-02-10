@@ -19,11 +19,11 @@ import { ConfettiBurst } from "@/components/ConfettiBurst";
 import { trackError, trackEvent, trackLinkClick } from "@/lib/analytics";
 
 const PILLAR_LABELS = {
-  discovery: "Discovery",
-  callableSurface: "Callable Surface",
-  llmIngestion: "LLM Ingestion",
-  trust: "Trust",
-  reliability: "Reliability",
+  discovery: "Can agents find you?",
+  callableSurface: "Can agents call you?",
+  llmIngestion: "Can AI read your docs?",
+  trust: "Should agents trust you?",
+  reliability: "Are responses consistent?",
 } as const;
 
 type PillarKey = keyof typeof PILLAR_LABELS;
@@ -51,27 +51,27 @@ const PILLAR_DETAILS: Record<
   { description: string; signals: string; fixes: string }
 > = {
   discovery: {
-    description: "How easy it is for an agent to find your public entrypoints and docs.",
+    description: "Can an agent locate your machine entrypoints and canonical docs without guessing?",
     signals: "Machine entrypoint files, clear links, and crawlable paths.",
     fixes: "Publish /.well-known/air.json and link it to your docs and API.",
   },
   callableSurface: {
-    description: "Whether your API is described clearly enough for tools to call.",
+    description: "Can tools reliably call your API with a validated spec and examples?",
     signals: "A valid API description file with endpoints and examples.",
     fixes: "Publish an OpenAPI file with clear endpoints and examples.",
   },
   llmIngestion: {
-    description: "Whether your docs are easy for AI to read and keep in memory.",
+    description: "Can an LLM ingest your docs quickly and keep the important bits in memory?",
     signals: "A public docs page with real text and stable URLs.",
     fixes: "Keep docs text-first, stable, and linked from the manifest.",
   },
   trust: {
-    description: "Signals that the site is official and safe to use.",
+    description: "Do you provide legal + contact metadata that tools and users can trust?",
     signals: "Verification files, contact info, and legal links.",
     fixes: "Publish a simple verification file and contact info.",
   },
   reliability: {
-    description: "Whether important pages respond consistently over time.",
+    description: "Do critical surfaces return consistent responses across retries?",
     signals: "Same status, content type, and body on repeat requests.",
     fixes: "Remove flaky redirects and random output.",
   },
@@ -288,9 +288,10 @@ export function ReportPage() {
   const score = report?.score ?? 0;
   const diff = report?.diff;
   const previousSummary = report?.previousSummary;
+  const isCelebration = report?.grade?.toUpperCase().startsWith("A") ?? false;
   const [displayScore, setDisplayScore] = useState(0);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [tab, setTab] = useState("overview");
   const viewKey = useRef<string | null>(null);
 
   useEffect(() => {
@@ -313,17 +314,12 @@ export function ReportPage() {
 
   useEffect(() => {
     if (!report) return;
-    const isCelebration = report.grade.toUpperCase().startsWith("A");
     if (!isCelebration) return;
-    setShowConfetti(true);
-    const timer = window.setTimeout(() => setShowConfetti(false), 1800);
     trackEvent("report_confetti", { run_id: report.runId, grade: report.grade, score: report.score });
-    return () => window.clearTimeout(timer);
-  }, [report]);
+  }, [report, isCelebration]);
 
   useEffect(() => {
     if (!report || !soundEnabled) return;
-    const isCelebration = report.grade.toUpperCase().startsWith("A");
     if (!isCelebration) return;
     const audio = new Audio(
       "data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVQAAAAA////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh////f39/4eHh"
@@ -396,7 +392,7 @@ export function ReportPage() {
     return (
       <div className="animate-fade-up">
         <p className="text-sm text-destructive">Report not found.</p>
-        <Link className="text-sm text-emerald-700" to="/">
+        <Link className="text-sm text-primary hover:text-primary/80" to="/">
           Back to home
         </Link>
       </div>
@@ -407,7 +403,7 @@ export function ReportPage() {
     return (
       <div className="animate-fade-up">
         <p className="text-sm text-destructive">Report not found.</p>
-        <Link className="text-sm text-emerald-700" to="/">
+        <Link className="text-sm text-primary hover:text-primary/80" to="/">
           Back to home
         </Link>
       </div>
@@ -438,6 +434,14 @@ export function ReportPage() {
       if (statusDelta !== 0) return statusDelta;
       return SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity];
     });
+
+  const nextFixes = issueChecks
+    .map((check) => ({ check, fix: getFixIt(check.id, check.recommendationId) }))
+    .filter((item): item is { check: (typeof issueChecks)[number]; fix: NonNullable<ReturnType<typeof getFixIt>> } =>
+      Boolean(item.fix)
+    )
+    .slice(0, 3);
+  const nextFixMinutes = nextFixes.reduce((sum, item) => sum + (item.fix.estimatedMinutes ?? 10), 0);
   const weights = PROFILE_WEIGHTS[report.profile];
   const weightSummary = (Object.entries(weights) as [PillarKey, number][])
     .map(([key, value]) => `${PILLAR_LABELS[key]} ${formatWeight(value)}`)
@@ -522,12 +526,12 @@ export function ReportPage() {
 
       <Card className="border-border/60 bg-white/70">
         <CardContent className="relative grid gap-6 p-6 md:grid-cols-[1.1fr_0.9fr]">
-          <ConfettiBurst active={showConfetti} />
+          <ConfettiBurst active={isCelebration} />
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-emerald-700">Score</p>
-                <div className="text-3xl font-semibold text-emerald-900">
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-primary">Score</p>
+                <div className="text-3xl font-semibold text-foreground">
                   {displayScore.toFixed(1)}
                 </div>
               </div>
@@ -561,6 +565,17 @@ export function ReportPage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              {fixItChecks.length ? (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setTab("findings");
+                    trackEvent("report_cta_fixes", { run_id: report.runId, domain: report.domain });
+                  }}
+                >
+                  Copy-paste fixes
+                </Button>
+              ) : null}
               <Button
                 variant={soundEnabled ? "secondary" : "outline"}
                 size="sm"
@@ -658,7 +673,7 @@ export function ReportPage() {
       </Card>
 
       {isShowcase ? (
-        <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4 text-sm text-emerald-900">
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
           This report is a public demo to showcase Agentability scoring and recommendations.
         </div>
       ) : null}
@@ -691,7 +706,7 @@ export function ReportPage() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs value={tab} onValueChange={(value) => setTab(value)} className="space-y-6">
         <TabsList className="bg-white/70">
           <TabsTrigger
             value="overview"
@@ -1004,6 +1019,65 @@ export function ReportPage() {
               </div>
             </CardContent>
           </Card>
+
+          {nextFixes.length ? (
+            <Card className="border-border/60 bg-white/70">
+              <CardHeader>
+                <CardTitle>Next steps</CardTitle>
+                <CardDescription>
+                  {nextFixes.length} priority fix{nextFixes.length === 1 ? "" : "es"} · Estimated time ~{nextFixMinutes} min
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <div className="space-y-3">
+                  {nextFixes.map((item, index) => (
+                    <div key={item.check.id} className="rounded-2xl border border-border/60 bg-white/80 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                            Step {index + 1} · {item.check.id} · {item.fix.estimatedMinutes ?? 10} min
+                          </p>
+                          <p className="mt-2 text-base font-semibold text-foreground">{item.fix.title}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">{item.fix.whyItMatters}</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            void navigator.clipboard?.writeText(item.fix.snippet);
+                            trackEvent("next_steps_copy", {
+                              run_id: report.runId,
+                              domain: report.domain,
+                              check_id: item.check.id,
+                              recommendation_id: item.check.recommendationId,
+                            });
+                          }}
+                        >
+                          Copy snippet
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-muted-foreground">
+                    Re-run the audit after deploying fixes to see your score change.
+                  </p>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setTab("findings");
+                      trackEvent("next_steps_view_all", { run_id: report.runId, domain: report.domain });
+                    }}
+                  >
+                    View all fixes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
+
           <div className="rounded-2xl border border-border/60 bg-white/70 p-4 text-sm text-muted-foreground">
             Latest run completed {new Date(report.completedAt ?? report.createdAt).toLocaleString()}.
           </div>
@@ -1063,7 +1137,7 @@ export function ReportPage() {
                           {fix.links?.length ? (
                             <div className="space-y-1">
                               {fix.links.map((link) => (
-                                <a key={link} className="text-emerald-700 hover:text-emerald-900" href={link}>
+                                <a key={link} className="text-primary hover:text-primary/80" href={link}>
                                   {link}
                                 </a>
                               ))}

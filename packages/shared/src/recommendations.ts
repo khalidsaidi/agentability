@@ -5,6 +5,7 @@ export type FixIt = {
   steps: string[];
   snippet: string;
   links?: string[];
+  estimatedMinutes?: number;
 };
 
 export const FIX_IT_LIBRARY: Record<string, FixIt> = {
@@ -12,6 +13,7 @@ export const FIX_IT_LIBRARY: Record<string, FixIt> = {
     id: "D1",
     title: "Add machine discovery entrypoints",
     whyItMatters: "Agents need stable, machine-readable entrypoints to avoid scraping HTML.",
+    estimatedMinutes: 15,
     steps: [
       "Publish /.well-known/air.json with product, entrypoints, legal, and verification fields.",
       "Publish /llms.txt and /llms-full.txt with canonical links.",
@@ -24,6 +26,7 @@ export const FIX_IT_LIBRARY: Record<string, FixIt> = {
     id: "D2",
     title: "Serve entrypoints with correct content-types",
     whyItMatters: "Agents reject unstable or mis-typed surfaces (HTML where JSON is expected).",
+    estimatedMinutes: 10,
     steps: [
       "Serve JSON/YAML/Markdown with explicit Content-Type headers.",
       "Avoid SPA rewrites for machine surfaces.",
@@ -36,6 +39,7 @@ export const FIX_IT_LIBRARY: Record<string, FixIt> = {
     id: "C2",
     title: "Publish an example-rich OpenAPI",
     whyItMatters: "Callable APIs need examples and clear servers to be usable by agents.",
+    estimatedMinutes: 20,
     steps: [
       "Publish OpenAPI JSON/YAML under /.well-known/.",
       "Include servers pointing to your domain.",
@@ -48,6 +52,7 @@ export const FIX_IT_LIBRARY: Record<string, FixIt> = {
     id: "C3",
     title: "Expose an MCP endpoint",
     whyItMatters: "MCP provides a direct tool surface for agents beyond HTTP scraping.",
+    estimatedMinutes: 30,
     steps: [
       "Expose POST /mcp for JSON-RPC 2.0.",
       "Implement initialize and tools/list.",
@@ -60,6 +65,7 @@ export const FIX_IT_LIBRARY: Record<string, FixIt> = {
     id: "L1",
     title: "Publish canonical docs entrypoints",
     whyItMatters: "Agents need stable, linkable documentation for ingestion.",
+    estimatedMinutes: 15,
     steps: [
       "Publish /docs.md with a concise product overview.",
       "Link to deeper docs like /docs/api.md.",
@@ -72,30 +78,33 @@ export const FIX_IT_LIBRARY: Record<string, FixIt> = {
     id: "T1",
     title: "Complete air.json with legal + verification",
     whyItMatters: "Trust requires machine-readable provenance and legal endpoints.",
+    estimatedMinutes: 10,
     steps: [
       "Add canonical_base_url and contact.email.",
       "Include legal terms + privacy URLs.",
       "Include verification discovery audit URLs.",
     ],
-    snippet: `\"legal\": {\n  \"terms_url\": \"https://example.com/legal/terms\",\n  \"privacy_url\": \"https://example.com/legal/privacy\"\n}\n`,
+    snippet: `{\n  \"canonical_base_url\": \"https://example.com\",\n  \"contact\": {\n    \"email\": \"support@example.com\"\n  },\n  \"legal\": {\n    \"terms_url\": \"https://example.com/legal/terms\",\n    \"privacy_url\": \"https://example.com/legal/privacy\"\n  }\n}\n`,
     links: ["https://agentability.org/spec.md"],
   },
   T2: {
     id: "T2",
     title: "Add an AI plugin manifest",
     whyItMatters: "Plugin manifests provide a standard, trusted handshake for tools.",
+    estimatedMinutes: 15,
     steps: [
       "Publish /.well-known/ai-plugin.json.",
       "Point to OpenAPI and legal URLs.",
       "Include contact_email.",
     ],
-    snippet: `{\n  \"schema_version\": \"v1\",\n  \"name_for_model\": \"example\",\n  \"api\": {\"type\": \"openapi\", \"url\": \"https://example.com/.well-known/openapi.json\"},\n  \"contact_email\": \"support@example.com\",\n  \"legal_url\": \"https://example.com/legal/terms\"\n}\n`,
+    snippet: `{\n  \"schema_version\": \"v1\",\n  \"name_for_model\": \"example\",\n  \"api\": {\"type\": \"openapi\", \"url\": \"https://example.com/.well-known/openapi.json\"},\n  \"contact_email\": \"support@example.com\",\n  \"legal_info_url\": \"https://example.com/legal/terms\"\n}\n`,
     links: ["https://agentability.org/spec.md"],
   },
   R3: {
     id: "R3",
     title: "Stabilize critical surfaces",
     whyItMatters: "Agents need repeatable responses for deterministic tool use.",
+    estimatedMinutes: 20,
     steps: [
       "Avoid dynamic timestamps in core discovery surfaces.",
       "Use caching headers for stability.",

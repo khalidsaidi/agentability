@@ -141,12 +141,14 @@ type DiscoveryState = {
 type RepeatFetchResult = {
   url: string;
   results: FetchResult[];
+  errors: Array<string | undefined>;
   stable: boolean;
   ok: boolean;
   contentTypeOk: boolean;
 };
 
-const USER_AGENT = "AgentabilityEvaluator/0.1 (+https://agentability.org)";
+// Use a transparent, browser-compatible UA to reduce false positives from bot/WAF rules.
+const USER_AGENT = "Mozilla/5.0 (compatible; Agentability/0.1; +https://agentability.org)";
 
 function coerceOrigin(raw: string): string {
   const trimmed = raw.trim();
@@ -229,6 +231,18 @@ function isSuccessStatus(result?: FetchResult): result is FetchResult {
   return Boolean(result && result.status >= 200 && result.status < 300);
 }
 
+function summarizeFetchError(message: string): string {
+  const trimmed = message.trim();
+  if (!trimmed) return "Fetch failed";
+  if (trimmed.includes("Response too large")) return "Response exceeded 2 MB limit";
+  if (trimmed.includes("DNS resolution failed")) return "DNS resolution failed";
+  if (trimmed.includes("Blocked hostname")) return "Blocked hostname";
+  if (trimmed.includes("Blocked IP address")) return "Blocked IP address";
+  if (trimmed.includes("Only http/https URLs are allowed")) return "Only http/https URLs are allowed";
+  if (trimmed.includes("Too many redirects")) return "Too many redirects";
+  return trimmed;
+}
+
 function isSuccessJson(result?: FetchResult): boolean {
   return isSuccessStatus(result) && isJsonLike(result.contentType);
 }
@@ -263,7 +277,11 @@ function uniqueUrls(values: Array<string | undefined>): string[] {
 }
 
 async function fetchOnce(url: string, options: SafeFetchOptions = {}): Promise<FetchResult> {
-  const headers = { "user-agent": USER_AGENT, ...(options.headers ?? {}) };
+  const headers = {
+    "user-agent": USER_AGENT,
+    accept: "text/html,application/json;q=0.9,*/*;q=0.8",
+    ...(options.headers ?? {}),
+  };
   return safeFetch(url, {
     ...options,
     headers,
@@ -272,8 +290,23 @@ async function fetchOnce(url: string, options: SafeFetchOptions = {}): Promise<F
 
 async function fetchRepeated(url: string, times: number): Promise<RepeatFetchResult> {
   const results: FetchResult[] = [];
+  const errors: Array<string | undefined> = [];
   for (let i = 0; i < times; i += 1) {
-    results.push(await fetchOnce(url));
+    try {
+      results.push(await fetchOnce(url));
+      errors.push(undefined);
+    } catch (error) {
+      // Never abort the full evaluation because one fetch failed.
+      // Record a synthetic result (status 0) so reports can reference it.
+      results.push({
+        url,
+        status: 0,
+        headers: {},
+        fetchedAt: new Date().toISOString(),
+        redirectChain: [],
+      });
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
   }
   const status = results[0]?.status;
   const type = results[0]?.contentType;
@@ -284,7 +317,7 @@ async function fetchRepeated(url: string, times: number): Promise<RepeatFetchRes
   );
   const contentTypeOk =
     ok && (isJsonLike(type) || isYamlLike(type) || Boolean(type && type.includes("text/")));
-  return { url, results, stable, ok, contentTypeOk };
+  return { url, results, errors, stable, ok, contentTypeOk };
 }
 
 async function discover(origin: string): Promise<DiscoveryState> {
@@ -540,8 +573,8 @@ export async function evaluatePublic(
   let entrypointRepeat: RepeatFetchResult | undefined;
   if (primaryEntrypoint) {
     entrypointRepeat = await fetchRepeated(primaryEntrypoint, 3);
-    for (const result of entrypointRepeat.results) {
-      recordEvidence(evidence, result);
+    for (let i = 0; i < entrypointRepeat.results.length; i += 1) {
+      recordEvidence(evidence, entrypointRepeat.results[i], "GET", entrypointRepeat.errors[i]);
     }
   }
 
@@ -549,8 +582,8 @@ export async function evaluatePublic(
   let docsText = "";
   if (docsUrl) {
     docsRepeat = await fetchRepeated(docsUrl, 3);
-    for (const result of docsRepeat.results) {
-      recordEvidence(evidence, result);
+    for (let i = 0; i < docsRepeat.results.length; i += 1) {
+      recordEvidence(evidence, docsRepeat.results[i], "GET", docsRepeat.errors[i]);
     }
     if (docsRepeat.ok) {
       docsText = extractMeaningfulText(docsRepeat.results[0]?.bodyText);
@@ -697,6 +730,7 @@ export async function evaluatePublic(
   const entrypointStable = entrypointRepeat?.stable ?? false;
   const entrypointOk = entrypointRepeat?.contentTypeOk ?? false;
   const entrypointStatusOk = entrypointRepeat?.ok ?? false;
+  const entrypointError = entrypointRepeat?.errors.find(Boolean);
   const d2Status = entrypointRepeat
     ? entrypointStatusOk
       ? entrypointStable && entrypointOk
@@ -710,11 +744,13 @@ export async function evaluatePublic(
     status: d2Status,
     severity: "high",
     summary: entrypointRepeat
-      ? entrypointStatusOk
-        ? entrypointStable
-          ? "Entrypoint reachable with stable response."
-          : "Entrypoint reachable but unstable across requests."
-        : "Entrypoint responded with a non-success status."
+      ? entrypointError
+        ? `Entrypoint fetch failed: ${summarizeFetchError(entrypointError)}.`
+        : entrypointStatusOk
+          ? entrypointStable
+            ? "Entrypoint reachable with stable response."
+            : "Entrypoint reachable but unstable across requests."
+          : "Entrypoint responded with a non-success status."
       : "Entrypoint unreachable or missing.",
     evidence: primaryEntrypoint ? [primaryEntrypoint] : [],
   });
@@ -756,6 +792,7 @@ export async function evaluatePublic(
   });
 
   let l1Status: CheckResult["status"] = "fail";
+  const docsError = docsRepeat?.errors.find(Boolean);
   if (docsRepeat) {
     if (!docsRepeat.ok) {
       l1Status = "fail";
@@ -770,9 +807,11 @@ export async function evaluatePublic(
     status: l1Status,
     severity: "high",
     summary: docsRepeat
-      ? l1Status === "pass"
-        ? "Docs entrypoint contains meaningful text."
-        : "Docs entrypoint found but content appears thin."
+      ? docsError
+        ? `Docs fetch failed: ${summarizeFetchError(docsError)}.`
+        : l1Status === "pass"
+          ? "Docs entrypoint contains meaningful text."
+          : "Docs entrypoint found but content appears thin."
       : "No docs entrypoint discovered.",
     evidence: docsUrl ? [docsUrl] : [],
   });

@@ -9,7 +9,7 @@ type ScoreBadgeProps = {
 export function ScoreBadge({ score, grade }: ScoreBadgeProps) {
   const tone =
     grade === "A"
-      ? "bg-emerald-600"
+      ? "bg-primary"
       : grade === "B"
         ? "bg-amber-600"
         : grade === "C"

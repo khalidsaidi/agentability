@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { AlertTriangle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { trackEvent, trackLinkClick } from "@/lib/analytics";
+import { Card } from "@/components/ui/card";
+import { trackEvent } from "@/lib/analytics";
 
 type URLInputCardProps = {
   onSubmit: (origin: string) => void;
@@ -10,8 +10,26 @@ type URLInputCardProps = {
   error?: string | null;
 };
 
+function tryNormalizeOrigin(raw: string): { origin: string; domain: string } | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/\s/.test(trimmed)) return null;
+
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    const parsed = new URL(withProtocol);
+    const domain = parsed.hostname.toLowerCase();
+    if (!domain.includes(".")) return null;
+    const origin = `${parsed.protocol}//${parsed.host}`;
+    return { origin, domain };
+  } catch {
+    return null;
+  }
+}
+
 export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
   const [origin, setOrigin] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
   const changeTimer = useRef<number | null>(null);
 
   const emitInputChange = (value: string) => {
@@ -26,65 +44,154 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
     });
   };
 
+  const trimmed = origin.trim();
+  const normalized = useMemo(() => tryNormalizeOrigin(trimmed), [trimmed]);
+  const liveHint = trimmed.length
+    ? normalized
+      ? `Looks good — we'll audit ${normalized.domain}.`
+      : "That doesn't look like a valid public domain or URL."
+    : null;
+
   return (
-    <Card className="border-border/60 bg-white/70 backdrop-blur">
-      <CardHeader>
-        <CardTitle className="text-xl">Run a public-mode audit</CardTitle>
-        <CardDescription>
-          Paste a domain or full URL. We will discover entrypoints, validate docs, and score readiness.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="mb-3 text-sm text-muted-foreground">
-          Want a quick demo? Try{" "}
-          <a
-            className="font-medium text-emerald-700 hover:text-emerald-900"
-            href="/reports/aistatusdashboard.com"
-            onClick={() => trackLinkClick("showcase_report_inline", "/reports/aistatusdashboard.com")}
-          >
-            the showcase report
-          </a>
-          .
-        </p>
+    <Card className="border-border/60 bg-white/80 shadow-sm backdrop-blur transition-transform duration-200 hover:scale-[1.01]">
+      <div className="p-5 md:p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Live public audit
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Paste a website or API URL. You’ll get a score, ranked fixes, and copy-paste instructions.
+            </p>
+          </div>
+        </div>
+
         <form
-          className="flex flex-col gap-4 sm:flex-row"
+          className="flex flex-col gap-3 sm:flex-row sm:items-start"
           onSubmit={(event) => {
             event.preventDefault();
-            const trimmed = origin.trim();
-            if (!trimmed) {
+            const raw = origin.trim();
+            if (!raw) {
+              setLocalError("Paste a domain or URL (example: your-site.com).");
               trackEvent("audit_submit_empty");
               return;
             }
+            const parsed = tryNormalizeOrigin(raw);
+            if (!parsed) {
+              setLocalError("That doesn't look like a valid public domain or URL.");
+              trackEvent("audit_submit_invalid", { origin_trimmed: raw });
+              return;
+            }
+
+            setLocalError(null);
             trackEvent("audit_submit", {
               origin_raw: origin,
-              origin_trimmed: trimmed,
-              origin_length: trimmed.length,
-              has_protocol: /^https?:\/\//i.test(trimmed),
+              origin_trimmed: raw,
+              origin_length: raw.length,
+              has_protocol: /^https?:\/\//i.test(raw),
+              normalized_origin: parsed.origin,
+              normalized_domain: parsed.domain,
             });
-            onSubmit(trimmed);
+            onSubmit(raw);
           }}
         >
-          <Input
-            value={origin}
-            onChange={(event) => {
-              const value = event.target.value;
-              setOrigin(value);
-              if (changeTimer.current) {
-                window.clearTimeout(changeTimer.current);
-              }
-              changeTimer.current = window.setTimeout(() => emitInputChange(value), 500);
-            }}
-            placeholder="example.com"
-            className="h-12 text-base"
-            onFocus={() => trackEvent("audit_input_focus")}
-            onBlur={() => emitInputChange(origin)}
-          />
-          <Button type="submit" className="h-12 px-6" disabled={loading}>
-            {loading ? "Running…" : "Run Audit"}
+          <div className="flex-1">
+            <div className="group relative">
+              <input
+                id="audit-origin"
+                value={origin}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setOrigin(value);
+                  if (localError) setLocalError(null);
+                  if (changeTimer.current) {
+                    window.clearTimeout(changeTimer.current);
+                  }
+                  changeTimer.current = window.setTimeout(() => emitInputChange(value), 500);
+                }}
+                placeholder="your-site.com or url/api"
+                className="peer h-16 w-full rounded-2xl border border-input bg-white/80 px-4 pb-3 pt-7 text-lg shadow-sm transition-all duration-200 placeholder:text-muted-foreground/70 hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 focus-visible:border-primary/60 md:text-2xl"
+                inputMode="url"
+                autoComplete="url"
+                onFocus={() => trackEvent("audit_input_focus")}
+                onBlur={() => emitInputChange(origin)}
+                aria-invalid={Boolean(localError || error)}
+                aria-describedby="audit-origin-help audit-origin-error"
+              />
+              <label
+                htmlFor="audit-origin"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground transition-all duration-200 peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-[0.7rem] peer-focus:text-primary peer-[&:not(:placeholder-shown)]:top-3 peer-[&:not(:placeholder-shown)]:translate-y-0 peer-[&:not(:placeholder-shown)]:text-[0.7rem]"
+              >
+                Website or API URL
+              </label>
+
+              {trimmed.length ? (
+                normalized ? (
+                  <CheckCircle2 className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-primary" />
+                ) : (
+                  <AlertTriangle className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-amber-600" />
+                )
+              ) : null}
+            </div>
+
+            <div id="audit-origin-help" className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                Live report
+              </span>
+              <span className="opacity-50">•</span>
+              <span>Public surfaces only</span>
+              <span className="opacity-50">•</span>
+              <span>No sign-up</span>
+              <span className="opacity-50">•</span>
+              <span>Usually done in 30–60s</span>
+              <span className="opacity-50">•</span>
+              <span>Free during beta</span>
+            </div>
+
+            {!trimmed.length ? (
+              <div className="mt-2 text-xs text-muted-foreground">
+                Try:{" "}
+                <button
+                  type="button"
+                  className="font-medium text-primary hover:text-primary/80"
+                  onClick={() => setOrigin("aistatusdashboard.com")}
+                >
+                  aistatusdashboard.com
+                </button>
+                <span className="opacity-50">, </span>
+                <button
+                  type="button"
+                  className="font-medium text-primary hover:text-primary/80"
+                  onClick={() => setOrigin("agentability.org")}
+                >
+                  agentability.org
+                </button>
+              </div>
+            ) : null}
+          </div>
+
+          <Button
+            type="submit"
+            className="h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 px-7 text-base shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 active:translate-y-0 sm:mt-0"
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {loading ? "Running audit" : "Run free audit"}
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </form>
-        {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
-      </CardContent>
+
+        {liveHint ? (
+          <p className={`mt-3 text-sm ${normalized ? "text-primary" : "text-amber-700"}`}>{liveHint}</p>
+        ) : null}
+
+        {localError || error ? (
+          <p id="audit-origin-error" className="mt-3 text-sm text-destructive">
+            {localError ?? error}
+          </p>
+        ) : null}
+      </div>
     </Card>
   );
 }

@@ -1,4 +1,4 @@
 export const SSR_ASSETS = {
-  "scriptSrc": "/assets/index-BzcKiyQX.js",
-  "cssHref": "/assets/index-B4zxdAnX.css"
+  "scriptSrc": "/assets/index-CqNZCZSk.js",
+  "cssHref": "/assets/index-eJ5XCAyL.css"
 } as const;

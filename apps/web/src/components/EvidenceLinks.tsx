@@ -28,7 +28,7 @@ export function EvidenceLinks({ evidenceIndex }: { evidenceIndex: EvaluationResu
                       href={item}
                       target="_blank"
                       rel="noreferrer"
-                      className="break-words text-foreground hover:text-emerald-700"
+                      className="break-words text-foreground hover:text-primary"
                       onClick={() => trackLinkClick("evidence_link", item, { section: section.label })}
                     >
                       {item}

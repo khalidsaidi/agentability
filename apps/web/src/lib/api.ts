@@ -8,7 +8,7 @@ const A2ABENCH_BASE_URL = import.meta.env.VITE_A2ABENCH_BASE_URL ?? "https://a2a
 
 export type EvaluateResponse = {
   runId: string;
-  status: "complete" | "running";
+  status: "complete" | "running" | "failed";
   reportUrl: string;
   jsonUrl: string;
   statusUrl: string;

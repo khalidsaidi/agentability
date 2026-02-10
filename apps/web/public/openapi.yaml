@@ -22,7 +22,7 @@ paths:
                   profile: "auto"
       responses:
         "200":
-          description: Evaluation accepted or completed
+          description: Evaluation accepted, completed, or failed-fast
           content:
             application/json:
               schema:
@@ -40,6 +40,14 @@ paths:
                   value:
                     runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
                     status: "complete"
+                    jsonUrl: "https://agentability.org/v1/evaluations/example.com/latest.json"
+                    reportUrl: "https://agentability.org/reports/example.com"
+                    statusUrl: "https://agentability.org/v1/runs/b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    domain: "example.com"
+                failed:
+                  value:
+                    runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+                    status: "failed"
                     jsonUrl: "https://agentability.org/v1/evaluations/example.com/latest.json"
                     reportUrl: "https://agentability.org/reports/example.com"
                     statusUrl: "https://agentability.org/v1/runs/b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
@@ -70,16 +78,16 @@ paths:
                     message: "Rate limit exceeded"
                     code: "rate_limited"
         "500":
-          description: Evaluation failed
+          description: Unexpected server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
               examples:
-                failed:
+                error:
                   value:
-                    message: "Evaluation failed"
-                    code: "evaluation_failed"
+                    message: "Internal server error"
+                    code: "internal_error"
   /mcp:
     post:
       summary: MCP JSON-RPC endpoint
@@ -392,6 +400,7 @@ components:
           enum:
             - complete
             - running
+            - failed
         reportUrl:
           type: string
           format: uri
