@@ -26,5 +26,39 @@ jobs:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase.json
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" > "$GOOGLE_APPLICATION_CREDENTIALS"
-          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID"
+          cat > "$GOOGLE_APPLICATION_CREDENTIALS" <<'EOF'
+          ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          EOF
+
+          # Normalize the secret into a real service-account JSON file.
+          # Supports raw JSON, JSON-stringified JSON, or base64-encoded variants.
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+          if (!path) throw new Error("GOOGLE_APPLICATION_CREDENTIALS missing");
+
+          function normalize(raw) {
+            const trimmed = raw.trim();
+            const parsed = JSON.parse(trimmed);
+            if (typeof parsed === "string") return normalize(parsed);
+            if (!parsed || typeof parsed !== "object") throw new Error("Invalid credentials JSON");
+            return JSON.stringify(parsed);
+          }
+
+          const raw = fs.readFileSync(path, "utf8");
+          let normalized;
+          try {
+            normalized = normalize(raw);
+          } catch (error) {
+            // If secrets were stored as base64, decode and try again.
+            const decoded = Buffer.from(raw.trim(), "base64").toString("utf8");
+            normalized = normalize(decoded);
+          }
+
+          fs.writeFileSync(path, normalized, "utf8");
+
+          const creds = JSON.parse(normalized);
+          console.log(`Using service account for project_id=${creds.project_id} (${creds.client_email})`);
+          NODE
+
+          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --non-interactive
