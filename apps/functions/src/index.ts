@@ -966,6 +966,8 @@ app.get("/v1", (_req, res) => {
       evaluate: { method: "POST", path: "/v1/evaluate" },
       runStatus: { method: "GET", path: "/v1/runs/{runId}" },
       latest: { method: "GET", path: "/v1/evaluations/{domain}/latest.json" },
+      subscribe: { method: "POST", path: "/v1/subscribe" },
+      communityFix: { method: "GET", path: "/v1/community-fix?runId={runId}&issueId={issueId}" },
       report: { method: "GET", path: "/reports/{domain}" },
       mcp: { method: "POST", path: "/mcp" },
     },
