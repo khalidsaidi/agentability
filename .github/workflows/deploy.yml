@@ -61,4 +61,6 @@ jobs:
           console.log(`Using service account for project_id=${creds.project_id} (${creds.client_email})`);
           NODE
 
-          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --non-interactive
+          # Deploy hosting first so UI updates can ship even if functions deploy is blocked by IAM.
+          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only hosting --non-interactive
+          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only functions --non-interactive
