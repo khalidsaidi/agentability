@@ -25,6 +25,10 @@ import { renderBadgeSvg } from "./brand/renderBadgeSvg";
 initializeApp();
 
 const db = getFirestore();
+// Many fields in our run/evaluation documents are optional. By default Firestore rejects
+// `undefined` values, which causes first-time evaluations (no previousRunId/diffSummary)
+// to fail hard. Treat `undefined` as "omit this field" instead.
+db.settings({ ignoreUndefinedProperties: true });
 const storage = getStorage();
 const evidenceBucketName =
   process.env.EVIDENCE_BUCKET ||
