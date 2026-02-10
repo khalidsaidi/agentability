@@ -38,12 +38,12 @@ function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-x-hidden">
       <div className="pointer-events-none absolute -left-32 top-10 h-64 w-64 rounded-full bg-primary/20 blur-3xl animate-float" />
       <div className="pointer-events-none absolute right-0 top-40 h-80 w-80 rounded-full bg-cyan-200/40 blur-3xl animate-float" />
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-orange-200/30 blur-3xl" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-8 sm:px-6">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <Link
             to="/"

@@ -70,7 +70,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
         </div>
 
         <form
-          className="flex flex-col gap-3 sm:flex-row sm:items-start"
+          className="flex flex-col gap-3 min-[1200px]:flex-row min-[1200px]:items-start"
           onSubmit={(event) => {
             event.preventDefault();
             if (loading) {
@@ -180,7 +180,7 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
 
           <Button
             type="submit"
-            className="h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 px-7 text-base shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 active:translate-y-0 sm:mt-0"
+            className="h-16 w-full rounded-2xl bg-gradient-to-br from-primary to-primary/80 px-7 text-base shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 active:translate-y-0 min-[1200px]:mt-0 min-[1200px]:w-auto"
             disabled={loading}
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

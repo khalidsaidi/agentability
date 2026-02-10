@@ -123,8 +123,8 @@ export function HomePage() {
         <OnboardingTour key={tourInstance} onClose={() => setTourOpen(false)} />
       ) : null}
 
-      <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-        <div className="space-y-7">
+      <section className="grid gap-10 min-[1200px]:grid-cols-[55fr_45fr] min-[1200px]:items-start min-[1200px]:gap-12">
+        <div className="min-w-0 space-y-7">
           <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-border/60 bg-white/80 px-3 py-1 text-xs font-semibold tracking-wide text-muted-foreground shadow-sm">
             <span className="text-primary">Audits in ~60s</span>
             <span className="opacity-50">•</span>
@@ -134,7 +134,7 @@ export function HomePage() {
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-5xl leading-[1.05] tracking-tight md:text-6xl">
+            <h1 className="w-full max-w-2xl break-words text-[32px] leading-[1.2] tracking-tight sm:text-[36px] md:text-[42px] min-[1200px]:text-[56px]">
               Get AI-ready in 60 seconds.
               <span className="block text-foreground/80">See what breaks automation, then fix it.</span>
             </h1>
@@ -164,17 +164,17 @@ export function HomePage() {
           </div>
         </div>
 
-        <Card className="border-border/60 bg-white/80 shadow-sm backdrop-blur">
+        <Card className="min-w-0 border-border/60 bg-white/80 shadow-sm backdrop-blur">
           <CardHeader>
-            <CardTitle>Preview: score + ranked fixes</CardTitle>
-            <CardDescription>3 min read · Real audit for {exampleDomain}.</CardDescription>
+            <CardTitle className="text-base">Preview: score + ranked fixes</CardTitle>
+            <CardDescription className="break-words">3 min read · Real audit for {exampleDomain}.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-muted-foreground">
             <div className="rounded-2xl border border-border/60 bg-white p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
+              <div className="flex min-w-0 items-start justify-between gap-4">
+                <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Example</p>
-                  <p className="mt-2 text-lg font-semibold text-foreground">{exampleDomain}</p>
+                  <p className="mt-2 break-words text-lg font-semibold leading-snug text-foreground">{exampleDomain}</p>
                   <p className="mt-1 text-sm text-muted-foreground">Public-mode audit</p>
                 </div>
                 <div className="text-right">
@@ -424,9 +424,9 @@ export function HomePage() {
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     #{index + 1}
                   </p>
-                  <div className="mt-2 flex items-center justify-between gap-2">
-                    <span className="font-semibold text-foreground">{entry.domain}</span>
-                    <span className="text-sm font-semibold text-foreground">
+                  <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2">
+                    <span className="min-w-0 break-words font-semibold text-foreground">{entry.domain}</span>
+                    <span className="whitespace-nowrap text-sm font-semibold text-foreground">
                       {entry.score.toFixed(1)} ({entry.grade})
                     </span>
                   </div>
