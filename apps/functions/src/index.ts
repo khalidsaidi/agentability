@@ -34,6 +34,9 @@ const A2ABENCH_BASE_URL = process.env.A2ABENCH_BASE_URL || "https://a2abench-api
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 
+const AGENTABILITY_VERSION = process.env.AGENTABILITY_VERSION || "0.1.0";
+const AGENTABILITY_REVISION = process.env.AGENTABILITY_BUILD || process.env.K_REVISION || "";
+
 const allowedPostOrigins = new Set([
   "https://agentability.org",
   "https://www.agentability.org",
@@ -66,6 +69,15 @@ const corsHandler = cors((req, callback) => {
 
 app.use(corsHandler);
 app.options("*", corsHandler);
+
+// Make it easy to confirm which backend revision is serving requests.
+app.use((_req, res, next) => {
+  res.set("x-agentability-version", AGENTABILITY_VERSION);
+  if (AGENTABILITY_REVISION) {
+    res.set("x-agentability-revision", AGENTABILITY_REVISION);
+  }
+  next();
+});
 
 function getRequestIp(req: express.Request): string {
   const forwarded = req.header("x-forwarded-for");
@@ -612,7 +624,7 @@ type EvaluateOutcome =
 const MCP_PROTOCOL_VERSION = "2024-11-05";
 const MCP_SERVER_INFO = {
   name: "agentability",
-  version: process.env.AGENTABILITY_VERSION || "0.1.0",
+  version: AGENTABILITY_VERSION,
 };
 
 const mcpTools = [
@@ -962,6 +974,8 @@ app.get("/v1/evaluate", (_req, res) => {
 
 app.get("/v1", (_req, res) => {
   return res.json({
+    version: AGENTABILITY_VERSION,
+    revision: AGENTABILITY_REVISION || null,
     endpoints: {
       evaluate: { method: "POST", path: "/v1/evaluate" },
       runStatus: { method: "GET", path: "/v1/runs/{runId}" },

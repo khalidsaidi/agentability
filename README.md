@@ -50,6 +50,21 @@ Optional: run Functions locally (uses Firebase emulators):
 firebase emulators:start
 ```
 
+## Deploy (Firebase)
+
+Deploys run from GitHub Actions using a dedicated service account. If Functions deploy fails with an error like:
+
+`Missing permissions required for functions deploy. You must have permission iam.serviceAccounts.ActAs on service account <project>@appspot.gserviceaccount.com`
+
+An Owner must grant the deploy identity `roles/iam.serviceAccountUser` on the App Engine default service account
+(`{project}@appspot.gserviceaccount.com`), then retry the deploy.
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding <project>@appspot.gserviceaccount.com \
+  --member="serviceAccount:<deployer-sa>@<project>.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
+```
+
 ## Run an evaluation
 
 ```bash

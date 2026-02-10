@@ -367,7 +367,11 @@ async function discover(origin: string): Promise<DiscoveryState> {
       getNestedString(manifestSource, ["documentation"]) ||
       getNestedString(manifestSource, ["llm_entrypoints", "docs_md"]);
     if (docs) {
-      state.docsUrl = new URL(docs, origin).toString();
+      try {
+        state.docsUrl = new URL(docs, origin).toString();
+      } catch (error) {
+        state.notes.push(`Docs URL in air.json invalid: ${docs} (${String(error)})`);
+      }
     }
   }
 
