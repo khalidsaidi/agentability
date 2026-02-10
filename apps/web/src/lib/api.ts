@@ -94,6 +94,17 @@ export async function evaluateOrigin(origin: string, profile?: string): Promise<
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+    if (response.status === 429) {
+      const retryAfterSeconds = typeof error?.details?.retryAfterSeconds === "number" ? error.details.retryAfterSeconds : null;
+      if (retryAfterSeconds && Number.isFinite(retryAfterSeconds)) {
+        const minutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+        throw new Error(`Too many audits from this network. Try again in ~${minutes} min.`);
+      }
+      throw new Error("Too many audits from this network. Please wait a few minutes and try again.");
+    }
+    if (response.status === 503 && error?.code === "rate_limit_unavailable") {
+      throw new Error("Audit service is busy right now. Please try again in a minute.");
+    }
     throw new Error(error.message || error.error || "Evaluation failed");
   }
   return response.json();

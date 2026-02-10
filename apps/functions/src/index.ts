@@ -4,7 +4,7 @@ import net from "node:net";
 import cors from "cors";
 import express from "express";
 import { initializeApp } from "firebase-admin/app";
-import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { FieldValue, Timestamp, getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { onRequest } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
@@ -36,6 +36,10 @@ const evidenceBucketName =
 const A2ABENCH_BASE_URL = process.env.A2ABENCH_BASE_URL || "https://a2abench-api.web.app";
 
 const app = express();
+// We sit behind a CDN / reverse proxy in production. `req.ip` is unreliable unless
+// we explicitly trust (some) proxy hops. We still defensively validate IP strings
+// because client-controlled headers are spoofable.
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "1mb" }));
 
 const AGENTABILITY_VERSION = process.env.AGENTABILITY_VERSION || "0.1.0";
@@ -84,25 +88,74 @@ app.use((_req, res, next) => {
 });
 
 function getRequestIp(req: express.Request): string {
+  const candidates = [
+    req.header("fastly-client-ip"),
+    req.header("cf-connecting-ip"),
+    req.header("true-client-ip"),
+    req.header("x-appengine-user-ip"),
+  ]
+    .map((value) => (typeof value === "string" ? value.trim() : ""))
+    .filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (net.isIP(candidate)) return candidate;
+  }
+
   const forwarded = req.header("x-forwarded-for");
   if (forwarded) {
-    return forwarded.split(",")[0]?.trim() || "unknown";
+    for (const part of forwarded.split(",")) {
+      const trimmed = part.trim();
+      if (trimmed && net.isIP(trimmed)) return trimmed;
+    }
   }
-  return req.ip || "unknown";
+
+  const ip = typeof req.ip === "string" ? req.ip.trim() : "";
+  if (ip && net.isIP(ip)) return ip;
+  return "unknown";
 }
 
-async function enforceRateLimit(ip: string): Promise<void> {
-  const windowMs = 5 * 60 * 1000;
-  const maxRequests = 10;
+type RateLimitDetails = {
+  retryAfterSeconds: number;
+  limit: number;
+  windowSeconds: number;
+  windowResetAt: string;
+};
+
+class RateLimitError extends Error {
+  readonly details: RateLimitDetails;
+  constructor(details: RateLimitDetails) {
+    super("Rate limit exceeded");
+    this.name = "RateLimitError";
+    this.details = details;
+  }
+}
+
+function toRateLimitDetails(windowMs: number, maxRequests: number, windowId: number): RateLimitDetails {
+  const windowEndMs = (windowId + 1) * windowMs;
+  const retryAfterSeconds = Math.max(1, Math.ceil((windowEndMs - Date.now()) / 1000));
+  return {
+    retryAfterSeconds,
+    limit: maxRequests,
+    windowSeconds: Math.floor(windowMs / 1000),
+    windowResetAt: new Date(windowEndMs).toISOString(),
+  };
+}
+
+async function enforceRateLimitForCollection(
+  collection: string,
+  ip: string,
+  windowMs: number,
+  maxRequests: number
+): Promise<void> {
   const windowId = Math.floor(Date.now() / windowMs);
   const docId = `${ip.replace(/[:.]/g, "_")}_${windowId}`;
-  const ref = db.collection("rateLimits").doc(docId);
+  const ref = db.collection(collection).doc(docId);
 
   await db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const count = snap.exists ? (snap.data()?.count as number) || 0 : 0;
     if (count >= maxRequests) {
-      throw new Error("Rate limit exceeded");
+      throw new RateLimitError(toRateLimitDetails(windowMs, maxRequests, windowId));
     }
     tx.set(
       ref,
@@ -111,65 +164,33 @@ async function enforceRateLimit(ip: string): Promise<void> {
         count: count + 1,
         windowId,
         updatedAt: FieldValue.serverTimestamp(),
-        expiresAt: new Date(Date.now() + windowMs * 2).toISOString(),
+        // Used for Firestore TTL policies (expects a Timestamp).
+        expiresAt: Timestamp.fromMillis(Date.now() + windowMs * 2),
       },
       { merge: true }
     );
   });
+}
+
+async function enforceRateLimit(ip: string): Promise<void> {
+  const windowMs = 5 * 60 * 1000;
+  // 10/5min is too low for a typical "try a handful of domains" workflow.
+  // Keep it modest to protect the service, but high enough that normal usage
+  // doesn't immediately trip the limiter.
+  const maxRequests = 30;
+  await enforceRateLimitForCollection("rateLimits", ip, windowMs, maxRequests);
 }
 
 async function enforceCommunityFixRateLimit(ip: string): Promise<void> {
   const windowMs = 5 * 60 * 1000;
   const maxRequests = 30;
-  const windowId = Math.floor(Date.now() / windowMs);
-  const docId = `${ip.replace(/[:.]/g, "_")}_${windowId}`;
-  const ref = db.collection("rateLimitsCommunityFix").doc(docId);
-
-  await db.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const count = snap.exists ? (snap.data()?.count as number) || 0 : 0;
-    if (count >= maxRequests) {
-      throw new Error("Rate limit exceeded");
-    }
-    tx.set(
-      ref,
-      {
-        ip,
-        count: count + 1,
-        windowId,
-        updatedAt: FieldValue.serverTimestamp(),
-        expiresAt: new Date(Date.now() + windowMs * 2).toISOString(),
-      },
-      { merge: true }
-    );
-  });
+  await enforceRateLimitForCollection("rateLimitsCommunityFix", ip, windowMs, maxRequests);
 }
 
 async function enforceSubscribeRateLimit(ip: string): Promise<void> {
   const windowMs = 5 * 60 * 1000;
   const maxRequests = 20;
-  const windowId = Math.floor(Date.now() / windowMs);
-  const docId = `${ip.replace(/[:.]/g, "_")}_${windowId}`;
-  const ref = db.collection("rateLimitsSubscribe").doc(docId);
-
-  await db.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const count = snap.exists ? (snap.data()?.count as number) || 0 : 0;
-    if (count >= maxRequests) {
-      throw new Error("Rate limit exceeded");
-    }
-    tx.set(
-      ref,
-      {
-        ip,
-        count: count + 1,
-        windowId,
-        updatedAt: FieldValue.serverTimestamp(),
-        expiresAt: new Date(Date.now() + windowMs * 2).toISOString(),
-      },
-      { merge: true }
-    );
-  });
+  await enforceRateLimitForCollection("rateLimitsSubscribe", ip, windowMs, maxRequests);
 }
 
 function buildBaseUrl(req: express.Request): string {
@@ -703,13 +724,6 @@ async function runEvaluation(
   req: express.Request,
   payload: Record<string, unknown>
 ): Promise<EvaluateOutcome> {
-  const ip = getRequestIp(req);
-  try {
-    await enforceRateLimit(ip);
-  } catch (error) {
-    return { ok: false, status: 429, message: "Rate limit exceeded", code: "rate_limited" };
-  }
-
   const rawOrigin = typeof payload.origin === "string" ? payload.origin : "";
   const coerced = { ...payload, origin: coerceOrigin(rawOrigin) };
   const parseResult = EvaluationInputSchema.safeParse(coerced);
@@ -720,6 +734,28 @@ async function runEvaluation(
       message: "Invalid request",
       code: "invalid_request",
       details: parseResult.error.flatten(),
+    };
+  }
+
+  const ip = getRequestIp(req);
+  try {
+    await enforceRateLimit(ip);
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      return {
+        ok: false,
+        status: 429,
+        message: "Too many audits from this network. Please wait and try again.",
+        code: "rate_limited",
+        details: error.details,
+      };
+    }
+    logger.warn("Rate limit check failed", error);
+    return {
+      ok: false,
+      status: 503,
+      message: "Temporarily unable to accept audits. Please try again in a minute.",
+      code: "rate_limit_unavailable",
     };
   }
 
@@ -964,6 +1000,18 @@ app.post("/v1/evaluate", async (req, res) => {
   const payload = (req.body ?? {}) as Record<string, unknown>;
   const outcome = await runEvaluation(req, payload);
   if (!outcome.ok) {
+    if (
+      outcome.status === 429 &&
+      outcome.code === "rate_limited" &&
+      outcome.details &&
+      typeof outcome.details === "object" &&
+      "retryAfterSeconds" in outcome.details
+    ) {
+      const retryAfterSeconds = (outcome.details as { retryAfterSeconds?: unknown }).retryAfterSeconds;
+      if (typeof retryAfterSeconds === "number" && Number.isFinite(retryAfterSeconds)) {
+        res.set("Retry-After", String(Math.max(1, Math.floor(retryAfterSeconds))));
+      }
+    }
     return sendError(res, outcome.status, outcome.message, outcome.code, outcome.details);
   }
   return res.json(outcome.result);
@@ -1170,7 +1218,17 @@ app.get("/v1/community-fix", async (req, res) => {
   try {
     await enforceCommunityFixRateLimit(getRequestIp(req));
   } catch (error) {
-    return sendError(res, 429, "Rate limit exceeded", "rate_limited");
+    if (error instanceof RateLimitError) {
+      res.set("Retry-After", String(Math.max(1, Math.floor(error.details.retryAfterSeconds))));
+      return sendError(res, 429, "Too many requests. Please wait and try again.", "rate_limited", error.details);
+    }
+    logger.warn("Community-fix rate limit check failed", error);
+    return sendError(
+      res,
+      503,
+      "Temporarily unable to accept requests. Please try again in a minute.",
+      "rate_limit_unavailable"
+    );
   }
 
   const runDoc = await db.collection("runs").doc(runId).get();
@@ -1247,7 +1305,17 @@ app.post("/v1/subscribe", async (req, res) => {
   try {
     await enforceSubscribeRateLimit(getRequestIp(req));
   } catch (error) {
-    return sendError(res, 429, "Rate limit exceeded", "rate_limited");
+    if (error instanceof RateLimitError) {
+      res.set("Retry-After", String(Math.max(1, Math.floor(error.details.retryAfterSeconds))));
+      return sendError(res, 429, "Too many requests. Please wait and try again.", "rate_limited", error.details);
+    }
+    logger.warn("Subscribe rate limit check failed", error);
+    return sendError(
+      res,
+      503,
+      "Temporarily unable to accept subscriptions. Please try again in a minute.",
+      "rate_limit_unavailable"
+    );
   }
 
   const id = crypto.createHash("sha256").update(email).digest("hex").slice(0, 32);

@@ -73,6 +73,10 @@ export function URLInputCard({ onSubmit, loading, error }: URLInputCardProps) {
           className="flex flex-col gap-3 sm:flex-row sm:items-start"
           onSubmit={(event) => {
             event.preventDefault();
+            if (loading) {
+              trackEvent("audit_submit_while_loading");
+              return;
+            }
             const raw = origin.trim();
             if (!raw) {
               setLocalError("Paste a domain or URL (example: your-site.com).");
