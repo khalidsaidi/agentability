@@ -1,12 +1,13 @@
 import type { PillarScores } from "@agentability/shared";
 import { useEffect, useState } from "react";
 import { Activity, BookOpen, Link2, Search, ShieldCheck } from "lucide-react";
+import type { ComponentType } from "react";
 
 const PILLARS: {
   key: keyof PillarScores;
   label: string;
   hint: string;
-  Icon: (props: { className?: string }) => JSX.Element;
+  Icon: ComponentType<{ className?: string }>;
 }[] = [
   { key: "discovery", label: "Can agents find you?", hint: "Entrypoints + crawlable docs", Icon: Search },
   { key: "callableSurface", label: "Can agents call you?", hint: "OpenAPI + tool surfaces", Icon: Link2 },
