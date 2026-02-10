@@ -1295,10 +1295,12 @@ export const api = onRequest(
   {
     region: "us-central1",
     invoker: "public",
-    // Optional override for CI deploys where the deployer service account can't "ActAs"
-    // the default runtime service account (often {project}@appspot.gserviceaccount.com).
-    // When unset, Firebase/Cloud Functions picks the default runtime service account.
-    serviceAccount: process.env.FUNCTIONS_SERVICE_ACCOUNT || undefined,
+    // CI deploys use a service account key that doesn't have "ActAs" on the App Engine default
+    // runtime service account. Use the CI deployer SA as the runtime identity instead.
+    //
+    // If you change the CI service account name, update this email (and ensure it has
+    // Firestore/Storage access needed by this function).
+    serviceAccount: "firebase-deployer@agentability-prod-jenfjn.iam.gserviceaccount.com",
   },
   app
 );
