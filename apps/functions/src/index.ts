@@ -1295,6 +1295,10 @@ export const api = onRequest(
   {
     region: "us-central1",
     invoker: "public",
+    // Optional override for CI deploys where the deployer service account can't "ActAs"
+    // the default runtime service account (often {project}@appspot.gserviceaccount.com).
+    // When unset, Firebase/Cloud Functions picks the default runtime service account.
+    serviceAccount: process.env.FUNCTIONS_SERVICE_ACCOUNT || undefined,
   },
   app
 );
