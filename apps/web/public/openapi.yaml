@@ -305,6 +305,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /v1/subscribe:
+    post:
+      summary: Subscribe for score updates
+      description: Stores an email + domain association so the project can notify users about score changes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscribeRequest"
+            examples:
+              basic:
+                value:
+                  email: "you@company.com"
+                  domain: "example.com"
+                  runId: "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1"
+      responses:
+        "200":
+          description: Subscription stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscribeResponse"
+              examples:
+                ok:
+                  value:
+                    status: "ok"
+                    email: "you@company.com"
+                    domain: "example.com"
+        "400":
+          description: Invalid email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalid_email:
+                  value:
+                    message: "Invalid email address"
+                    code: "invalid_email"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /v1/evaluations/{domain}/latest.json:
     get:
       summary: Fetch the latest evaluation for a domain
@@ -412,6 +458,37 @@ components:
           format: uri
         domain:
           type: string
+    SubscribeRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        domain:
+          type: string
+          description: Audited domain or origin
+        runId:
+          type: string
+          description: Optional run ID associated with the subscription event
+    SubscribeResponse:
+      type: object
+      required:
+        - status
+        - email
+        - domain
+      properties:
+        status:
+          type: string
+          enum: ["ok"]
+        email:
+          type: string
+          format: email
+        domain:
+          type:
+            - string
+            - "null"
     RunStatus:
       type: object
       required:
