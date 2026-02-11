@@ -5,10 +5,19 @@ import { ReportPage } from "@/pages/ReportPage";
 import { RunPage } from "@/pages/RunPage";
 import { CertificatePage } from "@/pages/CertificatePage";
 import { Badge } from "@/components/ui/badge";
-import { trackEvent, trackLinkClick, trackPageView } from "@/lib/analytics";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { syncAnalyticsConsent, trackEvent, trackLinkClick, trackPageView } from "@/lib/analytics";
+import { getConsentStatus, openCookieSettings, subscribeConsentChange } from "@/lib/consent";
 
 function App() {
   const location = useLocation();
+
+  useEffect(() => {
+    syncAnalyticsConsent(getConsentStatus());
+    return subscribeConsentChange((record) => {
+      syncAnalyticsConsent(record?.decision ?? "unknown");
+    });
+  }, []);
 
   useEffect(() => {
     trackPageView({ route: location.pathname });
@@ -161,6 +170,26 @@ function App() {
                   </a>
                   <a
                     className="group block"
+                    href="/legal/privacy.md"
+                    onClick={() => trackLinkClick("footer_privacy", "/legal/privacy.md")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Privacy policy</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      How we process public audit and usage data
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
+                    href="/legal/cookies.md"
+                    onClick={() => trackLinkClick("footer_cookies", "/legal/cookies.md")}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Cookie policy</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      What cookies are used and how to control them
+                    </span>
+                  </a>
+                  <a
+                    className="group block"
                     href="https://github.com/khalidsaidi/agentability"
                     onClick={() => trackLinkClick("footer_github", "https://github.com/khalidsaidi/agentability")}
                   >
@@ -169,6 +198,16 @@ function App() {
                       Open source on GitHub
                     </span>
                   </a>
+                  <button
+                    type="button"
+                    className="group block text-left"
+                    onClick={() => openCookieSettings()}
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">Cookie settings</span>
+                    <span className="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                      Update your analytics consent choice
+                    </span>
+                  </button>
                   <a
                     className="group block"
                     href="mailto:hello@agentability.org"
@@ -185,6 +224,7 @@ function App() {
           </div>
         </footer>
       </div>
+      <CookieConsentBanner />
     </div>
   );
 }
