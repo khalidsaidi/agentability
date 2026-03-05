@@ -125,13 +125,13 @@ export function HomePage() {
     leaderboardQuery.data?.entries[0] ??
     null;
   const latestShowcase = showcaseLatestQuery.data;
-  const exampleDomain = latestShowcase?.domain ?? exampleReport?.domain ?? showcaseDomain;
-  const exampleScore = latestShowcase?.score ?? exampleReport?.score ?? 70.0;
-  const exampleGrade = latestShowcase?.grade ?? exampleReport?.grade ?? "C";
+  const exampleDomain = latestShowcase?.domain ?? exampleReport?.domain ?? "example.com";
+  const exampleScore = latestShowcase?.score ?? exampleReport?.score;
+  const exampleGrade = latestShowcase?.grade ?? exampleReport?.grade ?? "—";
   const exampleReportUrl =
     latestShowcase?.artifacts?.reportUrl ??
     exampleReport?.reportUrl ??
-    `/reports/${showcaseDomain}`;
+    "/";
 
   return (
     <div className="space-y-14 animate-fade-up">
@@ -195,7 +195,9 @@ export function HomePage() {
                 </div>
                 <div className="text-right">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Score</p>
-                  <p className="mt-1 text-3xl font-semibold text-foreground">{exampleScore.toFixed(1)}</p>
+                  <p className="mt-1 text-3xl font-semibold text-foreground">
+                    {typeof exampleScore === "number" ? exampleScore.toFixed(1) : "—"}
+                  </p>
                   <p className="text-xs text-muted-foreground">Grade {exampleGrade}</p>
                 </div>
               </div>
@@ -536,24 +538,32 @@ export function HomePage() {
             <div className="grid gap-3 md:grid-cols-2">
               {leaderboardQuery.data.entries.map((entry, index) => (
                 <div key={entry.domain} className="rounded-2xl border border-border/60 bg-white/80 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    #{index + 1}
-                  </p>
-                  <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2">
-                    <span className="min-w-0 break-words font-semibold text-foreground">{entry.domain}</span>
-                    <span className="whitespace-nowrap text-sm font-semibold text-foreground">
-                      {entry.score.toFixed(1)} ({entry.grade})
-                    </span>
-                  </div>
-                  <a
-                    className="mt-2 block text-xs text-primary"
-                    href={entry.reportUrl}
-                    onClick={() =>
-                      trackLinkClick("leaderboard_report", entry.reportUrl, { domain: entry.domain, rank: index + 1 })
-                    }
-                  >
-                    View report →
-                  </a>
+                  {(() => {
+                    const score = entry.domain === showcaseDomain ? (latestShowcase?.score ?? entry.score) : entry.score;
+                    const grade = entry.domain === showcaseDomain ? (latestShowcase?.grade ?? entry.grade) : entry.grade;
+                    return (
+                      <>
+                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                          #{index + 1}
+                        </p>
+                        <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2">
+                          <span className="min-w-0 break-words font-semibold text-foreground">{entry.domain}</span>
+                          <span className="whitespace-nowrap text-sm font-semibold text-foreground">
+                            {score.toFixed(1)} ({grade})
+                          </span>
+                        </div>
+                        <a
+                          className="mt-2 block text-xs text-primary"
+                          href={entry.reportUrl}
+                          onClick={() =>
+                            trackLinkClick("leaderboard_report", entry.reportUrl, { domain: entry.domain, rank: index + 1 })
+                          }
+                        >
+                          View report →
+                        </a>
+                      </>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
