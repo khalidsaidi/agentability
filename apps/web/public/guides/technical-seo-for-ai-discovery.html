@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Technical SEO for AI Discovery: What to Ship First | Agentability</title>
+    <meta
+      name="description"
+      content="Technical SEO checklist for AI discovery: crawl architecture, canonical URLs, structured data, and machine-readable API surfaces."
+    />
+    <meta
+      name="keywords"
+      content="technical seo for ai, ai discoverability seo, structured data for developers, canonical api docs"
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <link rel="canonical" href="https://agentability.org/guides/technical-seo-for-ai-discovery.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Technical SEO for AI Discovery: What to Ship First" />
+    <meta
+      property="og:description"
+      content="A practical roadmap for teams improving crawlability and AI-facing discoverability at the same time."
+    />
+    <meta property="og:url" content="https://agentability.org/guides/technical-seo-for-ai-discovery.html" />
+    <meta property="og:image" content="https://agentability.org/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Technical SEO for AI Discovery: What to Ship First" />
+    <meta
+      name="twitter:description"
+      content="A practical roadmap for teams improving crawlability and AI-facing discoverability at the same time."
+    />
+    <meta name="twitter:image" content="https://agentability.org/og.png" />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 50%, #ffffff 100%);
+        color: #0f172a;
+      }
+      .wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+      article {
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 2rem;
+        line-height: 1.2;
+      }
+      h2 {
+        margin: 24px 0 10px;
+        font-size: 1.2rem;
+      }
+      p,
+      li {
+        color: #334155;
+        line-height: 1.65;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      th,
+      td {
+        border: 1px solid #e2e8f0;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: #f8fafc;
+      }
+      .cta a {
+        color: #0f766e;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .muted {
+        color: #64748b;
+        font-size: 14px;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Technical SEO for AI Discovery: What to Ship First",
+        "description": "Technical SEO checklist for AI discovery: crawl architecture, canonical URLs, structured data, and machine-readable API surfaces.",
+        "author": {
+          "@type": "Organization",
+          "name": "Agentability"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Agentability",
+          "url": "https://agentability.org"
+        },
+        "mainEntityOfPage": "https://agentability.org/guides/technical-seo-for-ai-discovery.html"
+      }
+    </script>
+  </head>
+  <body>
+    <main class="wrap">
+      <article>
+        <h1>Technical SEO for AI Discovery: What to Ship First</h1>
+        <p>
+          Traditional SEO is not enough for AI-native traffic. You need crawlability for search engines and
+          machine-readable contracts for agent runtimes. This page prioritizes the highest-leverage fixes.
+        </p>
+
+        <h2>Priority matrix</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Fix</th>
+              <th>Expected impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>P0</td>
+              <td>Canonical URLs + sitemap + robots hygiene</td>
+              <td>Improves crawl coverage and indexing consistency.</td>
+            </tr>
+            <tr>
+              <td>P0</td>
+              <td>Publish OpenAPI + llms.txt + air.json</td>
+              <td>Enables machine discovery and API callability.</td>
+            </tr>
+            <tr>
+              <td>P1</td>
+              <td>Add schema.org structured data on key pages</td>
+              <td>Improves semantic clarity for search and AI parsers.</td>
+            </tr>
+            <tr>
+              <td>P1</td>
+              <td>Create indexable solution pages for target intents</td>
+              <td>Expands keyword footprint and topical authority.</td>
+            </tr>
+            <tr>
+              <td>P2</td>
+              <td>Stability checks and retry orchestration</td>
+              <td>Reduces false negatives from intermittent failures.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>On-page implementation basics</h2>
+        <ul>
+          <li>Keep one clear H1 that matches search intent.</li>
+          <li>Use descriptive titles and meta descriptions with action language.</li>
+          <li>Link related guides and product pages from every article.</li>
+          <li>Keep content focused on practical implementation, not generic concepts.</li>
+        </ul>
+
+        <h2>Crawl architecture checklist</h2>
+        <ul>
+          <li>Expose all important pages through sitemap.xml.</li>
+          <li>Ensure robots.txt allows docs and machine entrypoint files.</li>
+          <li>Use canonical URLs consistently across mirrors and rewrites.</li>
+          <li>Return clean status codes and avoid soft-404 pages.</li>
+        </ul>
+
+        <h2>Measure what changes</h2>
+        <ul>
+          <li>Track indexed pages and impressions in Google Search Console.</li>
+          <li>Track organic landing pages in analytics and compare weekly deltas.</li>
+          <li>Monitor AI-readiness score drift after each release.</li>
+        </ul>
+
+        <p class="cta"><a href="https://agentability.org/">Check your site on Agentability →</a></p>
+        <p class="muted">
+          Related guides:
+          <a href="/guides/ai-readiness-audit-checklist.html">AI readiness checklist</a>
+          ·
+          <a href="/guides/llms-txt-openapi-for-ai-agents.html">llms.txt + OpenAPI</a>
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

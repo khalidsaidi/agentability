@@ -304,6 +304,105 @@ export function HomePage() {
 
       <Card className="border-border/60 bg-white/70">
         <CardHeader>
+          <CardTitle>SEO + AI discovery guides</CardTitle>
+          <CardDescription>Actionable walkthroughs for teams improving AI referral traffic.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">AI readiness audit checklist</p>
+            <p className="mt-1">Step-by-step checklist to improve machine discoverability and AI callability.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/guides/ai-readiness-audit-checklist.html"
+              onClick={() => trackLinkClick("home_guide_checklist", "/guides/ai-readiness-audit-checklist.html")}
+            >
+              Read guide →
+            </a>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">llms.txt + OpenAPI guide</p>
+            <p className="mt-1">Publish the core machine-readable files agents need to find and use your API.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/guides/llms-txt-openapi-for-ai-agents.html"
+              onClick={() =>
+                trackLinkClick("home_guide_llms_openapi", "/guides/llms-txt-openapi-for-ai-agents.html")
+              }
+            >
+              Read guide →
+            </a>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Technical SEO for AI discovery</p>
+            <p className="mt-1">Crawl architecture and internal linking practices tuned for AI discovery.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/guides/technical-seo-for-ai-discovery.html"
+              onClick={() =>
+                trackLinkClick("home_guide_technical_seo", "/guides/technical-seo-for-ai-discovery.html")
+              }
+            >
+              Read guide →
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>High-Intent Keyword Hubs</CardTitle>
+          <CardDescription>Programmatic SEO pages built for organic AI discoverability queries.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 text-sm text-muted-foreground md:grid-cols-2">
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">AI SEO keyword hub</p>
+            <p className="mt-1">Intent pages targeting discoverability and API readiness searches.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/seo/"
+              onClick={() => trackLinkClick("home_hub_seo", "/seo/")}
+            >
+              Open hub →
+            </a>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Industry playbooks</p>
+            <p className="mt-1">Vertical-specific pages for SaaS, fintech, healthcare, ecommerce, and more.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/seo/industry/"
+              onClick={() => trackLinkClick("home_hub_industry", "/seo/industry/")}
+            >
+              Open hub →
+            </a>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Framework playbooks</p>
+            <p className="mt-1">Implementation guides for Next.js, FastAPI, Rails, and other stacks.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/seo/framework/"
+              onClick={() => trackLinkClick("home_hub_framework", "/seo/framework/")}
+            >
+              Open hub →
+            </a>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Role playbooks</p>
+            <p className="mt-1">Execution plans for founders, DevRel, product, and platform teams.</p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80"
+              href="/seo/role/"
+              onClick={() => trackLinkClick("home_hub_role", "/seo/role/")}
+            >
+              Open hub →
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
           <CardTitle>How we verify</CardTitle>
           <CardDescription>Transparent checks you can reproduce.</CardDescription>
         </CardHeader>
@@ -443,6 +542,39 @@ export function HomePage() {
               ))}
             </div>
           ) : null}
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/60 bg-white/70">
+        <CardHeader>
+          <CardTitle>Promote your score</CardTitle>
+          <CardDescription>Add a live Agentability widget or badge to your site.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-border/60 bg-white/80 p-4">
+            <p className="font-semibold text-foreground">Drop-in widget script</p>
+            <p className="mt-1">Shows the latest public score and links directly to your report.</p>
+            <pre className="mt-3 overflow-x-auto rounded-xl border border-border/60 bg-muted/20 p-3 text-xs text-foreground">
+              {`<script src="https://agentability.org/embed/widget.js" async></script>
+<div data-agentability-domain="example.com" data-agentability-style="card"></div>`}
+            </pre>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              className="inline-flex items-center rounded-xl border border-border/60 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/30"
+              href="/docs/api.md"
+              onClick={() => trackLinkClick("home_widget_docs", "/docs/api.md")}
+            >
+              Widget docs
+            </a>
+            <a
+              className="inline-flex items-center rounded-xl border border-border/60 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/30"
+              href="/badge/aistatusdashboard.com.svg"
+              onClick={() => trackLinkClick("home_widget_badge_example", "/badge/aistatusdashboard.com.svg")}
+            >
+              Badge example
+            </a>
+          </div>
         </CardContent>
       </Card>
 

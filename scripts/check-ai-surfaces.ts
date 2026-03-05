@@ -13,6 +13,7 @@ type DiscoveryAudit = {
 
 const requiredPaths = [
   "/.well-known/air.json",
+  "/air.json",
   "/.well-known/openapi.json",
   "/.well-known/openapi.yaml",
   "/.well-known/ai-plugin.json",
@@ -43,7 +44,7 @@ const llmsRequired = [
   "API: https://agentability.org/v1",
   "MCP: https://agentability.org/mcp",
   "OpenAPI: https://agentability.org/.well-known/openapi.json",
-  "Manifest: https://agentability.org/.well-known/air.json",
+  "Manifest: https://agentability.org/air.json",
   "https://agentability.org/discovery/audit/latest.json",
   "https://agentability.org/reports/{domain}",
   "https://agentability.org/v1/evaluations/{domain}/latest.json",

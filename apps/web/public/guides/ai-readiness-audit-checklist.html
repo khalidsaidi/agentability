@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Readiness Audit Checklist for Websites and APIs | Agentability</title>
+    <meta
+      name="description"
+      content="Use this AI readiness audit checklist to improve discoverability, API callability, trust signals, and reliability for AI agents."
+    />
+    <meta
+      name="keywords"
+      content="ai readiness audit checklist, agent readiness, llms.txt checklist, openapi checklist, api discoverability"
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <link rel="canonical" href="https://agentability.org/guides/ai-readiness-audit-checklist.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="AI Readiness Audit Checklist for Websites and APIs" />
+    <meta
+      property="og:description"
+      content="A practical checklist to make your site and API discoverable, callable, and reliable for AI tools."
+    />
+    <meta property="og:url" content="https://agentability.org/guides/ai-readiness-audit-checklist.html" />
+    <meta property="og:image" content="https://agentability.org/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AI Readiness Audit Checklist for Websites and APIs" />
+    <meta
+      name="twitter:description"
+      content="A practical checklist to make your site and API discoverable, callable, and reliable for AI tools."
+    />
+    <meta name="twitter:image" content="https://agentability.org/og.png" />
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+        color: #0f172a;
+      }
+      .wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+      .card {
+        background: #ffffff;
+        border: 1px solid #dbe4f5;
+        border-radius: 18px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+        padding: 26px;
+      }
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin: 0 0 10px;
+      }
+      h2 {
+        margin: 26px 0 10px;
+        font-size: 1.25rem;
+      }
+      p,
+      li {
+        line-height: 1.65;
+        color: #334155;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      .chip {
+        display: inline-block;
+        border: 1px solid #bfdbfe;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 10px;
+      }
+      .cta a {
+        color: #0f766e;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
+      .box {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+        padding: 14px;
+      }
+      .muted {
+        color: #64748b;
+        font-size: 14px;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AI Readiness Audit Checklist for Websites and APIs",
+        "description": "Use this AI readiness audit checklist to improve discoverability, API callability, trust signals, and reliability for AI agents.",
+        "author": {
+          "@type": "Organization",
+          "name": "Agentability"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Agentability",
+          "url": "https://agentability.org"
+        },
+        "mainEntityOfPage": "https://agentability.org/guides/ai-readiness-audit-checklist.html"
+      }
+    </script>
+  </head>
+  <body>
+    <main class="wrap">
+      <article class="card">
+        <p class="chip">Guide</p>
+        <h1>AI Readiness Audit Checklist for Websites and APIs</h1>
+        <p>
+          Most teams want AI traffic but are missing basic machine-readable surfaces. This checklist helps you ship
+          the minimum public signals AI agents need to discover your product, understand your docs, and call your API
+          safely.
+        </p>
+
+        <h2>1. Discovery surfaces</h2>
+        <ul>
+          <li>Publish <code>/.well-known/openapi.json</code> and keep it reachable with a 200 response.</li>
+          <li>Add <code>/.well-known/air.json</code> with contact, legal, and verification metadata.</li>
+          <li>Publish <code>/llms.txt</code> with canonical docs, API base URL, and endpoint references.</li>
+          <li>Avoid blocked robots rules for docs and machine entrypoint files.</li>
+        </ul>
+
+        <h2>2. Callable API surfaces</h2>
+        <ul>
+          <li>Use valid OpenAPI schema with request and response examples.</li>
+          <li>Keep endpoint paths stable and return deterministic JSON shapes.</li>
+          <li>Expose clear error payloads with status code guidance.</li>
+          <li>Avoid auth-only landing pages for your public docs.</li>
+        </ul>
+
+        <h2>3. Documentation for LLM ingestion</h2>
+        <ul>
+          <li>Keep a canonical docs index page with stable URLs.</li>
+          <li>Link directly from docs to API reference and quickstart.</li>
+          <li>Provide short, copyable cURL examples for core endpoints.</li>
+          <li>Keep markdown assets crawlable and lightweight.</li>
+        </ul>
+
+        <h2>4. Trust and safety signals</h2>
+        <ul>
+          <li>Publish privacy policy, terms, and cookie policy on stable URLs.</li>
+          <li>Expose contact email and support route in public metadata.</li>
+          <li>Keep attestation fields aligned across <code>air.json</code> and docs.</li>
+        </ul>
+
+        <h2>5. Reliability checks</h2>
+        <ul>
+          <li>Re-test core endpoints from multiple origins to detect flaky behavior.</li>
+          <li>Prevent redirect loops and temporary anti-bot blocks on docs pages.</li>
+          <li>Keep timeouts and response sizes predictable.</li>
+        </ul>
+
+        <h2>Fast implementation plan</h2>
+        <div class="grid">
+          <div class="box"><strong>Day 1:</strong> publish OpenAPI, air.json, and llms.txt with canonical links.</div>
+          <div class="box"><strong>Day 2:</strong> harden docs with quickstarts and schema-backed examples.</div>
+          <div class="box"><strong>Day 3:</strong> run a public audit and fix the top failing checks by severity.</div>
+        </div>
+
+        <p class="cta">
+          <a href="https://agentability.org/">Run a live AI readiness audit on Agentability →</a>
+        </p>
+        <p class="muted">
+          Related guides:
+          <a href="/guides/llms-txt-openapi-for-ai-agents.html">llms.txt + OpenAPI</a>
+          ·
+          <a href="/guides/technical-seo-for-ai-discovery.html">Technical SEO for AI discovery</a>
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

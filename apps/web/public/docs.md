@@ -14,6 +14,7 @@ Agentability evaluates public-facing agent readiness signals: discovery, callabl
 - Latest JSON: https://agentability.org/v1/evaluations/{domain}/latest.json
 - Badge: https://agentability.org/badge/{domain}.svg
 - Certificate: https://agentability.org/cert/{domain}
+- Widget script: https://agentability.org/embed/widget.js
 
 ## API
 
@@ -23,6 +24,15 @@ Agentability evaluates public-facing agent readiness signals: discovery, callabl
 - GET  https://agentability.org/badge/{domain}.svg
 
 See https://agentability.org/docs/api.md for full request and response details.
+
+## Promote Your Score
+
+Embed a live score widget on any page:
+
+```html
+<script src="https://agentability.org/embed/widget.js" async></script>
+<div data-agentability-domain="example.com" data-agentability-style="card"></div>
+```
 
 ## Methodology
 

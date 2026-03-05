@@ -41,6 +41,14 @@ async function writeOpenApiArtifacts(repoRoot: string, publicDir: string): Promi
   await fs.writeFile(path.join(publicDir, "openapi.json"), jsonText, "utf8");
 }
 
+async function writeAirManifestAlias(publicDir: string): Promise<void> {
+  const wellKnownPath = path.join(publicDir, ".well-known", "air.json");
+  const aliasPath = path.join(publicDir, "air.json");
+  const raw = await fs.readFile(wellKnownPath, "utf8");
+  const normalized = raw.endsWith("\n") ? raw : `${raw}\n`;
+  await fs.writeFile(aliasPath, normalized, "utf8");
+}
+
 function buildLlmsTxt(): string {
   return [
     "Product: Agentability",
@@ -49,7 +57,8 @@ function buildLlmsTxt(): string {
     "API: https://agentability.org/v1",
     "MCP: https://agentability.org/mcp",
     "OpenAPI: https://agentability.org/.well-known/openapi.json",
-    "Manifest: https://agentability.org/.well-known/air.json",
+    "Manifest: https://agentability.org/air.json",
+    "Canonical manifest: https://agentability.org/.well-known/air.json",
     "",
     "Verification:",
     "- https://agentability.org/discovery/audit/latest.json",
@@ -135,6 +144,7 @@ async function main(): Promise<void> {
   const buildId = resolveBuildId();
   await writeBuildStamp(publicDir, buildId);
   await writeOpenApiArtifacts(repoRoot, publicDir);
+  await writeAirManifestAlias(publicDir);
   await writeLlms(publicDir);
   await generateDiscoveryAudit(repoRoot);
   await updateFirebaseHeaders(repoRoot, buildId);

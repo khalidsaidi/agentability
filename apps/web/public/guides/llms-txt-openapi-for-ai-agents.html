@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>llms.txt and OpenAPI Setup Guide for AI Agents | Agentability</title>
+    <meta
+      name="description"
+      content="Learn how to publish llms.txt and OpenAPI correctly so AI agents can discover docs, understand endpoints, and call your API."
+    />
+    <meta
+      name="keywords"
+      content="llms.txt guide, openapi setup, ai agent api guide, machine readable docs, api discoverability"
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <link rel="canonical" href="https://agentability.org/guides/llms-txt-openapi-for-ai-agents.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="llms.txt and OpenAPI Setup Guide for AI Agents" />
+    <meta
+      property="og:description"
+      content="A practical implementation guide for llms.txt, air.json, and OpenAPI discoverability surfaces."
+    />
+    <meta property="og:url" content="https://agentability.org/guides/llms-txt-openapi-for-ai-agents.html" />
+    <meta property="og:image" content="https://agentability.org/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="llms.txt and OpenAPI Setup Guide for AI Agents" />
+    <meta
+      name="twitter:description"
+      content="A practical implementation guide for llms.txt, air.json, and OpenAPI discoverability surfaces."
+    />
+    <meta name="twitter:image" content="https://agentability.org/og.png" />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at 20% 0%, #e0f2fe 0%, #f8fafc 45%, #ffffff 100%);
+        color: #0f172a;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+      .card {
+        border-radius: 20px;
+        border: 1px solid #dbeafe;
+        background: #ffffff;
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin: 0 0 8px;
+        line-height: 1.2;
+      }
+      h2 {
+        margin: 26px 0 10px;
+        font-size: 1.2rem;
+      }
+      p,
+      li {
+        line-height: 1.65;
+        color: #334155;
+      }
+      code {
+        background: #eff6ff;
+        border-radius: 6px;
+        padding: 2px 5px;
+      }
+      pre {
+        margin: 0;
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 12px;
+        padding: 14px;
+        overflow-x: auto;
+      }
+      .muted {
+        color: #64748b;
+        font-size: 14px;
+      }
+      .cta a {
+        color: #0f766e;
+        text-decoration: none;
+        font-weight: 700;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "llms.txt and OpenAPI setup for AI agents",
+        "description": "Implement llms.txt, air.json, and OpenAPI machine entrypoints so AI tools can discover and call your API.",
+        "step": [
+          { "@type": "HowToStep", "name": "Publish OpenAPI", "text": "Expose /openapi.json and /.well-known/openapi.json." },
+          { "@type": "HowToStep", "name": "Publish llms.txt", "text": "List API base URL, docs, and canonical entrypoints." },
+          { "@type": "HowToStep", "name": "Publish air.json", "text": "Add contact and legal references for trust signals." },
+          { "@type": "HowToStep", "name": "Verify", "text": "Run a public AI-readiness audit and fix fails first." }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <main class="wrap">
+      <article class="card">
+        <h1>llms.txt and OpenAPI Setup Guide for AI Agents</h1>
+        <p>
+          If your product is not machine-readable, agents cannot use it reliably. This guide shows the minimum
+          implementation to make AI tools discover your docs and call your API with fewer failures.
+        </p>
+
+        <h2>Required public files</h2>
+        <ul>
+          <li><code>/llms.txt</code> for high-level discovery and canonical links.</li>
+          <li><code>/.well-known/openapi.json</code> for schema-backed endpoint understanding.</li>
+          <li><code>/.well-known/air.json</code> for identity, contact, and legal metadata.</li>
+        </ul>
+
+        <h2>Example llms.txt structure</h2>
+        <pre><code>Product: Your API
+Start here: https://example.com
+API: https://example.com/v1
+OpenAPI: https://example.com/.well-known/openapi.json
+Docs: https://example.com/docs
+Contact: mailto:support@example.com</code></pre>
+
+        <h2>OpenAPI implementation checklist</h2>
+        <ul>
+          <li>Define schemas for requests and responses (avoid free-form payloads).</li>
+          <li>Include authentication method and error examples.</li>
+          <li>Use stable operation IDs for endpoint-level reliability.</li>
+          <li>Mirror the same spec at a canonical and a well-known URL.</li>
+        </ul>
+
+        <h2>Common failures to avoid</h2>
+        <ul>
+          <li>Spec file exists but returns HTML due redirect/proxy misconfiguration.</li>
+          <li>llms.txt links to stale or non-canonical docs.</li>
+          <li>Public docs require login, causing ingestion failures.</li>
+          <li>Inconsistent response shape between retries or datacenters.</li>
+        </ul>
+
+        <h2>Verification workflow</h2>
+        <ul>
+          <li>Run an external public-mode audit.</li>
+          <li>Fix all high-severity failures first.</li>
+          <li>Re-run and track score deltas weekly.</li>
+        </ul>
+
+        <p class="cta"><a href="https://agentability.org/">Run your public AI-readiness audit →</a></p>
+        <p class="muted">
+          Related guides:
+          <a href="/guides/ai-readiness-audit-checklist.html">AI readiness checklist</a>
+          ·
+          <a href="/guides/technical-seo-for-ai-discovery.html">Technical SEO for AI discovery</a>
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

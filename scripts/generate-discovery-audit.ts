@@ -57,6 +57,7 @@ type DiscoveryAudit = {
 
 const requiredSurfaces: Surface[] = [
   { path: "/.well-known/air.json", expectedContentType: "application/json; charset=utf-8" },
+  { path: "/air.json", expectedContentType: "application/json; charset=utf-8" },
   { path: "/.well-known/openapi.json", expectedContentType: "application/json; charset=utf-8" },
   { path: "/.well-known/openapi.yaml", expectedContentType: "text/yaml; charset=utf-8" },
   { path: "/.well-known/ai-plugin.json", expectedContentType: "application/json; charset=utf-8" },

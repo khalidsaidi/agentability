@@ -55,6 +55,28 @@ May include:
 Returns a shareable SVG badge for the latest score.
 Cache-Control: public, max-age=300.
 
+## Embeddable score widget
+
+Widget script:
+
+```
+https://agentability.org/embed/widget.js
+```
+
+Example embed (card):
+
+```
+<script src="https://agentability.org/embed/widget.js" async></script>
+<div data-agentability-domain="example.com" data-agentability-style="card"></div>
+```
+
+Example embed (inline):
+
+```
+<script src="https://agentability.org/embed/widget.js" async></script>
+<div data-agentability-domain="example.com" data-agentability-style="inline"></div>
+```
+
 ## POST /mcp
 
 MCP JSON-RPC endpoint. Example tool call:
