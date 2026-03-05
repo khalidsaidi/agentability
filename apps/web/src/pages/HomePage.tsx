@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { URLInputCard } from "@/components/URLInputCard";
 import { evaluateOrigin, fetchDiscoveryAudit, fetchLatest, fetchLeaderboard } from "@/lib/api";
 import { useSeo } from "@/lib/seo";
@@ -30,11 +30,15 @@ export function HomePage() {
     queryKey: ["leaderboard"],
     queryFn: fetchLeaderboard,
   });
-  const showcaseDomain = "aistatusdashboard.com";
-  const showcaseLatestQuery = useQuery({
-    queryKey: ["showcase-latest", showcaseDomain],
-    queryFn: () => fetchLatest(showcaseDomain),
-    retry: 1,
+  const leaderboardEntries = leaderboardQuery.data?.entries ?? [];
+  const leaderboardLatestQueries = useQueries({
+    queries: leaderboardEntries.map((entry) => ({
+      queryKey: ["leaderboard-latest", entry.domain],
+      queryFn: () => fetchLatest(entry.domain),
+      retry: 1,
+      staleTime: 60_000,
+      enabled: Boolean(entry.domain),
+    })),
   });
   const mutation = useMutation({
     mutationFn: (origin: string) => evaluateOrigin(origin),
@@ -79,10 +83,12 @@ export function HomePage() {
   }, [leaderboardQuery.isError, leaderboardQuery.data]);
 
   useEffect(() => {
-    if (showcaseLatestQuery.isError) {
-      trackError("showcase_latest_error", showcaseLatestQuery.error);
+    for (const query of leaderboardLatestQueries) {
+      if (query.isError) {
+        trackError("leaderboard_latest_error", query.error);
+      }
     }
-  }, [showcaseLatestQuery.isError, showcaseLatestQuery.error]);
+  }, [leaderboardLatestQueries]);
 
   const audit = auditQuery.data;
   const status = audit?.discoverability_health?.status ?? "unknown";
@@ -120,18 +126,30 @@ export function HomePage() {
     return Number.isNaN(parsed.getTime()) ? audit.live_checked_at : parsed.toLocaleString();
   })();
 
-  const exampleReport =
-    leaderboardQuery.data?.entries.find((entry) => entry.domain === showcaseDomain) ??
-    leaderboardQuery.data?.entries[0] ??
-    null;
-  const latestShowcase = showcaseLatestQuery.data;
-  const exampleDomain = latestShowcase?.domain ?? exampleReport?.domain ?? "example.com";
-  const exampleScore = latestShowcase?.score ?? exampleReport?.score;
-  const exampleGrade = latestShowcase?.grade ?? exampleReport?.grade ?? "—";
-  const exampleReportUrl =
-    latestShowcase?.artifacts?.reportUrl ??
-    exampleReport?.reportUrl ??
-    "/";
+  const leaderboardLatestByDomain = useMemo(() => {
+    const latest = new Map<
+      string,
+      { domain: string; score: number; grade: string; reportUrl: string | undefined }
+    >();
+    leaderboardEntries.forEach((entry, index) => {
+      const data = leaderboardLatestQueries[index]?.data;
+      if (!data || typeof data.score !== "number") return;
+      latest.set(entry.domain, {
+        domain: data.domain,
+        score: data.score,
+        grade: data.grade,
+        reportUrl: data.artifacts?.reportUrl,
+      });
+    });
+    return latest;
+  }, [leaderboardEntries, leaderboardLatestQueries]);
+
+  const exampleReport = leaderboardEntries[0] ?? null;
+  const latestExample = exampleReport ? leaderboardLatestByDomain.get(exampleReport.domain) : undefined;
+  const exampleDomain = latestExample?.domain ?? exampleReport?.domain ?? "example.com";
+  const exampleScore = latestExample?.score;
+  const exampleGrade = latestExample?.grade ?? "—";
+  const exampleReportUrl = latestExample?.reportUrl ?? exampleReport?.reportUrl ?? "/";
 
   return (
     <div className="space-y-14 animate-fade-up">
@@ -539,8 +557,7 @@ export function HomePage() {
               {leaderboardQuery.data.entries.map((entry, index) => (
                 <div key={entry.domain} className="rounded-2xl border border-border/60 bg-white/80 p-4">
                   {(() => {
-                    const score = entry.domain === showcaseDomain ? (latestShowcase?.score ?? entry.score) : entry.score;
-                    const grade = entry.domain === showcaseDomain ? (latestShowcase?.grade ?? entry.grade) : entry.grade;
+                    const live = leaderboardLatestByDomain.get(entry.domain);
                     return (
                       <>
                         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -549,7 +566,7 @@ export function HomePage() {
                         <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2">
                           <span className="min-w-0 break-words font-semibold text-foreground">{entry.domain}</span>
                           <span className="whitespace-nowrap text-sm font-semibold text-foreground">
-                            {score.toFixed(1)} ({grade})
+                            {live ? `${live.score.toFixed(1)} (${live.grade})` : "—"}
                           </span>
                         </div>
                         <a
@@ -595,8 +612,13 @@ export function HomePage() {
             </a>
             <a
               className="inline-flex items-center rounded-xl border border-border/60 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/30"
-              href="/badge/aistatusdashboard.com.svg"
-              onClick={() => trackLinkClick("home_widget_badge_example", "/badge/aistatusdashboard.com.svg")}
+              href={exampleReport ? `/badge/${encodeURIComponent(exampleReport.domain)}.svg` : "/badge/agentability.org.svg"}
+              onClick={() =>
+                trackLinkClick(
+                  "home_widget_badge_example",
+                  exampleReport ? `/badge/${encodeURIComponent(exampleReport.domain)}.svg` : "/badge/agentability.org.svg"
+                )
+              }
             >
               Badge example
             </a>
