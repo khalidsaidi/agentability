@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { URLInputCard } from "@/components/URLInputCard";
-import { evaluateOrigin, fetchDiscoveryAudit, fetchLeaderboard } from "@/lib/api";
+import { evaluateOrigin, fetchDiscoveryAudit, fetchLatest, fetchLeaderboard } from "@/lib/api";
 import { useSeo } from "@/lib/seo";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,12 @@ export function HomePage() {
   const leaderboardQuery = useQuery({
     queryKey: ["leaderboard"],
     queryFn: fetchLeaderboard,
+  });
+  const showcaseDomain = "aistatusdashboard.com";
+  const showcaseLatestQuery = useQuery({
+    queryKey: ["showcase-latest", showcaseDomain],
+    queryFn: () => fetchLatest(showcaseDomain),
+    retry: 1,
   });
   const mutation = useMutation({
     mutationFn: (origin: string) => evaluateOrigin(origin),
@@ -72,6 +78,12 @@ export function HomePage() {
     }
   }, [leaderboardQuery.isError, leaderboardQuery.data]);
 
+  useEffect(() => {
+    if (showcaseLatestQuery.isError) {
+      trackError("showcase_latest_error", showcaseLatestQuery.error);
+    }
+  }, [showcaseLatestQuery.isError, showcaseLatestQuery.error]);
+
   const audit = auditQuery.data;
   const status = audit?.discoverability_health?.status ?? "unknown";
   const statusLabel = status.toUpperCase();
@@ -109,13 +121,17 @@ export function HomePage() {
   })();
 
   const exampleReport =
-    leaderboardQuery.data?.entries.find((entry) => entry.domain === "aistatusdashboard.com") ??
+    leaderboardQuery.data?.entries.find((entry) => entry.domain === showcaseDomain) ??
     leaderboardQuery.data?.entries[0] ??
     null;
-  const exampleDomain = exampleReport?.domain ?? "aistatusdashboard.com";
-  const exampleScore = exampleReport?.score ?? 70.0;
-  const exampleGrade = exampleReport?.grade ?? "C";
-  const exampleReportUrl = exampleReport?.reportUrl ?? "/reports/aistatusdashboard.com";
+  const latestShowcase = showcaseLatestQuery.data;
+  const exampleDomain = latestShowcase?.domain ?? exampleReport?.domain ?? showcaseDomain;
+  const exampleScore = latestShowcase?.score ?? exampleReport?.score ?? 70.0;
+  const exampleGrade = latestShowcase?.grade ?? exampleReport?.grade ?? "C";
+  const exampleReportUrl =
+    latestShowcase?.artifacts?.reportUrl ??
+    exampleReport?.reportUrl ??
+    `/reports/${showcaseDomain}`;
 
   return (
     <div className="space-y-14 animate-fade-up">
