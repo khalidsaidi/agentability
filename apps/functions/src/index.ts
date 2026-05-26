@@ -1431,37 +1431,47 @@ async function loadPublicLeaderboard(baseUrl: string): Promise<{
   updatedAt: string;
   entries: PublicLeaderboardEntry[];
 }> {
-  const evaluations = await db.collection("evaluations").limit(500).get();
   const entries: PublicLeaderboardEntry[] = [];
+  let cursor: FirebaseFirestore.QueryDocumentSnapshot | undefined;
 
-  for (const evaluation of evaluations.docs) {
-    const domain = evaluation.id;
-    const latestRunId = evaluation.data()?.latestRunId as string | undefined;
-    if (!latestRunId) continue;
-    const runDoc = await db
-      .collection("evaluations")
-      .doc(domain)
-      .collection("runs")
-      .doc(latestRunId)
-      .get();
-    if (!runDoc.exists) continue;
-    const run = runDoc.data() as Record<string, unknown>;
-    const status = typeof run.status === "string" ? run.status : "";
-    if (status !== "complete") continue;
-    const score = Number(run.score ?? 0);
-    const grade = typeof run.grade === "string" ? run.grade : "F";
-    const completedAt = typeof run.completedAt === "string" ? run.completedAt : new Date().toISOString();
-    const runId = typeof run.runId === "string" && run.runId ? run.runId : latestRunId;
-    entries.push({
-      domain,
-      score,
-      grade,
-      runId,
-      completedAt,
-      reportUrl: `${baseUrl}/reports/${encodeURIComponent(domain)}`,
-      badgeUrl: `${baseUrl}/badge/${encodeURIComponent(domain)}.svg`,
-      jsonUrl: `${baseUrl}/v1/evaluations/${encodeURIComponent(domain)}/latest.json`,
-    });
+  while (true) {
+    let query: FirebaseFirestore.Query = db.collection("evaluations").orderBy("__name__").limit(500);
+    if (cursor) query = query.startAfter(cursor);
+    const evaluations = await query.get();
+    if (evaluations.empty) break;
+
+    for (const evaluation of evaluations.docs) {
+      const domain = evaluation.id;
+      const latestRunId = evaluation.data()?.latestRunId as string | undefined;
+      if (!latestRunId) continue;
+      const runDoc = await db
+        .collection("evaluations")
+        .doc(domain)
+        .collection("runs")
+        .doc(latestRunId)
+        .get();
+      if (!runDoc.exists) continue;
+      const run = runDoc.data() as Record<string, unknown>;
+      const status = typeof run.status === "string" ? run.status : "";
+      if (status !== "complete") continue;
+      const score = Number(run.score ?? 0);
+      const grade = typeof run.grade === "string" ? run.grade : "F";
+      const completedAt = typeof run.completedAt === "string" ? run.completedAt : new Date().toISOString();
+      const runId = typeof run.runId === "string" && run.runId ? run.runId : latestRunId;
+      entries.push({
+        domain,
+        score,
+        grade,
+        runId,
+        completedAt,
+        reportUrl: `${baseUrl}/reports/${encodeURIComponent(domain)}`,
+        badgeUrl: `${baseUrl}/badge/${encodeURIComponent(domain)}.svg`,
+        jsonUrl: `${baseUrl}/v1/evaluations/${encodeURIComponent(domain)}/latest.json`,
+      });
+    }
+
+    if (evaluations.size < 500) break;
+    cursor = evaluations.docs[evaluations.docs.length - 1];
   }
 
   entries.sort((a, b) => b.score - a.score || a.domain.localeCompare(b.domain));
