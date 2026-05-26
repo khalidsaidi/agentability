@@ -312,7 +312,11 @@ export async function generateDiscoveryAudit(repoRoot = process.cwd()): Promise<
         entry.live_bytes = primary.bytes;
       }
       if (checks.some((check) => !check.ok)) {
-        unreachable.push(surface.path);
+        if (optionalPaths.has(surface.path)) {
+          unreachableOptional.push(surface.path);
+        } else {
+          unreachableRequired.push(surface.path);
+        }
       }
       const liveHashes = checks.map((check) => check.sha256).filter(Boolean) as string[];
       if (liveHashes.length && new Set(liveHashes).size > 1) {
