@@ -222,6 +222,24 @@ function App() {
               </div>
             </div>
           </div>
+          <div
+            data-cross-project-footer
+            className="mt-8 border-t border-border/50 pt-4 text-xs text-muted-foreground"
+          >
+            Cross-project:{" "}
+            <a href="https://a2abench-api.web.app/stats" className="text-primary hover:underline">
+              A2ABench
+            </a>{" "}
+            ·{" "}
+            <a href="https://ragmap-api.web.app/stats" className="text-primary hover:underline">
+              Ragmap
+            </a>{" "}
+            ·{" "}
+            <a href="https://rootfetch.com/stats" className="text-primary hover:underline">
+              Rootfetch
+            </a>{" "}
+            — benchmark · MCP search · DNS delegation
+          </div>
         </footer>
       </div>
       <CookieConsentBanner />
