@@ -63,4 +63,4 @@ jobs:
 
           # Deploy hosting first so UI updates can ship even if functions deploy is blocked by IAM.
           pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only hosting --non-interactive
-          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only functions --non-interactive
+          pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only functions --non-interactive --force
