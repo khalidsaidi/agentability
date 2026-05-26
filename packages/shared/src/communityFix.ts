@@ -143,7 +143,7 @@ export function normalizeCommunityFixResponse(input: unknown): {
   return { answerMd: answer, citations };
 }
 
-export function buildA2ABenchSearchUrl(baseUrl: string, query: string): string {
+export function buildA2ABenchQuestionsUrl(baseUrl: string): string {
   const trimmed = baseUrl.replace(/\/+$/, "");
-  return `${trimmed}/search?q=${encodeURIComponent(query)}`;
+  return `${trimmed}/v1/eval/questions`;
 }

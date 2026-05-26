@@ -388,7 +388,7 @@
           {
             "name": "runId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -396,7 +396,15 @@
           {
             "name": "issueId",
             "in": "query",
-            "required": true,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "finding",
+            "in": "query",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -413,19 +421,33 @@
                 "examples": {
                   "ok": {
                     "value": {
-                      "status": "ok",
+                      "status": "available",
                       "runId": "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1",
                       "issueId": "T1",
                       "query": "Agentability T1 Complete air.json with legal + verification fix ...",
-                      "mode": "rag",
-                      "answerMd": "1. Add contact.email...",
-                      "citations": [
+                      "cached": false,
+                      "sourceUrl": "https://a2abench-api.web.app/v1/eval/questions",
+                      "results": [
                         {
-                          "title": "Agentability Spec",
-                          "url": "https://agentability.org/spec.md"
+                          "title": "How to expose machine-readable manifests",
+                          "url": "https://stackoverflow.com/questions/123456",
+                          "score": 3,
+                          "excerpt": "Publish air.json and keep canonical URLs aligned..."
                         }
                       ],
-                      "searchUrl": "https://a2abench-api.web.app/search?q=Agentability%20T1"
+                      "createdAt": "2026-05-26T12:00:00.000Z"
+                    }
+                  },
+                  "no_matches": {
+                    "value": {
+                      "status": "no_matches",
+                      "runId": "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1",
+                      "issueId": "T1",
+                      "query": "Agentability T1 Complete air.json with legal + verification fix ...",
+                      "cached": false,
+                      "sourceUrl": "https://a2abench-api.web.app/v1/eval/questions",
+                      "results": [],
+                      "createdAt": "2026-05-26T12:00:00.000Z"
                     }
                   },
                   "unavailable": {
@@ -434,7 +456,11 @@
                       "runId": "b41b56ff-2d10-4b2f-8e5a-197defb8b1f1",
                       "issueId": "T1",
                       "query": "Agentability T1 Complete air.json with legal + verification fix ...",
-                      "searchUrl": "https://a2abench-api.web.app/search?q=Agentability%20T1"
+                      "cached": false,
+                      "sourceUrl": "https://a2abench-api.web.app/v1/eval/questions",
+                      "results": [],
+                      "createdAt": "2026-05-26T12:00:00.000Z",
+                      "error": "A2ABench timeout"
                     }
                   }
                 }
@@ -1489,13 +1515,18 @@
           "status",
           "runId",
           "issueId",
-          "query"
+          "query",
+          "cached",
+          "sourceUrl",
+          "results",
+          "createdAt"
         ],
         "properties": {
           "status": {
             "type": "string",
             "enum": [
-              "ok",
+              "available",
+              "no_matches",
               "unavailable"
             ]
           },
@@ -1508,21 +1539,18 @@
           "query": {
             "type": "string"
           },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "rag",
-              "retrieve_only"
-            ]
+          "cached": {
+            "type": "boolean"
           },
-          "answerMd": {
+          "sourceUrl": {
             "type": "string"
           },
-          "citations": {
+          "results": {
             "type": "array",
             "items": {
               "type": "object",
               "required": [
+                "title",
                 "url"
               ],
               "properties": {
@@ -1531,15 +1559,15 @@
                 },
                 "url": {
                   "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "excerpt": {
+                  "type": "string"
                 }
               }
             }
-          },
-          "cached": {
-            "type": "boolean"
-          },
-          "searchUrl": {
-            "type": "string"
           },
           "createdAt": {
             "type": "string",

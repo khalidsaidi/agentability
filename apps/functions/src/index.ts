@@ -15,8 +15,7 @@ import {
   EvaluationResult,
   computeDiff,
   buildCommunityFixQuery,
-  buildA2ABenchSearchUrl,
-  normalizeCommunityFixResponse,
+  buildA2ABenchQuestionsUrl,
   getFixIt,
 } from "@agentability/shared";
 import { SSR_ASSETS } from "./ssr/asset-manifest";
@@ -34,6 +33,7 @@ const evidenceBucketName =
   process.env.EVIDENCE_BUCKET ||
   (process.env.GCLOUD_PROJECT ? `${process.env.GCLOUD_PROJECT}-evidence` : undefined);
 const A2ABENCH_BASE_URL = process.env.A2ABENCH_BASE_URL || "https://a2abench-api.web.app";
+const CANONICAL_BASE_URL = (process.env.PUBLIC_BASE_URL || "https://agentability.org").replace(/\/+$/, "");
 
 const app = express();
 // We sit behind a CDN / reverse proxy in production. `req.ip` is unreliable unless
@@ -194,6 +194,9 @@ async function enforceSubscribeRateLimit(ip: string): Promise<void> {
 }
 
 function buildBaseUrl(req: express.Request): string {
+  if (CANONICAL_BASE_URL) {
+    return CANONICAL_BASE_URL;
+  }
   const proto = req.header("x-forwarded-proto") || req.protocol;
   const host = req.header("x-forwarded-host") || req.get("host");
   return `${proto}://${host}`;
@@ -255,38 +258,41 @@ function isValidEmail(email: string): boolean {
   return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 }
 
-type CommunityFixCitation = { title?: string; url: string };
+type CommunityFixResult = {
+  title: string;
+  url: string;
+  score?: number;
+  excerpt?: string;
+};
 type CommunityFixPayload = {
-  status: "available" | "unavailable";
+  status: "available" | "no_matches" | "unavailable";
   runId: string;
   issueId: string;
   query: string;
-  results?: Array<{
-    title: string;
-    url?: string;
-    snippet?: string;
-  }>;
-  mode?: "rag" | "retrieve_only";
-  answerMd?: string;
-  citations?: CommunityFixCitation[];
-  cached?: boolean;
-  searchUrl?: string;
-  createdAt?: string;
+  cached: boolean;
+  sourceUrl: string;
+  results: CommunityFixResult[];
+  createdAt: string;
   error?: string;
 };
 
-async function postJsonWithTimeout(
-  url: string,
-  payload: Record<string, unknown>,
-  timeoutMs = 8000
-): Promise<Response> {
+const COMMUNITY_FIX_CACHE_TTL_MS = 5 * 60 * 1000;
+const COMMUNITY_FIX_BREAKER_TIMEOUT_MS = 60 * 1000;
+const COMMUNITY_FIX_UPSTREAM_TIMEOUT_MS = 1500;
+
+const communityFixCache = new Map<string, { expiresAtMs: number; payload: CommunityFixPayload }>();
+const communityFixBreakerState = {
+  consecutiveFailures: 0,
+  openUntilMs: 0,
+};
+
+async function fetchJsonWithTimeout(url: string, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      method: "GET",
+      headers: { Accept: "application/json" },
       signal: controller.signal,
     });
   } finally {
@@ -294,36 +300,141 @@ async function postJsonWithTimeout(
   }
 }
 
-async function fetchA2ABenchAnswer(query: string, mode: "rag" | "retrieve_only") {
-  const base = A2ABENCH_BASE_URL.replace(/\/+$/, "");
-  const response = await postJsonWithTimeout(`${base}/api/v1/answer`, {
-    query,
-    topK: 5,
-    mode,
-    style: "concise",
+function tokenizeCommunityFixQuery(query: string): string[] {
+  return query
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(/\s+/)
+    .filter((token) => token.length >= 4)
+    .slice(0, 12);
+}
+
+function normalizeCommunityFixResults(query: string, payload: unknown): CommunityFixResult[] {
+  const rows = Array.isArray((payload as Record<string, unknown>)?.results)
+    ? ((payload as Record<string, unknown>).results as Array<Record<string, unknown>>)
+    : [];
+  if (!rows.length) return [];
+  const queryTokens = tokenizeCommunityFixQuery(query);
+  const scored = rows.map((row) => {
+    const prompt = typeof row.prompt === "string" ? row.prompt : "";
+    const source = typeof row.source === "string" ? row.source : "";
+    const text = `${prompt} ${source}`.toLowerCase();
+    const matches = queryTokens.filter((token) => text.includes(token)).length;
+    return {
+      title: prompt || "A2ABench question",
+      url: source || `${A2ABENCH_BASE_URL.replace(/\/+$/, "")}/v1/eval/questions`,
+      excerpt: prompt.slice(0, 280),
+      score: matches,
+      _matches: matches,
+    };
   });
-  if (!response.ok) {
-    throw new Error(`A2ABench ${mode} failed (${response.status})`);
-  }
-  const data = await response.json();
-  const normalized = normalizeCommunityFixResponse(data);
+  return scored
+    .filter((row) => row._matches > 0)
+    .sort((a, b) => b._matches - a._matches)
+    .slice(0, 10)
+    .map(({ _matches, ...rest }) => rest);
+}
+
+function buildCommunityFixUnavailablePayload(args: {
+  runId: string;
+  issueId: string;
+  query: string;
+  sourceUrl: string;
+  error: string;
+}): CommunityFixPayload {
   return {
-    answerMd: normalized.answerMd,
-    citations: normalized.citations,
+    status: "unavailable",
+    runId: args.runId,
+    issueId: args.issueId,
+    query: args.query,
+    cached: false,
+    sourceUrl: args.sourceUrl,
+    results: [],
+    createdAt: new Date().toISOString(),
+    error: args.error,
   };
 }
 
-async function resolveCommunityFix(query: string): Promise<{
-  answerMd?: string;
-  citations?: CommunityFixCitation[];
-  mode: "rag" | "retrieve_only";
-}> {
+async function resolveCommunityFix(query: string, runId: string, issueId: string): Promise<CommunityFixPayload> {
+  const cacheKey = query.trim().toLowerCase();
+  const now = Date.now();
+  const sourceUrl = buildA2ABenchQuestionsUrl(A2ABENCH_BASE_URL);
+  const cached = communityFixCache.get(cacheKey);
+  if (cached && cached.expiresAtMs > now) {
+    return { ...cached.payload, runId, issueId, cached: true };
+  }
+
+  if (communityFixBreakerState.openUntilMs > now) {
+    return buildCommunityFixUnavailablePayload({
+      runId,
+      issueId,
+      query,
+      sourceUrl,
+      error: "A2ABench temporarily unavailable (circuit breaker open)",
+    });
+  }
+
   try {
-    const result = await fetchA2ABenchAnswer(query, "rag");
-    return { ...result, mode: "rag" };
+    const response = await fetchJsonWithTimeout(sourceUrl, COMMUNITY_FIX_UPSTREAM_TIMEOUT_MS);
+    if (response.status >= 500) {
+      throw new Error(`A2ABench upstream error (${response.status})`);
+    }
+    if (!response.ok) {
+      const payload: CommunityFixPayload = {
+        status: "no_matches",
+        runId,
+        issueId,
+        query,
+        cached: false,
+        sourceUrl,
+        results: [],
+        createdAt: new Date().toISOString(),
+      };
+      communityFixCache.set(cacheKey, {
+        expiresAtMs: now + COMMUNITY_FIX_CACHE_TTL_MS,
+        payload,
+      });
+      return payload;
+    }
+
+    const body = await response.json();
+    const results = normalizeCommunityFixResults(query, body);
+    const payload: CommunityFixPayload = {
+      status: results.length ? "available" : "no_matches",
+      runId,
+      issueId,
+      query,
+      cached: false,
+      sourceUrl,
+      results,
+      createdAt: new Date().toISOString(),
+    };
+    communityFixCache.set(cacheKey, {
+      expiresAtMs: now + COMMUNITY_FIX_CACHE_TTL_MS,
+      payload,
+    });
+    communityFixBreakerState.consecutiveFailures = 0;
+    communityFixBreakerState.openUntilMs = 0;
+    return payload;
   } catch (error) {
-    const fallback = await fetchA2ABenchAnswer(query, "retrieve_only");
-    return { ...fallback, mode: "retrieve_only" };
+    communityFixBreakerState.consecutiveFailures += 1;
+    if (communityFixBreakerState.consecutiveFailures >= 3) {
+      communityFixBreakerState.openUntilMs = now + COMMUNITY_FIX_BREAKER_TIMEOUT_MS;
+      communityFixBreakerState.consecutiveFailures = 0;
+    }
+    const message =
+      error instanceof Error && error.name === "AbortError"
+        ? "A2ABench timeout"
+        : error instanceof Error
+          ? error.message
+          : "A2ABench unavailable";
+    return buildCommunityFixUnavailablePayload({
+      runId,
+      issueId,
+      query,
+      sourceUrl,
+      error: message,
+    });
   }
 }
 
@@ -623,6 +734,10 @@ function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationRe
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="robots" content="${robots}" />
     <link rel="canonical" href="${canonicalUrl}" />
+    ${report?.runId ? `<meta name="agentability:runId" content="${escapeHtml(report.runId)}" />` : ""}
+    ${typeof report?.score === "number" ? `<meta name="agentability:score" content="${escapeHtml(String(report.score))}" />` : ""}
+    ${report?.grade ? `<meta name="agentability:grade" content="${escapeHtml(report.grade)}" />` : ""}
+    ${report?.completedAt ? `<meta name="agentability:completedAt" content="${escapeHtml(report.completedAt)}" />` : ""}
     <meta property="og:site_name" content="${SITE_NAME}" />
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(description)}" />
@@ -1375,11 +1490,42 @@ app.get("/stats", async (_req, res) => {
   return res.status(200).send(renderStatsHtml(payload));
 });
 
-for (const legacyPath of ["/audit", "/scan", "/submit", "/evaluate"]) {
-  app.all(legacyPath, (_req, res) => {
-    return sendError(res, 404, "Not found", "not_found");
-  });
-}
+app.get("/discovery/audit/latest.json", async (_req, res) => {
+  const domain = "agentability.org";
+  const run = await loadLatestEvaluationForDomain(domain);
+  const generatedAt = new Date().toISOString();
+  const payload = {
+    generated_at: generatedAt,
+    domain,
+    runId: run?.runId ?? null,
+    score: typeof run?.score === "number" ? run.score : null,
+    grade: typeof run?.grade === "string" ? run.grade : null,
+    completedAt: run?.completedAt ?? run?.createdAt ?? null,
+    report_url: `${CANONICAL_BASE_URL}/reports/${domain}`,
+    latest_json_url: `${CANONICAL_BASE_URL}/v1/evaluations/${domain}/latest.json`,
+  };
+  res.set("Cache-Control", "public, max-age=60");
+  return res.status(200).json(payload);
+});
+
+app.get("/discovery/audit/latest.pretty.json", async (_req, res) => {
+  const domain = "agentability.org";
+  const run = await loadLatestEvaluationForDomain(domain);
+  const generatedAt = new Date().toISOString();
+  const payload = {
+    generated_at: generatedAt,
+    domain,
+    runId: run?.runId ?? null,
+    score: typeof run?.score === "number" ? run.score : null,
+    grade: typeof run?.grade === "string" ? run.grade : null,
+    completedAt: run?.completedAt ?? run?.createdAt ?? null,
+    report_url: `${CANONICAL_BASE_URL}/reports/${domain}`,
+    latest_json_url: `${CANONICAL_BASE_URL}/v1/evaluations/${domain}/latest.json`,
+  };
+  res.set("Cache-Control", "public, max-age=60");
+  res.type("application/json");
+  return res.status(200).send(`${JSON.stringify(payload, null, 2)}\n`);
+});
 
 app.post("/v1/evaluate", async (req, res) => {
   const payload = (req.body ?? {}) as Record<string, unknown>;
@@ -1554,25 +1700,71 @@ app.post("/mcp", async (req, res) => {
   return res.json(jsonRpcError(id, -32601, "Method not found"));
 });
 
+async function loadLatestEvaluationForDomain(domain: string): Promise<EvaluationResult | null> {
+  const parent = await db.collection("evaluations").doc(domain).get();
+  const latestRunId = parent.exists ? (parent.data()?.latestRunId as string | undefined) : undefined;
+  if (!latestRunId) return null;
+  const run = await db
+    .collection("evaluations")
+    .doc(domain)
+    .collection("runs")
+    .doc(latestRunId)
+    .get();
+  if (!run.exists) return null;
+  return run.data() as EvaluationResult;
+}
+
+function renderCertHtml(baseUrl: string, domain: string, report: EvaluationResult | null): string {
+  const canonicalUrl = `${baseUrl}/cert/${encodeURIComponent(domain)}`;
+  const hasReport = !!report && report.status === "complete";
+  const score = hasReport ? Number(report?.score ?? 0).toFixed(1) : "n/a";
+  const grade = hasReport ? String(report?.grade ?? "n/a") : "n/a";
+  const runId = report?.runId ?? "n/a";
+  const completedAt = report?.completedAt ?? report?.createdAt ?? null;
+  const reportUrl = `${baseUrl}/reports/${encodeURIComponent(domain)}`;
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agentability certificate - ${escapeHtml(domain)}</title>
+    <meta name="description" content="Agentability certificate for ${escapeHtml(domain)}." />
+    <link rel="canonical" href="${canonicalUrl}" />
+    <style>
+      body { margin: 40px auto; max-width: 900px; padding: 0 16px; font-family: ui-sans-serif, system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
+      .card { background: #fff; border: 1px solid #dbe3ef; border-radius: 16px; padding: 20px; }
+      .score { font-size: 34px; font-weight: 700; margin: 8px 0; }
+      .meta { color: #475569; }
+      a { color: #0b57d0; }
+      dl { display: grid; grid-template-columns: 180px 1fr; gap: 8px 12px; margin-top: 16px; }
+      dt { color: #475569; }
+      dd { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <section class="card">
+      <p class="meta">Agentability certificate</p>
+      <h1 style="margin:0">${escapeHtml(domain)}</h1>
+      <p class="score">Score ${escapeHtml(score)} (${escapeHtml(grade)})</p>
+      <dl>
+        <dt>Run ID</dt><dd>${escapeHtml(runId)}</dd>
+        <dt>Completed at</dt><dd>${escapeHtml(completedAt ?? "n/a")}</dd>
+        <dt>Report</dt><dd><a href="${reportUrl}">${reportUrl}</a></dd>
+        <dt>Badge</dt><dd><a href="${baseUrl}/badge/${encodeURIComponent(domain)}.svg">${baseUrl}/badge/${encodeURIComponent(domain)}.svg</a></dd>
+      </dl>
+      ${crossProjectFooterHtml()}
+    </section>
+  </body>
+</html>`;
+}
+
 app.get("/reports/:domain", async (req, res) => {
   const domain = req.params.domain.toLowerCase();
   const baseUrl = buildBaseUrl(req);
   let report: EvaluationResult | undefined;
 
   try {
-    const parent = await db.collection("evaluations").doc(domain).get();
-    const latestRunId = parent.exists ? (parent.data()?.latestRunId as string | undefined) : undefined;
-    if (latestRunId) {
-      const run = await db
-        .collection("evaluations")
-        .doc(domain)
-        .collection("runs")
-        .doc(latestRunId)
-        .get();
-      if (run.exists) {
-        report = run.data() as EvaluationResult;
-      }
-    }
+    report = (await loadLatestEvaluationForDomain(domain)) ?? undefined;
   } catch (error) {
     logger.warn("Report SSR failed", error);
   }
@@ -1581,6 +1773,20 @@ app.get("/reports/:domain", async (req, res) => {
   res.set("Content-Type", "text/html; charset=utf-8");
   res.set("Cache-Control", "public, max-age=300");
   res.status(200).send(html);
+});
+
+app.get("/cert/:domain", async (req, res) => {
+  const domain = req.params.domain.toLowerCase();
+  const baseUrl = buildBaseUrl(req);
+  let report: EvaluationResult | null = null;
+  try {
+    report = await loadLatestEvaluationForDomain(domain);
+  } catch (error) {
+    logger.warn("Certificate render failed", error);
+  }
+  res.set("Content-Type", "text/html; charset=utf-8");
+  res.set("Cache-Control", "public, max-age=300");
+  return res.status(report ? 200 : 404).send(renderCertHtml(baseUrl, domain, report));
 });
 
 app.get("/v1/runs/:runId", async (req, res) => {
@@ -1599,39 +1805,8 @@ app.get("/v1/community-fix", async (req, res) => {
 
   if (finding && (!runId || !issueId)) {
     const query = `Agentability finding ${finding} remediation examples`;
-    const searchUrl = buildA2ABenchSearchUrl(A2ABENCH_BASE_URL, query);
-    try {
-      const result = await resolveCommunityFix(query);
-      const payload: CommunityFixPayload = {
-        status: "available",
-        runId: "ad-hoc",
-        issueId: finding,
-        query,
-        results: (result.citations ?? []).map((citation) => ({
-          title: citation.title || "Reference",
-          url: citation.url,
-          snippet: result.answerMd?.slice(0, 280),
-        })),
-        mode: result.mode,
-        answerMd: result.answerMd,
-        citations: result.citations ?? [],
-        cached: false,
-        searchUrl,
-        createdAt: new Date().toISOString(),
-      };
-      return res.json(payload);
-    } catch (error) {
-      return res.json({
-        status: "unavailable",
-        runId: "ad-hoc",
-        issueId: finding,
-        query,
-        cached: false,
-        searchUrl,
-        createdAt: new Date().toISOString(),
-        error: error instanceof Error ? error.message : "A2ABench unavailable",
-      } satisfies CommunityFixPayload);
-    }
+    const payload = await resolveCommunityFix(query, "ad-hoc", finding);
+    return res.json(payload);
   }
 
   if (!runId || !issueId) {
@@ -1668,8 +1843,25 @@ app.get("/v1/community-fix", async (req, res) => {
   const cacheRef = db.collection("runs").doc(runId).collection("communityFixes").doc(issueId);
   const cacheSnap = await cacheRef.get();
   if (cacheSnap.exists) {
-    const cached = cacheSnap.data() as CommunityFixPayload;
-    return res.json({ ...cached, cached: true });
+    const cached = cacheSnap.data() as Partial<CommunityFixPayload>;
+    const sourceUrl =
+      typeof cached.sourceUrl === "string" && cached.sourceUrl
+        ? cached.sourceUrl
+        : buildA2ABenchQuestionsUrl(A2ABENCH_BASE_URL);
+    const results = Array.isArray(cached.results) ? cached.results : [];
+    return res.json({
+      status: cached.status === "available" || cached.status === "no_matches" || cached.status === "unavailable"
+        ? cached.status
+        : "no_matches",
+      runId,
+      issueId,
+      query: typeof cached.query === "string" ? cached.query : "",
+      cached: true,
+      sourceUrl,
+      results,
+      createdAt: typeof cached.createdAt === "string" ? cached.createdAt : new Date().toISOString(),
+      ...(typeof cached.error === "string" ? { error: cached.error } : {}),
+    } satisfies CommunityFixPayload);
   }
 
   const fixIt = getFixIt(check.id, check.recommendationId);
@@ -1678,45 +1870,9 @@ app.get("/v1/community-fix", async (req, res) => {
     summary: check.summary,
     recommendation: fixIt ?? undefined,
   });
-  const searchUrl = buildA2ABenchSearchUrl(A2ABENCH_BASE_URL, query);
-
-  try {
-    const result = await resolveCommunityFix(query);
-    const results = (result.citations ?? []).map((citation) => ({
-      title: citation.title || "Reference",
-      url: citation.url,
-      snippet: result.answerMd?.slice(0, 280),
-    }));
-    const payload: CommunityFixPayload = {
-      status: "available",
-      runId,
-      issueId: check.id,
-      query,
-      results,
-      mode: result.mode,
-      answerMd: result.answerMd,
-      citations: result.citations ?? [],
-      cached: false,
-      searchUrl,
-      createdAt: new Date().toISOString(),
-    };
-    await cacheRef.set(payload, { merge: true });
-    return res.json(payload);
-  } catch (error) {
-    logger.warn("A2ABench fetch failed", error);
-    const payload: CommunityFixPayload = {
-      status: "unavailable",
-      runId,
-      issueId: check.id,
-      query,
-      searchUrl,
-      cached: false,
-      createdAt: new Date().toISOString(),
-      error: error instanceof Error ? error.message : "A2ABench unavailable",
-    };
-    await cacheRef.set(payload, { merge: true });
-    return res.json(payload);
-  }
+  const payload = await resolveCommunityFix(query, runId, check.id);
+  await cacheRef.set(payload, { merge: true });
+  return res.json(payload);
 });
 
 app.post("/v1/subscribe", async (req, res) => {
@@ -1895,10 +2051,15 @@ app.get("/badge/:domain.svg", async (req, res) => {
   return res.status(data.status === "complete" ? 200 : 404).send(svg);
 });
 
+app.use((_req, res) => {
+  return sendError(res, 404, "Not found", "not_found");
+});
+
 export const api = onRequest(
   {
     region: "us-central1",
     invoker: "public",
+    minInstances: 1,
   },
   app
 );

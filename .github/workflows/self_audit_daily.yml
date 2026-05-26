@@ -1,0 +1,63 @@
+name: self-audit-daily
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  self-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger self evaluation
+        id: trigger
+        run: |
+          set -euo pipefail
+          body="$(curl -sS -X POST 'https://agentability.org/v1/evaluate' \
+            -H 'Content-Type: application/json' \
+            --data '{"origin":"https://agentability.org","profile":"auto"}')"
+          echo "$body" | jq .
+          run_id="$(echo "$body" | jq -r '.runId // empty')"
+          if [ -z "$run_id" ]; then
+            echo "missing runId"
+            exit 1
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+
+      - name: Poll run completion
+        run: |
+          set -euo pipefail
+          run_id='${{ steps.trigger.outputs.run_id }}'
+          for _ in $(seq 1 80); do
+            body="$(curl -sS "https://agentability.org/v1/runs/${run_id}")"
+            status="$(echo "$body" | jq -r '.status // empty')"
+            echo "status=${status}"
+            if [ "$status" = "complete" ]; then
+              exit 0
+            fi
+            if [ "$status" = "failed" ]; then
+              echo "$body" | jq .
+              exit 1
+            fi
+            sleep 3
+          done
+          echo "self-audit run did not complete in time"
+          exit 1
+
+      - name: Verify discovery latest freshness
+        run: |
+          set -euo pipefail
+          body="$(curl -sS 'https://agentability.org/discovery/audit/latest.json')"
+          echo "$body" | jq .
+          generated_at="$(echo "$body" | jq -r '.generated_at // empty')"
+          if [ -z "$generated_at" ]; then
+            echo "missing generated_at"
+            exit 1
+          fi
+          now_epoch="$(date -u +%s)"
+          gen_epoch="$(date -u -d "$generated_at" +%s)"
+          age="$((now_epoch - gen_epoch))"
+          if [ "$age" -gt 86400 ]; then
+            echo "latest.json is stale: ${age}s"
+            exit 1
+          fi

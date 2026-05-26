@@ -41,7 +41,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -62,7 +62,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -83,7 +83,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -104,7 +104,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -125,7 +125,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -146,7 +146,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -167,7 +167,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -188,7 +188,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -209,7 +209,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -230,7 +230,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -251,7 +251,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -272,7 +272,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -293,7 +293,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -314,7 +314,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -335,7 +335,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -356,7 +356,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -377,7 +377,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       },
@@ -398,7 +398,7 @@
           },
           {
             "key": "X-Agentability-Build",
-            "value": "32c6374"
+            "value": "41914cb"
           }
         ]
       }
@@ -407,6 +407,18 @@
       {
         "source": "/.well-known/agent.json",
         "function": "api"
+      },
+      {
+        "source": "/air.json",
+        "destination": "/.well-known/air.json"
+      },
+      {
+        "source": "/openapi.json",
+        "destination": "/.well-known/openapi.json"
+      },
+      {
+        "source": "/openapi.yaml",
+        "destination": "/.well-known/openapi.yaml"
       },
       {
         "source": "/stats",
@@ -425,19 +437,11 @@
         "function": "api"
       },
       {
-        "source": "/audit",
+        "source": "/discovery/audit/latest.json",
         "function": "api"
       },
       {
-        "source": "/scan",
-        "function": "api"
-      },
-      {
-        "source": "/submit",
-        "function": "api"
-      },
-      {
-        "source": "/evaluate",
+        "source": "/discovery/audit/latest.pretty.json",
         "function": "api"
       },
       {
@@ -465,7 +469,15 @@
         "function": "api"
       },
       {
-        "source": "**",
+        "source": "/cert/**",
+        "function": "api"
+      },
+      {
+        "source": "/seo/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/guides/**",
         "destination": "/index.html"
       }
     ]
