@@ -257,10 +257,15 @@ function isValidEmail(email: string): boolean {
 
 type CommunityFixCitation = { title?: string; url: string };
 type CommunityFixPayload = {
-  status: "ok" | "unavailable";
+  status: "available" | "unavailable";
   runId: string;
   issueId: string;
   query: string;
+  results?: Array<{
+    title: string;
+    url?: string;
+    snippet?: string;
+  }>;
   mode?: "rag" | "retrieve_only";
   answerMd?: string;
   citations?: CommunityFixCitation[];
@@ -329,6 +334,66 @@ const DEFAULT_DESCRIPTION =
   "Agentability audits public machine entrypoints, docs, and reliability to score agent readiness.";
 const ROBOTS_INDEX =
   "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
+const SIBLING_A2ABENCH_URL = "https://a2abench-api.web.app";
+const SIBLING_RAGMAP_URL = "https://ragmap-api.web.app";
+const SIBLING_ROOTFETCH_URL = "https://rootfetch.com";
+
+type SiblingStatsLink = {
+  name: string;
+  url: string;
+  stats_url: string;
+  stats_json_url: string;
+  agent_card_url: string;
+};
+
+function siblingLinksForStats(): Record<string, SiblingStatsLink> {
+  return {
+    a2abench: {
+      name: "A2ABench",
+      url: SIBLING_A2ABENCH_URL,
+      stats_url: `${SIBLING_A2ABENCH_URL}/stats`,
+      stats_json_url: `${SIBLING_A2ABENCH_URL}/stats.json`,
+      agent_card_url: `${SIBLING_A2ABENCH_URL}/.well-known/agent.json`,
+    },
+    ragmap: {
+      name: "Ragmap",
+      url: SIBLING_RAGMAP_URL,
+      stats_url: `${SIBLING_RAGMAP_URL}/stats`,
+      stats_json_url: `${SIBLING_RAGMAP_URL}/stats.json`,
+      agent_card_url: `${SIBLING_RAGMAP_URL}/.well-known/agent.json`,
+    },
+    rootfetch: {
+      name: "Rootfetch",
+      url: SIBLING_ROOTFETCH_URL,
+      stats_url: `${SIBLING_ROOTFETCH_URL}/stats`,
+      stats_json_url: `${SIBLING_ROOTFETCH_URL}/stats.json`,
+      agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`,
+    },
+  };
+}
+
+function relatedProjectsForAgentCard() {
+  return [
+    {
+      name: "A2ABench",
+      url: SIBLING_A2ABENCH_URL,
+      agent_card_url: `${SIBLING_A2ABENCH_URL}/.well-known/agent.json`,
+      description: "Public benchmark for agent Q&A performance.",
+    },
+    {
+      name: "Ragmap",
+      url: SIBLING_RAGMAP_URL,
+      agent_card_url: `${SIBLING_RAGMAP_URL}/.well-known/agent.json`,
+      description: "MCP search and RAG-focused server discovery.",
+    },
+    {
+      name: "Rootfetch",
+      url: SIBLING_ROOTFETCH_URL,
+      agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`,
+      description: "DNS delegation intelligence with MCP telemetry.",
+    },
+  ];
+}
 
 const PILLAR_LABELS: Record<PillarKey, string> = {
   discovery: "Discovery",
@@ -433,6 +498,10 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function crossProjectFooterHtml(): string {
+  return `<footer data-cross-project-footer style="margin-top:24px;padding-top:14px;border-top:1px solid #d8d8d2;color:#555;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_RAGMAP_URL}/stats">Ragmap</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> — benchmark · MCP search · DNS delegation</footer>`;
 }
 
 function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationResult): string {
@@ -611,6 +680,13 @@ function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationRe
         <h2>Concrete recommendations</h2>
         ${recommendationsHtml}
         <p class="cta"><a href="${canonicalUrl}">Open the full interactive report →</a></p>
+        <h2>Embed badge</h2>
+        <p>HTML</p>
+        <pre style="white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;"><code>${escapeHtml(`<a href="${baseUrl}/reports/${encodeURIComponent(domain)}?via=badge"><img src="${baseUrl}/badge/${encodeURIComponent(domain)}.svg" alt="Agentability score for ${domain}" /></a>`)}</code></pre>
+        <p>Markdown</p>
+        <pre style="white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;"><code>${escapeHtml(`[![Agentability score for ${domain}](${baseUrl}/badge/${encodeURIComponent(domain)}.svg)](${baseUrl}/reports/${encodeURIComponent(domain)}?via=badge)`)}</code></pre>
+        <p>Badge URL: <a href="${baseUrl}/badge/${encodeURIComponent(domain)}.svg">${baseUrl}/badge/${encodeURIComponent(domain)}.svg</a></p>
+        ${crossProjectFooterHtml()}
       </div>
     </div>
   </body>
@@ -996,6 +1072,315 @@ async function uploadEvidenceBundle(
   }
 }
 
+type AgentabilityPublicStats = {
+  audits_run_total: number;
+  distinct_domains_audited: number;
+  audits_run_7d: number;
+  audits_run_30d: number;
+  median_audit_duration_seconds: number;
+  p95_audit_duration_seconds: number;
+  last_run_id: string | null;
+  last_run_ts: string | null;
+  score_distribution_30d: {
+    A: number;
+    B: number;
+    C: number;
+    D: number;
+    F: number;
+  };
+  generated_at: string;
+  siblings: Record<string, SiblingStatsLink>;
+};
+
+function parseIsoDateOrNull(value: unknown): Date | null {
+  if (typeof value !== "string" || !value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+function percentile(values: number[], p: number): number {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil((p / 100) * sorted.length) - 1));
+  return sorted[idx] ?? 0;
+}
+
+async function countCollection(collectionName: string): Promise<number> {
+  const collection = db.collection(collectionName);
+  try {
+    const aggregate = await collection.count().get();
+    const count = aggregate.data().count;
+    if (typeof count === "number") return count;
+  } catch (error) {
+    logger.warn(`Count aggregation failed for ${collectionName}; falling back to scan`, error);
+  }
+  let total = 0;
+  let cursor: FirebaseFirestore.QueryDocumentSnapshot | undefined;
+  while (true) {
+    let query: FirebaseFirestore.Query = collection.orderBy("__name__").limit(500);
+    if (cursor) query = query.startAfter(cursor);
+    const page = await query.get();
+    total += page.size;
+    if (page.size < 500) break;
+    cursor = page.docs[page.docs.length - 1];
+  }
+  return total;
+}
+
+async function loadAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
+  const now = new Date();
+  const generatedAt = now.toISOString();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  const [auditsRunTotal, distinctDomainsAudited, recentRunsSnap] = await Promise.all([
+    countCollection("runs"),
+    countCollection("evaluations"),
+    db.collection("runs").orderBy("createdAt", "desc").limit(5000).get(),
+  ]);
+
+  let auditsRun7d = 0;
+  let auditsRun30d = 0;
+  let lastRunId: string | null = null;
+  let lastRunTs: string | null = null;
+  let lastRunEpoch = 0;
+  const durationsSeconds: number[] = [];
+  const scoreDistribution30d = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+
+  for (const doc of recentRunsSnap.docs) {
+    const data = doc.data() as Record<string, unknown>;
+    const createdAt = parseIsoDateOrNull(data.createdAt);
+    const completedAt = parseIsoDateOrNull(data.completedAt);
+    const status = typeof data.status === "string" ? data.status : "";
+    const grade = typeof data.grade === "string" ? data.grade.toUpperCase() : "";
+
+    if (createdAt && createdAt.toISOString() >= sevenDaysAgo) auditsRun7d += 1;
+    if (createdAt && createdAt.toISOString() >= thirtyDaysAgo) auditsRun30d += 1;
+
+    if (status === "complete" && completedAt && createdAt) {
+      const durationSeconds = Math.max(0, (completedAt.getTime() - createdAt.getTime()) / 1000);
+      if (Number.isFinite(durationSeconds)) durationsSeconds.push(durationSeconds);
+
+      if (completedAt.toISOString() >= thirtyDaysAgo) {
+        if (grade in scoreDistribution30d) {
+          scoreDistribution30d[grade as keyof typeof scoreDistribution30d] += 1;
+        } else {
+          scoreDistribution30d.F += 1;
+        }
+      }
+
+      if (completedAt.getTime() > lastRunEpoch) {
+        lastRunEpoch = completedAt.getTime();
+        lastRunTs = completedAt.toISOString();
+        lastRunId = typeof data.runId === "string" && data.runId ? data.runId : doc.id;
+      }
+    }
+  }
+
+  return {
+    audits_run_total: auditsRunTotal,
+    distinct_domains_audited: distinctDomainsAudited,
+    audits_run_7d: auditsRun7d,
+    audits_run_30d: auditsRun30d,
+    median_audit_duration_seconds: Number(percentile(durationsSeconds, 50).toFixed(3)),
+    p95_audit_duration_seconds: Number(percentile(durationsSeconds, 95).toFixed(3)),
+    last_run_id: lastRunId,
+    last_run_ts: lastRunTs,
+    score_distribution_30d: scoreDistribution30d,
+    generated_at: generatedAt,
+    siblings: siblingLinksForStats(),
+  };
+}
+
+function renderStatsHtml(payload: AgentabilityPublicStats): string {
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agentability stats</title>
+    <meta name="description" content="Server-rendered Agentability public counters and distribution." />
+    <style>
+      body { margin: 32px auto; max-width: 920px; padding: 0 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #0f172a; }
+      h1 { margin-bottom: 6px; }
+      .muted { color: #475569; }
+      table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+      th, td { border: 1px solid #d9d9d9; padding: 8px 10px; text-align: left; }
+      th { background: #f8fafc; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      a { color: #0b57d0; }
+      .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+      .chip { border: 1px solid #cbd5e1; border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Agentability stats</h1>
+    <p class="muted">Generated ${escapeHtml(payload.generated_at)} · JSON: <a href="/stats.json">/stats.json</a></p>
+    <table>
+      <tbody>
+        <tr><th>Audits run total</th><td class="num">${payload.audits_run_total}</td></tr>
+        <tr><th>Distinct domains audited</th><td class="num">${payload.distinct_domains_audited}</td></tr>
+        <tr><th>Audits run (7d)</th><td class="num">${payload.audits_run_7d}</td></tr>
+        <tr><th>Audits run (30d)</th><td class="num">${payload.audits_run_30d}</td></tr>
+        <tr><th>Median audit duration (seconds)</th><td class="num">${payload.median_audit_duration_seconds}</td></tr>
+        <tr><th>P95 audit duration (seconds)</th><td class="num">${payload.p95_audit_duration_seconds}</td></tr>
+        <tr><th>Last run ID</th><td>${escapeHtml(payload.last_run_id ?? "n/a")}</td></tr>
+        <tr><th>Last run timestamp</th><td>${escapeHtml(payload.last_run_ts ?? "n/a")}</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">Score distribution (30d)</p>
+    <div class="chips">
+      <span class="chip">A: ${payload.score_distribution_30d.A}</span>
+      <span class="chip">B: ${payload.score_distribution_30d.B}</span>
+      <span class="chip">C: ${payload.score_distribution_30d.C}</span>
+      <span class="chip">D: ${payload.score_distribution_30d.D}</span>
+      <span class="chip">F: ${payload.score_distribution_30d.F}</span>
+    </div>
+    <p><a href="/">Back to homepage</a></p>
+    ${crossProjectFooterHtml()}
+  </body>
+</html>`;
+}
+
+type PublicLeaderboardEntry = {
+  domain: string;
+  score: number;
+  grade: string;
+  runId: string;
+  completedAt: string;
+  reportUrl: string;
+  badgeUrl: string;
+  jsonUrl: string;
+};
+
+async function loadPublicLeaderboard(baseUrl: string): Promise<{
+  updatedAt: string;
+  entries: PublicLeaderboardEntry[];
+}> {
+  const evaluations = await db.collection("evaluations").limit(500).get();
+  const entries: PublicLeaderboardEntry[] = [];
+
+  for (const evaluation of evaluations.docs) {
+    const domain = evaluation.id;
+    const latestRunId = evaluation.data()?.latestRunId as string | undefined;
+    if (!latestRunId) continue;
+    const runDoc = await db
+      .collection("evaluations")
+      .doc(domain)
+      .collection("runs")
+      .doc(latestRunId)
+      .get();
+    if (!runDoc.exists) continue;
+    const run = runDoc.data() as Record<string, unknown>;
+    const status = typeof run.status === "string" ? run.status : "";
+    if (status !== "complete") continue;
+    const score = Number(run.score ?? 0);
+    const grade = typeof run.grade === "string" ? run.grade : "F";
+    const completedAt = typeof run.completedAt === "string" ? run.completedAt : new Date().toISOString();
+    const runId = typeof run.runId === "string" && run.runId ? run.runId : latestRunId;
+    entries.push({
+      domain,
+      score,
+      grade,
+      runId,
+      completedAt,
+      reportUrl: `${baseUrl}/reports/${encodeURIComponent(domain)}`,
+      badgeUrl: `${baseUrl}/badge/${encodeURIComponent(domain)}.svg`,
+      jsonUrl: `${baseUrl}/v1/evaluations/${encodeURIComponent(domain)}/latest.json`,
+    });
+  }
+
+  entries.sort((a, b) => b.score - a.score || a.domain.localeCompare(b.domain));
+  const updatedAt = entries[0]?.completedAt ?? new Date().toISOString();
+  return { updatedAt, entries };
+}
+
+function renderSitemapXml(baseUrl: string, entries: PublicLeaderboardEntry[]): string {
+  const staticUrls = [
+    { loc: `${baseUrl}/`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/stats`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/stats.json`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/llms.txt`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/llms-full.txt`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/.well-known/air.json`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/.well-known/agent.json`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/openapi.json`, lastmod: new Date().toISOString() },
+  ];
+  const reportUrls = entries.map((entry) => ({
+    loc: `${baseUrl}/reports/${encodeURIComponent(entry.domain)}`,
+    lastmod: entry.completedAt,
+  }));
+  const all = [...staticUrls, ...reportUrls];
+  const body = all
+    .map((item) => `  <url><loc>${escapeHtml(item.loc)}</loc><lastmod>${escapeHtml(item.lastmod)}</lastmod></url>`)
+    .join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+
+app.get("/.well-known/agent.json", (req, res) => {
+  const baseUrl = buildBaseUrl(req);
+  res.set("Cache-Control", "public, max-age=60");
+  return res.json({
+    name: "Agentability",
+    description: "Public-mode agent-readiness audit with evidence-backed reports.",
+    url: baseUrl,
+    version: AGENTABILITY_VERSION,
+    documentationUrl: `${baseUrl}/docs.md`,
+    apiEndpoints: {
+      openapi: `${baseUrl}/openapi.json`,
+      evaluate: `${baseUrl}/v1/evaluate`,
+      run_status: `${baseUrl}/v1/runs/{runId}`,
+      latest: `${baseUrl}/v1/evaluations/{domain}/latest.json`,
+    },
+    mcpServers: [
+      {
+        name: "agentability",
+        transport: "streamable-http",
+        url: `${baseUrl}/mcp`,
+      },
+    ],
+    related: relatedProjectsForAgentCard(),
+  });
+});
+
+app.get("/leaderboard.json", async (req, res) => {
+  const baseUrl = buildBaseUrl(req);
+  const leaderboard = await loadPublicLeaderboard(baseUrl);
+  res.set("Cache-Control", "public, max-age=60");
+  return res.json({
+    updatedAt: leaderboard.updatedAt,
+    entries: leaderboard.entries,
+  });
+});
+
+app.get("/sitemap.xml", async (req, res) => {
+  const baseUrl = buildBaseUrl(req);
+  const leaderboard = await loadPublicLeaderboard(baseUrl);
+  res.set("Cache-Control", "public, max-age=60");
+  res.set("Content-Type", "application/xml; charset=utf-8");
+  return res.status(200).send(renderSitemapXml(baseUrl, leaderboard.entries));
+});
+
+app.get("/stats.json", async (_req, res) => {
+  const payload = await loadAgentabilityPublicStats();
+  res.set("Cache-Control", "public, max-age=60");
+  return res.json(payload);
+});
+
+app.get("/stats", async (_req, res) => {
+  const payload = await loadAgentabilityPublicStats();
+  res.set("Cache-Control", "public, max-age=60");
+  res.set("Content-Type", "text/html; charset=utf-8");
+  return res.status(200).send(renderStatsHtml(payload));
+});
+
+for (const legacyPath of ["/audit", "/scan", "/submit", "/evaluate"]) {
+  app.all(legacyPath, (_req, res) => {
+    return sendError(res, 404, "Not found", "not_found");
+  });
+}
+
 app.post("/v1/evaluate", async (req, res) => {
   const payload = (req.body ?? {}) as Record<string, unknown>;
   const outcome = await runEvaluation(req, payload);
@@ -1210,9 +1595,47 @@ app.get("/v1/runs/:runId", async (req, res) => {
 app.get("/v1/community-fix", async (req, res) => {
   const runId = typeof req.query.runId === "string" ? req.query.runId : "";
   const issueId = typeof req.query.issueId === "string" ? req.query.issueId : "";
+  const finding = typeof req.query.finding === "string" ? req.query.finding.trim() : "";
+
+  if (finding && (!runId || !issueId)) {
+    const query = `Agentability finding ${finding} remediation examples`;
+    const searchUrl = buildA2ABenchSearchUrl(A2ABENCH_BASE_URL, query);
+    try {
+      const result = await resolveCommunityFix(query);
+      const payload: CommunityFixPayload = {
+        status: "available",
+        runId: "ad-hoc",
+        issueId: finding,
+        query,
+        results: (result.citations ?? []).map((citation) => ({
+          title: citation.title || "Reference",
+          url: citation.url,
+          snippet: result.answerMd?.slice(0, 280),
+        })),
+        mode: result.mode,
+        answerMd: result.answerMd,
+        citations: result.citations ?? [],
+        cached: false,
+        searchUrl,
+        createdAt: new Date().toISOString(),
+      };
+      return res.json(payload);
+    } catch (error) {
+      return res.json({
+        status: "unavailable",
+        runId: "ad-hoc",
+        issueId: finding,
+        query,
+        cached: false,
+        searchUrl,
+        createdAt: new Date().toISOString(),
+        error: error instanceof Error ? error.message : "A2ABench unavailable",
+      } satisfies CommunityFixPayload);
+    }
+  }
 
   if (!runId || !issueId) {
-    return sendError(res, 400, "Missing runId or issueId", "invalid_request");
+    return sendError(res, 400, "Missing runId+issueId or finding", "invalid_request");
   }
 
   try {
@@ -1259,11 +1682,17 @@ app.get("/v1/community-fix", async (req, res) => {
 
   try {
     const result = await resolveCommunityFix(query);
+    const results = (result.citations ?? []).map((citation) => ({
+      title: citation.title || "Reference",
+      url: citation.url,
+      snippet: result.answerMd?.slice(0, 280),
+    }));
     const payload: CommunityFixPayload = {
-      status: "ok",
+      status: "available",
       runId,
       issueId: check.id,
       query,
+      results,
       mode: result.mode,
       answerMd: result.answerMd,
       citations: result.citations ?? [],
