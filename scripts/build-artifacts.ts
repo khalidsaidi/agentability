@@ -120,6 +120,45 @@ async function writeLlms(publicDir: string): Promise<void> {
   await fs.writeFile(path.join(publicDir, "llms-full.txt"), buildLlmsFullTxt(), "utf8");
 }
 
+function buildSitemapXml(): string {
+  const now = new Date().toISOString();
+  const urls = [
+    "https://agentability.org/",
+    "https://agentability.org/stats",
+    "https://agentability.org/stats.json",
+    "https://agentability.org/llms.txt",
+    "https://agentability.org/llms-full.txt",
+    "https://agentability.org/air.json",
+    "https://agentability.org/.well-known/air.json",
+    "https://agentability.org/.well-known/agent.json",
+    "https://agentability.org/.well-known/openapi.json",
+    "https://agentability.org/.well-known/openapi.yaml",
+    "https://agentability.org/.well-known/ai-plugin.json",
+    "https://agentability.org/openapi.json",
+    "https://agentability.org/openapi.yaml",
+    "https://agentability.org/leaderboard.json",
+    "https://agentability.org/discovery/audit/latest.json",
+    "https://agentability.org/discovery/audit/latest.pretty.json",
+    "https://agentability.org/reports/agentability.org",
+    "https://agentability.org/reports/aistatusdashboard.com",
+    "https://agentability.org/reports/a2abench-api.web.app",
+    "https://agentability.org/reports/ragmap-api.web.app",
+    "https://agentability.org/reports/rootfetch.com",
+  ];
+
+  const body = urls
+    .map(
+      (url) =>
+        `  <url>\n    <loc>${url}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.6</priority>\n  </url>`
+    )
+    .join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+
+async function writeSitemap(publicDir: string): Promise<void> {
+  await fs.writeFile(path.join(publicDir, "sitemap.xml"), buildSitemapXml(), "utf8");
+}
+
 async function updateFirebaseHeaders(repoRoot: string, buildId: string): Promise<void> {
   const firebasePath = path.join(repoRoot, "firebase.json");
   const raw = await fs.readFile(firebasePath, "utf8");
@@ -153,6 +192,7 @@ async function main(): Promise<void> {
   await writeOpenApiArtifacts(repoRoot, publicDir);
   await writeAirManifestAlias(publicDir);
   await writeLlms(publicDir);
+  await writeSitemap(publicDir);
   await generateDiscoveryAudit(repoRoot);
   await updateFirebaseHeaders(repoRoot, buildId);
 
