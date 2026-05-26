@@ -1207,6 +1207,15 @@ type AgentabilityPublicStats = {
   siblings: Record<string, SiblingStatsLink>;
 };
 
+const AGENTABILITY_STATS_CACHE_TTL_MS = 30 * 1000;
+let agentabilityStatsCache:
+  | {
+      fetchedAt: number;
+      payload: AgentabilityPublicStats;
+    }
+  | null = null;
+let agentabilityStatsInFlight: Promise<AgentabilityPublicStats> | null = null;
+
 function parseIsoDateOrNull(value: unknown): Date | null {
   if (typeof value !== "string" || !value) return null;
   const parsed = new Date(value);
@@ -1306,6 +1315,55 @@ async function loadAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
     generated_at: generatedAt,
     siblings: siblingLinksForStats(),
   };
+}
+
+function emptyAgentabilityStatsPayload(generatedAt: string): AgentabilityPublicStats {
+  return {
+    audits_run_total: 0,
+    distinct_domains_audited: 0,
+    audits_run_7d: 0,
+    audits_run_30d: 0,
+    median_audit_duration_seconds: 0,
+    p95_audit_duration_seconds: 0,
+    last_run_id: null,
+    last_run_ts: null,
+    score_distribution_30d: { A: 0, B: 0, C: 0, D: 0, F: 0 },
+    generated_at: generatedAt,
+    siblings: siblingLinksForStats(),
+  };
+}
+
+async function getAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
+  const now = Date.now();
+  if (agentabilityStatsCache && now - agentabilityStatsCache.fetchedAt < AGENTABILITY_STATS_CACHE_TTL_MS) {
+    return agentabilityStatsCache.payload;
+  }
+
+  if (!agentabilityStatsInFlight) {
+    agentabilityStatsInFlight = (async () => {
+      const payload = await loadAgentabilityPublicStats();
+      agentabilityStatsCache = {
+        fetchedAt: Date.now(),
+        payload,
+      };
+      return payload;
+    })()
+      .catch((error) => {
+        logger.error("Agentability stats load failed", error);
+        if (agentabilityStatsCache) {
+          return {
+            ...agentabilityStatsCache.payload,
+            generated_at: new Date().toISOString(),
+          };
+        }
+        return emptyAgentabilityStatsPayload(new Date().toISOString());
+      })
+      .finally(() => {
+        agentabilityStatsInFlight = null;
+      });
+  }
+
+  return agentabilityStatsInFlight;
 }
 
 function renderStatsHtml(payload: AgentabilityPublicStats): string {
@@ -1478,13 +1536,13 @@ app.get("/sitemap.xml", async (req, res) => {
 });
 
 app.get("/stats.json", async (_req, res) => {
-  const payload = await loadAgentabilityPublicStats();
+  const payload = await getAgentabilityPublicStats();
   res.set("Cache-Control", "public, max-age=60");
   return res.json(payload);
 });
 
 app.get("/stats", async (_req, res) => {
-  const payload = await loadAgentabilityPublicStats();
+  const payload = await getAgentabilityPublicStats();
   res.set("Cache-Control", "public, max-age=60");
   res.set("Content-Type", "text/html; charset=utf-8");
   return res.status(200).send(renderStatsHtml(payload));
