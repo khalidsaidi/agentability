@@ -1475,7 +1475,9 @@ async function loadPublicLeaderboard(baseUrl: string): Promise<{
   }
 
   entries.sort((a, b) => b.score - a.score || a.domain.localeCompare(b.domain));
-  const updatedAt = entries[0]?.completedAt ?? new Date().toISOString();
+  const updatedAt =
+    entries.reduce((latest, entry) => (entry.completedAt > latest ? entry.completedAt : latest), "") ||
+    new Date().toISOString();
   return { updatedAt, entries };
 }
 
