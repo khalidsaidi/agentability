@@ -76,6 +76,7 @@ function buildLlmsTxt(): string {
     "- Ragmap: https://ragmap-api.web.app (stats: https://ragmap-api.web.app/stats)",
     "- Rootfetch: https://rootfetch.com (stats: https://rootfetch.com/stats)",
     "- RelayOrb: https://relayorb.com (stats: https://relayorb.com/stats)",
+    "- AIStatusDashboard: https://aistatusdashboard.com (stats: https://aistatusdashboard.com/stats)",
     "",
     "Spec:",
     "- https://agentability.org/spec.md",
