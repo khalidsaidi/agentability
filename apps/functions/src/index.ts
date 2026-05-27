@@ -1221,7 +1221,9 @@ type AgentabilityPublicStats = {
   siblings: Record<string, SiblingStatsLink>;
 };
 
-const AGENTABILITY_STATS_CACHE_TTL_MS = 30 * 1000;
+const AGENTABILITY_STATS_CACHE_TTL_MS = 5 * 60 * 1000;
+const AGENTABILITY_STATS_STALE_MS = 15 * 60 * 1000;
+const AGENTABILITY_PUBLIC_STATS_DOC = "publicStats";
 let agentabilityStatsCache:
   | {
       fetchedAt: number;
@@ -1316,7 +1318,7 @@ async function loadAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
     }
   }
 
-  return {
+  const payload: AgentabilityPublicStats = {
     audits_run_total: auditsRunTotal,
     distinct_domains_audited: distinctDomainsAudited,
     audits_run_7d: auditsRun7d,
@@ -1329,6 +1331,18 @@ async function loadAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
     generated_at: generatedAt,
     siblings: siblingLinksForStats(),
   };
+  try {
+    await db.collection("meta").doc(AGENTABILITY_PUBLIC_STATS_DOC).set(
+      {
+        payload,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    logger.warn("Persist public stats snapshot failed", error);
+  }
+  return payload;
 }
 
 function emptyAgentabilityStatsPayload(generatedAt: string): AgentabilityPublicStats {
@@ -1347,12 +1361,34 @@ function emptyAgentabilityStatsPayload(generatedAt: string): AgentabilityPublicS
   };
 }
 
-async function getAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
-  const now = Date.now();
-  if (agentabilityStatsCache && now - agentabilityStatsCache.fetchedAt < AGENTABILITY_STATS_CACHE_TTL_MS) {
-    return agentabilityStatsCache.payload;
-  }
+function isAgentabilityPublicStatsCandidate(value: unknown): value is AgentabilityPublicStats {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.audits_run_total === "number" &&
+    typeof candidate.distinct_domains_audited === "number" &&
+    typeof candidate.audits_run_7d === "number" &&
+    typeof candidate.audits_run_30d === "number" &&
+    typeof candidate.generated_at === "string" &&
+    !!candidate.siblings &&
+    typeof candidate.siblings === "object"
+  );
+}
 
+async function readPersistedAgentabilityPublicStats(): Promise<AgentabilityPublicStats | null> {
+  try {
+    const snap = await db.collection("meta").doc(AGENTABILITY_PUBLIC_STATS_DOC).get();
+    if (!snap.exists) return null;
+    const payload = snap.data()?.payload;
+    if (!isAgentabilityPublicStatsCandidate(payload)) return null;
+    return payload;
+  } catch (error) {
+    logger.warn("Read persisted public stats snapshot failed", error);
+    return null;
+  }
+}
+
+function startAgentabilityStatsRefresh(): Promise<AgentabilityPublicStats> {
   if (!agentabilityStatsInFlight) {
     agentabilityStatsInFlight = (async () => {
       const payload = await loadAgentabilityPublicStats();
@@ -1376,8 +1412,33 @@ async function getAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
         agentabilityStatsInFlight = null;
       });
   }
-
   return agentabilityStatsInFlight;
+}
+
+async function getAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
+  const now = Date.now();
+  if (agentabilityStatsCache && now - agentabilityStatsCache.fetchedAt < AGENTABILITY_STATS_CACHE_TTL_MS) {
+    return agentabilityStatsCache.payload;
+  }
+
+  if (agentabilityStatsCache) {
+    if (now - agentabilityStatsCache.fetchedAt >= AGENTABILITY_STATS_CACHE_TTL_MS) {
+      void startAgentabilityStatsRefresh();
+    }
+    return agentabilityStatsCache.payload;
+  }
+
+  const persisted = await readPersistedAgentabilityPublicStats();
+  if (persisted) {
+    const ageMs = Math.max(0, now - Date.parse(persisted.generated_at || ""));
+    agentabilityStatsCache = { fetchedAt: now, payload: persisted };
+    if (!Number.isFinite(ageMs) || ageMs >= AGENTABILITY_STATS_STALE_MS) {
+      void startAgentabilityStatsRefresh();
+    }
+    return persisted;
+  }
+
+  return startAgentabilityStatsRefresh();
 }
 
 function renderStatsHtml(payload: AgentabilityPublicStats): string {
@@ -2137,6 +2198,10 @@ app.get("/badge/:domain.svg", async (req, res) => {
 
 app.use((_req, res) => {
   return sendError(res, 404, "Not found", "not_found");
+});
+
+void getAgentabilityPublicStats().catch((error) => {
+  logger.warn("Initial public stats prewarm failed", error);
 });
 
 export const api = onRequest(
