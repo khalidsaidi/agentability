@@ -1,0 +1,16 @@
+name: warm-stats
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm public stats pages
+        run: |
+          set -euo pipefail
+          curl -fsS "https://agentability.org/stats" >/dev/null
+          curl -fsS "https://agentability.org/stats.json" >/dev/null
