@@ -238,7 +238,15 @@ function App() {
             <a href="https://rootfetch.com/stats" className="text-primary hover:underline">
               Rootfetch
             </a>{" "}
-            — benchmark · MCP search · DNS delegation
+            ·{" "}
+            <a href="https://relayorb.com/stats" className="text-primary hover:underline">
+              RelayOrb
+            </a>{" "}
+            ·{" "}
+            <a href="https://aistatusdashboard.com/stats" className="text-primary hover:underline">
+              AIStatusDashboard
+            </a>{" "}
+            — benchmark · MCP search · DNS delegation · tool control plane · status monitoring
           </div>
         </footer>
       </div>
