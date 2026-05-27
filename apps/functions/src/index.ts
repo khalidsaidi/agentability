@@ -448,6 +448,7 @@ const ROBOTS_INDEX =
 const SIBLING_A2ABENCH_URL = "https://a2abench-api.web.app";
 const SIBLING_RAGMAP_URL = "https://ragmap-api.web.app";
 const SIBLING_ROOTFETCH_URL = "https://rootfetch.com";
+const SIBLING_RELAYORB_URL = "https://relayorb.com";
 
 type SiblingStatsLink = {
   name: string;
@@ -480,6 +481,13 @@ function siblingLinksForStats(): Record<string, SiblingStatsLink> {
       stats_json_url: `${SIBLING_ROOTFETCH_URL}/stats.json`,
       agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`,
     },
+    relayorb: {
+      name: "RelayOrb",
+      url: SIBLING_RELAYORB_URL,
+      stats_url: `${SIBLING_RELAYORB_URL}/stats`,
+      stats_json_url: `${SIBLING_RELAYORB_URL}/stats.json`,
+      agent_card_url: `${SIBLING_RELAYORB_URL}/.well-known/agent.json`,
+    },
   };
 }
 
@@ -502,6 +510,12 @@ function relatedProjectsForAgentCard() {
       url: SIBLING_ROOTFETCH_URL,
       agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`,
       description: "DNS delegation intelligence with MCP telemetry.",
+    },
+    {
+      name: "RelayOrb",
+      url: SIBLING_RELAYORB_URL,
+      agent_card_url: `${SIBLING_RELAYORB_URL}/.well-known/agent.json`,
+      description: "Tool control plane for AI agents with contract-first routing.",
     },
   ];
 }
@@ -612,7 +626,7 @@ function escapeHtml(value: string): string {
 }
 
 function crossProjectFooterHtml(): string {
-  return `<footer data-cross-project-footer style="margin-top:24px;padding-top:14px;border-top:1px solid #d8d8d2;color:#555;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_RAGMAP_URL}/stats">Ragmap</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> — benchmark · MCP search · DNS delegation</footer>`;
+  return `<footer data-cross-project-footer style="margin-top:24px;padding-top:14px;border-top:1px solid #d8d8d2;color:#555;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_RAGMAP_URL}/stats">Ragmap</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> · <a href="${SIBLING_RELAYORB_URL}/stats">RelayOrb</a> — benchmark · MCP search · DNS delegation · tool control plane</footer>`;
 }
 
 function renderReportHtml(baseUrl: string, domain: string, report?: EvaluationResult): string {
