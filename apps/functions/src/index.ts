@@ -1073,6 +1073,15 @@ async function runEvaluation(
         { merge: true }
       );
 
+      void updateLeaderboardSnapshotForCompletedRun(result.domain, {
+        score: evaluation.score,
+        grade: evaluation.grade,
+        runId,
+        completedAt: evaluation.completedAt ?? new Date().toISOString(),
+      }).catch((error) => {
+        logger.warn("Incremental leaderboard snapshot update failed", error);
+      });
+
       return {
         jsonUrl: `${baseUrl}/v1/evaluations/${result.domain}/latest.json`,
         reportUrl: `${baseUrl}/reports/${result.domain}`,
@@ -1516,12 +1525,136 @@ type PublicLeaderboardEntry = {
   jsonUrl: string;
 };
 
-async function loadPublicLeaderboard(baseUrl: string): Promise<{
+type PublicLeaderboardSnapshotEntry = {
+  domain: string;
+  score: number;
+  grade: string;
+  runId: string;
+  completedAt: string;
+};
+
+type PublicLeaderboardSnapshot = {
   updatedAt: string;
-  entries: PublicLeaderboardEntry[];
-}> {
-  const entries: PublicLeaderboardEntry[] = [];
+  generatedAt: string;
+  entries: PublicLeaderboardSnapshotEntry[];
+};
+
+const AGENTABILITY_PUBLIC_LEADERBOARD_DOC = "publicLeaderboard";
+const AGENTABILITY_LEADERBOARD_CACHE_TTL_MS = 5 * 60 * 1000;
+const AGENTABILITY_LEADERBOARD_STALE_MS = 15 * 60 * 1000;
+let leaderboardCache:
+  | {
+      fetchedAt: number;
+      payload: PublicLeaderboardSnapshot;
+    }
+  | null = null;
+let leaderboardInFlight: Promise<PublicLeaderboardSnapshot> | null = null;
+
+function mapLeaderboardEntries(baseUrl: string, entries: PublicLeaderboardSnapshotEntry[]): PublicLeaderboardEntry[] {
+  return entries.map((entry) => ({
+    domain: entry.domain,
+    score: entry.score,
+    grade: entry.grade,
+    runId: entry.runId,
+    completedAt: entry.completedAt,
+    reportUrl: `${baseUrl}/reports/${encodeURIComponent(entry.domain)}`,
+    badgeUrl: `${baseUrl}/badge/${encodeURIComponent(entry.domain)}.svg`,
+    jsonUrl: `${baseUrl}/v1/evaluations/${encodeURIComponent(entry.domain)}/latest.json`,
+  }));
+}
+
+function emptyLeaderboardSnapshot(): PublicLeaderboardSnapshot {
+  const nowIso = new Date().toISOString();
+  return {
+    updatedAt: nowIso,
+    generatedAt: nowIso,
+    entries: [],
+  };
+}
+
+function isLeaderboardSnapshotCandidate(value: unknown): value is PublicLeaderboardSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  if (
+    typeof candidate.updatedAt !== "string" ||
+    typeof candidate.generatedAt !== "string" ||
+    !Array.isArray(candidate.entries)
+  ) {
+    return false;
+  }
+  return candidate.entries.every((entry) => {
+    if (!entry || typeof entry !== "object") return false;
+    const row = entry as Record<string, unknown>;
+    return (
+      typeof row.domain === "string" &&
+      typeof row.score === "number" &&
+      typeof row.grade === "string" &&
+      typeof row.runId === "string" &&
+      typeof row.completedAt === "string"
+    );
+  });
+}
+
+async function readPersistedLeaderboardSnapshot(): Promise<PublicLeaderboardSnapshot | null> {
+  try {
+    const snap = await db.collection("meta").doc(AGENTABILITY_PUBLIC_LEADERBOARD_DOC).get();
+    if (!snap.exists) return null;
+    const payload = snap.data()?.payload;
+    if (!isLeaderboardSnapshotCandidate(payload)) return null;
+    return payload;
+  } catch (error) {
+    logger.warn("Read persisted leaderboard snapshot failed", error);
+    return null;
+  }
+}
+
+async function persistLeaderboardSnapshot(snapshot: PublicLeaderboardSnapshot): Promise<void> {
+  try {
+    await db.collection("meta").doc(AGENTABILITY_PUBLIC_LEADERBOARD_DOC).set(
+      {
+        payload: snapshot,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    logger.warn("Persist leaderboard snapshot failed", error);
+  }
+}
+
+async function updateLeaderboardSnapshotForCompletedRun(
+  domain: string,
+  completed: { score: number; grade: string; runId: string; completedAt: string }
+): Promise<void> {
+  const nowIso = new Date().toISOString();
+  const snapshot = (await readPersistedLeaderboardSnapshot()) ?? emptyLeaderboardSnapshot();
+  const nextEntries = snapshot.entries.filter((entry) => entry.domain !== domain);
+  nextEntries.push({
+    domain,
+    score: Number.isFinite(completed.score) ? completed.score : 0,
+    grade: completed.grade || "F",
+    runId: completed.runId,
+    completedAt: completed.completedAt || nowIso,
+  });
+  nextEntries.sort((a, b) => b.score - a.score || a.domain.localeCompare(b.domain));
+  const updatedAt =
+    nextEntries.reduce((latest, entry) => (entry.completedAt > latest ? entry.completedAt : latest), "") || nowIso;
+  const nextSnapshot: PublicLeaderboardSnapshot = {
+    updatedAt,
+    generatedAt: nowIso,
+    entries: nextEntries,
+  };
+  leaderboardCache = {
+    fetchedAt: Date.now(),
+    payload: nextSnapshot,
+  };
+  await persistLeaderboardSnapshot(nextSnapshot);
+}
+
+async function rebuildPublicLeaderboardSnapshot(): Promise<PublicLeaderboardSnapshot> {
+  const entries: PublicLeaderboardSnapshotEntry[] = [];
   let cursor: FirebaseFirestore.QueryDocumentSnapshot | undefined;
+  const runRefBatchSize = 250;
 
   while (true) {
     let query: FirebaseFirestore.Query = db.collection("evaluations").orderBy("__name__").limit(500);
@@ -1529,34 +1662,39 @@ async function loadPublicLeaderboard(baseUrl: string): Promise<{
     const evaluations = await query.get();
     if (evaluations.empty) break;
 
+    const runRefs: FirebaseFirestore.DocumentReference[] = [];
+    const runRefMeta: Array<{ domain: string; latestRunId: string }> = [];
     for (const evaluation of evaluations.docs) {
       const domain = evaluation.id;
       const latestRunId = evaluation.data()?.latestRunId as string | undefined;
       if (!latestRunId) continue;
-      const runDoc = await db
-        .collection("evaluations")
-        .doc(domain)
-        .collection("runs")
-        .doc(latestRunId)
-        .get();
-      if (!runDoc.exists) continue;
-      const run = runDoc.data() as Record<string, unknown>;
-      const status = typeof run.status === "string" ? run.status : "";
-      if (status !== "complete") continue;
-      const score = Number(run.score ?? 0);
-      const grade = typeof run.grade === "string" ? run.grade : "F";
-      const completedAt = typeof run.completedAt === "string" ? run.completedAt : new Date().toISOString();
-      const runId = typeof run.runId === "string" && run.runId ? run.runId : latestRunId;
-      entries.push({
-        domain,
-        score,
-        grade,
-        runId,
-        completedAt,
-        reportUrl: `${baseUrl}/reports/${encodeURIComponent(domain)}`,
-        badgeUrl: `${baseUrl}/badge/${encodeURIComponent(domain)}.svg`,
-        jsonUrl: `${baseUrl}/v1/evaluations/${encodeURIComponent(domain)}/latest.json`,
-      });
+      runRefs.push(db.collection("evaluations").doc(domain).collection("runs").doc(latestRunId));
+      runRefMeta.push({ domain, latestRunId });
+    }
+
+    for (let start = 0; start < runRefs.length; start += runRefBatchSize) {
+      const refs = runRefs.slice(start, start + runRefBatchSize);
+      const refsMeta = runRefMeta.slice(start, start + runRefBatchSize);
+      const runDocs = await db.getAll(...refs);
+      for (let idx = 0; idx < runDocs.length; idx += 1) {
+        const runDoc = runDocs[idx];
+        const meta = refsMeta[idx];
+        if (!meta || !runDoc.exists) continue;
+        const run = runDoc.data() as Record<string, unknown>;
+        const status = typeof run.status === "string" ? run.status : "";
+        if (status !== "complete") continue;
+        const score = Number(run.score ?? 0);
+        const grade = typeof run.grade === "string" ? run.grade : "F";
+        const completedAt = typeof run.completedAt === "string" ? run.completedAt : new Date().toISOString();
+        const runId = typeof run.runId === "string" && run.runId ? run.runId : meta.latestRunId;
+        entries.push({
+          domain: meta.domain,
+          score,
+          grade,
+          runId,
+          completedAt,
+        });
+      }
     }
 
     if (evaluations.size < 500) break;
@@ -1564,10 +1702,82 @@ async function loadPublicLeaderboard(baseUrl: string): Promise<{
   }
 
   entries.sort((a, b) => b.score - a.score || a.domain.localeCompare(b.domain));
+  const nowIso = new Date().toISOString();
   const updatedAt =
-    entries.reduce((latest, entry) => (entry.completedAt > latest ? entry.completedAt : latest), "") ||
-    new Date().toISOString();
-  return { updatedAt, entries };
+    entries.reduce((latest, entry) => (entry.completedAt > latest ? entry.completedAt : latest), "") || nowIso;
+  const snapshot: PublicLeaderboardSnapshot = {
+    updatedAt,
+    generatedAt: nowIso,
+    entries,
+  };
+  await persistLeaderboardSnapshot(snapshot);
+  return snapshot;
+}
+
+function startLeaderboardRefresh(): Promise<PublicLeaderboardSnapshot> {
+  if (!leaderboardInFlight) {
+    leaderboardInFlight = (async () => {
+      const snapshot = await rebuildPublicLeaderboardSnapshot();
+      leaderboardCache = {
+        fetchedAt: Date.now(),
+        payload: snapshot,
+      };
+      return snapshot;
+    })()
+      .catch((error) => {
+        logger.error("Leaderboard snapshot rebuild failed", error);
+        if (leaderboardCache) {
+          return leaderboardCache.payload;
+        }
+        return emptyLeaderboardSnapshot();
+      })
+      .finally(() => {
+        leaderboardInFlight = null;
+      });
+  }
+  return leaderboardInFlight;
+}
+
+async function getPublicLeaderboard(baseUrl: string): Promise<{
+  updatedAt: string;
+  entries: PublicLeaderboardEntry[];
+}> {
+  const now = Date.now();
+  if (leaderboardCache && now - leaderboardCache.fetchedAt < AGENTABILITY_LEADERBOARD_CACHE_TTL_MS) {
+    return {
+      updatedAt: leaderboardCache.payload.updatedAt,
+      entries: mapLeaderboardEntries(baseUrl, leaderboardCache.payload.entries),
+    };
+  }
+
+  if (leaderboardCache) {
+    if (now - leaderboardCache.fetchedAt >= AGENTABILITY_LEADERBOARD_CACHE_TTL_MS) {
+      void startLeaderboardRefresh();
+    }
+    return {
+      updatedAt: leaderboardCache.payload.updatedAt,
+      entries: mapLeaderboardEntries(baseUrl, leaderboardCache.payload.entries),
+    };
+  }
+
+  const persisted = await readPersistedLeaderboardSnapshot();
+  if (persisted) {
+    const ageMs = Math.max(0, now - Date.parse(persisted.generatedAt || ""));
+    leaderboardCache = { fetchedAt: now, payload: persisted };
+    if (!Number.isFinite(ageMs) || ageMs >= AGENTABILITY_LEADERBOARD_STALE_MS) {
+      void startLeaderboardRefresh();
+    }
+    return {
+      updatedAt: persisted.updatedAt,
+      entries: mapLeaderboardEntries(baseUrl, persisted.entries),
+    };
+  }
+
+  const fresh = await startLeaderboardRefresh();
+  return {
+    updatedAt: fresh.updatedAt,
+    entries: mapLeaderboardEntries(baseUrl, fresh.entries),
+  };
 }
 
 function renderSitemapXml(baseUrl: string, entries: PublicLeaderboardEntry[]): string {
@@ -1620,8 +1830,8 @@ app.get("/.well-known/agent.json", (req, res) => {
 
 app.get("/leaderboard.json", async (req, res) => {
   const baseUrl = buildBaseUrl(req);
-  const leaderboard = await loadPublicLeaderboard(baseUrl);
-  res.set("Cache-Control", "public, max-age=60");
+  const leaderboard = await getPublicLeaderboard(baseUrl);
+  res.set("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=600");
   return res.json({
     updatedAt: leaderboard.updatedAt,
     entries: leaderboard.entries,
@@ -1630,8 +1840,8 @@ app.get("/leaderboard.json", async (req, res) => {
 
 app.get("/sitemap.xml", async (req, res) => {
   const baseUrl = buildBaseUrl(req);
-  const leaderboard = await loadPublicLeaderboard(baseUrl);
-  res.set("Cache-Control", "public, max-age=60");
+  const leaderboard = await getPublicLeaderboard(baseUrl);
+  res.set("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=600");
   res.set("Content-Type", "application/xml; charset=utf-8");
   return res.status(200).send(renderSitemapXml(baseUrl, leaderboard.entries));
 });
@@ -2216,6 +2426,9 @@ app.use((_req, res) => {
 
 void getAgentabilityPublicStats().catch((error) => {
   logger.warn("Initial public stats prewarm failed", error);
+});
+void getPublicLeaderboard(CANONICAL_BASE_URL).catch((error) => {
+  logger.warn("Initial leaderboard prewarm failed", error);
 });
 
 export const api = onRequest(

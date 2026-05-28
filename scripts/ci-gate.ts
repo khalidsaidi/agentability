@@ -34,6 +34,22 @@ type CliOptions = {
   strictTrends: boolean;
 };
 
+const REQUIRED_LEADERBOARD_DOMAINS = [
+  "aistatusdashboard.com",
+  "agentability.org",
+  "a2abench-api.web.app",
+  "ragmap-api.web.app",
+  "rootfetch.com",
+  "relayorb.com",
+];
+
+type LeaderboardPayload = {
+  updatedAt?: string;
+  entries?: Array<{
+    domain?: string;
+  }>;
+};
+
 function usage(): string {
   return [
     "Usage: pnpm ci:gate -- --domain <domain-or-origin> [options]",
@@ -132,6 +148,105 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await response.json()) as T;
 }
 
+function validateLeaderboardPayload(
+  payload: LeaderboardPayload,
+  nowMs: number
+): { ok: boolean; violations: string[] } {
+  const violations: string[] = [];
+  if (typeof payload.updatedAt !== "string" || !payload.updatedAt) {
+    violations.push("leaderboard missing updatedAt");
+  } else {
+    const updatedAtMs = Date.parse(payload.updatedAt);
+    if (!Number.isFinite(updatedAtMs)) {
+      violations.push("leaderboard updatedAt is not parseable");
+    } else if (nowMs - updatedAtMs > 24 * 60 * 60 * 1000) {
+      violations.push("leaderboard updatedAt is older than 24h");
+    }
+  }
+
+  const domains = new Set((payload.entries ?? []).map((entry) => (entry.domain ?? "").toLowerCase()));
+  for (const domain of REQUIRED_LEADERBOARD_DOMAINS) {
+    if (!domains.has(domain)) {
+      violations.push(`leaderboard missing domain ${domain}`);
+    }
+  }
+  return { ok: violations.length === 0, violations };
+}
+
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      headers: { accept: "application/json", "cache-control": "no-cache", pragma: "no-cache" },
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function runLeaderboardReliabilityCheck(
+  apiBase: string
+): Promise<{ ok: boolean; violations: string[]; samples: Array<{ status: number; latencyMs: number }> }> {
+  const samples: Array<{ status: number; latencyMs: number }> = [];
+  const violations: string[] = [];
+  for (let index = 0; index < 3; index += 1) {
+    const url = `${apiBase}/leaderboard.json?cb=${Date.now()}-${index}`;
+    const start = Date.now();
+    let response: Response;
+    try {
+      response = await fetchWithTimeout(url, 10000);
+    } catch (error) {
+      violations.push(`leaderboard request ${index + 1} timed out/failed: ${String(error)}`);
+      continue;
+    }
+    const latencyMs = Date.now() - start;
+    samples.push({ status: response.status, latencyMs });
+    if (!response.ok) {
+      violations.push(`leaderboard request ${index + 1} returned HTTP ${response.status}`);
+      continue;
+    }
+    if (latencyMs > 1000) {
+      violations.push(`leaderboard request ${index + 1} latency ${latencyMs}ms exceeded 1000ms`);
+    }
+    let payload: LeaderboardPayload;
+    try {
+      payload = (await response.json()) as LeaderboardPayload;
+    } catch (error) {
+      violations.push(`leaderboard request ${index + 1} returned invalid JSON: ${String(error)}`);
+      continue;
+    }
+    const payloadCheck = validateLeaderboardPayload(payload, Date.now());
+    if (!payloadCheck.ok) {
+      violations.push(...payloadCheck.violations.map((item) => `leaderboard request ${index + 1}: ${item}`));
+    }
+  }
+  return { ok: violations.length === 0, violations, samples };
+}
+
+async function runLeaderboardSelfTests(): Promise<{ ok: boolean; violations: string[] }> {
+  const violations: string[] = [];
+
+  const stalePayload: LeaderboardPayload = {
+    updatedAt: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(),
+    entries: REQUIRED_LEADERBOARD_DOMAINS.map((domain) => ({ domain })),
+  };
+  const staleCheck = validateLeaderboardPayload(stalePayload, Date.now());
+  if (staleCheck.ok) {
+    violations.push("self-test failed: stale updatedAt fixture did not fail");
+  }
+
+  try {
+    await fetchWithTimeout("https://10.255.255.1/timeout-fixture", 50);
+    violations.push("self-test failed: timeout fixture did not fail");
+  } catch {
+    // Expected timeout/failure path.
+  }
+
+  return { ok: violations.length === 0, violations };
+}
+
 function failCount(latest: LatestEvaluation): number {
   return latest.checks?.filter((check) => check.status === "fail").length ?? 0;
 }
@@ -171,6 +286,8 @@ async function main(): Promise<void> {
   const currentBlocked = blockedWorkflows(latest);
 
   const violations: string[] = [];
+  const leaderboardReliability = await runLeaderboardReliabilityCheck(options.apiBase);
+  const leaderboardSelfTests = await runLeaderboardSelfTests();
 
   if (latest.status !== "complete") {
     violations.push(`latest status is ${latest.status} (must be complete)`);
@@ -196,6 +313,12 @@ async function main(): Promise<void> {
   } else if (options.strictTrends) {
     violations.push("trends endpoint unavailable (--strict-trends enabled)");
   }
+  if (!leaderboardReliability.ok) {
+    violations.push(...leaderboardReliability.violations);
+  }
+  if (!leaderboardSelfTests.ok) {
+    violations.push(...leaderboardSelfTests.violations);
+  }
 
   console.log("Agentability CI gate");
   console.log(`Domain: ${latest.domain}`);
@@ -213,6 +336,14 @@ async function main(): Promise<void> {
   } else {
     console.log(`Drift: unavailable (${trendsError ?? "unknown error"})`);
   }
+  console.log(
+    `Leaderboard reliability samples: ${
+      leaderboardReliability.samples.length
+        ? leaderboardReliability.samples.map((s) => `${s.status}@${s.latencyMs}ms`).join(", ")
+        : "none"
+    }`
+  );
+  console.log(`Leaderboard self-tests: ${leaderboardSelfTests.ok ? "pass" : "fail"}`);
 
   if (violations.length) {
     console.error("\nCI gate failed:");
