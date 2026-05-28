@@ -1521,8 +1521,6 @@ type PublicLeaderboardEntry = {
   runId: string;
   completedAt: string;
   reportUrl: string;
-  badgeUrl: string;
-  jsonUrl: string;
 };
 
 type PublicLeaderboardSnapshotEntry = {
@@ -1558,8 +1556,6 @@ function mapLeaderboardEntries(baseUrl: string, entries: PublicLeaderboardSnapsh
     runId: entry.runId,
     completedAt: entry.completedAt,
     reportUrl: `${baseUrl}/reports/${encodeURIComponent(entry.domain)}`,
-    badgeUrl: `${baseUrl}/badge/${encodeURIComponent(entry.domain)}.svg`,
-    jsonUrl: `${baseUrl}/v1/evaluations/${encodeURIComponent(entry.domain)}/latest.json`,
   }));
 }
 
