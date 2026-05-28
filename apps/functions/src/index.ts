@@ -1830,7 +1830,12 @@ app.get("/leaderboard.json", async (req, res) => {
   res.set("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=600");
   return res.json({
     updatedAt: leaderboard.updatedAt,
-    entries: leaderboard.entries,
+    entries: leaderboard.entries.map((entry) => ({
+      domain: entry.domain,
+      score: entry.score,
+      grade: entry.grade,
+      reportUrl: entry.reportUrl,
+    })),
   });
 });
 
