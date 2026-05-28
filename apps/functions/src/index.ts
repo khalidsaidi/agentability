@@ -1555,7 +1555,7 @@ function mapLeaderboardEntries(baseUrl: string, entries: PublicLeaderboardSnapsh
     grade: entry.grade,
     runId: entry.runId,
     completedAt: entry.completedAt,
-    reportUrl: `${baseUrl}/reports/${encodeURIComponent(entry.domain)}`,
+    reportUrl: `/reports/${encodeURIComponent(entry.domain)}`,
   }));
 }
 
