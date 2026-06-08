@@ -1445,10 +1445,7 @@ async function getAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
   }
 
   if (agentabilityStatsCache) {
-    if (now - agentabilityStatsCache.fetchedAt >= AGENTABILITY_STATS_CACHE_TTL_MS) {
-      void startAgentabilityStatsRefresh();
-    }
-    return agentabilityStatsCache.payload;
+    return startAgentabilityStatsRefresh();
   }
 
   const persisted = await readPersistedAgentabilityPublicStats();
@@ -1456,7 +1453,7 @@ async function getAgentabilityPublicStats(): Promise<AgentabilityPublicStats> {
     const ageMs = Math.max(0, now - Date.parse(persisted.generated_at || ""));
     agentabilityStatsCache = { fetchedAt: now, payload: persisted };
     if (!Number.isFinite(ageMs) || ageMs >= AGENTABILITY_STATS_STALE_MS) {
-      void startAgentabilityStatsRefresh();
+      return startAgentabilityStatsRefresh();
     }
     return persisted;
   }

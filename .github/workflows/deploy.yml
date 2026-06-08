@@ -64,3 +64,23 @@ jobs:
           # Deploy hosting first so UI updates can ship even if functions deploy is blocked by IAM.
           pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only hosting --non-interactive
           pnpm dlx firebase-tools deploy --project "$FIREBASE_PROJECT_ID" --only functions --non-interactive --force
+
+      - name: Verify public freshness after deploy
+        run: |
+          set -euo pipefail
+          for path in /stats.json /discovery/audit/latest.json; do
+            body="$(curl -sS "https://agentability.org${path}?cb=$(date +%s)")"
+            generated_at="$(echo "$body" | jq -r '.generated_at // empty')"
+            if [[ -z "$generated_at" ]]; then
+              echo "::error::${path} missing generated_at"
+              exit 1
+            fi
+            now_epoch="$(date -u +%s)"
+            gen_epoch="$(date -u -d "$generated_at" +%s)"
+            age="$((now_epoch - gen_epoch))"
+            echo "path=${path} generated_at=${generated_at} age_seconds=${age}"
+            if [[ "$age" -gt 86400 ]]; then
+              echo "::error::${path} stale after deploy (${age}s)"
+              exit 1
+            fi
+          done
