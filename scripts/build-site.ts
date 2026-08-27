@@ -255,7 +255,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
 <p><span class="scorebig" style="color:${scoreColor(r.score)}">${r.score}</span><span style="color:#667085">/100</span>
 &nbsp; <span class="chip">${esc(r.grade)}</span>${rank ? ` <span class="chip">#${rank} of ${s.audited}</span>` : ""}
 ${r.paradox ? ' <span class="chip paradox">the paradox: courts AI, blocks AI</span>' : ""}</p>
-<p class="lede">Audited ${generated} from public surfaces only. Can AI agents discover, read, and act on
+<p class="lede">Audited ${(r as any).carriedForward ? `${new Date(r.checkedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} (site unreachable during the latest run — showing the last successful audit)` : generated} from public surfaces only. Can AI agents discover, read, and act on
 ${esc(r.domain)}? Check by check:</p>
 ${robotsRow}
 <table>

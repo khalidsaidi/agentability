@@ -25,28 +25,61 @@ async function main() {
   await fsp.mkdir(RESULTS_DIR, { recursive: true });
   await fsp.mkdir(HISTORY_DIR, { recursive: true });
 
-  const queue = [...domains];
-  const records: SiteEvaluation[] = [];
+  const byDomain = new Map<string, SiteEvaluation>();
   let done = 0;
 
-  async function worker() {
-    while (queue.length) {
-      const domain = queue.shift();
-      if (!domain) return;
-      const record = await evaluateSite(domain);
-      records.push(record);
-      done += 1;
-      console.log(
-        `[${done}/${domains.length}] ${domain} → ${record.status}` +
-          (record.status === "complete"
-            ? ` score=${record.score} grade=${record.grade} posture=${record.posture}${record.paradox ? " PARADOX" : ""}`
-            : ` (${record.error})`)
-      );
-      await fsp.writeFile(path.join(RESULTS_DIR, `${domain}.json`), JSON.stringify(record, null, 1), "utf8");
+  async function sweep(list: string[], label: string) {
+    const queue = [...list];
+    async function worker() {
+      while (queue.length) {
+        const domain = queue.shift();
+        if (!domain) return;
+        const record = await evaluateSite(domain);
+        byDomain.set(domain, record);
+        done += 1;
+        console.log(
+          `[${label} ${done}] ${domain} → ${record.status}` +
+            (record.status === "complete"
+              ? ` score=${record.score} grade=${record.grade} posture=${record.posture}${record.paradox ? " PARADOX" : ""}`
+              : ` (${record.error})`)
+        );
+      }
     }
+    await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
   }
 
-  await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+  await sweep(domains, "pass1");
+
+  // Transient failures are common from CI runner IPs — retry stragglers twice
+  // (lower concurrency, spaced out) before giving up on them for this run.
+  for (const attempt of [2, 3]) {
+    const failed = domains.filter((d) => byDomain.get(d)?.status !== "complete");
+    if (!failed.length) break;
+    console.log(`Retry pass ${attempt}: ${failed.length} unreachable → waiting 30s`);
+    await new Promise((resolve) => setTimeout(resolve, 30_000));
+    await sweep(failed, `pass${attempt}`);
+  }
+
+  // Still unreachable after retries: carry forward the last successful audit
+  // instead of silently dropping the site off the index for a week.
+  const records: SiteEvaluation[] = [];
+  for (const domain of domains) {
+    let record = byDomain.get(domain)!;
+    if (record.status !== "complete") {
+      try {
+        const prevRaw = await fsp.readFile(path.join(RESULTS_DIR, `${domain}.json`), "utf8");
+        const prev = JSON.parse(prevRaw) as SiteEvaluation;
+        if (prev.status === "complete") {
+          record = { ...prev, carriedForward: true, carriedForwardAt: new Date().toISOString() };
+          console.log(`Carrying forward ${domain} from ${prev.checkedAt} (unreachable this run)`);
+        }
+      } catch {
+        // No prior successful audit — stays unreachable.
+      }
+    }
+    records.push(record);
+    await fsp.writeFile(path.join(RESULTS_DIR, `${domain}.json`), JSON.stringify(record, null, 1), "utf8");
+  }
 
   const complete = records.filter((r) => r.status === "complete");
   const leaderboard = complete

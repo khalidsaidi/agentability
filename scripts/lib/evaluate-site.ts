@@ -38,6 +38,10 @@ export type SiteEvaluation = {
     parseableText: boolean;
   };
   error?: string;
+  // Set by the runner when a transiently unreachable domain reuses its last
+  // successful audit instead of dropping off the index.
+  carriedForward?: boolean;
+  carriedForwardAt?: string;
 };
 
 const UA = "AgentabilityBot/2.0 (+https://agentability.org/methodology)";
