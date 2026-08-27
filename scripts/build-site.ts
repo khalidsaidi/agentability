@@ -20,9 +20,9 @@ function esc(v: unknown): string {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 70) return "#0a7d46";
-  if (score >= 55) return "#8a6d00";
-  return "#b3261e";
+  if (score >= 70) return "#46e094";
+  if (score >= 55) return "#ffd028";
+  return "#ff6058";
 }
 
 function shell(opts: { title: string; description: string; canonicalPath: string; body: string; jsonLd?: object }): string {
@@ -39,63 +39,132 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <meta property="og:description" content="${esc(opts.description)}">
 <meta property="og:url" content="${SITE}${opts.canonicalPath}">
 <meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0f1014">
 ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd)}</script>` : ""}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --stage: #0f1014; --panel: #16171d; --panel-2: #1c1d25; --line: #272935;
+    --ink: #f2f1ea; --dim: #9a9daf;
+    --hazard: #ffd028; --win: #46e094; --alert: #ff6058; --link: #9db8ff;
+    --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --mono: "Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
   * { box-sizing: border-box; margin: 0; }
-  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #171b26; background: #fff; line-height: 1.55; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 64px; }
-  header.top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 36px; }
-  .brand { font-weight: 700; font-size: 1.05rem; color: #171b26; text-decoration: none; }
-  .brand span { color: #1d4ed8; }
-  nav.top a { margin-left: 18px; font-size: .88rem; color: #445; text-decoration: none; }
-  nav.top a:hover { color: #1d4ed8; }
-  h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.15; margin: 6px 0 14px; }
-  h2 { font-size: 1.15rem; margin: 34px 0 10px; }
-  a { color: #1d4ed8; }
-  .lede { color: #46506a; max-width: 62ch; font-size: 1.02rem; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 26px 0; }
-  .stat { border: 1px solid #e6e8ef; border-radius: 12px; padding: 14px; }
-  .stat b { display: block; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
-  .stat small { color: #667085; }
+  html { scroll-behavior: smooth; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--stage); line-height: 1.6; }
+  ::selection { background: var(--hazard); color: #111; }
+  :focus-visible { outline: 2px solid var(--hazard); outline-offset: 2px; border-radius: 4px; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 26px 20px 72px; }
+  header.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 40px; }
+  .brand { font-family: var(--display); font-weight: 800; font-size: 1.12rem; color: var(--ink); text-decoration: none; letter-spacing: -.01em; }
+  .brand span { background: var(--hazard); color: #111; padding: 0 5px; border-radius: 5px; margin-left: 1px; }
+  nav.top { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav.top a { padding: 6px 12px; font-size: .85rem; font-weight: 600; color: var(--dim); text-decoration: none; border-radius: 999px; transition: color .15s, background .15s; }
+  nav.top a:hover { color: var(--ink); background: var(--panel-2); }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2rem, 5.4vw, 3.6rem); line-height: 1.04; letter-spacing: -.02em; margin: 10px 0 18px; text-wrap: balance; max-width: 20ch; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.2rem, 2.6vw, 1.55rem); letter-spacing: -.01em; margin: 52px 0 14px; }
+  a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--ink); }
+  .hl { background: var(--hazard); color: #111; padding: 0 .14em; border-radius: .12em; display: inline-block; transform: rotate(-1deg); }
+  .lede { color: var(--dim); max-width: 64ch; font-size: 1.05rem; }
+  .lede b, .lede a { color: var(--ink); }
+  .eyebrow, .chip { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .chip { padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); white-space: nowrap; text-transform: none; letter-spacing: .02em; }
+  .chip a { color: inherit; }
+  .chip.paradox { border-color: rgba(255,96,88,.5); color: var(--alert); }
+  .chip.closed { background: var(--hazard); border-color: var(--hazard); color: #111; font-weight: 700; }
+  .live { width: 8px; height: 8px; border-radius: 50%; background: var(--win); box-shadow: 0 0 0 0 rgba(70,224,148,.5); }
+  @media (prefers-reduced-motion: no-preference) {
+    .live { animation: pulse 2.2s ease-out infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(70,224,148,.55); } 70% { box-shadow: 0 0 0 9px rgba(70,224,148,0); } 100% { box-shadow: 0 0 0 0 rgba(70,224,148,0); } }
+    .rise { opacity: 0; transform: translateY(18px); animation: rise .65s cubic-bezier(.2,.75,.25,1) forwards; }
+    .rise.d1 { animation-delay: .07s; } .rise.d2 { animation-delay: .16s; } .rise.d3 { animation-delay: .26s; } .rise.d4 { animation-delay: .38s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+  /* ticker */
+  .ticker { margin: 34px -20px 0; border-block: 1px solid var(--line); overflow: hidden; }
+  .ticker-track { display: inline-flex; gap: 0; white-space: nowrap; padding: 9px 0; }
+  .ticker-track span { font-family: var(--mono); font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); padding: 0 1.4rem; }
+  .ticker-track span b { color: var(--hazard); font-weight: 600; }
+  @media (prefers-reduced-motion: no-preference) {
+    .ticker-track { animation: tick 36s linear infinite; }
+    @keyframes tick { to { transform: translateX(-50%); } }
+  }
+  /* bento scoreboard */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 30px 0 8px; }
+  .stat { border: 1px solid var(--line); background: var(--panel); border-radius: 18px; padding: 18px; transition: transform .18s, border-color .18s; }
+  .stat:hover { transform: translateY(-3px); border-color: #3a3d4d; }
+  .stat b { display: block; font-family: var(--display); font-weight: 800; font-size: clamp(1.7rem, 3.4vw, 2.5rem); line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .stat small { color: var(--dim); font-size: .8rem; }
+  .stat.walls b { color: var(--hazard); }
+  @media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  /* tables */
   table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .92rem; }
-  th { text-align: left; font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: #667085; padding: 8px; border-bottom: 1px solid #e6e8ef; }
-  td { padding: 9px 8px; border-bottom: 1px solid #f0f1f5; vertical-align: top; }
+  th { text-align: left; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px 8px; border-bottom: 1px solid #1d1f28; vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,.018); }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .bar { display: inline-block; width: 80px; height: 8px; border-radius: 4px; background: #eef0f5; vertical-align: middle; margin-right: 8px; }
+  .bar { display: inline-block; width: 76px; height: 7px; border-radius: 4px; background: #22242e; vertical-align: middle; margin-right: 8px; }
   .bar > span { display: block; height: 100%; border-radius: 4px; }
-  .chip { display: inline-block; font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #f1f3f9; color: #444; white-space: nowrap; }
-  .chip.paradox { background: #fdecec; color: #b3261e; }
-  .chip.closed { background: #171b26; color: #fff; }
-  .status-pass { color: #0a7d46; font-weight: 600; }
-  .status-warn { color: #8a6d00; font-weight: 600; }
-  .status-fail { color: #b3261e; font-weight: 600; }
-  .status-skip { color: #98a1b3; }
-  .cta { margin-top: 26px; padding: 16px; border: 1px solid #e6e8ef; border-radius: 12px; font-size: .92rem; color: #46506a; }
-  .foot { margin-top: 44px; padding-top: 18px; border-top: 1px solid #eef0f5; font-size: .8rem; color: #8a90a3; }
-  .scorebig { font-size: 3.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
-  .task { border: 1px solid #e6e8ef; border-radius: 12px; padding: 18px; margin: 16px 0; }
-  .task h3 { font-size: 1.05rem; margin-bottom: 6px; }
-  .outcome { display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
-  .outcome.completed { background: #e7f5ec; color: #0a7d46; }
-  .outcome.partial { background: #fdf3d8; color: #8a6d00; }
-  .outcome.failed { background: #fdecec; color: #b3261e; }
-  .answer { margin: 10px 0; padding: 12px 14px; background: #f7f8fb; border-radius: 10px; font-size: .95rem; }
-  .task details { margin-top: 10px; }
-  .task summary { cursor: pointer; font-size: .85rem; color: #1d4ed8; }
-  .tl { list-style: none; padding: 0; margin: 10px 0 0; border-left: 2px solid #e6e8ef; }
-  .tl li { padding: 7px 0 7px 14px; font-size: .87rem; }
-  .tl .say { color: #171b26; }
-  .tl .act { color: #667085; font-size: .8rem; word-break: break-all; }
-  .tl .wall { color: #b3261e; font-weight: 600; }
-  .obst { font-size: .85rem; color: #8a4b00; margin-top: 8px; }
-  .diag { font-size: .8rem; color: #667085; margin-top: 8px; }
+  .status-pass { color: var(--win); font-weight: 600; }
+  .status-warn { color: var(--hazard); font-weight: 600; }
+  .status-fail { color: var(--alert); font-weight: 600; }
+  .status-skip { color: #565968; }
+  .cta { margin-top: 30px; padding: 18px 20px; border: 1px dashed #3a3d4d; border-radius: 16px; font-size: .93rem; color: var(--dim); }
+  .cta b { color: var(--ink); }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .8rem; color: #6d7080; }
+  .scorebig { font-family: var(--display); font-size: 3.6rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.03em; }
+  /* the show: segments */
+  .task { position: relative; border: 1px solid var(--line); background: var(--panel); border-radius: 20px; padding: 22px 24px; margin: 18px 0; transition: border-color .18s; }
+  .task:hover { border-color: #3a3d4d; }
+  .task h3 { font-family: var(--display); font-weight: 700; font-size: 1.28rem; letter-spacing: -.01em; margin: 4px 0 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .segno { font-family: var(--mono); font-size: .7rem; letter-spacing: .14em; color: #565968; text-transform: uppercase; }
+  .stamp { font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; border: 2px solid currentColor; padding: 2px 8px; border-radius: 7px; transform: rotate(-2deg); }
+  .stamp.completed { color: var(--win); }
+  .stamp.partial { color: var(--hazard); }
+  .stamp.failed { color: var(--alert); }
+  .wallcount { font-family: var(--mono); font-size: .7rem; color: var(--hazard); letter-spacing: .06em; }
+  .pick { font-family: var(--mono); font-size: .7rem; color: var(--win); letter-spacing: .06em; }
+  .prompt { font-size: .88rem; color: var(--dim); max-width: 70ch; }
+  .answer { position: relative; margin: 14px 0 4px; padding: 14px 16px 13px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px 16px 16px 16px; font-size: .95rem; }
+  .answer::before { content: "AGENT'S REPORT"; display: block; font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; color: var(--dim); margin-bottom: 6px; }
+  .obst { font-size: .86rem; color: var(--hazard); margin-top: 10px; opacity: .92; }
+  .diag { font-size: .8rem; color: var(--dim); margin-top: 8px; }
+  .task details { margin-top: 12px; }
+  .task summary { cursor: pointer; font-family: var(--mono); font-size: .78rem; letter-spacing: .04em; color: var(--link); }
+  .task summary:hover { color: var(--ink); }
+  .tl { list-style: none; padding: 0; margin: 14px 0 0; }
+  .tl li { position: relative; padding: 0 0 14px 22px; }
+  .tl li::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: -2px; width: 2px; background: #262835; }
+  .tl li::after { content: ""; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--stage); border: 2px solid #3a3d4d; }
+  .tl li:last-child::before { display: none; }
+  .tl li.walled::after { border-color: var(--hazard); background: var(--hazard); }
+  .tl .say { display: inline-block; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; padding: 8px 12px; font-size: .9rem; margin-bottom: 6px; }
+  .tl .act { font-family: var(--mono); font-size: .74rem; color: #767a8c; word-break: break-all; }
+  .tl .act .ok { color: #767a8c; }
+  .stripe { height: 12px; border-radius: 4px; margin: 6px 0 8px; max-width: 420px;
+    background: repeating-linear-gradient(-45deg, var(--hazard) 0 12px, #14151a 12px 24px); }
+  .wallchip { display: inline-block; font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; background: var(--hazard); color: #111; padding: 2px 8px; border-radius: 5px; }
+  /* this-week segment cards */
+  .segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+  .seg { position: relative; display: block; border: 1px solid var(--line); background: var(--panel); border-radius: 18px; padding: 18px; text-decoration: none; color: var(--ink); overflow: hidden; transition: transform .18s, border-color .18s; }
+  .seg:hover { transform: translateY(-3px); border-color: #3a3d4d; color: var(--ink); }
+  .seg .bigno { position: absolute; right: 10px; top: 2px; font-family: var(--display); font-weight: 800; font-size: 4.4rem; color: #20222c; line-height: 1; z-index: 0; }
+  .seg .t { position: relative; font-family: var(--display); font-weight: 700; font-size: 1.02rem; line-height: 1.25; z-index: 1; }
+  .seg .o { position: relative; display: block; margin-top: 10px; z-index: 1; }
+  @media (max-width: 720px) { .segs { grid-template-columns: 1fr; } }
+  .hero-cta { display: inline-block; margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: 1rem; background: var(--hazard); color: #111 !important; text-decoration: none; padding: 12px 22px; border-radius: 999px; transition: transform .15s; }
+  .hero-cta:hover { transform: translateY(-2px) rotate(-1deg); }
   @media (max-width: 640px) { .hide-sm { display: none; } }
 </style>
 </head>
 <body><div class="wrap">
 <header class="top">
   <a class="brand" href="/">agent<span>ability</span></a>
-  <nav class="top"><a href="/fieldtest/">Field Test</a><a href="/ai-index/">The Index</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
+  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
@@ -195,19 +264,25 @@ function prettyDate(iso: string): string {
   return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
-function outcomeChip(outcome: EpisodeRun["outcome"]): string {
-  const label = outcome === "completed" ? "done" : outcome === "partial" ? "gave up honestly" : "failed";
-  return `<span class="outcome ${outcome}">${label}</span>`;
+const STAMP_LABEL: Record<EpisodeRun["outcome"], string> = {
+  completed: "done",
+  partial: "gave up honestly",
+  failed: "failed",
+};
+
+function stamp(outcome: EpisodeRun["outcome"]): string {
+  return `<span class="stamp ${outcome}">${STAMP_LABEL[outcome]}</span>`;
 }
 
-function taskCard(run: EpisodeRun): string {
+function taskCard(run: EpisodeRun, idx: number): string {
   const timeline = run.steps
     .map((s) => {
       const say = s.narration ? `<div class="say">“${esc(s.narration)}”</div>` : "";
+      const wall = s.botWall ? `<div class="stripe"></div><span class="wallchip">⚠ BOT WALL</span> ` : "";
       const act = s.url
-        ? `<div class="act">→ ${esc(s.finalUrl || s.url)} — <span class="${s.botWall ? "wall" : ""}">${esc(s.note)}</span></div>`
-        : `<div class="act">→ ${esc(s.note)}</div>`;
-      return `<li>${say}${act}</li>`;
+        ? `<div class="act">${wall}GET ${esc(s.finalUrl || s.url)} — ${esc(s.note)}</div>`
+        : `<div class="act">${esc(s.note)}</div>`;
+      return `<li${s.botWall ? ' class="walled"' : ""}>${say}${act}</li>`;
     })
     .join("\n");
   const diag = run.diagnosis
@@ -220,32 +295,44 @@ function taskCard(run: EpisodeRun): string {
     )
     .join("; ");
   return `<div class="task" id="task-${esc(run.taskId)}">
-<h3>${esc(run.title)} ${outcomeChip(run.outcome)}${run.wallsHit ? ` <span class="chip paradox">${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>` : ""}${run.chosenSite ? ` <span class="chip">picked: ${esc(run.chosenSite)}</span>` : ""}</h3>
-<p style="font-size:.88rem;color:#667085">The task: ${esc(run.prompt)}</p>
-<div class="answer"><b>Agent's report:</b> ${esc(run.answer || run.error || "no report")}</div>
-${run.obstacles.length ? `<p class="obst">Obstacles, in the agent's words: ${run.obstacles.map((o) => `“${esc(o)}”`).join(" · ")}</p>` : ""}
+<div class="segno">Segment ${String(idx + 1).padStart(2, "0")} · ${esc(run.kind)}</div>
+<h3>${esc(run.title)} ${stamp(run.outcome)}${run.wallsHit ? ` <span class="wallcount">⚠ ${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>` : ""}${run.chosenSite ? ` <span class="pick">✓ picked ${esc(run.chosenSite)}</span>` : ""}</h3>
+<p class="prompt">The task: ${esc(run.prompt)}</p>
+<div class="answer">${esc(run.answer || run.error || "no report")}</div>
+${run.obstacles.length ? `<p class="obst">In the agent's words: ${run.obstacles.map((o) => `“${esc(o)}”`).join(" · ")}</p>` : ""}
 ${diag ? `<p class="diag">Why: ${diag}.</p>` : ""}
-<details><summary>Play-by-play (${run.steps.filter((s) => s.url).length} page visits, published verbatim)</summary>
+<details><summary>▸ Play-by-play — ${run.steps.filter((s) => s.url).length} page visits, published verbatim</summary>
 <ul class="tl">${timeline}</ul></details>
 </div>`;
 }
 
-function episodeHeadlines(episode: Episode): string[] {
-  const heads: string[] = [];
-  for (const run of episode.runs) {
-    if (run.kind === "stunt" || run.outcome === "failed" || (run.outcome === "partial" && run.wallsHit > 0)) {
-      heads.push(
-        `<a href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">${esc(run.title)}</a> — ${
-          run.wallsHit ? "blocked by bot walls" : run.outcome === "failed" ? "the agent failed" : "the agent gave up"
-        }`
-      );
-    } else if (run.kind === "choose" && run.chosenSite) {
-      heads.push(
-        `<a href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">${esc(run.title)}</a> — it picked <b>${esc(run.chosenSite)}</b>`
-      );
-    }
-  }
-  return heads.slice(0, 4);
+function segCards(episode: Episode): string {
+  const scored = episode.runs
+    .map((run) => ({
+      run,
+      drama:
+        run.wallsHit * 3 +
+        (run.kind === "stunt" ? 4 : 0) +
+        (run.outcome === "failed" ? 3 : run.outcome === "partial" ? 1 : 0) +
+        (run.chosenSite ? 2 : 0),
+    }))
+    .sort((a, b) => b.drama - a.drama)
+    .slice(0, 3);
+  return `<div class="segs">${scored
+    .map(({ run }) => {
+      const idx = episode.runs.indexOf(run) + 1;
+      const note = run.wallsHit
+        ? `<span class="wallcount">⚠ ${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>`
+        : run.chosenSite
+          ? `<span class="pick">✓ picked ${esc(run.chosenSite)}</span>`
+          : stamp(run.outcome);
+      return `<a class="seg" href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">
+<span class="bigno">${String(idx).padStart(2, "0")}</span>
+<span class="t">${esc(run.title)}</span>
+<span class="o">${note}</span>
+</a>`;
+    })
+    .join("\n")}</div>`;
 }
 
 function leaderboardTable(rows: Summary["leaderboard"]): string {
@@ -294,26 +381,30 @@ async function main() {
 
   // ---------- Landing: the field test leads, the index is the reference ----------
   const s = summary?.stats;
+  const tickerSpans = latest
+    ? `<span><b>${latest.stats.tasks}</b> tasks</span><span><b>${latest.stats.completed}</b> completed</span><span><b>${latest.stats.wallsHit}</b> bot walls</span><span><b>${latest.stats.pageVisits}</b> pages read</span><span><b>${latest.stats.domainsVisited}</b> sites visited</span><span>no retries · no editing · no mercy</span><span>agent: ${esc(latest.model)}</span><span>producer: opus 5 + live search</span>`
+    : "";
   const fieldtestHero = latest
     ? `
-<p class="chip">The Agent Field Test · episode of ${prettyDate(latest.date)} · new episode weekly, fully autonomous</p>
-<h1>We send an AI agent to do your errands<br>on the real web. Then we publish everything.</h1>
-<p class="lede">Every week an AI producer invents real tasks — find the true price, cancel the subscription, reach a
-human, pick a product — and a real agent (${esc(latest.model)}) attempts them with read-only web access. Transcripts
-published verbatim: the wins, the bot walls, the brands it picks. (We pay for the API calls for fun.)</p>
+<p class="eyebrow rise"><span class="live"></span>The Agent Field Test · episode of ${prettyDate(latest.date)} · new every week, fully autonomous</p>
+<h1 class="rise d1">We send an AI agent to run your <span class="hl">errands</span> on the real web. Then we publish <span class="hl">everything</span>.</h1>
+<p class="lede rise d2">An AI producer reads the week's news and invents real tasks — find the true price, cancel the
+subscription, reach a human, pick a product. A real agent (${esc(latest.model)}) attempts them with read-only web
+access. Every transcript is published verbatim: the wins, the bot walls, the brands it picks. (We pay for the API
+calls for fun.)</p>
+<a class="hero-cta rise d3" href="/fieldtest/${latest.date}/">Watch this week's episode →</a>
+<div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
 <div class="stats">
   <div class="stat"><b>${latest.stats.completed}/${latest.stats.tasks}</b><small>tasks completed this episode</small></div>
-  <div class="stat"><b>${latest.stats.wallsHit}</b><small>bot walls hit</small></div>
+  <div class="stat walls"><b>${latest.stats.wallsHit}</b><small>bot walls hit</small></div>
   <div class="stat"><b>${latest.stats.pageVisits}</b><small>pages read</small></div>
   <div class="stat"><b>${latest.stats.domainsVisited}</b><small>sites visited</small></div>
 </div>
-${episodeHeadlines(latest).length ? `<h2>This week</h2><ul style="font-size:.95rem;line-height:2">${episodeHeadlines(latest)
-        .map((h) => `<li>${h}</li>`)
-        .join("\n")}</ul>` : ""}
-<p style="margin-top:12px"><a href="/fieldtest/${latest.date}/">Watch the full episode →</a></p>`
+<h2>This week's best segments</h2>
+${segCards(latest)}`
     : `
-<p class="chip">The Agent Field Test · first episode in production</p>
-<h1>We send an AI agent to do your errands<br>on the real web. Then we publish everything.</h1>
+<p class="eyebrow"><span class="live"></span>The Agent Field Test · first episode in production</p>
+<h1>We send an AI agent to run your <span class="hl">errands</span> on the real web. Then we publish <span class="hl">everything</span>.</h1>
 <p class="lede">A weekly, fully autonomous show: an AI producer invents real errands, a real agent attempts them with
 read-only web access, and the full transcripts are published here — wins, bot walls, and all.</p>`;
   const landingBody = `${fieldtestHero}
@@ -374,7 +465,7 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
         description: `All ${s.audited} sites ranked by AI-agent readiness. ${failShare}% score under 55/100. Updated ${generated}.`,
         canonicalPath: "/ai-index/",
         body: `
-<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · AI-Readiness Index · updated ${generated}</p>
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · AI-Readiness Index · updated ${generated}</p>
 <h1>The AI-Readiness Index</h1>
 <p class="lede">${s.audited} well-known sites, ranked by how usable they are for AI agents. Average ${s.averageScore}/100.
 Checks: llms.txt, AI-crawler policy, content parseability, structured data, sitemap, task reachability, plus MCP/OpenAPI bonuses —
@@ -428,7 +519,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
           description: `${r.domain} scores ${r.score}/100 (${r.grade}) for AI-agent readiness${r.paradox ? " — and publishes llms.txt while blocking AI crawlers" : ""}. Full check-by-check report.`,
           canonicalPath: `/ai-index/site/${r.domain}/`,
           body: `
-<p class="chip"><a href="/ai-index/" style="text-decoration:none;color:inherit">← AI-Readiness Index</a></p>
+<p class="eyebrow"><a href="/ai-index/" style="text-decoration:none;color:inherit">← AI-Readiness Index</a></p>
 <h1>${esc(r.domain)}</h1>
 <p><span class="scorebig" style="color:${scoreColor(r.score)}">${r.score}</span><span style="color:#667085">/100</span>
 &nbsp; <span class="chip">${esc(r.grade)}</span>${rank ? ` <span class="chip">#${rank} of ${s.audited}</span>` : ""}
@@ -460,7 +551,7 @@ ${robotsRow}
 
   // ---------- Methodology ----------
   const methodologyBody = `
-<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Methodology</p>
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Methodology</p>
 <h1>How scoring works</h1>
 <p class="lede">Eight checks, all against public surfaces, all reproducible with plain HTTP requests. No invented
 standards: every check is traceable to a convention that real AI systems use in 2026.</p>
@@ -531,7 +622,7 @@ transcript? Open an issue — everything is versioned in public.</p>`;
         "A weekly autonomous show: an AI producer invents real web errands, a real agent attempts them read-only, and every transcript is published verbatim.",
       canonicalPath: "/fieldtest/",
       body: `
-<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · The Agent Field Test</p>
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · The Agent Field Test</p>
 <h1>The Agent Field Test</h1>
 <p class="lede">The web's newest users are AI agents — so every week we make one run real errands: find the true
 price, cancel the thing, reach a human, pick a product. Read-only access, hard step limits, transcripts published
@@ -567,7 +658,7 @@ ${FIELD_FAQ.map((f) => `<h3 style="font-size:.98rem;margin:18px 0 4px">${esc(f.q
         description: `Episode of ${prettyDate(ep.date)}: ${ep.stats.completed}/${ep.stats.tasks} tasks completed, ${ep.stats.wallsHit} bot walls, ${ep.stats.pageVisits} pages read${chosen.length ? `; picked ${chosen.map((r) => r.chosenSite).join(", ")}` : ""}. Full verbatim transcripts.`,
         canonicalPath: `/fieldtest/${ep.date}/`,
         body: `
-<p class="chip"><a href="/fieldtest/" style="text-decoration:none;color:inherit">← All episodes</a> · ${prettyDate(ep.date)} · agent: ${esc(ep.model)}</p>
+<p class="eyebrow"><a href="/fieldtest/" style="text-decoration:none;color:inherit">← All episodes</a> · ${prettyDate(ep.date)} · agent: ${esc(ep.model)}</p>
 <h1>Episode of ${prettyDate(ep.date)}</h1>
 <p class="lede">${ep.stats.tasks} tasks, invented by the AI producer and attempted by ${esc(ep.model)} with read-only
 web access. ${ep.stats.completed} completed, ${ep.stats.partial} honest give-ups, ${ep.stats.failed} failures,
@@ -591,7 +682,7 @@ rules: <a href="/methodology/">methodology</a>. Raw episode JSON: <a href="/data
 
   // ---------- Docs / Support / Privacy (the task pages we grade everyone else on) ----------
   const docsBody = `
-<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Data docs</p>
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Data docs</p>
 <h1>Using the open data</h1>
 <p class="lede">Everything the Index publishes is available as plain JSON with CORS enabled — no key, no signup,
 no rate-limit games. Cite it, chart it, build on it.</p>
@@ -609,7 +700,7 @@ file per domain, refreshed by the same public CI run. The evaluator itself is
 TypeScript</a> — reproduce any number on this site with plain HTTP requests.</p>
 <p class="lede">Attribution: link to <a href="/ai-index/">the Index</a> or the per-site report you're citing.</p>`;
   const supportBody = `
-<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
 <h1>Get help, get audited, or dispute a score</h1>
 <p class="lede"><b>Request an audit</b> — open an
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&amp;labels=audit-request">audit
@@ -622,7 +713,7 @@ issue with the domain and the check ID; the rubric is versioned in public and we
 <p class="lede"><b>Anything else</b> — <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issues</a>
 is the front door; there is no ticket system because there is no company, just an open observatory.</p>`;
   const privacyBody = `
-<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Privacy</p>
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Privacy</p>
 <h1>Privacy</h1>
 <p class="lede">This site collects nothing. No analytics, no cookies, no accounts, no forms, no third-party scripts.
 Pages are static files served from a CDN; we never see who you are.</p>
