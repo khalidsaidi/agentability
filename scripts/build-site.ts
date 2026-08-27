@@ -44,7 +44,7 @@ ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
-gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
 gtag('js', new Date());
 gtag('config', 'G-55RKNLGPNT');
 </script>
@@ -176,7 +176,7 @@ gtag('config', 'G-55RKNLGPNT');
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
-<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. No cookies, no signup, no cost.
+<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. Open data, no signup, no cost.
 <br /><a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></footer>
 </div></body>
 </html>`;
@@ -723,9 +723,10 @@ is the front door; there is no ticket system because there is no company, just a
   const privacyBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Privacy</p>
 <h1>Privacy</h1>
-<p class="lede">No cookies, no accounts, no forms, no identifiers. Pages are static files served from a CDN. We count
-visits in aggregate using Google Analytics locked in cookie-less consent-denied mode: it stores nothing on your
-device and cannot identify you — it tells us roughly how many people visited, and nothing about who they are.</p>
+<p class="lede">No accounts, no forms, no ads, nothing sold. Pages are static files served from a CDN. We use Google
+Analytics only to count visits in aggregate (a first-party analytics cookie; all ad features disabled) — it tells us
+roughly how many people read which pages, and nothing about who they are. To opt out, block the
+<code>googletagmanager.com</code> script; the site works identically without it.</p>
 <p class="lede">The audit data we publish is gathered exclusively from public surfaces — homepages, robots.txt,
 llms.txt, sitemaps, and well-known endpoints — the same requests any AI crawler makes. We fetch each site a handful
 of times per week with the user agent <code>AgentabilityBot/2.0</code>, honor what robots.txt tells us in scoring,
