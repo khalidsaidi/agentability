@@ -178,7 +178,27 @@ ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
 <a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. Open data, no signup, no cost.
 <br /><a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></footer>
-</div></body>
+</div>
+<script>
+(function () {
+  function send(name, params) { try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {} }
+  // Did they actually read a transcript? The core engagement signal.
+  document.addEventListener('toggle', function (e) {
+    var d = e.target;
+    if (d && d.tagName === 'DETAILS' && d.open) {
+      var card = d.closest ? d.closest('.task') : null;
+      send('playbyplay_open', { task_id: card && card.id ? card.id.replace('task-', '') : 'unknown', page_path: location.pathname });
+    }
+  }, true);
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    if (a.href.indexOf('issues/new') !== -1) send('audit_request_click', { page_path: location.pathname });
+    else if (a.host && a.host !== location.host) send('outbound_click', { link_domain: a.host, page_path: location.pathname });
+  });
+})();
+</script>
+</body>
 </html>`;
 }
 
