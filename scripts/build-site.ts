@@ -31,6 +31,7 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="UwlyIMgY4AbelS-xVcScH18Jmk1-ojfzvD3vZOi1vTk">
 <title>${esc(opts.title)}</title>
 <meta name="description" content="${esc(opts.description)}">
 <link rel="canonical" href="${SITE}${opts.canonicalPath}">
