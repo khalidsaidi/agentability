@@ -1,132 +1,53 @@
 # Agentability
 
-Agentability is an open-source, public-mode evaluator for agent readiness. It audits discoverability, callable surfaces,
-LLM ingestion hygiene, trust signals, and reliability to produce shareable reports and evidence bundles.
+**The observatory of the agentic web.**
 
-Live: https://agentability.org
-OpenAPI: https://agentability.org/.well-known/openapi.json
-Manifest: https://agentability.org/.well-known/air.json
-MCP: https://agentability.org/mcp
+Every week we audit ~115 well-known sites — the AI companies included — for
+whether AI agents can actually discover, read, and act on them, then publish
+the results as a public index with open data.
 
-## Why this project exists
+Live: https://agentability.org · Index: https://agentability.org/ai-index/ ·
+Methodology: https://agentability.org/methodology/ · Data: https://agentability.org/data/summary.json
 
-We want a transparent, community-owned standard for "agent readiness" that any product can run and improve against.
-Agentability is open by design: the checks, scoring, and evidence format are public, and improvements from contributors
-directly shape the ecosystem.
+## What we measure (all real 2026 conventions — nothing invented)
 
-If you care about building agent-friendly APIs, docs, or tooling, this project is for you.
+| Check | Convention | Points |
+|---|---|---|
+| A1 | `llms.txt` present and substantive (llmstxt.org) | 15 |
+| A2 | robots.txt policy toward GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot | 15 |
+| A3 | Homepage readable from a plain fetch (no JS wall / bot challenge) | 25 |
+| A4 | Valid schema.org JSON-LD | 15 |
+| A5 | Sitemap discoverable | 10 |
+| A6 | Pricing / support / docs / legal reachable from the homepage | 20 |
+| B1 | MCP server advertised (`/.well-known/mcp.json`) | +5 bonus |
+| B2 | OpenAPI document published | +5 bonus |
 
-## What it does (Public Mode v1)
+Sites that block essentially all AI crawlers are labeled **“Closed by policy”**
+rather than graded — refusing agents is a stance, and we report it as one.
+Sites that publish `llms.txt` *while blocking AI crawlers* get the **paradox**
+flag. The weekly history in `data/index/history/` is an adoption time series
+for the agentic web — the longer it runs, the more it's worth.
 
-- Discovers machine entrypoints and docs across common locations.
-- Runs deterministic checks (D1, D2, L1, R3) with evidence.
-- Produces a shareable report URL and a stable JSON result.
-- Enforces SSRF protection, timeouts, and size limits.
+## Architecture: $0/month, no servers
 
-## Quickstart (local)
+- `scripts/lib/evaluate-site.ts` — the evaluator (~300 lines, zero dependencies, plain `fetch`)
+- `scripts/run-ai-index.ts` — batch runner; writes `data/index/` results + summary + weekly history
+- `scripts/build-site.ts` — generates the entire static site into `dist-static/`
+- `.github/workflows/ai-index.yml` — weekly cron in public-repo CI (free) → audit → commit data → deploy
+- Firebase **Hosting only** (free tier; the project deliberately runs without billing)
 
-Requirements:
-- Node 20+
-- pnpm
-- Firebase CLI (authenticated)
-
-Install and run the web app:
-
-```bash
-pnpm install
-pnpm build:artifacts
-pnpm -C apps/web dev --host 0.0.0.0 --port 5174
-```
-
-To point the local UI to production API, create `apps/web/.env.local`:
+## Run it yourself
 
 ```bash
-VITE_API_BASE_URL=https://agentability.org
+npm ci
+npm run index   # audits every domain in data/index/domains.txt
+npm run build   # builds the site into dist-static/
 ```
 
-Optional: run Functions locally (uses Firebase emulators):
-
-```bash
-firebase emulators:start
-```
-
-## Deploy (Firebase)
-
-Deploys run from GitHub Actions using a dedicated service account. If Functions deploy fails with an error like:
-
-`Missing permissions required for functions deploy. You must have permission iam.serviceAccounts.ActAs on service account <project>@appspot.gserviceaccount.com`
-
-An Owner must grant the deploy identity `roles/iam.serviceAccountUser` on the App Engine default service account
-(`{project}@appspot.gserviceaccount.com`), then retry the deploy.
-
-```bash
-gcloud iam service-accounts add-iam-policy-binding <project>@appspot.gserviceaccount.com \
-  --member="serviceAccount:<deployer-sa>@<project>.iam.gserviceaccount.com" \
-  --role="roles/iam.serviceAccountUser"
-```
-
-## Run an evaluation
-
-```bash
-curl -X POST https://agentability.org/v1/evaluate \
-  -H "Content-Type: application/json" \
-  -d '{"origin":"https://example.com","profile":"auto"}'
-```
-
-You will receive a `runId` and URLs for the report and JSON result.
-
-## MCP usage (tooling)
-
-```bash
-curl -X POST https://agentability.org/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/call",
-    "params": {
-      "name": "evaluate_site",
-      "arguments": { "origin": "https://example.com" }
-    }
-  }'
-```
-
-## Project structure
-
-```
-apps/web          # React + Vite UI + static public surfaces
-apps/functions    # Firebase Functions v2 API (SSR + evaluation endpoints)
-packages/evaluator# Evaluation engine + SSRF-safe fetch
-packages/shared   # Shared schemas and types
-spec              # Public specs (OpenAPI source)
-```
-
-## Contributing
-
-We actively welcome new collaborators. If you want to help, pick an area and open a PR:
-
-- Add new checks or profiles to the evaluator
-- Improve reporting clarity for non-technical users
-- Harden SSRF and abuse controls
-- Expand AI-native public surfaces and audits
-
-Guidelines:
-- No secrets in commits (ever).
-- Keep generated artifacts out of git (`.ai/generated` is ignored).
-- Run `pnpm check:ai` and `pnpm -C apps/functions build` before submitting.
-
-If you plan a significant change, open an issue first so we can align.
-
-## Security
-
-Agentability fetches user-provided URLs and enforces strict SSRF protections:
-- http/https only
-- blocks private IP ranges after DNS resolution
-- re-checks redirects
-- timeouts and size limits
-
-If you find a security issue, open a private report via GitHub Security Advisories.
+Add a site: PR a line into `data/index/domains.txt`, or open an
+[audit request issue](https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request).
+Dispute a check: open an issue — the rubric is versioned in public.
 
 ## License
 
-Apache-2.0. See `LICENSE`.
+MIT

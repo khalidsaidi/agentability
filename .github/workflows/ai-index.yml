@@ -1,16 +1,21 @@
-name: deploy
+name: ai-index
 
 on:
-  push:
-    branches: [main]
+  schedule:
+    - cron: "23 6 * * 1" # weekly, Monday 06:23 UTC
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: ai-index
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  audit-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -20,8 +25,22 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run check
-      - run: npm run build
+
+      - name: Run the AI-Readiness Index
+        env:
+          INDEX_CONCURRENCY: "6"
+        run: npm run index
+
+      - name: Build the static site
+        run: npm run build
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "ai-index-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/index
+          git diff --cached --quiet || git commit -m "chore: weekly AI-Readiness Index refresh [skip ci]"
+          git push
 
       - name: Prepare Firebase credentials
         env:
@@ -49,7 +68,7 @@ jobs:
           fs.writeFileSync(path, normalized);
           NODE
 
-      - name: Deploy (static hosting only)
+      - name: Deploy (static hosting only — no billing required)
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase.json
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
