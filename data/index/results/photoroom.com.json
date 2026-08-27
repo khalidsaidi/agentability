@@ -1,110 +1,21 @@
 {
  "domain": "photoroom.com",
- "checkedAt": "2026-08-27T04:58:35.423Z",
- "status": "complete",
- "elapsedMs": 1290,
- "score": 100,
- "grade": "A",
+ "checkedAt": "2026-08-27T05:07:15.930Z",
+ "status": "error",
+ "elapsedMs": 10496,
+ "score": 0,
+ "grade": "unreachable",
  "posture": "open",
  "paradox": false,
- "checks": [
-  {
-   "id": "A1",
-   "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
-   "maxPoints": 15,
-   "detail": "Present with 5557 chars and links."
-  },
-  {
-   "id": "A2",
-   "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
-   "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
-  },
-  {
-   "id": "A3",
-   "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
-   "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1239 words of visible text."
-  },
-  {
-   "id": "A4",
-   "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
-   "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
-  },
-  {
-   "id": "A5",
-   "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
-   "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
-  },
-  {
-   "id": "A6",
-   "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 20,
-   "maxPoints": 20,
-   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
-  },
-  {
-   "id": "B1",
-   "title": "MCP server advertised",
-   "status": "skip",
-   "points": 0,
-   "maxPoints": 5,
-   "detail": "No MCP advertisement (bonus check — most sites skip this)."
-  },
-  {
-   "id": "B2",
-   "title": "OpenAPI description published",
-   "status": "skip",
-   "points": 0,
-   "maxPoints": 5,
-   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
-  }
- ],
- "robots": [
-  {
-   "bot": "GPTBot",
-   "policy": "partial"
-  },
-  {
-   "bot": "ClaudeBot",
-   "policy": "partial"
-  },
-  {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
-   "bot": "PerplexityBot",
-   "policy": "partial"
-  },
-  {
-   "bot": "Google-Extended",
-   "policy": "partial"
-  },
-  {
-   "bot": "CCBot",
-   "policy": "partial"
-  }
- ],
+ "checks": [],
+ "robots": [],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": true,
-  "sitemap": true,
-  "parseableText": true
- }
+  "structuredData": false,
+  "sitemap": false,
+  "parseableText": false
+ },
+ "error": "homepage unreachable"
 }

@@ -1,10 +1,10 @@
 {
  "domain": "agentability.org",
- "checkedAt": "2026-08-27T04:58:18.514Z",
+ "checkedAt": "2026-08-27T05:06:53.390Z",
  "status": "complete",
- "elapsedMs": 753,
- "score": 65,
- "grade": "C",
+ "elapsedMs": 529,
+ "score": 95,
+ "grade": "A",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -14,7 +14,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "Present with 1194 chars and links."
+   "detail": "Present with 2796 chars and links."
   },
   {
    "id": "A2",
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~5 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~349 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "Found from homepage: docs/api."
+   "detail": "Found from homepage: support/contact, docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -67,44 +67,44 @@
   {
    "id": "B2",
    "title": "OpenAPI description published",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Valid OpenAPI document found."
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
   }
  ],
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
  "signals": {
   "llmsTxt": true,
   "mcp": false,
-  "openapi": true,
+  "openapi": false,
   "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }
