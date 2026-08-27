@@ -54,3 +54,21 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase.json
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         run: npx firebase-tools@13 deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive
+
+      - name: Ping IndexNow
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const xml = fs.readFileSync("dist-static/sitemap.xml", "utf8");
+          const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).slice(0, 2000);
+          fetch("https://api.indexnow.org/indexnow", {
+            method: "POST",
+            headers: { "content-type": "application/json; charset=utf-8" },
+            body: JSON.stringify({
+              host: "agentability.org",
+              key: "4e1abda486c0a02493e7b6520d2ae99b",
+              keyLocation: "https://agentability.org/4e1abda486c0a02493e7b6520d2ae99b.txt",
+              urlList: urls,
+            }),
+          }).then((r) => console.log("IndexNow:", r.status)).catch((e) => console.log("IndexNow failed (non-fatal):", e.message));
+          NODE

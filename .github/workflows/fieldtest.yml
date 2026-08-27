@@ -1,21 +1,21 @@
-name: ai-index
+name: fieldtest
 
 on:
   schedule:
-    - cron: "23 6 * * 1" # weekly, Monday 06:23 UTC
+    - cron: "23 13 * * 3" # weekly episode, Wednesday 13:23 UTC
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: ai-index
+  group: fieldtest
   cancel-in-progress: false
 
 jobs:
-  audit-and-publish:
+  episode:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -26,20 +26,20 @@ jobs:
 
       - run: npm ci
 
-      - name: Run the AI-Readiness Index
+      - name: Run this week's episode
         env:
-          INDEX_CONCURRENCY: "6"
-        run: npm run index
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npm run fieldtest
 
       - name: Build the static site
         run: npm run build
 
-      - name: Commit refreshed data
+      - name: Commit the episode
         run: |
-          git config user.name "ai-index-bot"
+          git config user.name "fieldtest-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/index
-          git diff --cached --quiet || git commit -m "chore: weekly AI-Readiness Index refresh [skip ci]"
+          git add data/fieldtest
+          git diff --cached --quiet || git commit -m "chore: weekly Agent Field Test episode [skip ci]"
           git push
 
       - name: Prepare Firebase credentials

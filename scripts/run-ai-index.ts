@@ -119,11 +119,20 @@ async function main() {
   };
   await fsp.writeFile(SUMMARY_PATH, JSON.stringify(summary, null, 1), "utf8");
 
-  // Weekly history snapshot — the adoption time series.
+  // History snapshot — the adoption time series. Per-site scores included so
+  // the site can render week-over-week deltas (risers, fallers, policy flips).
   const day = new Date().toISOString().slice(0, 10);
   await fsp.writeFile(
     path.join(HISTORY_DIR, `${day}.json`),
-    JSON.stringify({ date: day, ...stats }, null, 1),
+    JSON.stringify(
+      {
+        date: day,
+        ...stats,
+        sites: leaderboard.map((r) => ({ domain: r.domain, score: r.score, posture: r.posture, paradox: r.paradox })),
+      },
+      null,
+      1
+    ),
     "utf8"
   );
 

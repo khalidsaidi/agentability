@@ -10,8 +10,10 @@ const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
+const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
 const OUT = path.join(REPO_ROOT, "dist-static");
 const SITE = "https://agentability.org";
+const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
 
 function esc(v: unknown): string {
   return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -70,13 +72,29 @@ ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd
   .cta { margin-top: 26px; padding: 16px; border: 1px solid #e6e8ef; border-radius: 12px; font-size: .92rem; color: #46506a; }
   .foot { margin-top: 44px; padding-top: 18px; border-top: 1px solid #eef0f5; font-size: .8rem; color: #8a90a3; }
   .scorebig { font-size: 3.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .task { border: 1px solid #e6e8ef; border-radius: 12px; padding: 18px; margin: 16px 0; }
+  .task h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .outcome { display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+  .outcome.completed { background: #e7f5ec; color: #0a7d46; }
+  .outcome.partial { background: #fdf3d8; color: #8a6d00; }
+  .outcome.failed { background: #fdecec; color: #b3261e; }
+  .answer { margin: 10px 0; padding: 12px 14px; background: #f7f8fb; border-radius: 10px; font-size: .95rem; }
+  .task details { margin-top: 10px; }
+  .task summary { cursor: pointer; font-size: .85rem; color: #1d4ed8; }
+  .tl { list-style: none; padding: 0; margin: 10px 0 0; border-left: 2px solid #e6e8ef; }
+  .tl li { padding: 7px 0 7px 14px; font-size: .87rem; }
+  .tl .say { color: #171b26; }
+  .tl .act { color: #667085; font-size: .8rem; word-break: break-all; }
+  .tl .wall { color: #b3261e; font-weight: 600; }
+  .obst { font-size: .85rem; color: #8a4b00; margin-top: 8px; }
+  .diag { font-size: .8rem; color: #667085; margin-top: 8px; }
   @media (max-width: 640px) { .hide-sm { display: none; } }
 </style>
 </head>
 <body><div class="wrap">
 <header class="top">
   <a class="brand" href="/">agent<span>ability</span></a>
-  <nav class="top"><a href="/ai-index/">The Index</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
+  <nav class="top"><a href="/fieldtest/">Field Test</a><a href="/ai-index/">The Index</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
@@ -107,6 +125,126 @@ function postureChip(row: { posture: string; paradox: boolean }): string {
   if (row.posture === "closed") return `<span class="chip closed">closed by policy</span>`;
   if (row.posture === "selective") return `<span class="chip">selective</span>`;
   return "";
+}
+
+type EpisodeRun = {
+  taskId: string;
+  kind: string;
+  title: string;
+  prompt: string;
+  outcome: "completed" | "partial" | "failed";
+  answer: string;
+  chosenSite: string | null;
+  obstacles: string[];
+  sources: string[];
+  steps: Array<{
+    step: number;
+    narration: string;
+    url: string;
+    finalUrl: string;
+    status: number;
+    ok: boolean;
+    botWall: boolean;
+    pageTitle: string;
+    note: string;
+  }>;
+  wallsHit: number;
+  domainsVisited: string[];
+  error?: string;
+  diagnosis: Array<{ domain: string; posture: string; parseable: boolean }>;
+};
+
+type Episode = {
+  date: string;
+  generatedAt: string;
+  model: string;
+  stats: {
+    tasks: number;
+    completed: number;
+    partial: number;
+    failed: number;
+    wallsHit: number;
+    pageVisits: number;
+    domainsVisited: number;
+    costUsd: number;
+  };
+  runs: EpisodeRun[];
+};
+
+const FIELD_FAQ: Array<{ q: string; a: string }> = [
+  {
+    q: "Can AI agents actually use websites in 2026?",
+    a: "Sometimes. In our weekly field tests a production agent completes most simple errands (finding real prices, comparing plans) but is regularly stopped by bot walls, login-only pages, and JavaScript-only content — every attempt is published verbatim in the episodes.",
+  },
+  {
+    q: "Is the Agent Field Test edited or scripted?",
+    a: "No. An AI producer invents the tasks (grounded in that week's news), a separate AI agent attempts them with read-only web access, and the transcripts are published exactly as they happened — failures included. No human writes, selects, or edits an episode.",
+  },
+  {
+    q: "Which websites block AI agents?",
+    a: 'Our <a href="/ai-index/">AI-Readiness Index</a> audits 113 well-known sites weekly; sites like meta.ai are "closed by policy" (their robots.txt blocks all major AI crawlers), and field-test episodes regularly hit Cloudflare-style bot challenges on others.',
+  },
+  {
+    q: "What tools does the agent get?",
+    a: "One: a plain HTTP GET. It cannot run JavaScript, log in, submit forms, create accounts, or buy anything — which is exactly the point: it experiences the web the way most production AI assistants do.",
+  },
+];
+
+function prettyDate(iso: string): string {
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+}
+
+function outcomeChip(outcome: EpisodeRun["outcome"]): string {
+  const label = outcome === "completed" ? "done" : outcome === "partial" ? "gave up honestly" : "failed";
+  return `<span class="outcome ${outcome}">${label}</span>`;
+}
+
+function taskCard(run: EpisodeRun): string {
+  const timeline = run.steps
+    .map((s) => {
+      const say = s.narration ? `<div class="say">“${esc(s.narration)}”</div>` : "";
+      const act = s.url
+        ? `<div class="act">→ ${esc(s.finalUrl || s.url)} — <span class="${s.botWall ? "wall" : ""}">${esc(s.note)}</span></div>`
+        : `<div class="act">→ ${esc(s.note)}</div>`;
+      return `<li>${say}${act}</li>`;
+    })
+    .join("\n");
+  const diag = run.diagnosis
+    .filter((d) => d.posture !== "open" || !d.parseable)
+    .map(
+      (d) =>
+        `<a href="/ai-index/site/${esc(d.domain)}/">${esc(d.domain)}</a> is ${
+          d.posture === "closed" ? "closed to AI crawlers by policy" : d.posture === "selective" ? "selectively blocking AI crawlers" : ""
+        }${!d.parseable ? `${d.posture !== "open" ? " and" : ""} unreadable without a browser` : ""} on our index`
+    )
+    .join("; ");
+  return `<div class="task" id="task-${esc(run.taskId)}">
+<h3>${esc(run.title)} ${outcomeChip(run.outcome)}${run.wallsHit ? ` <span class="chip paradox">${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>` : ""}${run.chosenSite ? ` <span class="chip">picked: ${esc(run.chosenSite)}</span>` : ""}</h3>
+<p style="font-size:.88rem;color:#667085">The task: ${esc(run.prompt)}</p>
+<div class="answer"><b>Agent's report:</b> ${esc(run.answer || run.error || "no report")}</div>
+${run.obstacles.length ? `<p class="obst">Obstacles, in the agent's words: ${run.obstacles.map((o) => `“${esc(o)}”`).join(" · ")}</p>` : ""}
+${diag ? `<p class="diag">Why: ${diag}.</p>` : ""}
+<details><summary>Play-by-play (${run.steps.filter((s) => s.url).length} page visits, published verbatim)</summary>
+<ul class="tl">${timeline}</ul></details>
+</div>`;
+}
+
+function episodeHeadlines(episode: Episode): string[] {
+  const heads: string[] = [];
+  for (const run of episode.runs) {
+    if (run.kind === "stunt" || run.outcome === "failed" || (run.outcome === "partial" && run.wallsHit > 0)) {
+      heads.push(
+        `<a href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">${esc(run.title)}</a> — ${
+          run.wallsHit ? "blocked by bot walls" : run.outcome === "failed" ? "the agent failed" : "the agent gave up"
+        }`
+      );
+    } else if (run.kind === "choose" && run.chosenSite) {
+      heads.push(
+        `<a href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">${esc(run.title)}</a> — it picked <b>${esc(run.chosenSite)}</b>`
+      );
+    }
+  }
+  return heads.slice(0, 4);
 }
 
 function leaderboardTable(rows: Summary["leaderboard"]): string {
@@ -145,44 +283,70 @@ async function main() {
     }
   }
 
-  // ---------- Landing: the observatory ----------
+  const episodes: Episode[] = [];
+  if (fs.existsSync(EPISODES_DIR)) {
+    for (const file of (await fsp.readdir(EPISODES_DIR)).sort().reverse()) {
+      if (file.endsWith(".json")) episodes.push(JSON.parse(await fsp.readFile(path.join(EPISODES_DIR, file), "utf8")));
+    }
+  }
+  const latest = episodes[0] ?? null;
+
+  // ---------- Landing: the field test leads, the index is the reference ----------
   const s = summary?.stats;
-  const landingBody = summary && s
+  const fieldtestHero = latest
     ? `
-<p class="chip">Tracking the agentic web since August 27, 2026 · updated weekly</p>
-<h1>Is the web actually ready for AI agents?<br>We measure it.</h1>
-<p class="lede">Every week we test ${s.audited} well-known sites — the AI companies included — against the conventions
-real AI agents rely on in 2026: <code>llms.txt</code>, crawler policy, parseable content, structured data, MCP.
-The result is a public scoreboard, an adoption time series, and some uncomfortable findings.</p>
+<p class="chip">The Agent Field Test · episode of ${prettyDate(latest.date)} · new episode weekly, fully autonomous</p>
+<h1>We send an AI agent to do your errands<br>on the real web. Then we publish everything.</h1>
+<p class="lede">Every week an AI producer invents real tasks — find the true price, cancel the subscription, reach a
+human, pick a product — and a real agent (${esc(latest.model)}) attempts them with read-only web access. Transcripts
+published verbatim: the wins, the bot walls, the brands it picks. (We pay for the API calls for fun.)</p>
+<div class="stats">
+  <div class="stat"><b>${latest.stats.completed}/${latest.stats.tasks}</b><small>tasks completed this episode</small></div>
+  <div class="stat"><b>${latest.stats.wallsHit}</b><small>bot walls hit</small></div>
+  <div class="stat"><b>${latest.stats.pageVisits}</b><small>pages read</small></div>
+  <div class="stat"><b>${latest.stats.domainsVisited}</b><small>sites visited</small></div>
+</div>
+${episodeHeadlines(latest).length ? `<h2>This week</h2><ul style="font-size:.95rem;line-height:2">${episodeHeadlines(latest)
+        .map((h) => `<li>${h}</li>`)
+        .join("\n")}</ul>` : ""}
+<p style="margin-top:12px"><a href="/fieldtest/${latest.date}/">Watch the full episode →</a></p>`
+    : `
+<p class="chip">The Agent Field Test · first episode in production</p>
+<h1>We send an AI agent to do your errands<br>on the real web. Then we publish everything.</h1>
+<p class="lede">A weekly, fully autonomous show: an AI producer invents real errands, a real agent attempts them with
+read-only web access, and the full transcripts are published here — wins, bot walls, and all.</p>`;
+  const landingBody = `${fieldtestHero}
+${summary && s
+    ? `
+<h2>The reference data: the AI-Readiness Index</h2>
+<p class="lede">Behind the show sits the panel: ${s.audited} well-known sites audited weekly against the conventions
+real AI agents rely on — <code>llms.txt</code>, crawler policy, parseable content, structured data, MCP. When the
+agent hits a wall, the index usually already predicted it.</p>
 <div class="stats">
   <div class="stat"><b>${s.averageScore}/100</b><small>average readiness score</small></div>
   <div class="stat"><b>${s.pctLlmsTxt}%</b><small>publish llms.txt</small></div>
   <div class="stat"><b>${s.pctBlockingSomeAI}%</b><small>block at least one AI crawler</small></div>
-  <div class="stat"><b>${s.paradoxCount}</b><small>court AI while blocking it (the paradox)</small></div>
-  <div class="stat"><b>${s.pctMcp}%</b><small>advertise an MCP server</small></div>
+  <div class="stat"><b>${s.pctClosed}%</b><small>closed to AI by policy</small></div>
 </div>
-<h2>The AI-Readiness Index — top 20</h2>
-${leaderboardTable(summary.leaderboard.slice(0, 20))}
+<h2>The Index — top 10</h2>
+${leaderboardTable(summary.leaderboard.slice(0, 10))}
 <p style="margin-top:12px"><a href="/ai-index/">Full ranked index of ${s.audited} sites →</a></p>
 <div class="cta"><b>Work on one of these sites?</b> Every failed check on your report page has a concrete fix, and scores
 refresh weekly. <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Request an audit</a>
-of any site — it's free and takes one issue.</div>
+of any site — it's free and takes one issue.</div>`
+    : ""}
 <h2>Why this exists</h2>
-<p class="lede">Agents are becoming the web's newest audience: assistants that read pages, cite sources, and complete
-tasks for people. Whether your site is legible to them is measurable — so we measure it, in public, with
-reproducible checks and open data. History accrues weekly${history.length > 1 ? ` (${history.length} snapshots so far)` : " — this is week zero"}.</p>`
-    : `
-<h1>The observatory of the agentic web</h1>
-<p class="lede">First index run is in progress. The scoreboard, adoption statistics, and site reports appear here
-as soon as the initial audit completes.</p>`;
+<p class="lede">Agents are the web's newest audience: assistants that read pages, cite sources, and run errands for
+people. Whether the web actually works for them is an empirical question — so we test it, in public, every week,
+with verbatim transcripts, reproducible checks, and open data. History accrues weekly${history.length > 1 ? ` (${history.length} snapshots so far)` : ""}.</p>`;
 
   await fsp.writeFile(
     path.join(OUT, "index.html"),
     shell({
-      title: "Agentability — is the web ready for AI agents?",
-      description: summary && s
-        ? `We test ${s.audited} well-known sites weekly for AI-agent readiness. Average score ${s.averageScore}/100; ${s.pctBlockingSomeAI}% block at least one AI crawler.`
-        : "A public, open-source observatory measuring how ready the web is for AI agents.",
+      title: "Agentability — we send AI agents to use the real web",
+      description: latest
+        ? `The Agent Field Test: a real AI agent runs real errands on the real web weekly, transcripts published verbatim. This episode: ${latest.stats.completed}/${latest.stats.tasks} tasks done, ${latest.stats.wallsHit} bot walls.`
+        : "A weekly autonomous show plus an open index: real AI agents attempt real web tasks, and 100+ well-known sites are audited for AI-agent readiness.",
       canonicalPath: "/",
       body: landingBody,
       jsonLd: {
@@ -217,6 +381,19 @@ Checks: llms.txt, AI-crawler policy, content parseability, structured data, site
 ${leaderboardTable(summary.leaderboard)}
 ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-size:.85rem">Unreachable this run: ${summary.unreachable.map(esc).join(", ")}.</p>` : ""}
 <div class="cta">Your site missing or mis-scored? <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Open an issue</a> — audits are free, from public surfaces only, and re-run weekly.</div>`,
+        jsonLd: {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "The AI-Readiness Index",
+          description: `${s.audited} well-known sites ranked by AI-agent readiness.`,
+          numberOfItems: summary.leaderboard.length,
+          itemListElement: summary.leaderboard.slice(0, 25).map((r) => ({
+            "@type": "ListItem",
+            position: r.rank,
+            name: r.domain,
+            url: `${SITE}/ai-index/site/${r.domain}/`,
+          })),
+        },
       }),
       "utf8"
     );
@@ -303,10 +480,23 @@ standards: every check is traceable to a convention that real AI systems use in 
 <p class="lede">A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40 · F &lt; 40. Sites whose robots.txt blocks essentially all AI crawlers
 are labeled <b>“Closed by policy”</b> instead of graded — refusing agents is a legitimate choice, and we report it as
 one rather than pretending it's a defect.</p>
+<h2>The Agent Field Test</h2>
+<p class="lede">The weekly <a href="/fieldtest/">Field Test</a> is the empirical companion to the Index: instead of
+checking plumbing, it watches a real agent try real errands. The rules:</p>
+<table>
+<tbody>
+<tr><td><b>Autonomous end to end</b></td><td>An AI producer invents each episode's tasks (grounded in the audited panel, avoiding past topics); a separate agent attempts them. No human writes, selects, or edits an episode.</td></tr>
+<tr><td><b>Read-only, by construction</b></td><td>The agent's only tool is a plain HTTP GET. It cannot run JavaScript, log in, submit forms, create accounts, or buy anything.</td></tr>
+<tr><td><b>Hard limits</b></td><td>At most 14 page visits per task, a fixed token budget per episode, and the model is named on every page. (We pay for the API calls for fun.)</td></tr>
+<tr><td><b>Verbatim or nothing</b></td><td>Transcripts are published exactly as they happened — no retries, no cherry-picking, failures included. The raw JSON is open data.</td></tr>
+<tr><td><b>Honest reporting</b></td><td>The agent is instructed never to invent facts it didn't read on a page, and to report failure plainly. "Gave up honestly" is a first-class outcome.</td></tr>
+</tbody>
+</table>
 <h2>Reproducibility</h2>
 <p class="lede">The evaluator is ~300 lines of dependency-free TypeScript in the
 <a href="https://github.com/khalidsaidi/agentability">open repo</a>, runs weekly in public GitHub Actions, and commits
-raw results to the repository. Disagree with a check? Open an issue — the rubric is versioned in public.</p>`;
+raw results to the repository. The field-test agent and producer are in the same repo. Disagree with a check or a
+transcript? Open an issue — everything is versioned in public.</p>`;
   await fsp.mkdir(path.join(OUT, "methodology"), { recursive: true });
   await fsp.writeFile(
     path.join(OUT, "methodology/index.html"),
@@ -318,6 +508,85 @@ raw results to the repository. Disagree with a check? Open an issue — the rubr
     }),
     "utf8"
   );
+
+  // ---------- The Agent Field Test ----------
+  await fsp.mkdir(path.join(OUT, "fieldtest"), { recursive: true });
+  const archiveRows = episodes
+    .map(
+      (ep) => `<tr>
+  <td><a href="/fieldtest/${esc(ep.date)}/">${prettyDate(ep.date)}</a></td>
+  <td class="num">${ep.stats.completed}/${ep.stats.tasks}</td>
+  <td class="num">${ep.stats.wallsHit}</td>
+  <td class="num">${ep.stats.pageVisits}</td>
+  <td class="num">${ep.stats.domainsVisited}</td>
+</tr>`
+    )
+    .join("\n");
+  await fsp.writeFile(
+    path.join(OUT, "fieldtest/index.html"),
+    shell({
+      title: "The Agent Field Test — episodes",
+      description:
+        "A weekly autonomous show: an AI producer invents real web errands, a real agent attempts them read-only, and every transcript is published verbatim.",
+      canonicalPath: "/fieldtest/",
+      body: `
+<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · The Agent Field Test</p>
+<h1>The Agent Field Test</h1>
+<p class="lede">The web's newest users are AI agents — so every week we make one run real errands: find the true
+price, cancel the thing, reach a human, pick a product. Read-only access, hard step limits, transcripts published
+verbatim. The producer inventing the tasks is an AI too: no human touches an episode from cron to publish.</p>
+${episodes.length ? `<table>
+<thead><tr><th>Episode</th><th class="num">Completed</th><th class="num">Bot walls</th><th class="num">Pages read</th><th class="num">Sites</th></tr></thead>
+<tbody>${archiveRows}</tbody></table>` : `<p class="lede">First episode is in production — the weekly run publishes it here automatically.</p>`}
+<div class="cta"><b>Want your site in an episode?</b> Everyday tasks on real brands are invented weekly by the producer
+from <a href="/ai-index/">the audited panel</a>. <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Get on the panel</a>.</div>
+<h2>Questions people ask</h2>
+${FIELD_FAQ.map((f) => `<h3 style="font-size:.98rem;margin:18px 0 4px">${esc(f.q)}</h3><p class="lede" style="font-size:.92rem">${f.a}</p>`).join("\n")}`,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FIELD_FAQ.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a.replace(/<[^>]+>/g, "") },
+        })),
+      },
+    }),
+    "utf8"
+  );
+
+  for (const ep of episodes) {
+    const dir = path.join(OUT, "fieldtest", ep.date);
+    await fsp.mkdir(dir, { recursive: true });
+    const chosen = ep.runs.filter((r) => r.chosenSite);
+    await fsp.writeFile(
+      path.join(dir, "index.html"),
+      shell({
+        title: `Agent Field Test — ${prettyDate(ep.date)}`,
+        description: `Episode of ${prettyDate(ep.date)}: ${ep.stats.completed}/${ep.stats.tasks} tasks completed, ${ep.stats.wallsHit} bot walls, ${ep.stats.pageVisits} pages read${chosen.length ? `; picked ${chosen.map((r) => r.chosenSite).join(", ")}` : ""}. Full verbatim transcripts.`,
+        canonicalPath: `/fieldtest/${ep.date}/`,
+        body: `
+<p class="chip"><a href="/fieldtest/" style="text-decoration:none;color:inherit">← All episodes</a> · ${prettyDate(ep.date)} · agent: ${esc(ep.model)}</p>
+<h1>Episode of ${prettyDate(ep.date)}</h1>
+<p class="lede">${ep.stats.tasks} tasks, invented by the AI producer and attempted by ${esc(ep.model)} with read-only
+web access. ${ep.stats.completed} completed, ${ep.stats.partial} honest give-ups, ${ep.stats.failed} failures,
+${ep.stats.wallsHit} bot walls across ${ep.stats.pageVisits} page visits and ${ep.stats.domainsVisited} sites.
+(Yes, we pay for these API calls. For fun.)</p>
+${ep.runs.map(taskCard).join("\n")}
+<div class="cta">Every transcript above is verbatim — no retries, no editing, no cherry-picking. Method, limits, and
+rules: <a href="/methodology/">methodology</a>. Raw episode JSON: <a href="/data/fieldtest/${esc(ep.date)}.json">open data</a>.</div>`,
+        jsonLd: {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: `The Agent Field Test — episode of ${prettyDate(ep.date)}`,
+          datePublished: ep.generatedAt,
+          author: { "@type": "Organization", name: "Agentability", url: SITE },
+          description: `A real AI agent attempted ${ep.stats.tasks} real web errands; ${ep.stats.completed} completed, ${ep.stats.wallsHit} bot walls. Verbatim transcripts.`,
+        },
+      }),
+      "utf8"
+    );
+  }
 
   // ---------- Docs / Support / Privacy (the task pages we grade everyone else on) ----------
   const docsBody = `
@@ -387,6 +656,7 @@ and publish only what those public files say. To remove a domain from the Index,
       "crawler policy, parseable content, structured data, MCP, OpenAPI).",
       "",
       "## Key pages",
+      `- The Agent Field Test (weekly episodes, verbatim agent transcripts): ${SITE}/fieldtest/`,
       `- The AI-Readiness Index (full rankings): ${SITE}/ai-index/`,
       `- Methodology (checks and scoring): ${SITE}/methodology/`,
       `- Raw data (JSON): ${SITE}/data/summary.json`,
@@ -399,7 +669,25 @@ and publish only what those public files say. To remove a domain from the Index,
     "utf8"
   );
   await fsp.writeFile(path.join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`, "utf8");
-  const urls = ["/", "/ai-index/", "/methodology/", "/docs/", "/support/", "/privacy/", ...domains.map((d) => `/ai-index/site/${d}/`)];
+  // IndexNow key file (workflows ping api.indexnow.org after each deploy).
+  await fsp.writeFile(path.join(OUT, `${INDEXNOW_KEY}.txt`), INDEXNOW_KEY, "utf8");
+  // Google Search Console ownership verification — must persist forever.
+  await fsp.writeFile(
+    path.join(OUT, "googlea3bb680f11452088.html"),
+    "google-site-verification: googlea3bb680f11452088.html",
+    "utf8"
+  );
+  const urls = [
+    "/",
+    "/fieldtest/",
+    ...episodes.map((ep) => `/fieldtest/${ep.date}/`),
+    "/ai-index/",
+    "/methodology/",
+    "/docs/",
+    "/support/",
+    "/privacy/",
+    ...domains.map((d) => `/ai-index/site/${d}/`),
+  ];
   await fsp.writeFile(
     path.join(OUT, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
@@ -408,11 +696,15 @@ and publish only what those public files say. To remove a domain from the Index,
     "utf8"
   );
 
-  // Open data: publish summary + history verbatim.
+  // Open data: publish summary + history + episodes verbatim.
   await fsp.mkdir(path.join(OUT, "data/history"), { recursive: true });
+  await fsp.mkdir(path.join(OUT, "data/fieldtest"), { recursive: true });
   if (summary) await fsp.writeFile(path.join(OUT, "data/summary.json"), JSON.stringify(summary, null, 1), "utf8");
   for (const h of history) {
     await fsp.writeFile(path.join(OUT, `data/history/${h.date}.json`), JSON.stringify(h, null, 1), "utf8");
+  }
+  for (const ep of episodes) {
+    await fsp.writeFile(path.join(OUT, `data/fieldtest/${ep.date}.json`), JSON.stringify(ep, null, 1), "utf8");
   }
 
   await fsp.writeFile(
