@@ -41,6 +41,14 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#0f1014">
 ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd)}</script>` : ""}
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+gtag('js', new Date());
+gtag('config', 'G-55RKNLGPNT');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-55RKNLGPNT"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -168,7 +176,7 @@ ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
-<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. No tracking, no signup, no cost.
+<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. No cookies, no signup, no cost.
 <br /><a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></footer>
 </div></body>
 </html>`;
@@ -715,8 +723,9 @@ is the front door; there is no ticket system because there is no company, just a
   const privacyBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Privacy</p>
 <h1>Privacy</h1>
-<p class="lede">This site collects nothing. No analytics, no cookies, no accounts, no forms, no third-party scripts.
-Pages are static files served from a CDN; we never see who you are.</p>
+<p class="lede">No cookies, no accounts, no forms, no identifiers. Pages are static files served from a CDN. We count
+visits in aggregate using Google Analytics locked in cookie-less consent-denied mode: it stores nothing on your
+device and cannot identify you — it tells us roughly how many people visited, and nothing about who they are.</p>
 <p class="lede">The audit data we publish is gathered exclusively from public surfaces — homepages, robots.txt,
 llms.txt, sitemaps, and well-known endpoints — the same requests any AI crawler makes. We fetch each site a handful
 of times per week with the user agent <code>AgentabilityBot/2.0</code>, honor what robots.txt tells us in scoring,
