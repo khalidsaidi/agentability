@@ -1,20 +1,20 @@
 {
- "domain": "anthropic.com",
- "checkedAt": "2026-08-27T04:58:18.578Z",
+ "domain": "gamma.app",
+ "checkedAt": "2026-08-27T04:58:25.116Z",
  "status": "complete",
- "elapsedMs": 1400,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 811,
+ "score": 30,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 4325 chars and links."
   },
   {
    "id": "A2",
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~696 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -43,18 +43,18 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 20,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
+   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
   },
   {
    "id": "B1",
@@ -100,11 +100,11 @@
   }
  ],
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
   "openapi": false,
   "structuredData": false,
-  "sitemap": true,
-  "parseableText": true
+  "sitemap": false,
+  "parseableText": false
  }
 }

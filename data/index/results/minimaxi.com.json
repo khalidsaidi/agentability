@@ -1,8 +1,8 @@
 {
- "domain": "anthropic.com",
- "checkedAt": "2026-08-27T04:58:18.578Z",
+ "domain": "minimaxi.com",
+ "checkedAt": "2026-08-27T04:58:28.881Z",
  "status": "complete",
- "elapsedMs": 1400,
+ "elapsedMs": 3375,
  "score": 70,
  "grade": "B",
  "posture": "open",
@@ -30,15 +30,15 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~696 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~262 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 20,
+   "status": "fail",
+   "points": 5,
    "maxPoints": 20,
-   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
+   "detail": "Found from homepage: docs/api."
   },
   {
    "id": "B1",
@@ -76,34 +76,34 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
   "parseableText": true
  }

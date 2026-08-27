@@ -1,10 +1,10 @@
 {
- "domain": "anthropic.com",
- "checkedAt": "2026-08-27T04:58:18.578Z",
+ "domain": "udio.com",
+ "checkedAt": "2026-08-27T04:58:39.193Z",
  "status": "complete",
- "elapsedMs": 1400,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 1697,
+ "score": 30,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~696 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~8 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 20,
+   "status": "fail",
+   "points": 5,
    "maxPoints": 20,
-   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
+   "detail": "Found from homepage: pricing."
   },
   {
    "id": "B1",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "signals": {
@@ -105,6 +105,6 @@
   "openapi": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

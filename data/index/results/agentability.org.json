@@ -1,20 +1,20 @@
 {
- "domain": "anthropic.com",
- "checkedAt": "2026-08-27T04:58:18.578Z",
+ "domain": "agentability.org",
+ "checkedAt": "2026-08-27T04:58:18.514Z",
  "status": "complete",
- "elapsedMs": 1400,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 753,
+ "score": 65,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 1194 chars and links."
   },
   {
    "id": "A2",
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~696 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~5 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 20,
+   "status": "fail",
+   "points": 5,
    "maxPoints": 20,
-   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
+   "detail": "Found from homepage: docs/api."
   },
   {
    "id": "B1",
@@ -67,44 +67,44 @@
   {
    "id": "B2",
    "title": "OpenAPI description published",
-   "status": "skip",
-   "points": 0,
+   "status": "pass",
+   "points": 5,
    "maxPoints": 5,
-   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+   "detail": "Valid OpenAPI document found."
   }
  ],
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
-  "openapi": false,
-  "structuredData": false,
+  "openapi": true,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

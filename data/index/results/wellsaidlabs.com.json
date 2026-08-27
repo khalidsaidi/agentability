@@ -1,28 +1,28 @@
 {
- "domain": "anthropic.com",
- "checkedAt": "2026-08-27T04:58:18.578Z",
+ "domain": "wellsaidlabs.com",
+ "checkedAt": "2026-08-27T04:58:40.421Z",
  "status": "complete",
- "elapsedMs": 1400,
- "score": 70,
- "grade": "B",
- "posture": "open",
- "paradox": false,
+ "elapsedMs": 1676,
+ "score": 93,
+ "grade": "A",
+ "posture": "selective",
+ "paradox": true,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 40468 chars and links."
   },
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,15 +30,15 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~696 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~4071 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -92,18 +92,18 @@
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
   "parseableText": true
  }
