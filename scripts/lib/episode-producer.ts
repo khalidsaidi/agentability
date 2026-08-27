@@ -119,20 +119,31 @@ export async function produceEpisodeTasks(
     };
     // Streamed: producer turns are long (web research + 10 tasks) and
     // non-streaming requests of that length get dropped by intermediaries.
-    let response: Anthropic.Message | null = null;
-    let lastError: unknown;
-    for (let attempt = 0; attempt < 3 && !response; attempt++) {
-      try {
-        response = await client.messages.stream(params).finalMessage();
-      } catch (error) {
-        lastError = error;
-        await new Promise((resolve) => setTimeout(resolve, 5000 * (attempt + 1)));
+    // Server-tool turns can also end in `pause_turn` (continue by echoing the
+    // content back) or in prose without the tool call (nudge once) — handle both.
+    const messages: Anthropic.MessageParam[] = [...params.messages];
+    let toolUse: Anthropic.ToolUseBlock | undefined;
+    for (let round = 0; round < 6 && !toolUse; round++) {
+      let response: Anthropic.Message | null = null;
+      let lastError: unknown;
+      for (let attempt = 0; attempt < 3 && !response; attempt++) {
+        try {
+          response = await client.messages.stream({ ...params, messages }).finalMessage();
+        } catch (error) {
+          lastError = error;
+          await new Promise((resolve) => setTimeout(resolve, 5000 * (attempt + 1)));
+        }
+      }
+      if (!response) throw lastError;
+      toolUse = response.content.find(
+        (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "propose_tasks"
+      );
+      if (toolUse) break;
+      messages.push({ role: "assistant", content: response.content });
+      if (response.stop_reason !== "pause_turn") {
+        messages.push({ role: "user", content: "Good — now call propose_tasks exactly once with the 10 finished tasks." });
       }
     }
-    if (!response) throw lastError;
-    const toolUse = response.content.find(
-      (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "propose_tasks"
-    );
     const raw = (toolUse?.input as any)?.tasks;
     const tasks = (Array.isArray(raw) ? raw : []).map(sanitizeTask).filter((t): t is FieldTask => t !== null);
     const seen = new Set<string>();
