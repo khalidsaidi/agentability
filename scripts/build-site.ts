@@ -80,7 +80,8 @@ ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
-<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. No tracking, no signup, no cost.</footer>
+<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. No tracking, no signup, no cost.
+<br /><a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></footer>
 </div></body>
 </html>`;
 }
@@ -318,6 +319,62 @@ raw results to the repository. Disagree with a check? Open an issue — the rubr
     "utf8"
   );
 
+  // ---------- Docs / Support / Privacy (the task pages we grade everyone else on) ----------
+  const docsBody = `
+<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Data docs</p>
+<h1>Using the open data</h1>
+<p class="lede">Everything the Index publishes is available as plain JSON with CORS enabled — no key, no signup,
+no rate-limit games. Cite it, chart it, build on it.</p>
+<table>
+<thead><tr><th>Endpoint</th><th>What it returns</th></tr></thead>
+<tbody>
+<tr><td><code>/data/summary.json</code></td><td>The latest run: aggregate stats (average score, llms.txt adoption, blocking and closed percentages, paradox count) plus the full ranked leaderboard with score, grade, posture, and signal flags per domain.</td></tr>
+<tr><td><code>/data/history/{YYYY-MM-DD}.json</code></td><td>One snapshot per weekly run — the adoption time series. Week zero is 2026-08-27.</td></tr>
+</tbody>
+</table>
+<p class="lede">Raw per-site check results live in the repository under
+<a href="https://github.com/khalidsaidi/agentability/tree/main/data/index/results">data/index/results/</a>, one JSON
+file per domain, refreshed by the same public CI run. The evaluator itself is
+<a href="https://github.com/khalidsaidi/agentability/blob/main/scripts/lib/evaluate-site.ts">~300 lines of dependency-free
+TypeScript</a> — reproduce any number on this site with plain HTTP requests.</p>
+<p class="lede">Attribution: link to <a href="/ai-index/">the Index</a> or the per-site report you're citing.</p>`;
+  const supportBody = `
+<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
+<h1>Get help, get audited, or dispute a score</h1>
+<p class="lede"><b>Request an audit</b> — open an
+<a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&amp;labels=audit-request">audit
+request issue</a> (or PR a line into <code>data/index/domains.txt</code>) and your site joins the next weekly run.</p>
+<p class="lede"><b>Deployed a fix?</b> Scores refresh automatically every Monday. If you've shipped fixes and want the
+number updated sooner, say so in an issue and we'll trigger a re-run.</p>
+<p class="lede"><b>Dispute a check</b> — every check is reproducible from
+<a href="/methodology/">the methodology</a> and the open evaluator source. If you think a result is wrong, open an
+issue with the domain and the check ID; the rubric is versioned in public and we correct real errors in the next run.</p>
+<p class="lede"><b>Anything else</b> — <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issues</a>
+is the front door; there is no ticket system because there is no company, just an open observatory.</p>`;
+  const privacyBody = `
+<p class="chip"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Privacy</p>
+<h1>Privacy</h1>
+<p class="lede">This site collects nothing. No analytics, no cookies, no accounts, no forms, no third-party scripts.
+Pages are static files served from a CDN; we never see who you are.</p>
+<p class="lede">The audit data we publish is gathered exclusively from public surfaces — homepages, robots.txt,
+llms.txt, sitemaps, and well-known endpoints — the same requests any AI crawler makes. We fetch each site a handful
+of times per week with the user agent <code>AgentabilityBot/2.0</code>, honor what robots.txt tells us in scoring,
+and publish only what those public files say. To remove a domain from the Index, open a
+<a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
+  const smallPages: Array<{ dir: string; title: string; description: string; body: string }> = [
+    { dir: "docs", title: "Data docs — Agentability", description: "How to use the AI-Readiness Index open data: JSON endpoints, history snapshots, and raw per-site results.", body: docsBody },
+    { dir: "support", title: "Support — Agentability", description: "Request an audit, dispute a check, or get your score re-run after deploying fixes.", body: supportBody },
+    { dir: "privacy", title: "Privacy — Agentability", description: "No analytics, no cookies, no accounts. Audits use only public surfaces.", body: privacyBody },
+  ];
+  for (const p of smallPages) {
+    await fsp.mkdir(path.join(OUT, p.dir), { recursive: true });
+    await fsp.writeFile(
+      path.join(OUT, `${p.dir}/index.html`),
+      shell({ title: p.title, description: p.description, canonicalPath: `/${p.dir}/`, body: p.body }),
+      "utf8"
+    );
+  }
+
   // ---------- Machine surfaces (dogfood) ----------
   const domains = summary ? summary.leaderboard.map((r) => r.domain) : [];
   await fsp.writeFile(
@@ -333,6 +390,8 @@ raw results to the repository. Disagree with a check? Open an issue — the rubr
       `- The AI-Readiness Index (full rankings): ${SITE}/ai-index/`,
       `- Methodology (checks and scoring): ${SITE}/methodology/`,
       `- Raw data (JSON): ${SITE}/data/summary.json`,
+      `- Data docs (endpoints and attribution): ${SITE}/docs/`,
+      `- Support (audit requests, disputes): ${SITE}/support/`,
       "",
       "## Per-site reports",
       ...domains.slice(0, 40).map((d) => `- ${SITE}/ai-index/site/${d}/`),
@@ -340,7 +399,7 @@ raw results to the repository. Disagree with a check? Open an issue — the rubr
     "utf8"
   );
   await fsp.writeFile(path.join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`, "utf8");
-  const urls = ["/", "/ai-index/", "/methodology/", ...domains.map((d) => `/ai-index/site/${d}/`)];
+  const urls = ["/", "/ai-index/", "/methodology/", "/docs/", "/support/", "/privacy/", ...domains.map((d) => `/ai-index/site/${d}/`)];
   await fsp.writeFile(
     path.join(OUT, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
