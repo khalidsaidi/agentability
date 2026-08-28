@@ -1,12 +1,13 @@
 #!/usr/bin/env tsx
 // Runs one field-test episode: a real agent, real tasks, real websites.
 // Writes data/fieldtest/episodes/{date}.json for the site builder. Designed
-// for GitHub Actions (ANTHROPIC_API_KEY secret) with a hard token budget.
+// for GitHub Actions (ANTHROPIC_API_KEY secret) with a hard spend ceiling.
 
 import fsp from "node:fs/promises";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
-import { runFieldTask, AGENT_MODEL, PRICE_PER_MTOK_IN, PRICE_PER_MTOK_OUT, type TaskRun } from "./lib/field-agent";
+import { runFieldTask, AGENT_MODEL, type TaskRun } from "./lib/field-agent";
+import { CostBudget } from "./lib/cost-budget";
 import { produceEpisodeTasks } from "./lib/episode-producer";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
@@ -14,8 +15,9 @@ const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const DOMAINS_PATH = path.join(REPO_ROOT, "data/index/domains.txt");
 
-// Hard episode budget: ~2.5M tokens ≈ $3-4 worst case on the model above.
-const EPISODE_TOKEN_BUDGET = 2_500_000;
+// Hard episode ceiling in USD, covering BOTH the producer and the agent. A
+// typical episode lands near $1; this stops any runaway well before it matters.
+const EPISODE_BUDGET_USD = 6;
 
 type Diagnosis = { domain: string; posture: string; parseable: boolean; scoreLink: boolean };
 
@@ -73,14 +75,13 @@ async function main() {
   } catch {
     /* no index yet */
   }
-  const { tasks, producedBy } = await produceEpisodeTasks(client, panelDomains, blockedDomains, pastTitles);
+  const budget = new CostBudget(EPISODE_BUDGET_USD);
+  const { tasks, producedBy } = await produceEpisodeTasks(client, panelDomains, blockedDomains, pastTitles, budget);
   console.log(`Episode tasks by ${producedBy}: ${tasks.map((t) => t.id).join(", ")}`);
-
-  const budget = { tokensLeft: EPISODE_TOKEN_BUDGET };
   const runs: Array<TaskRun & { diagnosis: Diagnosis[] }> = [];
 
   for (const task of tasks) {
-    if (budget.tokensLeft <= 0) {
+    if (budget.exhausted) {
       console.log(`Budget exhausted — skipping remaining tasks from ${task.id} on.`);
       break;
     }
@@ -102,8 +103,8 @@ async function main() {
 
   const inputTokens = runs.reduce((acc, r) => acc + r.inputTokens, 0);
   const outputTokens = runs.reduce((acc, r) => acc + r.outputTokens, 0);
-  const costUsd =
-    Math.round(((inputTokens / 1e6) * PRICE_PER_MTOK_IN + (outputTokens / 1e6) * PRICE_PER_MTOK_OUT) * 100) / 100;
+  // Real spend for the whole episode, producer included.
+  const costUsd = budget.spent;
 
   const date = new Date().toISOString().slice(0, 10);
   const episode = {

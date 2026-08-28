@@ -5,6 +5,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { FieldTask } from "./field-agent";
+import { CostBudget } from "./cost-budget";
 
 const PRODUCER_MODEL = "claude-opus-5";
 
@@ -95,7 +96,8 @@ export async function produceEpisodeTasks(
   client: Anthropic,
   panelDomains: string[],
   blockedDomains: string[],
-  pastTitles: string[]
+  pastTitles: string[],
+  budget: CostBudget
 ): Promise<{ tasks: FieldTask[]; producedBy: "producer" | "seed" }> {
   try {
     const params = {
@@ -124,6 +126,8 @@ export async function produceEpisodeTasks(
     const messages: Anthropic.MessageParam[] = [...params.messages];
     let toolUse: Anthropic.ToolUseBlock | undefined;
     for (let round = 0; round < 6 && !toolUse; round++) {
+      // This model costs ~15x the agent's; a research loop must not run away.
+      if (budget.exhausted) throw new Error("spend ceiling reached before tasks were produced");
       let response: Anthropic.Message | null = null;
       let lastError: unknown;
       for (let attempt = 0; attempt < 3 && !response; attempt++) {
@@ -135,6 +139,7 @@ export async function produceEpisodeTasks(
         }
       }
       if (!response) throw lastError;
+      budget.record(PRODUCER_MODEL, response.usage.input_tokens, response.usage.output_tokens);
       toolUse = response.content.find(
         (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "propose_tasks"
       );

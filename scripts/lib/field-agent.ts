@@ -4,6 +4,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { visitPage, type PageView } from "./web-tools";
+import { CostBudget } from "./cost-budget";
 
 export const AGENT_MODEL = "claude-haiku-4-5";
 // Published pricing for the model above, used for the transparency line.
@@ -147,7 +148,7 @@ function pruneOldPages(messages: Anthropic.MessageParam[]): void {
   }
 }
 
-export async function runFieldTask(client: Anthropic, task: FieldTask, budget: { tokensLeft: number }): Promise<TaskRun> {
+export async function runFieldTask(client: Anthropic, task: FieldTask, budget: CostBudget): Promise<TaskRun> {
   const startedAt = Date.now();
   const run: TaskRun = {
     taskId: task.id,
@@ -178,8 +179,8 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: {
 
   try {
     for (let step = 1; step <= MAX_STEPS + 1; step++) {
-      if (budget.tokensLeft <= 0) {
-        run.error = "episode token budget exhausted";
+      if (budget.exhausted) {
+        run.error = "episode spend ceiling reached";
         break;
       }
       pruneOldPages(messages);
@@ -192,7 +193,7 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: {
       });
       run.inputTokens += response.usage.input_tokens;
       run.outputTokens += response.usage.output_tokens;
-      budget.tokensLeft -= response.usage.input_tokens + response.usage.output_tokens;
+      budget.record(AGENT_MODEL, response.usage.input_tokens, response.usage.output_tokens);
 
       const narration = response.content
         .filter((b): b is Anthropic.TextBlock => b.type === "text")
@@ -294,7 +295,7 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: {
       });
       run.inputTokens += response.usage.input_tokens;
       run.outputTokens += response.usage.output_tokens;
-      budget.tokensLeft -= response.usage.input_tokens + response.usage.output_tokens;
+      budget.record(AGENT_MODEL, response.usage.input_tokens, response.usage.output_tokens);
       const finishUse = response.content.find((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
       if (finishUse) {
         const input = finishUse.input as any;
