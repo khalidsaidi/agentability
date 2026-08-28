@@ -3,9 +3,18 @@ name: deploy
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - 'LICENSE'
 
 permissions:
   contents: read
+
+# Consecutive pushes supersede each other rather than queueing a build each.
+concurrency:
+  group: deploy
+  cancel-in-progress: true
 
 jobs:
   deploy:
