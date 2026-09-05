@@ -101,14 +101,32 @@ gtag('config', 'G-55RKNLGPNT');
     .ticker-track { animation: tick 36s linear infinite; }
     @keyframes tick { to { transform: translateX(-50%); } }
   }
-  /* bento scoreboard */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 30px 0 8px; }
-  .stat { border: 1px solid var(--line); background: var(--panel); border-radius: 18px; padding: 18px; transition: transform .18s, border-color .18s; }
-  .stat:hover { transform: translateY(-3px); border-color: #3a3d4d; }
-  .stat b { display: block; font-family: var(--display); font-weight: 800; font-size: clamp(1.7rem, 3.4vw, 2.5rem); line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .stat small { color: var(--dim); font-size: .8rem; }
-  .stat.walls b { color: var(--hazard); }
-  @media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  /* the scoreboard: one loud number, then the whole episode in a strip */
+  .board { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px 40px; margin: 30px 0 0; }
+  .board .score { font-family: var(--display); font-weight: 800; font-size: clamp(4rem, 10.5vw, 7rem); line-height: .8; letter-spacing: -.045em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .board .score i { font-style: normal; color: #4a4d5c; }
+  .board .caption { display: block; font-family: var(--mono); font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-top: 16px; }
+  /* result strip: one cell per errand, in the order they aired, named by the site it ran against */
+  .stripwrap { margin-top: 22px; }
+  /* one row on a wide screen; wraps to a grid rather than crushing the names on a phone */
+  .strip { display: flex; flex-wrap: wrap; gap: 4px; }
+  .strip a { flex: 1 1 84px; min-width: 0; height: 54px; border-radius: 7px; display: flex; align-items: flex-end; justify-content: center;
+    padding: 0 6px 6px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: #111; text-decoration: none; transition: transform .15s; }
+  .strip a > span { display: flex; align-items: baseline; gap: 4px; max-width: 100%; min-width: 0; }
+  .strip a .b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .strip a em { flex: none; font-style: normal; opacity: .55; }
+  .strip a:hover { transform: translateY(-4px); color: #111; }
+  .o-completed { background: var(--win); }
+  .o-partial { background: var(--hazard); }
+  .o-failed { background: var(--alert); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 11px; font-family: var(--mono); font-size: .72rem; letter-spacing: .04em; color: var(--dim); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: 0; }
+  .runline { margin: 0 0 8px; font-family: var(--mono); font-size: .78rem; letter-spacing: .04em; color: var(--dim); }
+  .runline b { color: var(--ink); font-weight: 600; }
+  /* index figures: same data, deliberately not the same shape as the scoreboard */
+  .figs { display: flex; flex-wrap: wrap; gap: 16px 40px; margin-top: 20px; }
+  .fig b { display: block; font-family: var(--display); font-weight: 800; font-size: 2rem; line-height: 1.05; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .fig small { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
   /* tables */
   table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .92rem; }
   th { text-align: left; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px; border-bottom: 1px solid var(--line); }
@@ -126,19 +144,53 @@ gtag('config', 'G-55RKNLGPNT');
   .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .8rem; color: #6d7080; }
   .scorebig { font-family: var(--display); font-size: 3.6rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.03em; }
   /* the show: segments */
-  .task { position: relative; border: 1px solid var(--line); background: var(--panel); border-radius: 20px; padding: 22px 24px; margin: 18px 0; transition: border-color .18s; }
+  .task { position: relative; border: 1px solid var(--line); border-left: 5px solid #3a3d4d; background: var(--panel); border-radius: 4px 20px 20px 4px; padding: 20px 24px 22px; margin: 16px 0; transition: border-color .18s; }
   .task:hover { border-color: #3a3d4d; }
-  .task h3 { font-family: var(--display); font-weight: 700; font-size: 1.28rem; letter-spacing: -.01em; margin: 4px 0 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .task.completed { border-left-color: var(--win); }
+  .task.partial { border-left-color: var(--hazard); }
+  .task.failed { border-left-color: var(--alert); }
+  .task h3 { font-family: var(--display); font-weight: 700; font-size: 1.28rem; letter-spacing: -.01em; margin: 6px 0 8px; }
+  .verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
   .segno { font-family: var(--mono); font-size: .7rem; letter-spacing: .14em; color: #565968; text-transform: uppercase; }
-  .stamp { font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; border: 2px solid currentColor; padding: 2px 8px; border-radius: 7px; transform: rotate(-2deg); }
+  .stamp { font-family: var(--mono); font-size: .76rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; border: 2px solid currentColor; padding: 3px 10px; border-radius: 7px; transform: rotate(-1.5deg); }
   .stamp.completed { color: var(--win); }
   .stamp.partial { color: var(--hazard); }
   .stamp.failed { color: var(--alert); }
   .wallcount { font-family: var(--mono); font-size: .7rem; color: var(--hazard); letter-spacing: .06em; }
   .pick { font-family: var(--mono); font-size: .7rem; color: var(--win); letter-spacing: .06em; }
-  .prompt { font-size: .88rem; color: var(--dim); max-width: 70ch; }
-  .answer { position: relative; margin: 14px 0 4px; padding: 14px 16px 13px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px 16px 16px 16px; font-size: .95rem; }
-  .answer::before { content: "AGENT'S REPORT"; display: block; font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; color: var(--dim); margin-bottom: 6px; }
+  /* which sites the errand was actually run against, busiest first */
+  .sites { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 12px; }
+  .sites .st { display: inline-flex; align-items: baseline; gap: 6px; font-family: var(--mono); font-size: .76rem; font-weight: 600;
+    color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 3px 9px; text-decoration: none; }
+  .sites .st.primary { background: var(--ink); border-color: var(--ink); color: #111; }
+  .sites .st b { font-weight: 600; font-size: .68rem; opacity: .5; }
+  .sites a.st:hover { border-color: var(--hazard); background: var(--panel-2); color: var(--hazard); }
+  .sites .more { font-family: var(--mono); font-size: .72rem; color: var(--dim); }
+  /* index → show: the errands a real agent ran against this domain */
+  .appear { list-style: none; padding: 0; margin: 16px 0 0; }
+  .appear li { border: 1px solid var(--line); border-left: 4px solid #3a3d4d; background: var(--panel); border-radius: 4px 14px 14px 4px; padding: 12px 16px; margin-bottom: 8px; }
+  .appear li.completed { border-left-color: var(--win); }
+  .appear li.partial { border-left-color: var(--hazard); }
+  .appear li.failed { border-left-color: var(--alert); }
+  .appear .v { font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .appear li.completed .v { color: var(--win); }
+  .appear li.partial .v { color: var(--hazard); }
+  .appear li.failed .v { color: var(--alert); }
+  .appear a { display: block; margin: 5px 0 4px; font-family: var(--display); font-weight: 700; font-size: 1.02rem; color: var(--ink); text-decoration: none; }
+  .appear a:hover { color: var(--hazard); }
+  .appear .m { font-family: var(--mono); font-size: .72rem; color: var(--dim); }
+  .prompt { font-size: .88rem; color: var(--dim); max-width: 74ch; margin-top: 8px; }
+  .brief { margin: 2px 0 4px; }
+  .brief summary { cursor: pointer; font-family: var(--mono); font-size: .74rem; letter-spacing: .04em; color: #6d7080; }
+  .brief summary:hover { color: var(--ink); }
+  .answer { position: relative; margin: 14px 0 4px; padding: 15px 18px 15px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px 16px 16px 16px; font-size: 1rem; max-width: 78ch; }
+  .answer::before { content: "AGENT'S REPORT"; display: block; font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; color: var(--dim); margin-bottom: 7px; }
+  .answer p { margin: 0 0 10px; }
+  .answer > :last-child { margin-bottom: 0; }
+  .answer strong { font-weight: 700; }
+  .answer ul { margin: 0 0 10px; padding-left: 20px; }
+  .answer li { margin-bottom: 3px; }
+  .answer a { word-break: break-word; }
   .obst { font-size: .86rem; color: var(--hazard); margin-top: 10px; opacity: .92; }
   .diag { font-size: .8rem; color: var(--dim); margin-top: 8px; }
   .task details { margin-top: 12px; }
@@ -158,11 +210,19 @@ gtag('config', 'G-55RKNLGPNT');
   .wallchip { display: inline-block; font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; background: var(--hazard); color: #111; padding: 2px 8px; border-radius: 5px; }
   /* this-week segment cards */
   .segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
-  .seg { position: relative; display: block; border: 1px solid var(--line); background: var(--panel); border-radius: 18px; padding: 18px; text-decoration: none; color: var(--ink); overflow: hidden; transition: transform .18s, border-color .18s; }
-  .seg:hover { transform: translateY(-3px); border-color: #3a3d4d; color: var(--ink); }
-  .seg .bigno { position: absolute; right: 10px; top: 2px; font-family: var(--display); font-weight: 800; font-size: 4.4rem; color: #20222c; line-height: 1; z-index: 0; }
-  .seg .t { position: relative; font-family: var(--display); font-weight: 700; font-size: 1.02rem; line-height: 1.25; z-index: 1; }
-  .seg .o { position: relative; display: block; margin-top: 10px; z-index: 1; }
+  .seg { display: block; border: 1px solid var(--line); border-top: 4px solid #3a3d4d; background: var(--panel); border-radius: 4px 4px 18px 18px; padding: 15px 18px 18px; text-decoration: none; color: var(--ink); transition: transform .18s, border-color .18s; }
+  .seg:hover { transform: translateY(-3px); color: var(--ink); }
+  .seg.completed { border-top-color: var(--win); }
+  .seg.partial { border-top-color: var(--hazard); }
+  .seg.failed { border-top-color: var(--alert); }
+  .seg .v { display: block; font-family: var(--mono); font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 9px; }
+  .seg.completed .v { color: var(--win); }
+  .seg.partial .v { color: var(--hazard); }
+  .seg.failed .v { color: var(--alert); }
+  .seg .t { display: block; font-family: var(--display); font-weight: 700; font-size: 1.05rem; line-height: 1.28; }
+  .seg .w { display: block; margin-top: 9px; font-family: var(--mono); font-size: .76rem; font-weight: 600; color: var(--ink); }
+  .seg .w em { font-style: normal; font-weight: 400; color: var(--dim); }
+  .seg .o { display: block; margin-top: 7px; }
   @media (max-width: 720px) { .segs { grid-template-columns: 1fr; } }
   .hero-cta { display: inline-block; margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: 1rem; background: var(--hazard); color: #111 !important; text-decoration: none; padding: 12px 22px; border-radius: 999px; transition: transform .15s; }
   .hero-cta:hover { transform: translateY(-2px) rotate(-1deg); }
@@ -185,7 +245,7 @@ ${opts.body}
   // Did they actually read a transcript? The core engagement signal.
   document.addEventListener('toggle', function (e) {
     var d = e.target;
-    if (d && d.tagName === 'DETAILS' && d.open) {
+    if (d && d.tagName === 'DETAILS' && d.open && !d.classList.contains('brief')) {
       var card = d.closest ? d.closest('.task') : null;
       send('playbyplay_open', { task_id: card && card.id ? card.id.replace('task-', '') : 'unknown', page_path: location.pathname });
     }
@@ -269,6 +329,84 @@ type Episode = {
   runs: EpisodeRun[];
 };
 
+// Domains with a report page under /ai-index/site/ — filled in by main() before any page is rendered.
+const audited = new Set<string>();
+
+// help.netflix.com and netflix.com are one errand against one brand — collapse to the root.
+const TWO_PART_TLD = /\.(co|com|org|net|gov|ac|edu)\.[a-z]{2}$/;
+function rootDomain(host: string): string {
+  const h = host.toLowerCase().replace(/^www\./, "");
+  const parts = h.split(".");
+  return parts.slice(-(TWO_PART_TLD.test(h) ? 3 : 2)).join(".");
+}
+
+// Which sites did this errand actually touch, busiest first?
+function runSites(run: EpisodeRun): Array<{ domain: string; visits: number }> {
+  const counts = new Map<string, number>();
+  for (const step of run.steps) {
+    let host = "";
+    try {
+      host = new URL(step.finalUrl || step.url).hostname;
+    } catch {
+      host = "";
+    }
+    if (!host) continue;
+    const d = rootDomain(host);
+    counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  if (!counts.size) for (const d of run.domainsVisited) counts.set(rootDomain(d), 1);
+  return [...counts]
+    .map(([domain, visits]) => ({ domain, visits }))
+    .sort((a, b) => b.visits - a.visits || a.domain.localeCompare(b.domain));
+}
+
+// The agent writes markdown. Rendering it is presentation, not editing — the words are untouched.
+function inline(t: string): string {
+  return t
+    .replace(/https?:\/\/(?:(?!&quot;)[^\s<>])+/g, (m) => {
+      const trail = /[).,;:]+$/.exec(m)?.[0] ?? "";
+      const url = trail ? m.slice(0, m.length - trail.length) : m;
+      const shown = url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+      return `<a href="${url}" rel="nofollow noopener">${shown.length > 44 ? `${shown.slice(0, 41)}…` : shown}</a>${trail}`;
+    })
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+
+// Short agent utterances stay one quoted run of text — markdown rendered, line breaks kept.
+function renderQuote(raw: string): string {
+  return inline(esc(raw)).replace(/\n+/g, "<br>");
+}
+
+function renderReport(raw: string): string {
+  const safe = esc(raw);
+  const out: string[] = [];
+  for (const chunk of safe.split(/\n{2,}/)) {
+    const lines = chunk.split("\n").map((l) => l.trim()).filter(Boolean);
+    // A chunk can be a lead sentence followed by bullets — keep both, in order.
+    let group: string[] = [];
+    let bullets = false;
+    const flush = () => {
+      if (!group.length) return;
+      out.push(
+        bullets
+          ? `<ul>${group.map((l) => `<li>${inline(l.replace(/^[-*]\s+/, ""))}</li>`).join("")}</ul>`
+          : `<p>${group.map(inline).join("<br>")}</p>`
+      );
+      group = [];
+    };
+    for (const line of lines) {
+      const isBullet = /^[-*]\s+/.test(line);
+      if (isBullet !== bullets) {
+        flush();
+        bullets = isBullet;
+      }
+      group.push(line);
+    }
+    flush();
+  }
+  return out.join("") || `<p>${inline(safe)}</p>`;
+}
+
 const FIELD_FAQ: Array<{ q: string; a: string }> = [
   {
     q: "Can AI agents actually use websites in 2026?",
@@ -303,9 +441,10 @@ function stamp(outcome: EpisodeRun["outcome"]): string {
 }
 
 function taskCard(run: EpisodeRun, idx: number): string {
+  const sites = runSites(run);
   const timeline = run.steps
     .map((s) => {
-      const say = s.narration ? `<div class="say">“${esc(s.narration)}”</div>` : "";
+      const say = s.narration ? `<div class="say">“${renderQuote(s.narration)}”</div>` : "";
       const wall = s.botWall ? `<div class="stripe"></div><span class="wallchip">⚠ BOT WALL</span> ` : "";
       const act = s.url
         ? `<div class="act">${wall}GET ${esc(s.finalUrl || s.url)} — ${esc(s.note)}</div>`
@@ -322,16 +461,56 @@ function taskCard(run: EpisodeRun, idx: number): string {
         }${!d.parseable ? `${d.posture !== "open" ? " and" : ""} unreadable without a browser` : ""} on our index`
     )
     .join("; ");
-  return `<div class="task" id="task-${esc(run.taskId)}">
-<div class="segno">Segment ${String(idx + 1).padStart(2, "0")} · ${esc(run.kind)}</div>
-<h3>${esc(run.title)} ${stamp(run.outcome)}${run.wallsHit ? ` <span class="wallcount">⚠ ${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>` : ""}${run.chosenSite ? ` <span class="pick">✓ picked ${esc(run.chosenSite)}</span>` : ""}</h3>
-<p class="prompt">The task: ${esc(run.prompt)}</p>
-<div class="answer">${esc(run.answer || run.error || "no report")}</div>
-${run.obstacles.length ? `<p class="obst">In the agent's words: ${run.obstacles.map((o) => `“${esc(o)}”`).join(" · ")}</p>` : ""}
+  return `<div class="task ${run.outcome}" id="task-${esc(run.taskId)}">
+<div class="verdict">${stamp(run.outcome)}<span class="segno">Segment ${String(idx + 1).padStart(2, "0")} · ${esc(run.kind)}</span>${run.wallsHit ? `<span class="wallcount">⚠ ${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>` : ""}${run.chosenSite ? `<span class="pick">✓ picked ${esc(run.chosenSite)}</span>` : ""}</div>
+<h3>${esc(run.title)}</h3>
+${sites.length
+    ? `<div class="sites">${sites
+        .slice(0, 4)
+        .map((x, i) => {
+          const cls = `st${i === 0 ? " primary" : ""}`;
+          const inner = `${esc(x.domain)}<b>${x.visits}</b>`;
+          return audited.has(x.domain)
+            ? `<a class="${cls}" href="/ai-index/site/${esc(x.domain)}/" title="${esc(x.domain)} is on the Index — see its report">${inner}</a>`
+            : `<span class="${cls}">${inner}</span>`;
+        })
+        .join("")}${sites.length > 4 ? `<span class="more">+${sites.length - 4} more</span>` : ""}</div>`
+    : `<div class="sites"><span class="more">no page ever loaded</span></div>`}
+<details class="brief"><summary>▸ The task, exactly as the producer wrote it</summary><p class="prompt">${esc(run.prompt)}</p></details>
+<div class="answer">${renderReport(run.answer || run.error || "no report")}</div>
+${run.obstacles.length ? `<p class="obst">In the agent's words: ${run.obstacles.map((o) => `“${renderQuote(o)}”`).join(" · ")}</p>` : ""}
 ${diag ? `<p class="diag">Why: ${diag}.</p>` : ""}
 <details><summary>▸ Play-by-play — ${run.steps.filter((s) => s.url).length} page visits, published verbatim</summary>
 <ul class="tl">${timeline}</ul></details>
 </div>`;
+}
+
+// The whole episode in one row: one cell per task, coloured by how it ended.
+function resultStrip(episode: Episode, hrefBase: string): string {
+  const cells = episode.runs
+    .map((run, i) => {
+      const sites = runSites(run);
+      // Drop a .com because everyone reads it anyway; keep .ai/.io/.bg, which are part of the name.
+      const brand = sites.length
+        ? sites[0].domain.replace(/\.com$/, "")
+        : `task ${i + 1}`;
+      const label = `<span class="b">${esc(brand)}</span>${sites.length > 1 ? `<em>+${sites.length - 1}</em>` : ""}`;
+      const where = sites.map((x) => x.domain).join(", ") || "no pages reached";
+      // Colour alone carries the outcome, so spell it out for screen readers and on hover.
+      const described = `${esc(run.title)} — ${STAMP_LABEL[run.outcome]} · ${esc(where)}`;
+      return `<a class="o-${run.outcome}" href="${hrefBase}#task-${esc(run.taskId)}" title="${described}" aria-label="Segment ${i + 1}: ${described}"><span>${label}</span></a>`;
+    })
+    .join("");
+  const counts: Array<[EpisodeRun["outcome"], number, string]> = [
+    ["completed", episode.stats.completed, "done"],
+    ["partial", episode.stats.partial, "gave up honestly"],
+    ["failed", episode.stats.failed, "failed"],
+  ];
+  const legend = counts
+    .filter(([, n]) => n > 0)
+    .map(([o, n, label]) => `<span><i class="o-${o}"></i>${n} ${label}</span>`)
+    .join("");
+  return `<div class="strip">${cells}</div><div class="legend">${legend}</div>`;
 }
 
 function segCards(episode: Episode): string {
@@ -348,16 +527,20 @@ function segCards(episode: Episode): string {
     .slice(0, 3);
   return `<div class="segs">${scored
     .map(({ run }) => {
-      const idx = episode.runs.indexOf(run) + 1;
       const note = run.wallsHit
         ? `<span class="wallcount">⚠ ${run.wallsHit} bot wall${run.wallsHit > 1 ? "s" : ""}</span>`
         : run.chosenSite
           ? `<span class="pick">✓ picked ${esc(run.chosenSite)}</span>`
-          : stamp(run.outcome);
-      return `<a class="seg" href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">
-<span class="bigno">${String(idx).padStart(2, "0")}</span>
+          : "";
+      const sites = runSites(run);
+      const where = sites.length
+        ? `<span class="w">${esc(sites[0].domain)}${sites.length > 1 ? ` <em>+${sites.length - 1} more</em>` : ""}</span>`
+        : "";
+      return `<a class="seg ${run.outcome}" href="/fieldtest/${episode.date}/#task-${esc(run.taskId)}">
+<span class="v">${STAMP_LABEL[run.outcome]}</span>
 <span class="t">${esc(run.title)}</span>
-<span class="o">${note}</span>
+${where}
+${note ? `<span class="o">${note}</span>` : ""}
 </a>`;
     })
     .join("\n")}</div>`;
@@ -406,11 +589,43 @@ async function main() {
     }
   }
   const latest = episodes[0] ?? null;
+  for (const row of summary?.leaderboard ?? []) audited.add(row.domain);
+
+  // The panel audits zoom.us while the agent visits zoom.com. Alias a brand to its audited domain,
+  // but only when exactly one audited domain carries that name — never guess between two.
+  const byBrand = new Map<string, string[]>();
+  for (const domain of audited) {
+    const brand = domain.split(".")[0];
+    byBrand.set(brand, [...(byBrand.get(brand) ?? []), domain]);
+  }
+  const reportFor = (domain: string): string | null => {
+    if (audited.has(domain)) return domain;
+    const match = byBrand.get(domain.split(".")[0]);
+    return match && match.length === 1 ? match[0] : null;
+  };
+
+  // Which episodes ran an errand against each domain? Closes the index → show loop.
+  type Appearance = { date: string; taskId: string; title: string; outcome: EpisodeRun["outcome"]; visits: number };
+  const appearances = new Map<string, Appearance[]>();
+  for (const ep of episodes) {
+    for (const run of ep.runs) {
+      const claimed = new Set<string>();
+      for (const site of runSites(run)) {
+        const target = reportFor(site.domain);
+        if (!target || claimed.has(target)) continue;
+        claimed.add(target);
+        const list = appearances.get(target) ?? [];
+        list.push({ date: ep.date, taskId: run.taskId, title: run.title, outcome: run.outcome, visits: site.visits });
+        appearances.set(target, list);
+      }
+    }
+  }
 
   // ---------- Landing: the field test leads, the index is the reference ----------
   const s = summary?.stats;
+  // The ticker states the rules; the numbers live in exactly one place, the scoreboard below it.
   const tickerSpans = latest
-    ? `<span><b>${latest.stats.tasks}</b> tasks</span><span><b>${latest.stats.completed}</b> completed</span><span><b>${latest.stats.wallsHit}</b> bot walls</span><span><b>${latest.stats.pageVisits}</b> pages read</span><span><b>${latest.stats.domainsVisited}</b> sites visited</span><span>no retries · no editing · no mercy</span><span>agent: ${esc(latest.model)}</span><span>producer: opus 5 + live search</span>`
+    ? `<span>no retries</span><span>no editing</span><span>no cherry-picking</span><span>read-only <b>http get</b> — no javascript, no logins, no forms</span><span>agent: <b>${esc(latest.model)}</b></span><span>producer: <b>opus 5</b> + live search</span><span>every transcript published verbatim</span>`
     : "";
   const fieldtestHero = latest
     ? `
@@ -422,19 +637,23 @@ access. Every transcript is published verbatim: the wins, the bot walls, the bra
 calls for fun.)</p>
 <a class="hero-cta rise d3" href="/fieldtest/${latest.date}/">Watch this week's episode →</a>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
-<div class="stats">
-  <div class="stat"><b>${latest.stats.completed}/${latest.stats.tasks}</b><small>tasks completed this episode</small></div>
-  <div class="stat walls"><b>${latest.stats.wallsHit}</b><small>bot walls hit</small></div>
-  <div class="stat"><b>${latest.stats.pageVisits}</b><small>pages read</small></div>
-  <div class="stat"><b>${latest.stats.domainsVisited}</b><small>sites visited</small></div>
+<div class="board">
+  <div>
+    <div class="score">${latest.stats.completed}<i>/${latest.stats.tasks}</i></div>
+    <span class="caption">errands the agent finished this week</span>
+  </div>
+  <p class="runline"><b>${latest.stats.wallsHit}</b> bot walls · <b>${latest.stats.pageVisits}</b> pages read · <b>${latest.stats.domainsVisited}</b> sites visited</p>
 </div>
-<h2>This week's best segments</h2>
+<div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
+<h2>Where it got interesting</h2>
 ${segCards(latest)}`
     : `
 <p class="eyebrow"><span class="live"></span>The Agent Field Test · first episode in production</p>
 <h1>We send an AI agent to run your <span class="hl">errands</span> on the real web. Then we publish <span class="hl">everything</span>.</h1>
 <p class="lede">A weekly, fully autonomous show: an AI producer invents real errands, a real agent attempts them with
 read-only web access, and the full transcripts are published here — wins, bot walls, and all.</p>`;
+  // Only worth splitting the table when the two halves can't overlap.
+  const bottomFive = summary && summary.leaderboard.length > 12 ? summary.leaderboard.slice(-5) : [];
   const landingBody = `${fieldtestHero}
 ${summary && s
     ? `
@@ -442,15 +661,19 @@ ${summary && s
 <p class="lede">Behind the show sits the panel: ${s.audited} well-known sites audited weekly against the conventions
 real AI agents rely on — <code>llms.txt</code>, crawler policy, parseable content, structured data, MCP. When the
 agent hits a wall, the index usually already predicted it.</p>
-<div class="stats">
-  <div class="stat"><b>${s.averageScore}/100</b><small>average readiness score</small></div>
-  <div class="stat"><b>${s.pctLlmsTxt}%</b><small>publish llms.txt</small></div>
-  <div class="stat"><b>${s.pctBlockingSomeAI}%</b><small>block at least one AI crawler</small></div>
-  <div class="stat"><b>${s.pctClosed}%</b><small>closed to AI by policy</small></div>
+<div class="figs">
+  <div class="fig"><b>${s.averageScore}/100</b><small>average readiness score</small></div>
+  <div class="fig"><b>${s.pctLlmsTxt}%</b><small>publish llms.txt</small></div>
+  <div class="fig"><b>${s.pctBlockingSomeAI}%</b><small>block at least one AI crawler</small></div>
+  <div class="fig"><b>${s.pctClosed}%</b><small>closed to AI by policy</small></div>
 </div>
-<h2>The Index — top 10</h2>
-${leaderboardTable(summary.leaderboard.slice(0, 10))}
-<p style="margin-top:12px"><a href="/ai-index/">Full ranked index of ${s.audited} sites →</a></p>
+<h2>The five best, and the five worst</h2>
+<p class="lede">Ranked ${s.audited} deep. The top of the table is a wall of hundreds — the bottom is where agents
+actually get stuck.</p>
+${leaderboardTable(summary.leaderboard.slice(0, 5))}
+${bottomFive.length ? `<p class="runline" style="margin:26px 0 0">↓ ranks ${bottomFive[0].rank}–${bottomFive[bottomFive.length - 1].rank} of ${s.audited}</p>
+${leaderboardTable(bottomFive)}` : ""}
+<p style="margin-top:14px"><a href="/ai-index/">Full ranked index of ${s.audited} sites →</a></p>
 <div class="cta"><b>Work on one of these sites?</b> Every failed check on your report page has a concrete fix, and scores
 refresh weekly. <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Request an audit</a>
 of any site — it's free and takes one issue.</div>`
@@ -559,6 +782,21 @@ ${robotsRow}
 <thead><tr><th>Check</th><th>Finding</th><th class="num">Points</th><th>Result</th></tr></thead>
 <tbody>${checksRows}</tbody>
 </table>
+${(appearances.get(r.domain) ?? []).length
+    ? `<h2>What happened when an agent tried to use it</h2>
+<p class="lede">A real agent ran ${(appearances.get(r.domain) ?? []).length === 1 ? "an errand" : "errands"} against ${esc(r.domain)} in the
+<a href="/fieldtest/">Field Test</a> — the score above is the prediction, this is the result.</p>
+<ul class="appear">${(appearances.get(r.domain) ?? [])
+        .slice(0, 6)
+        .map(
+          (a) => `<li class="${a.outcome}">
+<span class="v">${STAMP_LABEL[a.outcome]}</span>
+<a href="/fieldtest/${esc(a.date)}/#task-${esc(a.taskId)}">${esc(a.title)}</a>
+<span class="m">${prettyDate(a.date)} · ${a.visits} page${a.visits === 1 ? "" : "s"} read here</span>
+</li>`
+        )
+        .join("")}</ul>`
+    : ""}
 <div class="cta"><b>Work on ${esc(r.domain)}?</b> Each failed check maps to a concrete fix in the
 <a href="/methodology/">methodology</a> — most ship in under an hour. Scores refresh weekly;
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Re-audit:%20${esc(r.domain)}&labels=audit-request">request a re-run</a> after you deploy.</div>`,
@@ -688,10 +926,16 @@ ${FIELD_FAQ.map((f) => `<h3 style="font-size:.98rem;margin:18px 0 4px">${esc(f.q
         body: `
 <p class="eyebrow"><a href="/fieldtest/" style="text-decoration:none;color:inherit">← All episodes</a> · ${prettyDate(ep.date)} · agent: ${esc(ep.model)}</p>
 <h1>Episode of ${prettyDate(ep.date)}</h1>
-<p class="lede">${ep.stats.tasks} tasks, invented by the AI producer and attempted by ${esc(ep.model)} with read-only
-web access. ${ep.stats.completed} completed, ${ep.stats.partial} honest give-ups, ${ep.stats.failed} failures,
-${ep.stats.wallsHit} bot walls across ${ep.stats.pageVisits} page visits and ${ep.stats.domainsVisited} sites.
-(Yes, we pay for these API calls. For fun.)</p>
+<p class="lede">${ep.stats.tasks} errands, invented by the AI producer and attempted by ${esc(ep.model)} with read-only
+web access. Each block below is named for the site it ran against, and coloured by how it ended.</p>
+<div class="board">
+  <div>
+    <div class="score">${ep.stats.completed}<i>/${ep.stats.tasks}</i></div>
+    <span class="caption">finished</span>
+  </div>
+  <p class="runline"><b>${ep.stats.wallsHit}</b> bot walls · <b>${ep.stats.pageVisits}</b> pages read · <b>${ep.stats.domainsVisited}</b> sites visited · we pay for these API calls, for fun</p>
+</div>
+<div class="stripwrap">${resultStrip(ep, "")}</div>
 ${ep.runs.map(taskCard).join("\n")}
 <div class="cta">Every transcript above is verbatim — no retries, no editing, no cherry-picking. Method, limits, and
 rules: <a href="/methodology/">methodology</a>. Raw episode JSON: <a href="/data/fieldtest/${esc(ep.date)}.json">open data</a>.</div>`,
