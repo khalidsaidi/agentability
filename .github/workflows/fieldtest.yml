@@ -31,6 +31,12 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: npm run fieldtest
 
+      # New brands appear every week. Grab their marks once; a failure here is never
+      # worth blocking an episode over — the strip just falls back to a monogram.
+      - name: Cache brand logos for any new sites
+        continue-on-error: true
+        run: npm run logos
+
       - name: Build the static site
         run: npm run build
 
@@ -38,7 +44,7 @@ jobs:
         run: |
           git config user.name "fieldtest-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/fieldtest
+          git add data/fieldtest data/logos
           git diff --cached --quiet || git commit -m "chore: weekly Agent Field Test episode [skip ci]"
           git push
 

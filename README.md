@@ -61,6 +61,7 @@ in `data/index/history/` is an adoption time series for the agentic web.
 npm ci
 npm run index                       # audit every domain in data/index/domains.txt
 ANTHROPIC_API_KEY=... npm run fieldtest   # run an episode
+npm run logos                       # cache each brand's own favicon into data/logos/
 npm run build                       # build the site into dist-static/
 ```
 

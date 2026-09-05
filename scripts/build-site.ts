@@ -11,6 +11,8 @@ const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
 const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
+const LOGOS_DIR = path.join(REPO_ROOT, "data/logos");
+const LOGOS_MANIFEST = path.join(LOGOS_DIR, "manifest.json");
 const OUT = path.join(REPO_ROOT, "dist-static");
 const SITE = "https://agentability.org";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
@@ -110,9 +112,14 @@ gtag('config', 'G-55RKNLGPNT');
   .stripwrap { margin-top: 22px; }
   /* one row on a wide screen; wraps to a grid rather than crushing the names on a phone */
   .strip { display: flex; flex-wrap: wrap; gap: 4px; }
-  .strip a { flex: 1 1 84px; min-width: 0; height: 54px; border-radius: 7px; display: flex; align-items: flex-end; justify-content: center;
-    padding: 0 6px 6px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: #111; text-decoration: none; transition: transform .15s; }
+  .strip a { flex: 1 1 84px; min-width: 0; height: 68px; border-radius: 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    padding: 6px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: #111; text-decoration: none; transition: transform .15s; }
   .strip a > span { display: flex; align-items: baseline; gap: 4px; max-width: 100%; min-width: 0; }
+  /* a white chip behind the mark so any brand colour reads on green and on yellow */
+  .logo { flex: none; width: 20px; height: 20px; object-fit: contain; background: #fff; border-radius: 5px; padding: 2px; }
+  .logo.sm { width: 16px; height: 16px; border-radius: 4px; padding: 1px; align-self: center; }
+  .logo.mark { display: inline-flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 800; font-size: .82rem; line-height: 1; color: #4a4d5c; }
+  .logo.sm.mark { font-size: .66rem; }
   .strip a .b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .strip a em { flex: none; font-style: normal; opacity: .55; }
   .strip a:hover { transform: translateY(-4px); color: #111; }
@@ -332,6 +339,20 @@ type Episode = {
 // Domains with a report page under /ai-index/site/ — filled in by main() before any page is rendered.
 const audited = new Set<string>();
 
+// Brand marks fetched once by `npm run logos` and committed. A missing one is not an
+// error: plenty of these sites block bots, which is rather the point of the show.
+const logos: Record<string, string> = fs.existsSync(LOGOS_MANIFEST)
+  ? JSON.parse(fs.readFileSync(LOGOS_MANIFEST, "utf8"))
+  : {};
+
+function logoImg(domain: string, cls = "logo", lazy = true): string {
+  const file = logos[domain];
+  if (file)
+    return `<img class="${cls}" src="/logos/${esc(file)}" alt="" width="20" height="20"${lazy ? ' loading="lazy"' : ""} decoding="async">`;
+  // No mark reachable — usually because the site blocks bots. A monogram keeps the row even.
+  return `<span class="${cls} mark" aria-hidden="true">${esc(domain.slice(0, 1).toUpperCase())}</span>`;
+}
+
 // help.netflix.com and netflix.com are one errand against one brand — collapse to the root.
 const TWO_PART_TLD = /\.(co|com|org|net|gov|ac|edu)\.[a-z]{2}$/;
 function rootDomain(host: string): string {
@@ -469,7 +490,7 @@ ${sites.length
         .slice(0, 4)
         .map((x, i) => {
           const cls = `st${i === 0 ? " primary" : ""}`;
-          const inner = `${esc(x.domain)}<b>${x.visits}</b>`;
+          const inner = `${logoImg(x.domain, "logo sm")}${esc(x.domain)}<b>${x.visits}</b>`;
           return audited.has(x.domain)
             ? `<a class="${cls}" href="/ai-index/site/${esc(x.domain)}/" title="${esc(x.domain)} is on the Index — see its report">${inner}</a>`
             : `<span class="${cls}">${inner}</span>`;
@@ -494,11 +515,12 @@ function resultStrip(episode: Episode, hrefBase: string): string {
       const brand = sites.length
         ? sites[0].domain.replace(/\.com$/, "")
         : `task ${i + 1}`;
+      const mark = sites.length ? logoImg(sites[0].domain, "logo", false) : "";
       const label = `<span class="b">${esc(brand)}</span>${sites.length > 1 ? `<em>+${sites.length - 1}</em>` : ""}`;
       const where = sites.map((x) => x.domain).join(", ") || "no pages reached";
       // Colour alone carries the outcome, so spell it out for screen readers and on hover.
       const described = `${esc(run.title)} — ${STAMP_LABEL[run.outcome]} · ${esc(where)}`;
-      return `<a class="o-${run.outcome}" href="${hrefBase}#task-${esc(run.taskId)}" title="${described}" aria-label="Segment ${i + 1}: ${described}"><span>${label}</span></a>`;
+      return `<a class="o-${run.outcome}" href="${hrefBase}#task-${esc(run.taskId)}" title="${described}" aria-label="Segment ${i + 1}: ${described}">${mark}<span>${label}</span></a>`;
     })
     .join("");
   const counts: Array<[EpisodeRun["outcome"], number, string]> = [
@@ -1063,6 +1085,15 @@ and publish only what those public files say. To remove a domain from the Index,
   );
 
   // Open data: publish summary + history + episodes verbatim.
+  // Brand marks, committed by `npm run logos` — copied, never fetched at build time.
+  if (fs.existsSync(LOGOS_DIR)) {
+    await fsp.mkdir(path.join(OUT, "logos"), { recursive: true });
+    for (const file of await fsp.readdir(LOGOS_DIR)) {
+      if (file === "manifest.json") continue;
+      await fsp.copyFile(path.join(LOGOS_DIR, file), path.join(OUT, "logos", file));
+    }
+  }
+
   await fsp.mkdir(path.join(OUT, "data/history"), { recursive: true });
   await fsp.mkdir(path.join(OUT, "data/fieldtest"), { recursive: true });
   if (summary) await fsp.writeFile(path.join(OUT, "data/summary.json"), JSON.stringify(summary, null, 1), "utf8");
