@@ -46,6 +46,8 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/fieldtest data/logos
           git diff --cached --quiet || git commit -m "chore: weekly Agent Field Test episode [skip ci]"
+          # A 10-minute run races anything pushed to main meanwhile; land on top of it.
+          git pull --rebase origin main
           git push
 
       - name: Prepare Firebase credentials
