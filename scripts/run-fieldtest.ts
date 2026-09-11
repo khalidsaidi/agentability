@@ -1,14 +1,17 @@
 #!/usr/bin/env tsx
 // Runs one field-test episode: a real agent, real tasks, real websites.
 // Writes data/fieldtest/episodes/{date}.json for the site builder. Designed
-// for GitHub Actions (ANTHROPIC_API_KEY secret) with a hard spend ceiling.
+// for GitHub Actions (DEEPSEEK_API_KEY secret) with a hard spend ceiling.
+//
+// Both models are served by DeepSeek through its Anthropic-format endpoint, so
+// the Anthropic SDK is the client and only the base URL differs.
 
 import fsp from "node:fs/promises";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { runFieldTask, AGENT_MODEL, type TaskRun } from "./lib/field-agent";
 import { CostBudget } from "./lib/cost-budget";
-import { produceEpisodeTasks } from "./lib/episode-producer";
+import { produceEpisodeTasks, PRODUCER_MODEL } from "./lib/episode-producer";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
@@ -16,8 +19,10 @@ const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const DOMAINS_PATH = path.join(REPO_ROOT, "data/index/domains.txt");
 
 // Hard episode ceiling in USD, covering BOTH the producer and the agent. A
-// typical episode lands near $1; this stops any runaway well before it matters.
-const EPISODE_BUDGET_USD = 6;
+// typical episode lands near $0.30; this stops any runaway well before it matters.
+const EPISODE_BUDGET_USD = 3;
+
+const DEEPSEEK_BASE_URL = "https://api.deepseek.com/anthropic";
 
 type Diagnosis = { domain: string; posture: string; parseable: boolean; scoreLink: boolean };
 
@@ -62,12 +67,12 @@ async function preflight(client: Anthropic): Promise<void> {
 }
 
 async function main() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    console.error("ANTHROPIC_API_KEY is not set.");
+    console.error("DEEPSEEK_API_KEY is not set.");
     process.exit(1);
   }
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({ apiKey, baseURL: DEEPSEEK_BASE_URL });
   await preflight(client);
   await fsp.mkdir(EPISODES_DIR, { recursive: true });
 
@@ -144,6 +149,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     model: AGENT_MODEL,
     producedBy,
+    producerModel: producedBy === "producer" ? PRODUCER_MODEL : null,
     stats: {
       tasks: runs.length,
       completed: runs.filter((r) => r.outcome === "completed").length,

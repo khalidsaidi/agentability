@@ -16,6 +16,8 @@ const LOGOS_MANIFEST = path.join(LOGOS_DIR, "manifest.json");
 const OUT = path.join(REPO_ROOT, "dist-static");
 const SITE = "https://agentability.org";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
+// Episodes recorded before producerModel existed (Aug–Sep 2026) were produced by Opus 5.
+const LEGACY_PRODUCER_MODEL = "claude-opus-5";
 
 function esc(v: unknown): string {
   return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -323,6 +325,8 @@ type Episode = {
   date: string;
   generatedAt: string;
   model: string;
+  producedBy?: "producer" | "seed";
+  producerModel?: string;
   stats: {
     tasks: number;
     completed: number;
@@ -647,7 +651,7 @@ async function main() {
   const s = summary?.stats;
   // The ticker states the rules; the numbers live in exactly one place, the scoreboard below it.
   const tickerSpans = latest
-    ? `<span>no retries</span><span>no editing</span><span>no cherry-picking</span><span>read-only <b>http get</b> — no javascript, no logins, no forms</span><span>agent: <b>${esc(latest.model)}</b></span><span>producer: <b>opus 5</b> + live search</span><span>every transcript published verbatim</span>`
+    ? `<span>no retries</span><span>no editing</span><span>no cherry-picking</span><span>read-only <b>http get</b> — no javascript, no logins, no forms</span><span>agent: <b>${esc(latest.model)}</b></span><span>producer: <b>${latest.producedBy === "seed" ? "seed tasks (producer offline)" : esc(latest.producerModel ?? LEGACY_PRODUCER_MODEL)}</b>${latest.producedBy === "seed" ? "" : " + live search"}</span><span>every transcript published verbatim</span>`
     : "";
   const fieldtestHero = latest
     ? `

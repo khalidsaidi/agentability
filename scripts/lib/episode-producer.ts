@@ -1,13 +1,40 @@
 // The episode producer: invents each week's field-test tasks autonomously.
-// Runs on the strongest available model WITH live web search, so episodes are
-// grounded in what's actually happening this week — launches, price changes,
-// controversies — not stale training-data trivia.
+// Runs on the stronger model WITH live web search, so episodes are grounded in
+// what's actually happening this week — launches, price changes, controversies
+// — not stale training-data trivia.
+//
+// The search is the same plain-GET web access the agent gets (DuckDuckGo's
+// no-JavaScript results page plus page visits), executed client-side, so the
+// producer needs nothing from the model provider beyond tool use.
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { FieldTask } from "./field-agent";
 import { CostBudget } from "./cost-budget";
+import { searchWeb, visitPage } from "./web-tools";
 
-const PRODUCER_MODEL = "claude-opus-5";
+export const PRODUCER_MODEL = "deepseek-v4-pro";
+const MAX_RESEARCH_ROUNDS = 8;
+
+const RESEARCH_TOOLS: Anthropic.Tool[] = [
+  {
+    name: "search",
+    description: "Web search (DuckDuckGo). Returns titles, URLs and snippets. Use 3-6 focused queries about this week's news.",
+    input_schema: {
+      type: "object",
+      properties: { query: { type: "string", description: "Search query" } },
+      required: ["query"],
+    },
+  },
+  {
+    name: "visit",
+    description: "Fetch a web page (plain GET, no JavaScript) and read its text. Use it to confirm a story or a real URL before building a task on it.",
+    input_schema: {
+      type: "object",
+      properties: { url: { type: "string", description: "Absolute URL" } },
+      required: ["url"],
+    },
+  },
+];
 
 const PRODUCER_TOOL: Anthropic.Tool = {
   name: "propose_tasks",
@@ -103,30 +130,26 @@ export async function produceEpisodeTasks(
     const params = {
       model: PRODUCER_MODEL,
       max_tokens: 9000,
-      tools: [
-        PRODUCER_TOOL,
-        { type: "web_search_20260209", name: "web_search", max_uses: 5 } as unknown as Anthropic.ToolUnion,
-      ],
-      messages: [
-        {
-          role: "user" as const,
-          content: producerPrompt({
-            today: new Date().toISOString().slice(0, 10),
-            panelDomains,
-            blockedDomains,
-            pastTitles,
-          }),
-        },
-      ],
+      tools: [PRODUCER_TOOL, ...RESEARCH_TOOLS],
     };
-    // Streamed: producer turns are long (web research + 10 tasks) and
-    // non-streaming requests of that length get dropped by intermediaries.
-    // Server-tool turns can also end in `pause_turn` (continue by echoing the
-    // content back) or in prose without the tool call (nudge once) — handle both.
-    const messages: Anthropic.MessageParam[] = [...params.messages];
+    const messages: Anthropic.MessageParam[] = [
+      {
+        role: "user",
+        content: producerPrompt({
+          today: new Date().toISOString().slice(0, 10),
+          panelDomains,
+          blockedDomains,
+          pastTitles,
+        }),
+      },
+    ];
+    // Streamed: producer turns are long (research + 10 tasks) and non-streaming
+    // requests of that length get dropped by intermediaries. Research tools run
+    // here and their results go back as tool_results until propose_tasks arrives;
+    // a turn that ends in prose without any tool call is nudged once.
     let toolUse: Anthropic.ToolUseBlock | undefined;
-    for (let round = 0; round < 6 && !toolUse; round++) {
-      // This model costs ~15x the agent's; a research loop must not run away.
+    for (let round = 0; round < MAX_RESEARCH_ROUNDS && !toolUse; round++) {
+      // This model costs ~4x the agent's; a research loop must not run away.
       if (budget.exhausted) throw new Error("spend ceiling reached before tasks were produced");
       let response: Anthropic.Message | null = null;
       let lastError: unknown;
@@ -135,6 +158,8 @@ export async function produceEpisodeTasks(
           response = await client.messages.stream({ ...params, messages }).finalMessage();
         } catch (error) {
           lastError = error;
+          const status = (error as any)?.status ?? 0;
+          if (status && status < 500 && status !== 429) throw error;
           await new Promise((resolve) => setTimeout(resolve, 5000 * (attempt + 1)));
         }
       }
@@ -145,9 +170,36 @@ export async function produceEpisodeTasks(
       );
       if (toolUse) break;
       messages.push({ role: "assistant", content: response.content });
-      if (response.stop_reason !== "pause_turn") {
+
+      const research = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
+      if (!research.length) {
         messages.push({ role: "user", content: "Good — now call propose_tasks exactly once with the 10 finished tasks." });
+        continue;
       }
+      const results: Anthropic.ToolResultBlockParam[] = [];
+      for (const call of research) {
+        const input = call.input as any;
+        let content: string;
+        if (call.name === "search") {
+          const { hits, error } = await searchWeb(String(input.query || ""));
+          content = error
+            ? `Search failed: ${error}`
+            : hits.length
+              ? hits.map((h) => `- ${h.title}\n  ${h.url}\n  ${h.snippet}`).join("\n")
+              : "No results.";
+          console.log(`  producer searched: ${String(input.query || "").slice(0, 80)} → ${hits.length} hits${error ? ` (${error})` : ""}`);
+        } else if (call.name === "visit") {
+          const view = await visitPage(String(input.url || ""));
+          content = view.ok || view.text
+            ? `URL: ${view.url} (HTTP ${view.status})${view.botWall ? " — bot challenge wall" : ""}\nTitle: ${view.title}\n${view.text.slice(0, 3500)}`
+            : `FAILED to load ${view.url}: ${view.error || `HTTP ${view.status}`}`;
+          console.log(`  producer visited: ${view.url.slice(0, 80)} → HTTP ${view.status}`);
+        } else {
+          content = `Unknown tool ${call.name}`;
+        }
+        results.push({ type: "tool_result", tool_use_id: call.id, content });
+      }
+      messages.push({ role: "user", content: results });
     }
     const raw = (toolUse?.input as any)?.tasks;
     const tasks = (Array.isArray(raw) ? raw : []).map(sanitizeTask).filter((t): t is FieldTask => t !== null);

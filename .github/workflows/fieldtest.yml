@@ -28,7 +28,7 @@ jobs:
 
       - name: Run this week's episode
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: npm run fieldtest
 
       # New brands appear every week. Grab their marks once; a failure here is never

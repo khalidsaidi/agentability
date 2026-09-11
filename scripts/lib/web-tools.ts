@@ -149,3 +149,45 @@ export async function visitPage(rawUrl: string): Promise<PageView> {
     clearTimeout(timer);
   }
 }
+
+export type SearchHit = { title: string; url: string; snippet: string };
+
+// A web search the producer can run with the same plain GET the agent gets:
+// DuckDuckGo's no-JavaScript results page. Result hrefs are redirect links
+// carrying the real URL in `uddg`; unwrap them so the producer sees true URLs.
+export async function searchWeb(query: string, limit = 8): Promise<{ hits: SearchHit[]; error?: string }> {
+  const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query.trim())}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      signal: controller.signal,
+      headers: { "user-agent": UA, accept: "text/html,*/*;q=0.8" },
+    });
+    const html = (await response.text()).slice(0, MAX_BYTES);
+    if (!response.ok) return { hits: [], error: `HTTP ${response.status}` };
+    const hits: SearchHit[] = [];
+    const re = /<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?(?:<a[^>]+class="result__snippet"[^>]*>([\s\S]*?)<\/a>)?/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(html)) && hits.length < limit) {
+      let href = m[1].replace(/&amp;/g, "&");
+      const wrapped = /[?&]uddg=([^&]+)/.exec(href);
+      if (wrapped) href = decodeURIComponent(wrapped[1]);
+      else if (href.startsWith("//")) href = `https:${href}`;
+      if (!/^https?:\/\//i.test(href)) continue;
+      const title = stripText(m[2]).slice(0, 120);
+      const snippet = stripText(m[3] || "").slice(0, 240);
+      if (title) hits.push({ title, url: href, snippet });
+    }
+    const lower = stripText(html).slice(0, 2500).toLowerCase();
+    if (!hits.length && WALL_MARKERS.some((w) => lower.includes(w))) return { hits, error: "search engine served a bot challenge" };
+    return { hits };
+  } catch (error: any) {
+    const message = String(error?.message || error);
+    return { hits: [], error: /abort/i.test(message) ? `timed out after ${FETCH_TIMEOUT_MS / 1000}s` : message.slice(0, 160) };
+  } finally {
+    clearTimeout(timer);
+  }
+}

@@ -1,15 +1,16 @@
-// The field-test agent: a real Claude agent given read-only web access and a
+// The field-test agent: a real AI agent given read-only web access and a
 // concrete everyday task. The transcript of what it does IS the product —
 // published verbatim on agentability.org.
+//
+// Served by DeepSeek through its Anthropic-format endpoint, so the Anthropic
+// SDK's tool-use loop below is unchanged — only the client's base URL and the
+// model id differ (see run-fieldtest.ts).
 
 import Anthropic from "@anthropic-ai/sdk";
 import { visitPage, type PageView } from "./web-tools";
 import { CostBudget } from "./cost-budget";
 
-export const AGENT_MODEL = "claude-haiku-4-5";
-// Published pricing for the model above, used for the transparency line.
-export const PRICE_PER_MTOK_IN = 1.0;
-export const PRICE_PER_MTOK_OUT = 5.0;
+export const AGENT_MODEL = "deepseek-flash";
 
 const MAX_STEPS = 14;
 const KEEP_FULL_PAGES = 3; // older page contents are pruned from context
