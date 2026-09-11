@@ -8,11 +8,12 @@
 export type ModelPrice = { inPerMTok: number; outPerMTok: number };
 
 export const MODEL_PRICES: Record<string, ModelPrice> = {
-  "claude-opus-5": { inPerMTok: 15, outPerMTok: 75 },
+  "claude-opus-5": { inPerMTok: 5, outPerMTok: 25 },
   "claude-haiku-4-5": { inPerMTok: 1, outPerMTok: 5 },
 };
 
-const FALLBACK_PRICE: ModelPrice = { inPerMTok: 15, outPerMTok: 75 };
+// Unknown model: assume the dearest current list price so the ceiling errs on the safe side.
+const FALLBACK_PRICE: ModelPrice = { inPerMTok: 10, outPerMTok: 50 };
 
 export class CostBudget {
   private spentUsd = 0;
