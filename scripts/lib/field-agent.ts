@@ -44,6 +44,8 @@ export type TaskRun = {
   kind: FieldTask["kind"];
   title: string;
   prompt: string;
+  startUrls: string[];
+  candidates: string[];
   model: string;
   outcome: "completed" | "partial" | "failed";
   answer: string;
@@ -158,6 +160,8 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: C
     kind: task.kind,
     title: task.title,
     prompt: task.prompt,
+    startUrls: task.startUrls,
+    candidates: task.candidates ?? [],
     model: AGENT_MODEL,
     outcome: "failed",
     answer: "",

@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
-// Fetches each brand's own favicon once and commits it under data/logos/, so the
-// site build stays offline, deterministic, and free of third-party favicon
-// services. Sites that block bots simply don't get a logo — the strip falls back
-// to their name, which is honest: this is a show about who blocks agents.
+// Fetches each brand's favicon once and commits it under data/logos/, so the
+// site build stays offline and deterministic. The brand's own site is tried
+// first; brands that wall bots fall through to Google's favicon service — at
+// authoring time only, the page never hotlinks anything.
 //
 //   npm run logos            refresh logos for every brand seen in an episode
 //   npm run logos -- --all   include every audited domain too
@@ -85,8 +85,12 @@ async function fetchLogo(domain: string): Promise<{ file: string; bytes: number 
     candidates.push(...iconCandidates(home.buf.toString("utf8").slice(0, 200_000), `https://${domain}/`));
   }
   candidates.push(`https://${domain}/favicon.ico`);
+  // Sites that wall bots wall this fetch too. Google's favicon service has a
+  // copy of nearly every brand's mark — fetched here once and committed, never
+  // hotlinked from the page.
+  candidates.push(`https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`);
 
-  for (const url of candidates.slice(0, 5)) {
+  for (const url of candidates.slice(0, 6)) {
     const res = await get(url);
     if (!res.ok || !res.buf) continue;
     const ext = EXT_BY_TYPE[res.type];
@@ -115,6 +119,8 @@ async function main() {
           if (host) domains.add(rootDomain(host));
         }
         for (const d of run.domainsVisited ?? []) domains.add(rootDomain(d));
+        for (const u of run.startUrls ?? []) { const h = hostOf(u); if (h) domains.add(rootDomain(h)); }
+        for (const c of run.candidates ?? []) domains.add(rootDomain(c));
       }
     }
   }

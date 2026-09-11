@@ -5,6 +5,7 @@
 import fsp from "node:fs/promises";
 import fs from "node:fs";
 import path from "node:path";
+import { rootDomain, hostOf } from "./lib/domains";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
@@ -299,6 +300,8 @@ type EpisodeRun = {
   kind: string;
   title: string;
   prompt: string;
+  startUrls?: string[];
+  candidates?: string[];
   outcome: "completed" | "partial" | "failed";
   answer: string;
   chosenSite: string | null;
@@ -357,24 +360,18 @@ function logoImg(domain: string, cls = "logo", lazy = true): string {
   return `<span class="${cls} mark" aria-hidden="true">${esc(domain.slice(0, 1).toUpperCase())}</span>`;
 }
 
-// help.netflix.com and netflix.com are one errand against one brand — collapse to the root.
-const TWO_PART_TLD = /\.(co|com|org|net|gov|ac|edu)\.[a-z]{2}$/;
-function rootDomain(host: string): string {
-  const h = host.toLowerCase().replace(/^www\./, "");
-  const parts = h.split(".");
-  return parts.slice(-(TWO_PART_TLD.test(h) ? 3 : 2)).join(".");
-}
 
 // Which sites did this errand actually touch, busiest first?
 function runSites(run: EpisodeRun): Array<{ domain: string; visits: number }> {
   const counts = new Map<string, number>();
+  // The brands the task targets come first, so a walled site is still named.
+  for (const u of run.startUrls ?? []) {
+    const host = hostOf(u);
+    if (host) counts.set(rootDomain(host), 0);
+  }
+  for (const c of run.candidates ?? []) counts.set(rootDomain(c), counts.get(rootDomain(c)) ?? 0);
   for (const step of run.steps) {
-    let host = "";
-    try {
-      host = new URL(step.finalUrl || step.url).hostname;
-    } catch {
-      host = "";
-    }
+    const host = hostOf(step.finalUrl || step.url);
     if (!host) continue;
     const d = rootDomain(host);
     counts.set(d, (counts.get(d) ?? 0) + 1);
@@ -382,7 +379,7 @@ function runSites(run: EpisodeRun): Array<{ domain: string; visits: number }> {
   if (!counts.size) for (const d of run.domainsVisited) counts.set(rootDomain(d), 1);
   return [...counts]
     .map(([domain, visits]) => ({ domain, visits }))
-    .sort((a, b) => b.visits - a.visits || a.domain.localeCompare(b.domain));
+    .sort((a, b) => b.visits - a.visits);
 }
 
 // The agent writes markdown. Rendering it is presentation, not editing — the words are untouched.
