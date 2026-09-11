@@ -41,6 +41,26 @@ async function diagnose(domainsVisited: string[]): Promise<Diagnosis[]> {
   return out;
 }
 
+// One cheap call before anything runs. A rejected key, an empty credit balance,
+// or an outage must stop the episode here — not surface later as ten "failed"
+// tasks that the site would publish as if the agent had actually tried.
+// (An exhausted balance can come back as a plain 400, so any API error aborts.)
+async function preflight(client: Anthropic): Promise<void> {
+  try {
+    await client.messages.create({
+      model: AGENT_MODEL,
+      max_tokens: 1,
+      messages: [{ role: "user", content: "ok" }],
+    });
+  } catch (error) {
+    const status = error instanceof Anthropic.APIError ? error.status : "?";
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`::error::API preflight failed (${status}): ${message.slice(0, 300)}`);
+    console.error("Refusing to run an episode the agent cannot actually attempt.");
+    process.exit(1);
+  }
+}
+
 async function main() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -48,6 +68,7 @@ async function main() {
     process.exit(1);
   }
   const client = new Anthropic({ apiKey });
+  await preflight(client);
   await fsp.mkdir(EPISODES_DIR, { recursive: true });
 
   // Fully autonomous: an AI producer invents this episode's tasks from the
@@ -100,6 +121,17 @@ async function main() {
     console.error("No tasks ran — refusing to write an empty episode.");
     process.exit(1);
   }
+  // An episode where the agent never loaded a single page is not a field test,
+  // whatever the per-task outcomes say. Publishing it would misreport the web.
+  const pageVisits = runs.reduce((acc, r) => acc + r.steps.filter((s) => s.url).length, 0);
+  if (pageVisits === 0) {
+    const firstError = runs.find((r) => r.error)?.error ?? "no error recorded";
+    console.error(`::error::Agent loaded zero pages across ${runs.length} tasks — refusing to publish. First error: ${firstError.slice(0, 300)}`);
+    process.exit(1);
+  }
+  if (producedBy === "seed") {
+    console.warn("::warning::Producer fell back to seed tasks — the AI producer did not run this week.");
+  }
 
   const inputTokens = runs.reduce((acc, r) => acc + r.inputTokens, 0);
   const outputTokens = runs.reduce((acc, r) => acc + r.outputTokens, 0);
@@ -118,7 +150,7 @@ async function main() {
       partial: runs.filter((r) => r.outcome === "partial").length,
       failed: runs.filter((r) => r.outcome === "failed").length,
       wallsHit: runs.reduce((acc, r) => acc + r.wallsHit, 0),
-      pageVisits: runs.reduce((acc, r) => acc + r.steps.filter((s) => s.url).length, 0),
+      pageVisits,
       domainsVisited: [...new Set(runs.flatMap((r) => r.domainsVisited))].length,
       inputTokens,
       outputTokens,
