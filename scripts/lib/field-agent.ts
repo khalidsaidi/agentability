@@ -301,12 +301,14 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: C
       } else {
         messages.push({ role: "user", content: finalNudge });
       }
+      // With only `finish` offered, `any` forces it — and unlike `tool`, `any`
+      // is accepted while the model's thinking mode is on.
       const response = await callWithRetry(client, {
         model: AGENT_MODEL,
         max_tokens: MAX_TOKENS_PER_CALL,
         system: SYSTEM_PROMPT,
-        tools: TOOLS,
-        tool_choice: { type: "tool", name: "finish" },
+        tools: TOOLS.filter((t) => t.name === "finish"),
+        tool_choice: { type: "any" },
         messages,
       });
       run.inputTokens += response.usage.input_tokens;

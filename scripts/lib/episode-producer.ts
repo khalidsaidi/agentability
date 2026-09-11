@@ -160,7 +160,7 @@ export async function produceEpisodeTasks(
         messages.push({ role: "user", content: "Research is over. Call propose_tasks now with the 10 finished tasks, built from what you have already read." });
       }
       const turn = forcing
-        ? { ...params, tools: [PRODUCER_TOOL], tool_choice: { type: "tool" as const, name: "propose_tasks" } }
+        ? { ...params, tools: [PRODUCER_TOOL], tool_choice: { type: "any" as const } } // `tool` is rejected in thinking mode; with one tool, `any` forces it
         : params;
       let response: Anthropic.Message | null = null;
       let lastError: unknown;
