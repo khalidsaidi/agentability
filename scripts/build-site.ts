@@ -952,7 +952,7 @@ ${FIELD_FAQ.map((f) => `<h3 style="font-size:.98rem;margin:18px 0 4px">${esc(f.q
         body: `
 <p class="eyebrow"><a href="/fieldtest/" style="text-decoration:none;color:inherit">← All episodes</a> · ${prettyDate(ep.date)} · agent: ${esc(ep.model)}</p>
 <h1>Episode of ${prettyDate(ep.date)}</h1>
-<p class="lede">${ep.stats.tasks} errands, invented by the AI producer and attempted by ${esc(ep.model)} with read-only
+<p class="lede">${ep.stats.tasks} errands, ${ep.producedBy === "seed" ? "from the standing task list (the AI producer was offline this week)" : `invented by the AI producer (${esc(ep.producerModel ?? LEGACY_PRODUCER_MODEL)})`} and attempted by ${esc(ep.model)} with read-only
 web access. Each block below is named for the site it ran against, and coloured by how it ended.</p>
 <div class="board">
   <div>

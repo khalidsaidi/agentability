@@ -14,7 +14,9 @@ export const AGENT_MODEL = "deepseek-flash";
 
 const MAX_STEPS = 14;
 const KEEP_FULL_PAGES = 3; // older page contents are pruned from context
-const MAX_TOKENS_PER_CALL = 1200;
+// The model thinks before it acts and those tokens count against this cap; too
+// low and a long think truncates the turn before any tool call is emitted.
+const MAX_TOKENS_PER_CALL = 4000;
 
 export type FieldTask = {
   id: string;
@@ -178,6 +180,7 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: C
     },
   ];
 
+  let emptyTurnNudged = false;
   try {
     for (let step = 1; step <= MAX_STEPS + 1; step++) {
       if (budget.exhausted) {
@@ -204,8 +207,20 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: C
       const toolUses = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
 
       if (!toolUses.length) {
+        if (!narration) {
+          // Nothing but thinking came back (typically a turn truncated at max_tokens).
+          // That is a glitch, not a decision: nudge once, then let the forced finish
+          // below collect the agent's own report rather than publishing a blank.
+          messages.push({ role: "assistant", content: response.content });
+          messages.push({ role: "user", content: "Your last turn had no action. Continue: one sentence of narration, then call visit or finish." });
+          if (!emptyTurnNudged) {
+            emptyTurnNudged = true;
+            continue;
+          }
+          break;
+        }
         // Model answered in prose without finishing — treat as a partial report.
-        run.answer = narration || "(agent stopped without reporting)";
+        run.answer = narration;
         run.outcome = "partial";
         break;
       }

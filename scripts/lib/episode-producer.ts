@@ -14,6 +14,10 @@ import { searchWeb, visitPage } from "./web-tools";
 
 export const PRODUCER_MODEL = "deepseek-v4-pro";
 const MAX_RESEARCH_ROUNDS = 8;
+// Anthropic's server-side search capped itself at a handful of uses; these tools
+// don't, so the loop must: after this many research rounds the only tool left is
+// propose_tasks, and the call is forced.
+const RESEARCH_ROUNDS_BEFORE_FORCING = 4;
 
 const RESEARCH_TOOLS: Anthropic.Tool[] = [
   {
@@ -151,11 +155,18 @@ export async function produceEpisodeTasks(
     for (let round = 0; round < MAX_RESEARCH_ROUNDS && !toolUse; round++) {
       // This model costs ~4x the agent's; a research loop must not run away.
       if (budget.exhausted) throw new Error("spend ceiling reached before tasks were produced");
+      const forcing = round >= RESEARCH_ROUNDS_BEFORE_FORCING;
+      if (forcing && round === RESEARCH_ROUNDS_BEFORE_FORCING) {
+        messages.push({ role: "user", content: "Research is over. Call propose_tasks now with the 10 finished tasks, built from what you have already read." });
+      }
+      const turn = forcing
+        ? { ...params, tools: [PRODUCER_TOOL], tool_choice: { type: "tool" as const, name: "propose_tasks" } }
+        : params;
       let response: Anthropic.Message | null = null;
       let lastError: unknown;
       for (let attempt = 0; attempt < 3 && !response; attempt++) {
         try {
-          response = await client.messages.stream({ ...params, messages }).finalMessage();
+          response = await client.messages.stream({ ...turn, messages }).finalMessage();
         } catch (error) {
           lastError = error;
           const status = (error as any)?.status ?? 0;
@@ -173,7 +184,7 @@ export async function produceEpisodeTasks(
 
       const research = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
       if (!research.length) {
-        messages.push({ role: "user", content: "Good — now call propose_tasks exactly once with the 10 finished tasks." });
+        if (!forcing) messages.push({ role: "user", content: "Good — now call propose_tasks exactly once with the 10 finished tasks." });
         continue;
       }
       const results: Anthropic.ToolResultBlockParam[] = [];
