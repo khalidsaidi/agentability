@@ -2,17 +2,73 @@
   "hosting": {
     "public": "dist-static",
     "cleanUrls": true,
-    "ignore": ["firebase.json", "**/.*"],
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "redirects": [
+      {
+        "source": "/guides/ai-readiness-audit-checklist.html",
+        "destination": "/guides/ai-readiness-audit-checklist/",
+        "type": 301
+      },
+      {
+        "source": "/guides/llms-txt-openapi-for-ai-agents.html",
+        "destination": "/guides/llms-txt-openapi-for-ai-agents/",
+        "type": 301
+      },
+      {
+        "source": "/guides/technical-seo-for-ai-discovery.html",
+        "destination": "/guides/technical-seo-for-ai-discovery/",
+        "type": 301
+      },
+      {
+        "source": "/guides/index.html",
+        "destination": "/guides/",
+        "type": 301
+      },
+      {
+        "source": "/seo/framework/**",
+        "destination": "/guides/llms-txt-openapi-for-ai-agents/",
+        "type": 301
+      },
+      {
+        "source": "/seo/**",
+        "destination": "/guides/ai-readiness-audit-checklist/",
+        "type": 301
+      },
+      {
+        "source": "/seo",
+        "destination": "/guides/ai-readiness-audit-checklist/",
+        "type": 301
+      },
+      {
+        "source": "/agents.txt",
+        "destination": "/llms.txt",
+        "type": 301
+      }
+    ],
     "headers": [
       {
         "source": "/llms.txt",
-        "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }]
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          }
+        ]
       },
       {
         "source": "/data/**",
         "headers": [
-          { "key": "Access-Control-Allow-Origin", "value": "*" },
-          { "key": "Cache-Control", "value": "public, max-age=3600" }
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          }
         ]
       }
     ]

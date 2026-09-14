@@ -6,6 +6,7 @@ import fsp from "node:fs/promises";
 import fs from "node:fs";
 import path from "node:path";
 import { rootDomain, hostOf } from "./lib/domains";
+import { GUIDES, type GuideContext } from "./lib/guides";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
@@ -17,6 +18,9 @@ const LOGOS_MANIFEST = path.join(LOGOS_DIR, "manifest.json");
 const OUT = path.join(REPO_ROOT, "dist-static");
 const SITE = "https://agentability.org";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
+// Bump when evergreen copy (methodology, docs, support, privacy) changes; it feeds sitemap lastmod.
+const SITE_CONTENT_UPDATED = "2026-09-14";
+const OG_IMAGE = path.join(REPO_ROOT, "assets/og.png");
 // Episodes recorded before producerModel existed (Aug–Sep 2026) were produced by Opus 5.
 const LEGACY_PRODUCER_MODEL = "claude-opus-5";
 
@@ -40,10 +44,18 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <title>${esc(opts.title)}</title>
 <meta name="description" content="${esc(opts.description)}">
 <link rel="canonical" href="${SITE}${opts.canonicalPath}">
+<link rel="alternate" type="application/rss+xml" title="The Agent Field Test — weekly episodes" href="${SITE}/feed.xml">
 <meta property="og:title" content="${esc(opts.title)}">
 <meta property="og:description" content="${esc(opts.description)}">
 <meta property="og:url" content="${SITE}${opts.canonicalPath}">
-<meta name="twitter:card" content="summary">
+<meta property="og:type" content="${opts.canonicalPath.startsWith("/fieldtest/2") || opts.canonicalPath.startsWith("/guides/") ? "article" : "website"}">
+<meta property="og:site_name" content="Agentability">
+<meta property="og:image" content="${SITE}/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Agentability — we send an AI agent to run your errands on the real web, then publish everything">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${SITE}/og.png">
 <meta name="theme-color" content="#0f1014">
 ${opts.jsonLd ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd)}</script>` : ""}
 <script>
@@ -237,17 +249,32 @@ gtag('config', 'G-55RKNLGPNT');
   .hero-cta { display: inline-block; margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: 1rem; background: var(--hazard); color: #111 !important; text-decoration: none; padding: 12px 22px; border-radius: 999px; transition: transform .15s; }
   .hero-cta:hover { transform: translateY(-2px) rotate(-1deg); }
   @media (max-width: 640px) { .hide-sm { display: none; } }
+  /* guides */
+  .guide h2 { margin-top: 44px; }
+  .guide h3 { font-family: var(--display); font-weight: 700; font-size: 1.08rem; margin: 28px 0 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+  .guide .pts { font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--hazard); }
+  .guide ul { color: var(--dim); max-width: 70ch; padding-left: 22px; margin: 8px 0 12px; }
+  .guide li { margin-bottom: 6px; } .guide li b { color: var(--ink); }
+  .guide pre { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 10px 0 14px; overflow-x: auto; font-family: var(--mono); font-size: .8rem; line-height: 1.5; color: var(--ink); }
+  .guide code { font-family: var(--mono); font-size: .88em; }
+  .guide p code, .guide li code { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+  .guide .lede + .lede { margin-top: 10px; }
+  .guides-list { display: grid; gap: 12px; margin-top: 18px; }
+  .guides-list a { display: block; border: 1px solid var(--line); background: var(--panel); border-radius: 16px; padding: 18px 20px; text-decoration: none; color: var(--ink); transition: transform .18s; }
+  .guides-list a:hover { transform: translateY(-2px); color: var(--ink); }
+  .guides-list .t { display: block; font-family: var(--display); font-weight: 700; font-size: 1.12rem; margin-bottom: 6px; }
+  .guides-list .d { display: block; color: var(--dim); font-size: .93rem; max-width: 70ch; }
 </style>
 </head>
 <body><div class="wrap">
 <header class="top">
   <a class="brand" href="/">agent<span>ability</span></a>
-  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
+  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
 <a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. Open data, no signup, no cost.
-<br /><a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></footer>
+<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a></footer>
 </div>
 <script>
 (function () {
@@ -1033,6 +1060,72 @@ and publish only what those public files say. To remove a domain from the Index,
     );
   }
 
+  // ---------- Guides ----------
+  const guideCtx: GuideContext = {
+    audited: s?.audited ?? 0,
+    averageScore: s?.averageScore ?? 0,
+    pctLlmsTxt: s?.pctLlmsTxt ?? 0,
+    pctBlockingSomeAI: s?.pctBlockingSomeAI ?? 0,
+    pctClosed: s?.pctClosed ?? 0,
+    latestEpisode: latest
+      ? { date: latest.date, completed: latest.stats.completed, tasks: latest.stats.tasks, wallsHit: latest.stats.wallsHit, pageVisits: latest.stats.pageVisits }
+      : null,
+  };
+  await fsp.mkdir(path.join(OUT, "guides"), { recursive: true });
+  await fsp.writeFile(
+    path.join(OUT, "guides/index.html"),
+    shell({
+      title: "Guides — making a website work for AI agents",
+      description: "Practical guides built on the same checks the AI-Readiness Index scores every site on: the audit checklist, llms.txt and OpenAPI, and technical SEO for AI discovery.",
+      canonicalPath: "/guides/",
+      body: `
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Guides</p>
+<h1>Make your site work for AI agents</h1>
+<p class="lede">Three guides, built on the same eight checks the <a href="/ai-index/">Index</a> scores ${s?.audited ?? "the panel's"} sites on every
+week — and on what we watch a real agent run into every week on the <a href="/fieldtest/">Field Test</a>. Nothing invented,
+nothing you can't test with curl.</p>
+<div class="guides-list">${GUIDES.map((g) => `<a href="/guides/${g.slug}/"><span class="t">${esc(g.title)}</span><span class="d">${esc(g.description)}</span></a>`).join("")}</div>`,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Guides — making a website work for AI agents",
+        url: `${SITE}/guides/`,
+        hasPart: GUIDES.map((g) => ({ "@type": "TechArticle", name: g.title, url: `${SITE}/guides/${g.slug}/` })),
+      },
+    }),
+    "utf8"
+  );
+  for (const g of GUIDES) {
+    const dir = path.join(OUT, "guides", g.slug);
+    await fsp.mkdir(dir, { recursive: true });
+    const others = GUIDES.filter((o) => o.slug !== g.slug);
+    await fsp.writeFile(
+      path.join(dir, "index.html"),
+      shell({
+        title: g.title,
+        description: g.description,
+        canonicalPath: `/guides/${g.slug}/`,
+        body: `
+<p class="eyebrow"><a href="/guides/" style="text-decoration:none;color:inherit">← Guides</a> · updated ${prettyDate(g.updated)}</p>
+<h1>${esc(g.title)}</h1>
+<div class="guide">${g.body(guideCtx)}</div>
+<p class="lede" style="margin-top:34px">Related: ${others.map((o) => `<a href="/guides/${o.slug}/">${esc(o.title)}</a>`).join(" · ")}</p>`,
+        jsonLd: {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          headline: g.title,
+          description: g.description,
+          url: `${SITE}/guides/${g.slug}/`,
+          dateModified: g.updated,
+          author: { "@type": "Organization", name: "Agentability", url: SITE },
+          publisher: { "@type": "Organization", name: "Agentability", url: SITE },
+          isPartOf: { "@type": "WebSite", name: "Agentability", url: SITE },
+        },
+      }),
+      "utf8"
+    );
+  }
+
   // ---------- Machine surfaces (dogfood) ----------
   const domains = summary ? summary.leaderboard.map((r) => r.domain) : [];
   await fsp.writeFile(
@@ -1052,6 +1145,9 @@ and publish only what those public files say. To remove a domain from the Index,
       `- Data docs (endpoints and attribution): ${SITE}/docs/`,
       `- Support (audit requests, disputes): ${SITE}/support/`,
       "",
+      "## Guides",
+      ...GUIDES.map((g) => `- ${g.title}: ${SITE}/guides/${g.slug}/`),
+      "",
       "## Per-site reports",
       ...domains.slice(0, 40).map((d) => `- ${SITE}/ai-index/site/${d}/`),
     ].join("\n") + "\n",
@@ -1066,24 +1162,66 @@ and publish only what those public files say. To remove a domain from the Index,
     "google-site-verification: googlea3bb680f11452088.html",
     "utf8"
   );
-  const urls = [
-    "/",
-    "/fieldtest/",
-    ...episodes.map((ep) => `/fieldtest/${ep.date}/`),
-    "/ai-index/",
-    "/methodology/",
-    "/docs/",
-    "/support/",
-    "/privacy/",
-    ...domains.map((d) => `/ai-index/site/${d}/`),
+  // lastmod is what lets a crawler spend its budget on what changed: episodes and
+  // index pages carry their own generation dates; evergreen pages carry the site's
+  // last content edit.
+  const day = (iso: string) => iso.slice(0, 10);
+  const indexDate = summary ? day(summary.generatedAt) : SITE_CONTENT_UPDATED;
+  const latestDate = latest ? day(latest.generatedAt) : indexDate;
+  const newest = [indexDate, latestDate, SITE_CONTENT_UPDATED].sort().pop()!;
+  const urls: Array<[string, string]> = [
+    ["/", newest],
+    ["/fieldtest/", latestDate],
+    ...episodes.map((ep): [string, string] => [`/fieldtest/${ep.date}/`, day(ep.generatedAt)]),
+    ["/ai-index/", indexDate],
+    ["/guides/", GUIDES.map((g) => g.updated).sort().pop()!],
+    ...GUIDES.map((g): [string, string] => [`/guides/${g.slug}/`, g.updated]),
+    ["/methodology/", SITE_CONTENT_UPDATED],
+    ["/docs/", SITE_CONTENT_UPDATED],
+    ["/support/", SITE_CONTENT_UPDATED],
+    ["/privacy/", SITE_CONTENT_UPDATED],
+    ...domains.map((d): [string, string] => [`/ai-index/site/${d}/`, indexDate]),
   ];
   await fsp.writeFile(
     path.join(OUT, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-      urls.map((u) => `<url><loc>${SITE}${u}</loc></url>`).join("\n") +
+      urls.map(([u, m]) => `<url><loc>${SITE}${u}</loc><lastmod>${m}</lastmod></url>`).join("\n") +
       `\n</urlset>\n`,
     "utf8"
   );
+
+  // RSS: the show is episodic; this is how aggregators and readers follow it.
+  const rfc822 = (iso: string) => new Date(iso).toUTCString();
+  await fsp.writeFile(
+    path.join(OUT, "feed.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>The Agent Field Test</title>
+<link>${SITE}/fieldtest/</link>
+<atom:link href="${SITE}/feed.xml" rel="self" type="application/rss+xml"/>
+<description>A weekly autonomous show: an AI producer invents real web errands, a real agent attempts them read-only, and every transcript is published verbatim.</description>
+<language>en</language>
+${latest ? `<lastBuildDate>${rfc822(latest.generatedAt)}</lastBuildDate>` : ""}
+${episodes
+  .map(
+    (ep) => `<item>
+<title>${esc(`Episode of ${prettyDate(ep.date)}: ${ep.stats.completed}/${ep.stats.tasks} errands done, ${ep.stats.wallsHit} bot walls`)}</title>
+<link>${SITE}/fieldtest/${ep.date}/</link>
+<guid isPermaLink="true">${SITE}/fieldtest/${ep.date}/</guid>
+<pubDate>${rfc822(ep.generatedAt)}</pubDate>
+<description>${esc(`${ep.runs.map((r) => `${STAMP_LABEL[r.outcome]}: ${r.title}`).join(" · ")}. Agent: ${ep.model}. ${ep.stats.pageVisits} pages read across ${ep.stats.domainsVisited} sites.`)}</description>
+</item>`
+  )
+  .join("\n")}
+</channel>
+</rss>
+`,
+    "utf8"
+  );
+
+  // Social card, rendered once by scripts/render-og.sh and committed.
+  if (fs.existsSync(OG_IMAGE)) await fsp.copyFile(OG_IMAGE, path.join(OUT, "og.png"));
 
   // Open data: publish summary + history + episodes verbatim.
   // Brand marks, committed by `npm run logos` — copied, never fetched at build time.
