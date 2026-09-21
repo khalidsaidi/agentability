@@ -1,10 +1,10 @@
 {
  "domain": "windsurf.com",
- "checkedAt": "2026-09-14T13:05:34.308Z",
+ "checkedAt": "2026-09-21T13:03:45.708Z",
  "status": "complete",
- "elapsedMs": 840,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 1004,
+ "score": 85,
+ "grade": "A",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~2009 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 20,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -103,8 +103,8 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }
