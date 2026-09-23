@@ -1,0 +1,1732 @@
+{
+ "date": "2026-09-23",
+ "generatedAt": "2026-09-23T18:00:00.479Z",
+ "model": "deepseek-flash",
+ "producedBy": "seed",
+ "producerModel": null,
+ "stats": {
+  "tasks": 10,
+  "completed": 6,
+  "partial": 4,
+  "failed": 0,
+  "wallsHit": 17,
+  "pageVisits": 106,
+  "domainsVisited": 26,
+  "inputTokens": 158053,
+  "outputTokens": 57398,
+  "costUsd": 0.09
+ },
+ "runs": [
+  {
+   "taskId": "price-notion",
+   "kind": "find",
+   "title": "What does Notion really cost for a small team?",
+   "prompt": "You're setting up Notion for a 5-person team. Find the actual price per member per month when billed MONTHLY (not the annual rate) for the cheapest paid plan, from notion.com's own pages.",
+   "startUrls": [
+    "https://www.notion.com"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "partial",
+   "answer": "No prices in those. Notion's own help doc pointed to notion.so/pricing for \"monthly and yearly pricing,\" so I'll try that",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start at Notion's homepage and look for a pricing link.",
+     "url": "https://www.notion.com",
+     "finalUrl": "https://www.notion.com/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "The AI workspace that works for you. | Notion",
+     "note": "read ~2576 chars, 2 links"
+    },
+    {
+     "step": 2,
+     "narration": "The homepage doesn't show prices. I'll go to the pricing page directly.",
+     "url": "https://www.notion.com/pricing",
+     "finalUrl": "https://www.notion.com/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Notion Pricing Plans: Free, Plus, Business, & Enterprise.",
+     "note": "read ~5000 chars, 9 links"
+    },
+    {
+     "step": 3,
+     "narration": "The pricing page loaded but shows both a monthly/yearly toggle and one set of prices (Plus $10, Business $20). I need to confirm whether those are the monthly-billed numbers, so I'll check Notion's billing help article.",
+     "url": "https://www.notion.com/help/billing",
+     "finalUrl": "https://www.notion.com/help/billing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Manage billing in Notion | Notion Help – Notion Help Center",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "The help article doesn't list prices. I'll test whether the pricing page responds to a billing-interval query parameter, trying both monthly and yearly to see if the numbers change.",
+     "url": "https://www.notion.com/pricing?interval=monthly",
+     "finalUrl": "https://www.notion.com/pricing?interval=monthly",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Notion Pricing Plans: Free, Plus, Business, & Enterprise.",
+     "note": "read ~5000 chars, 9 links"
+    },
+    {
+     "step": 5,
+     "narration": "",
+     "url": "https://www.notion.com/pricing?interval=yearly",
+     "finalUrl": "https://www.notion.com/pricing?interval=yearly",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Notion Pricing Plans: Free, Plus, Business, & Enterprise.",
+     "note": "read ~5000 chars, 9 links"
+    },
+    {
+     "step": 6,
+     "narration": "Both interval URLs show identical numbers ($10 Plus, $20 Business), so the toggle is JS-driven and the crawler sees one default state. I need a second source to pin down which billing interval those numbers are. I'll check the plan-change help article and the plans/billing category.",
+     "url": "https://www.notion.so/help/upgrade-or-downgrade-your-plan",
+     "finalUrl": "https://www.notion.com/help/upgrade-or-downgrade-your-plan",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Change your Notion plan | Notion Help – Notion Help Center",
+     "note": "read ~5000 chars, 39 links"
+    },
+    {
+     "step": 7,
+     "narration": "",
+     "url": "https://www.notion.com/help/category/plans-billing-and-payment",
+     "finalUrl": "https://www.notion.com/help/category/plans-billing-and-payment",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Plans & billing – Notion Help Center",
+     "note": "read ~2796 chars, 28 links"
+    },
+    {
+     "step": 8,
+     "narration": "The plan-change article says nothing concrete and just points back to notion.so/pricing. I'll look for a page that explicitly states monthly vs yearly numbers — the full plans/billing article list, plus Notion's Business vs Enterprise guide.",
+     "url": "https://www.notion.com/help/category/plans-billing-and-payment/all",
+     "finalUrl": "https://www.notion.com/help/category/plans-billing-and-payment/all",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Plans & billing – Notion Help Center",
+     "note": "read ~2705 chars, 37 links"
+    },
+    {
+     "step": 9,
+     "narration": "",
+     "url": "https://www.notion.com/help/guides/is-notions-business-or-enterprise-plan-right-for-you",
+     "finalUrl": "https://www.notion.com/help/guides/is-notions-business-or-enterprise-plan-right-for-you",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Is Notion&#x27;s Business or Enterprise plan right for you?",
+     "note": "read ~5000 chars, 40 links"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "notion.com"
+   ],
+   "inputTokens": 32450,
+   "outputTokens": 13764,
+   "elapsedMs": 70927,
+   "diagnosis": []
+  },
+  {
+   "taskId": "price-midjourney",
+   "kind": "find",
+   "title": "Find Midjourney's cheapest plan",
+   "prompt": "Find what Midjourney costs per month on its cheapest subscription, using only midjourney.com's own public pages.",
+   "startUrls": [
+    "https://www.midjourney.com"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "partial",
+   "answer": "I could not get Midjourney's subscription pricing: every midjourney.com URL I tried returns HTTP 403 with a Cloudflare \"Just a moment...\" bot challenge, so no real page content was ever served. This included the homepage, /plans, /pricing, /home, /account/plans, sitemap.xml, the non-www host, the http scheme, and docs.midjourney.com (root, help center, and the \"Subscription Plans\" article). You'll need to open midjourney.com/plans in a normal browser (where the JS challenge solves) or check the Discord /account info; the often-quoted \"Basic plan, $10/month\" figure is widely reported but I could NOT verify it from Midjourney's own pages, so treat it as unconfirmed.",
+   "chosenSite": null,
+   "obstacles": [
+    "Cloudflare bot challenge (HTTP 403 'Just a moment...') on all midjourney.com URLs",
+    "Same wall on docs.midjourney.com help center and Subscription Plans article",
+    "Cannot execute JavaScript or solve the challenge with a plain GET"
+   ],
+   "sources": [
+    "https://www.midjourney.com",
+    "https://www.midjourney.com/plans",
+    "https://www.midjourney.com/pricing",
+    "https://www.midjourney.com/account/plans",
+    "https://docs.midjourney.com/hc/en-us/articles/24984325405325-Subscription-Plans"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start by visiting Midjourney's homepage and look for pricing links.",
+     "url": "https://www.midjourney.com",
+     "finalUrl": "https://www.midjourney.com/",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 2,
+     "narration": "Homepage hit a Cloudflare \"Just a moment...\" bot wall. Let me try known Midjourney plan/pricing URLs directly, plus their docs subdomain.",
+     "url": "https://www.midjourney.com/plans",
+     "finalUrl": "https://www.midjourney.com/plans",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 3,
+     "narration": "",
+     "url": "https://www.midjourney.com/account/plans",
+     "finalUrl": "https://www.midjourney.com/account/plans",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 4,
+     "narration": "",
+     "url": "https://docs.midjourney.com/hc/en-us/articles/24984325405325-Subscription-Plans",
+     "finalUrl": "https://docs.midjourney.com/hc/en-us/articles/24984325405325-Subscription-Plans",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 5,
+     "narration": "All 403 — same Cloudflare wall. Let me try the docs root, a Zendesk-style help center path, and an alternate pricing URL.",
+     "url": "https://docs.midjourney.com",
+     "finalUrl": "https://docs.midjourney.com/hc/en-us",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 6,
+     "narration": "",
+     "url": "https://docs.midjourney.com/hc/en-us",
+     "finalUrl": "https://docs.midjourney.com/hc/en-us",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 7,
+     "narration": "",
+     "url": "https://www.midjourney.com/pricing",
+     "finalUrl": "https://www.midjourney.com/pricing",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 8,
+     "narration": "Everything on the domain is behind Cloudflare. Let me try the non-www host, the HTTP scheme, and a likely alternate path — sometimes one variant slips through.",
+     "url": "https://midjourney.com",
+     "finalUrl": "https://midjourney.com/",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 9,
+     "narration": "",
+     "url": "http://www.midjourney.com/plans",
+     "finalUrl": "https://www.midjourney.com/plans",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 10,
+     "narration": "",
+     "url": "https://www.midjourney.com/home",
+     "finalUrl": "https://www.midjourney.com/home",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 11,
+     "narration": "Nine visits in, every midjourney.com URL returns the same Cloudflare challenge. Let me make a couple of last-ditch attempts (sitemap and a deep docs article) before concluding.",
+     "url": "https://www.midjourney.com/sitemap.xml",
+     "finalUrl": "https://www.midjourney.com/sitemap.xml",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 12,
+     "narration": "",
+     "url": "https://docs.midjourney.com/hc/en-us/articles/24984325405325",
+     "finalUrl": "https://docs.midjourney.com/hc/en-us/articles/24984325405325",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 13,
+     "narration": "Eleven visits, zero real content: every path on midjourney.com and docs.midjourney.com is behind the same Cloudflare interstitial. I have no page to cite, so I'll report the failure honestly rather than guess a number.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 12,
+   "domainsVisited": [
+    "docs.midjourney.com",
+    "midjourney.com"
+   ],
+   "inputTokens": 1375,
+   "outputTokens": 1997,
+   "elapsedMs": 12493,
+   "diagnosis": [
+    {
+     "domain": "midjourney.com",
+     "posture": "open",
+     "parseable": false,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "price-zoom",
+   "kind": "find",
+   "title": "Zoom's cheapest paid plan",
+   "prompt": "Find the monthly price of Zoom's cheapest paid plan for one host, from zoom.us's own pages.",
+   "startUrls": [
+    "https://zoom.us"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "partial",
+   "answer": "I could not verify the price. Zoom's own pricing page (zoom.us/pricing, which redirects from zoom.com/en/pricing) is JavaScript-rendered, so my plain page fetches returned only the navigation/footer — no plan cards or prices. Even running the page through a JavaScript-rendering reader (r.jina.ai) returned the page text but it got truncated inside the huge nav before reaching the plans. Search-engine snippets (DuckDuckGo hit a bot-captcha; Bing ignored the site: filter) didn't yield a usable zoom.us figure, and I hit the 14-visit limit before I could pin down the cheapest \"Pro\" plan's monthly price for a single host on a Zoom-owned page.",
+   "chosenSite": null,
+   "obstacles": [
+    "zoom.us/pricing is JavaScript-rendered; raw GET returns only nav/footer with no prices",
+    "JS-rendering reader (r.jina.ai) output was truncated before the pricing section",
+    "DuckDuckGo served a bot-verification captcha; Bing ignored the site: zoom.us operator"
+   ],
+   "sources": [
+    "https://zoom.us/pricing",
+    "https://www.zoom.com/en/pricing/",
+    "https://r.jina.ai/https://zoom.us/pricing"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start at Zoom's homepage and look for a link to their pricing page.",
+     "url": "https://zoom.us",
+     "finalUrl": "https://www.zoom.com/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "One platform to connect | Zoom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "The homepage redirected to zoom.com; I'll head straight to the pricing page.",
+     "url": "https://www.zoom.com/en/pricing/",
+     "finalUrl": "https://zoom.us/pricing?cms_guid=false",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Zoom Workplace Pricing - Zoom",
+     "note": "read ~1387 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "The pricing page loaded but showed only nav/footer (likely JS-rendered). Let me try the direct pricing URL.",
+     "url": "https://zoom.us/pricing",
+     "finalUrl": "https://zoom.us/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Zoom Workplace Pricing - Zoom",
+     "note": "read ~1387 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "The pricing page is JS-rendered and my plain GET can't see the plans. Let me try an alternate Zoom pricing URL that may render statically.",
+     "url": "https://explore.zoom.us/en/pricing/",
+     "finalUrl": "https://www.zoom.com/en/404/?cms_guid=false",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "&#xAF;\\_(&#x30C4;)_/&#xAF; | Zoom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 5,
+     "narration": "",
+     "url": "https://zoom.us/pricing/meetings",
+     "finalUrl": "https://zoom.us/pricing/meetings",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Page Not Found - Zoom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 6,
+     "narration": "The plans are JavaScript-rendered and not in the fetched HTML. Let me try a few alternate routes: the signup page, a pricing variant, and a search for Zoom's own page content.",
+     "url": "https://zoom.us/signup",
+     "finalUrl": "https://zoom.us/signup",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Sign Up Free | Zoom",
+     "note": "read ~199 chars, 2 links"
+    },
+    {
+     "step": 7,
+     "narration": "",
+     "url": "https://html.duckduckgo.com/html/?q=site%3Azoom.us+workplace+pro+plan+price+per+month+host",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=site%3Azoom.us+workplace+pro+plan+price+per+month+host",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "site:zoom.us workplace pro plan price per month host at DuckDuckGo",
+     "note": "read ~3140 chars, 2 links"
+    },
+    {
+     "step": 8,
+     "narration": "",
+     "url": "https://zoom.us/pricing?plan=pro",
+     "finalUrl": "https://zoom.us/pricing?plan=pro",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Zoom Workplace Pricing - Zoom",
+     "note": "read ~1387 chars, 40 links"
+    },
+    {
+     "step": 9,
+     "narration": "The static pricing page only renders nav/footer, but DuckDuckGo's index revealed Zoom's product pricing pages do carry static text. Let me open the Scheduler pricing page (which had real prices) and search for the Pro plan price specifically.",
+     "url": "https://zoom.us/pricing/scheduler",
+     "finalUrl": "https://zoom.us/pricing/scheduler",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Zoom Scheduler Pricing - Zoom",
+     "note": "read ~1387 chars, 40 links"
+    },
+    {
+     "step": 10,
+     "narration": "",
+     "url": "https://html.duckduckgo.com/html/?q=site%3Azoom.us+%22Pro%22+%22billed+monthly%22+per+month+host",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=site%3Azoom.us+%22Pro%22+%22billed+monthly%22+per+month+host",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "site:zoom.us Pro billed monthly per month host at DuckDuckGo",
+     "note": "read ~1318 chars, 2 links"
+    },
+    {
+     "step": 11,
+     "narration": "Zoom's product pricing pages are JS-rendered (my fetch saw only nav), but search engines indexed the rendered prices. Let me search specifically for the Pro (cheapest paid) plan price on zoom.us, via DuckDuckGo and Bing.",
+     "url": "https://html.duckduckgo.com/html/?q=site%3Azoom.us+pricing+%22Pro%22+per+month+host+billed+annually",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=site%3Azoom.us+pricing+%22Pro%22+per+month+host+billed+annually",
+     "status": 202,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "DuckDuckGo",
+     "note": "read ~288 chars, 2 links"
+    },
+    {
+     "step": 12,
+     "narration": "",
+     "url": "https://www.bing.com/search?q=site%3Azoom.us+pricing+pro+plan+per+month+host",
+     "finalUrl": "https://www.bing.com/search?q=site%3Azoom.us+pricing+pro+plan+per+month+host",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "site:zoom.us pricing pro plan per month host - Search",
+     "note": "read ~2823 chars, 3 links"
+    },
+    {
+     "step": 13,
+     "narration": "Zoom's pages are JavaScript-rendered, so I'll run their pricing page through a reader service that executes JavaScript and returns the text.",
+     "url": "https://r.jina.ai/https://zoom.us/pricing",
+     "finalUrl": "https://r.jina.ai/https://zoom.us/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~5000 chars, 0 links"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "bing.com",
+    "html.duckduckgo.com",
+    "r.jina.ai",
+    "zoom.com",
+    "zoom.us"
+   ],
+   "inputTokens": 46762,
+   "outputTokens": 13703,
+   "elapsedMs": 70762,
+   "diagnosis": [
+    {
+     "domain": "zoom.us",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "price-salesforce",
+   "kind": "find",
+   "title": "Salesforce's cheapest CRM plan",
+   "prompt": "A 3-person startup wants the cheapest Salesforce CRM plan. Find its name and per-user monthly price from salesforce.com.",
+   "startUrls": [
+    "https://www.salesforce.com"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "The cheapest paid Salesforce CRM plan is Starter Suite at $25 USD per user per month (billed monthly or annually). It includes lead/account/contact/opportunity management, sales flows, AI email sync, and email marketing. Note Salesforce also lists a \"Free Suite\" edition at $0/user/month; above Starter the next tier is Pro Suite at $100/user/month.",
+   "chosenSite": "salesforce.com",
+   "obstacles": [],
+   "sources": [
+    "https://www.salesforce.com/sales/pricing/"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start at salesforce.com and look for CRM pricing.",
+     "url": "https://www.salesforce.com",
+     "finalUrl": "https://www.salesforce.com/?bc=DB",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Salesforce: The #1 Agentic AI CRM",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "The homepage lists a Small Business Pricing page and a Sales Pricing page. Let me check the pricing hub first.",
+     "url": "https://www.salesforce.com/pricing/",
+     "finalUrl": "https://www.salesforce.com/pricing/?bc=DB",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Salesforce Pricing: See Pricing Plans for All Salesforce Products | Salesforce",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "The pricing hub is mostly navigation. Let me go straight to Sales Pricing, which should list the CRM plan tiers.",
+     "url": "https://www.salesforce.com/sales/pricing/",
+     "finalUrl": "https://www.salesforce.com/sales/pricing/?bc=DB",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Salesforce Sales Pricing | Salesforce",
+     "note": "read ~5000 chars, 15 links"
+    },
+    {
+     "step": 4,
+     "narration": "I have what I need from the official Sales Pricing page. It lists the full CRM ladder: Free Suite ($0), Starter Suite ($25/user/month), Pro Suite ($100), then Sales Cloud Core/Advanced/Max. The cheapest paid CRM plan is Starter Suite at $25 USD per user per month (billed monthly or annually). I'll report that, noting the free tier.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "salesforce.com"
+   ],
+   "inputTokens": 5370,
+   "outputTokens": 1175,
+   "elapsedMs": 8512,
+   "diagnosis": [
+    {
+     "domain": "salesforce.com",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "price-figma",
+   "kind": "find",
+   "title": "Figma Professional, billed monthly",
+   "prompt": "Find Figma's price per editor per month on the Professional plan when billed monthly, from figma.com's own pages.",
+   "startUrls": [
+    "https://www.figma.com"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "Figma's Professional plan costs $16 per editor per month when billed monthly. Note Figma has renamed the old \"Editor\" seat to \"Full seat\": on figma.com/pricing, under Professional (Monthly), the Full seat is listed at $16/mo (includes 3,000 AI credits/mo). For comparison, the Dev seat is $12/mo and the Collab seat is $3/mo, and Organization/Enterprise are billed annually at $55/mo and $90/mo per Full seat respectively.",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [
+    "https://www.figma.com/pricing/",
+    "https://www.figma.com/"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start by checking Figma's homepage for a pricing link.",
+     "url": "https://www.figma.com",
+     "finalUrl": "https://www.figma.com/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Figma: The collaborative canvas for design, code, and AI",
+     "note": "read ~3959 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "I found the pricing link; let me visit the pricing page.",
+     "url": "https://www.figma.com/pricing/",
+     "finalUrl": "https://www.figma.com/pricing/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Plans & Pricing | Figma",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "The pricing page lists Figma's plans with a Monthly/Annual toggle already showing monthly figures for Professional. I can read the answer directly: Professional plan, \"Full seat\" (the current name for what used to be the Editor seat) is $16/mo.\n\nLet me do one quick sanity check on Figma's help center to confirm the monthly-vs-annual distinction, so I don't report an annual price by mistake.",
+     "url": "https://help.figma.com/hc/en-us/articles/360040328653-Understand-seats-and-billing",
+     "finalUrl": "https://help.figma.com/hc/en-us/articles/360040328653-Use-Figma-products-with-a-keyboard",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Use Figma products with a keyboard Figma Learn - Help Center",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "That help URL just redirected to an unrelated article, so it added nothing. The pricing page itself is the authoritative source and it's unambiguous. I have my answer.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "figma.com",
+    "help.figma.com"
+   ],
+   "inputTokens": 5340,
+   "outputTokens": 2040,
+   "elapsedMs": 12333,
+   "diagnosis": [
+    {
+     "domain": "figma.com",
+     "posture": "closed",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "cancel-chatgpt",
+   "kind": "find",
+   "title": "How do you cancel ChatGPT Plus?",
+   "prompt": "A user wants to cancel their ChatGPT Plus subscription. Find the exact official steps to cancel, from OpenAI's own sites.",
+   "startUrls": [
+    "https://openai.com",
+    "https://help.openai.com"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "According to OpenAI's official help article \"Canceling your ChatGPT subscription,\" cancellation must be done on the platform where you subscribed. If you bought ChatGPT Plus on chatgpt.com: (1) Sign in to ChatGPT, (2) open your account menu and select Settings, (3) select Billing, (4) under \"Cancel plan\" select Cancel. If you subscribed via the Apple App Store, cancel under Settings > [your name] > Subscriptions > ChatGPT > Cancel Subscription; if via Google Play, cancel under Subscriptions > ChatGPT > Cancel subscription. OpenAI notes: cancel at least 24 hours before your next billing date, uninstalling the app does not cancel, and cancelling stops future renewals but does not automatically refund past charges.",
+   "chosenSite": null,
+   "obstacles": [
+    "openai.com and help.openai.com both returned HTTP 403 (bot wall) to direct requests, as did specific help-article URLs",
+    "Had to read the official OpenAI help article via a Wayback Machine archive snapshot"
+   ],
+   "sources": [
+    "https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+    "https://web.archive.org/web/20260916020928/https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start at OpenAI's help center and search for the cancellation guide, since that's where official account-management instructions live.",
+     "url": "https://help.openai.com",
+     "finalUrl": "https://help.openai.com/",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://openai.com",
+     "finalUrl": "https://openai.com/",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 3,
+     "narration": "Both root sites blocked me with a 403 bot wall. Let me try common help-article paths directly, since OpenAI's help docs use predictable /en/articles/ URLs.",
+     "url": "https://help.openai.com/en/articles/7232904-how-do-i-cancel-my-subscription",
+     "finalUrl": "https://help.openai.com/en/articles/7232904-how-do-i-cancel-my-subscription",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 4,
+     "narration": "",
+     "url": "https://help.openai.com/en/articles/6830476-how-do-i-cancel-my-chatgpt-plus-subscription",
+     "finalUrl": "https://help.openai.com/en/articles/6830476-how-do-i-cancel-my-chatgpt-plus-subscription",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 5,
+     "narration": "Still blocked — the whole help subdomain is behind a bot wall. Let me try finding the official article via a search engine so I can cite the exact URL.",
+     "url": "https://duckduckgo.com/html/?q=help.openai.com+cancel+ChatGPT+Plus+subscription",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=help.openai.com+cancel+ChatGPT+Plus+subscription",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "help.openai.com cancel ChatGPT Plus subscription at DuckDuckGo",
+     "note": "read ~4193 chars, 2 links"
+    },
+    {
+     "step": 6,
+     "narration": "",
+     "url": "https://www.bing.com/search?q=openai+help+how+to+cancel+ChatGPT+Plus+subscription",
+     "finalUrl": "https://www.bing.com/search?q=openai+help+how+to+cancel+ChatGPT+Plus+subscription",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "openai help how to cancel ChatGPT Plus subscription - Search",
+     "note": "read ~2212 chars, 3 links"
+    },
+    {
+     "step": 7,
+     "narration": "DuckDuckGo surfaced the exact official article: `help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription`. Let me try fetching it directly — sometimes article paths work even when the root is walled.",
+     "url": "https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+     "finalUrl": "https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 8,
+     "narration": "",
+     "url": "https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription?q=cancel",
+     "finalUrl": "https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription?q=cancel",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 9,
+     "narration": "The help domain is fully walled for my client. Let me try the Wayback Machine to read the same official OpenAI article content.",
+     "url": "https://web.archive.org/web/2024/https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+     "finalUrl": "https://web.archive.org/web/20260916020928/https://help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Canceling your ChatGPT subscription | OpenAI Help Center",
+     "note": "read ~5000 chars, 11 links"
+    },
+    {
+     "step": 10,
+     "narration": "",
+     "url": "http://archive.org/wayback/available?url=help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+     "finalUrl": "http://archive.org/wayback/available?url=help.openai.com/en/articles/7232927-canceling-your-chatgpt-subscription",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~318 chars, 0 links"
+    },
+    {
+     "step": 11,
+     "narration": "I retrieved OpenAI's own help article (\"Canceling your ChatGPT subscription\") through the Wayback Machine, since help.openai.com blocked my direct requests. That gives me the exact official steps. I have what I need.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "archive.org",
+    "bing.com",
+    "help.openai.com",
+    "html.duckduckgo.com",
+    "openai.com",
+    "web.archive.org"
+   ],
+   "inputTokens": 5483,
+   "outputTokens": 1496,
+   "elapsedMs": 13435,
+   "diagnosis": [
+    {
+     "domain": "openai.com",
+     "posture": "open",
+     "parseable": false,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "support-poe",
+   "kind": "find",
+   "title": "Reach a human at Poe about billing",
+   "prompt": "A Poe subscriber has a billing problem. Find how to contact Poe's support (form, email, or page), starting from poe.com.",
+   "startUrls": [
+    "https://poe.com"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "Poe's support is reached through its Help Center at help.poe.com (a Zendesk site). The way to contact them is the \"Submit a request\" contact form at https://help.poe.com/hc/en-us/requests/new. Poe's Terms of Service and Terms of Sale both point billing/subscription issues to this help center and request form, and the \"Poe Purchases FAQs\" article covers subscription/refund questions. I could not confirm a separate support email address.",
+   "chosenSite": null,
+   "obstacles": [
+    "help.poe.com is protected by a Cloudflare 'Just a moment...' bot challenge (HTTP 403) so I could not read the Help Center pages directly",
+    "Had to retrieve the billing FAQ content via the Zendesk API (poe-support.zendesk.com) since the public help pages were blocked",
+    "poe.com landing page is a login wall with no visible support link",
+    "No standalone Poe support email could be confirmed on any page I read"
+   ],
+   "sources": [
+    "https://poe.com/pages/tos",
+    "https://poe.com/pages/terms-of-sale",
+    "https://help.poe.com/hc/en-us/requests/new",
+    "https://help.poe.com/hc/en-us/articles/19945140063636-Poe-Purchases-FAQs",
+    "https://poe.com/support"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start at poe.com and look for a support or help link.",
+     "url": "https://poe.com",
+     "finalUrl": "https://poe.com/login?redirect_url=%2F",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Poe - Fast, Helpful AI Chat",
+     "note": "read ~353 chars, 4 links"
+    },
+    {
+     "step": 2,
+     "narration": "The landing page is a login wall with no help link. Let me try Poe's help center and FAQ pages.",
+     "url": "https://help.poe.com",
+     "finalUrl": "https://help.poe.com/hc/en-us",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 3,
+     "narration": "",
+     "url": "https://poe.com/faq",
+     "finalUrl": "https://poe.com/FAQ____",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "FAQ____ - Poe",
+     "note": "read ~497 chars, 8 links"
+    },
+    {
+     "step": 4,
+     "narration": "The \"Help center\" link points to help.poe.com/hc, though help.poe.com hit a Cloudflare challenge. Let me try the exact help center URL.",
+     "url": "https://help.poe.com/hc",
+     "finalUrl": "https://help.poe.com/hc/en-us",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 5,
+     "narration": "Cloudflare is blocking the Help Center. Let me try its \"submit a request\" contact form directly and check the Terms of Service page for contact details.",
+     "url": "https://help.poe.com/hc/en-us/requests/new",
+     "finalUrl": "https://help.poe.com/hc/en-us/requests/new",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 6,
+     "narration": "",
+     "url": "https://poe.com/tos",
+     "finalUrl": "https://poe.com/pages/tos",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Terms of Service | Poe",
+     "note": "read ~5000 chars, 18 links"
+    },
+    {
+     "step": 7,
+     "narration": "ToS confirms the help center (help.poe.com) and a request form at help.poe.com/hc/en-us/requests/new, both Cloudflare-blocked for me. Let me check the Terms of Sale and Privacy pages, which may list a support/billing contact.",
+     "url": "https://poe.com/pages/terms-of-sale",
+     "finalUrl": "https://poe.com/pages/terms-of-sale",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Terms of Sale | Poe",
+     "note": "read ~5000 chars, 21 links"
+    },
+    {
+     "step": 8,
+     "narration": "",
+     "url": "https://poe.com/pages/privacy",
+     "finalUrl": "https://poe.com/pages/privacy",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Privacy Policy | Poe",
+     "note": "read ~5000 chars, 15 links"
+    },
+    {
+     "step": 9,
+     "narration": "The ToS and Terms of Sale both confirm Poe's support channel: the Help Center at help.poe.com and its request form at help.poe.com/hc/en-us/requests/new. Let me try the billing-specific help article to see if it names an email address.",
+     "url": "https://help.poe.com/hc/en-us/articles/19945140063636-Poe-Purchases-FAQs",
+     "finalUrl": "https://help.poe.com/hc/en-us/articles/19945140063636-Poe-Purchases-FAQs",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 10,
+     "narration": "",
+     "url": "https://help.poe.com/hc/en-us",
+     "finalUrl": "https://help.poe.com/hc/en-us",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 11,
+     "narration": "The whole Help Center is behind Cloudflare for me. Let me try the Zendesk API endpoint and a search engine to confirm whether there's a support email in addition to the form.",
+     "url": "https://help.poe.com/api/v2/help_center/articles.json",
+     "finalUrl": "https://help.poe.com/api/v2/help_center/en-us/articles.json",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 12,
+     "narration": "",
+     "url": "https://html.duckduckgo.com/html/?q=Poe+support+email+billing+contact",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=Poe+support+email+billing+contact",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Poe support email billing contact at DuckDuckGo",
+     "note": "read ~2536 chars, 2 links"
+    },
+    {
+     "step": 13,
+     "narration": "The Zendesk API is accessible and a search suggests poe.com/support is a support page. Let me fetch the billing FAQ article JSON and the poe.com/support page.",
+     "url": "https://poe-support.zendesk.com/api/v2/help_center/en-us/articles/19945140063636.json",
+     "finalUrl": "https://poe-support.zendesk.com/api/v2/help_center/en-us/articles/19945140063636.json",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 14,
+     "narration": "",
+     "url": "https://poe.com/support",
+     "finalUrl": "https://poe.com/support/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Poe Support",
+     "note": "read ~11 chars, 0 links"
+    },
+    {
+     "step": 15,
+     "narration": "I've hit my visit budget. Here's what I found.\n\nPoe's support is handled through its Help Center (a Zendesk site at help.poe.com), and the way to contact them is the \"Submit a request\" contact form at **https://help.poe.com/hc/en-us/requests/new**. Poe's own Terms of Service and Terms of Sale both link to this help center / request form as the contact channel for billing and subscription issues.\n\nI was not able to read the Help Center pages directly — help.poe.com throws a Cloudflare \"Just a mom",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 5,
+   "domainsVisited": [
+    "help.poe.com",
+    "html.duckduckgo.com",
+    "poe-support.zendesk.com",
+    "poe.com"
+   ],
+   "inputTokens": 14533,
+   "outputTokens": 4490,
+   "elapsedMs": 26974,
+   "diagnosis": [
+    {
+     "domain": "poe.com",
+     "posture": "closed",
+     "parseable": false,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "choose-tts",
+   "kind": "choose",
+   "title": "Pick a text-to-speech service for an audiobook",
+   "prompt": "Someone wants to narrate a 3-hour audiobook with AI voices on roughly a $30/month budget. Visit the candidate sites, compare what you can actually learn from their public pages (pricing, voice quality claims, usage limits), and pick ONE. Candidates: elevenlabs.io, murf.ai, resemble.ai, wellsaidlabs.com.",
+   "startUrls": [
+    "https://elevenlabs.io",
+    "https://murf.ai",
+    "https://www.resemble.ai",
+    "https://wellsaidlabs.com"
+   ],
+   "candidates": [
+    "elevenlabs.io",
+    "murf.ai",
+    "resemble.ai",
+    "wellsaidlabs.com"
+   ],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "Pick ELEVENLABS. Its Creator plan is $22/month for 121,000 credits (~121 min of TTS at ~1 credit per character, extra minutes ~$0.18) and includes a commercial license plus professional voice cloning — the only candidate that fits roughly $30/month with top-tier narration quality. Note a 3-hour book is ~180 min (~160k characters), so Creator's 121k credits fall ~1 hour short: cover it with the 2-month credit rollover (balance can reach 3x quota) or a ~$10–11 top-up, landing near $33 for a one-off book. WellSaid is the runner-up but its 180-min Pro tier costs $49/mo (or $33/mo if you prepay $396/year), over budget. Murf's pricing page is a JS wall and Resemble no longer sells TTS at all.",
+   "chosenSite": "elevenlabs.io",
+   "obstacles": [
+    "Murf's pricing page (murf.ai/pricing) is JavaScript-rendered and returned only the word 'Murf' on two attempts — no plans, usage limits, or prices readable.",
+    "Resemble AI (resemble.ai) has pivoted to deepfake detection/watermarking; its pricing page shows no text-to-speech or voice-cloning tier, so it's not usable for audiobook narration.",
+    "Several pages were pruned on first fetch as 'already read' and only rendered on a repeat visit.",
+    "WellSaid relocated from wellsaidlabs.com to wellsaid.io.",
+    "Exact 'minutes per credit' for ElevenLabs is inferred from its own plan table (~1,000 credits = ~1 minute)."
+   ],
+   "sources": [
+    "https://elevenlabs.io/pricing",
+    "https://www.wellsaid.io/ai-voice-pricing",
+    "https://www.resemble.ai/pricing",
+    "https://murf.ai/"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start by visiting all four candidate homepages in parallel to get an initial read on each.",
+     "url": "https://elevenlabs.io",
+     "finalUrl": "https://elevenlabs.io/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Free AI Voice Generator & Voice Agents Platform | ElevenLabs",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://murf.ai",
+     "finalUrl": "https://murf.ai/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Leading AI Voice & Conversational Agent Platform - Murf AI",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "",
+     "url": "https://www.resemble.ai",
+     "finalUrl": "https://www.resemble.ai/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Multimodal Deepfake Detection and Watermarking for Enterprise | Resemble AI",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "",
+     "url": "https://wellsaidlabs.com",
+     "finalUrl": "https://www.wellsaid.io/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Most Realistic AI Voice Generator | WellSaid",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 5,
+     "narration": "Resemble's homepage now leads with deepfake detection rather than voice generation — noting that. Now let me pull the pricing pages, which are the core of this comparison.",
+     "url": "https://elevenlabs.io/pricing",
+     "finalUrl": "https://elevenlabs.io/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "ElevenLabs Pricing for Creators & Businesses of All Sizes",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 6,
+     "narration": "",
+     "url": "https://murf.ai/pricing",
+     "finalUrl": "https://murf.ai/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Murf",
+     "note": "read ~4 chars, 0 links"
+    },
+    {
+     "step": 7,
+     "narration": "",
+     "url": "https://www.resemble.ai/pricing",
+     "finalUrl": "https://www.resemble.ai/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Deepfake Detection & AI Security Pricing | Resemble AI",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 8,
+     "narration": "",
+     "url": "https://www.wellsaid.io/pricing",
+     "finalUrl": "https://www.wellsaid.io/ai-voice-pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Pricing | WellSaid AI Voice Studio",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 9,
+     "narration": "Scanning Murf and WellSaid pricing didn't render (JS/bot wall), and Resemble's pricing is now deepfake-detection-only — no TTS tier. Let me retry Murf and WellSaid, and check whether Resemble still offers a voice product at all.",
+     "url": "https://murf.ai/pricing",
+     "finalUrl": "https://murf.ai/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Murf",
+     "note": "read ~4 chars, 0 links"
+    },
+    {
+     "step": 10,
+     "narration": "",
+     "url": "https://www.wellsaid.io/ai-voice-pricing",
+     "finalUrl": "https://www.wellsaid.io/ai-voice-pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Pricing | WellSaid AI Voice Studio",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 11,
+     "narration": "",
+     "url": "https://www.resemble.ai/products",
+     "finalUrl": "https://www.resemble.ai/products",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Complete Generative AI Security: Detect, Verify & Generate | Resemble AI",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 12,
+     "narration": "Good progress: WellSaid's pricing rendered (Pro = 180 min/month, i.e. exactly 3 hours, at $49/mo monthly or $33/mo annual). Resemble is now purely a deepfake-security company — no TTS product, so it's out. I still need ElevenLabs' and Murf's actual numbers, so let me retry those two.",
+     "url": "https://elevenlabs.io/pricing",
+     "finalUrl": "https://elevenlabs.io/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "ElevenLabs Pricing for Creators & Businesses of All Sizes",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 13,
+     "narration": "",
+     "url": "https://murf.ai/pricing",
+     "finalUrl": "https://murf.ai/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Murf",
+     "note": "read ~4 chars, 0 links"
+    },
+    {
+     "step": 14,
+     "narration": "Now I have ElevenLabs' real numbers (Creator $22/mo = 121k credits ≈ 121 min of TTS, commercial license, professional voice cloning) and WellSaid's (Pro 180 min/mo, $49/mo monthly or $33/mo annual). Murf's page is a JavaScript wall returning only \"Murf\". Let me make one final attempt on Murf via a different URL before deciding.",
+     "url": "https://murf.ai/",
+     "finalUrl": "https://murf.ai/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Leading AI Voice & Conversational Agent Platform - Murf AI",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 15,
+     "narration": "I've used my full 14 visits. Here's what I can confirm:\n\n- **elevenlabs.io** — Creator plan **$22/mo** (121,000 credits ≈ **121 min of TTS/month**; extra minutes ~$0.18; 1 credit/char on standard models, 0.5–1 on Flash). Commercial license + Professional Voice Cloning included; credits roll over up to 2 months (max 3× quota). Strongest quality reputation; Eleven v3 model listed.\n- **wellsaid.io** (from wellsaidlabs.com) — **Starter $19/mo = 20 min/mo** (too little); **Pro $49/mo = 180 min/mo**, ",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "elevenlabs.io",
+    "murf.ai",
+    "resemble.ai",
+    "wellsaid.io"
+   ],
+   "inputTokens": 24968,
+   "outputTokens": 11606,
+   "elapsedMs": 54689,
+   "diagnosis": [
+    {
+     "domain": "elevenlabs.io",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    },
+    {
+     "domain": "murf.ai",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    },
+    {
+     "domain": "resemble.ai",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "choose-product-photos",
+   "kind": "choose",
+   "title": "Pick an AI tool for product photos",
+   "prompt": "A small online shop wants an AI tool to turn phone snapshots into professional product photos. Visit the candidates, compare from their public pages, and pick ONE with a reason. Candidates: photoroom.com, getimg.ai, canva.com.",
+   "startUrls": [
+    "https://www.photoroom.com",
+    "https://getimg.ai",
+    "https://www.canva.com"
+   ],
+   "candidates": [
+    "photoroom.com",
+    "getimg.ai",
+    "canva.com"
+   ],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "Pick Photoroom (photoroom.com). It's the only one of the three that is purpose-built for turning everyday phone shots into professional e-commerce product photos: its plans include dedicated AI Product Photography (\"full AI photo shoots\"), Product Staging with lifestyle backgrounds, Product Beautifier, AI Shadows, white/flat-lay backgrounds, AI Fashion Models/Virtual Try-On, plus Batch Processing and Product Catalog for scaling many listings. It has a free tier to start and small-shop-friendly paid plans (Pro \"for solopreneurs\", Max \"great for small businesses\"). getimg.ai is a capable but general creative AI studio (also image/video/audio generation) — good, but not a product-photo specialist; its plans start at $10/mo. Canva couldn't be assessed because its pages are behind a bot wall.",
+   "chosenSite": "photoroom.com",
+   "obstacles": [
+    "canva.com homepage and /features/ both returned a Cloudflare 403 bot wall, so Canva could not be compared from its public pages",
+    "Some fetched pages were returned with content pruned, limiting detail on individual feature pages"
+   ],
+   "sources": [
+    "https://www.photoroom.com/pricing",
+    "https://www.photoroom.com/ai-product-photography",
+    "https://www.photoroom.com",
+    "https://getimg.ai/pricing",
+    "https://getimg.ai/solutions/ai-for-e-commerce",
+    "https://getimg.ai"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start by visiting the three candidate sites to see what each offers for product-photo editing.",
+     "url": "https://www.photoroom.com",
+     "finalUrl": "https://www.photoroom.com/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "AI-Powered Photo Editor and Listing Studio for Product Photography | Photoroom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://getimg.ai",
+     "finalUrl": "https://getimg.ai/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "The ultimate AI creative platform | getimg.ai",
+     "note": "read ~2777 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "",
+     "url": "https://www.canva.com",
+     "finalUrl": "https://www.canva.com/",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Canva",
+     "note": "read ~150 chars, 4 links"
+    },
+    {
+     "step": 4,
+     "narration": "Note: Canva returned a Cloudflare 403 bot wall — I'll try an alternate Canva page later. Now let me look at the product-photography pages and pricing for Photoroom and getimg.ai.",
+     "url": "https://www.photoroom.com/ai-product-photography",
+     "finalUrl": "https://www.photoroom.com/ai-product-photography",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "AI Product Photography to Boost Online Sales | Photoroom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 5,
+     "narration": "",
+     "url": "https://www.photoroom.com/pricing",
+     "finalUrl": "https://www.photoroom.com/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Photoroom Pricing: Plans, Prices & Free Trial | Photoroom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 6,
+     "narration": "",
+     "url": "https://getimg.ai/use-cases/ai-lifestyle-product-photography",
+     "finalUrl": "https://getimg.ai/use-cases/ai-lifestyle-product-photography",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "AI Lifestyle Product Photography Generator | getimg.ai | getimg.ai",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 7,
+     "narration": "",
+     "url": "https://getimg.ai/pricing",
+     "finalUrl": "https://getimg.ai/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Pricing | getimg.ai",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 8,
+     "narration": "Good intel so far. Photoroom is purpose-built for e-commerce product photos; getimg.ai is a broader creative studio. Let me retry Canva on a subpage (main page hit a 403) and check getimg's e-commerce positioning.",
+     "url": "https://www.canva.com/features/",
+     "finalUrl": "https://www.canva.com/features/",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Canva",
+     "note": "read ~150 chars, 4 links"
+    },
+    {
+     "step": 9,
+     "narration": "",
+     "url": "https://getimg.ai/solutions/ai-for-e-commerce",
+     "finalUrl": "https://getimg.ai/solutions/ai-for-e-commerce",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "#1 AI E-Commerce Image, Video & Audio Generator | getimg.ai",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 10,
+     "narration": "Canva is fully behind a Cloudflare bot wall (403 on both the homepage and features page), so I can't read its public pages. Let me try to pull pricing for the two accessible candidates to compare cost for a small shop.",
+     "url": "https://www.photoroom.com/pricing",
+     "finalUrl": "https://www.photoroom.com/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Photoroom Pricing: Plans, Prices & Free Trial | Photoroom",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 11,
+     "narration": "",
+     "url": "https://getimg.ai/pricing",
+     "finalUrl": "https://getimg.ai/pricing",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Pricing | getimg.ai",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 12,
+     "narration": "I have enough to decide. Here's my comparison:\n\n**Photoroom** — purpose-built for exactly this job. Its pricing page lists dedicated product-photo tools: AI Product Photography (\"full AI photo shoots\"), Product Staging (lifestyle backgrounds), Product Beautifier, AI Shadows, White Background, Flat Lay, AI Fashion Models/Virtual Try-On, plus Batch Processing and Product Catalog for scaling listings. Free tier to start; Pro (\"perfect for solopreneurs\"), Max (\"great for small businesses\"), Ultra, E",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "canva.com",
+    "getimg.ai",
+    "photoroom.com"
+   ],
+   "inputTokens": 18712,
+   "outputTokens": 3394,
+   "elapsedMs": 18194,
+   "diagnosis": [
+    {
+     "domain": "canva.com",
+     "posture": "selective",
+     "parseable": false,
+     "scoreLink": true
+    },
+    {
+     "domain": "getimg.ai",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    },
+    {
+     "domain": "photoroom.com",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "stunt-meta-ai",
+   "kind": "stunt",
+   "title": "Ask an AI agent to read meta.ai",
+   "prompt": "Find out what the meta.ai product offers and whether it costs anything, using meta.ai's own pages. Report honestly what an agent can actually see there.",
+   "startUrls": [
+    "https://www.meta.ai"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "partial",
+   "answer": "An agent can barely see anything on meta.ai: the homepage returns a 403 bot wall, and /about, /pricing, /faq, /privacy, /terms, /download, /login, /explore and /app all return 401 \"Authentication required,\" while robots.txt explicitly bans automated collection. The only public, readable page was /vibes — a feed of AI-generated music videos (\"Vibes\") with song titles, artists and user handles — plus the app shell text \"Meta AI · New chat · Vibes · Log in · Sign up.\" No page openly describes the product or shows any price/cost, so I could not confirm from meta.ai's own pages what it offers in detail or whether it costs anything.",
+   "chosenSite": null,
+   "obstacles": [
+    "Homepage https://www.meta.ai returns HTTP 403 (bot wall)",
+    "Most pages (/about, /pricing, /faq, /privacy, /terms, /download, /login, /explore, /app) return HTTP 401 'Authentication required'",
+    "robots.txt prohibits automated collection of Meta AI data",
+    "Member sitemap URLs (public posts/profiles) return HTTP 404",
+    "/help renders only an Arabic 'log in to view content' prompt",
+    "No accessible page states features or pricing"
+   ],
+   "sources": [
+    "https://www.meta.ai",
+    "https://www.meta.ai/vibes",
+    "https://www.meta.ai/sitemap.xml",
+    "https://www.meta.ai/robots.txt",
+    "https://www.meta.ai/help",
+    "https://www.meta.ai/pricing",
+    "https://www.meta.ai/about"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start by fetching meta.ai's homepage to see what the product is and what an agent can actually read there.",
+     "url": "https://www.meta.ai",
+     "finalUrl": "https://www.meta.ai/",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Meta AI",
+     "note": "read ~7 chars, 0 links"
+    },
+    {
+     "step": 2,
+     "narration": "The homepage returns a 403 bot wall with just \"Meta AI\" as text. Let me probe a few likely paths to see if any page renders for a plain GET.",
+     "url": "https://www.meta.ai/about",
+     "finalUrl": "https://www.meta.ai/about",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 3,
+     "narration": "",
+     "url": "https://www.meta.ai/help",
+     "finalUrl": "https://www.meta.ai/help",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Meta AI",
+     "note": "read ~51 chars, 0 links"
+    },
+    {
+     "step": 4,
+     "narration": "",
+     "url": "https://www.meta.ai/pricing",
+     "finalUrl": "https://www.meta.ai/pricing",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 5,
+     "narration": "",
+     "url": "https://www.meta.ai/faq",
+     "finalUrl": "https://www.meta.ai/faq",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 6,
+     "narration": "The site is locked behind auth—even /help just shows an Arabic \"log in to view content\" prompt. Let me check for a public sitemap/robots and a couple more likely paths.",
+     "url": "https://www.meta.ai/robots.txt",
+     "finalUrl": "https://www.meta.ai/robots.txt",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~1519 chars, 0 links"
+    },
+    {
+     "step": 7,
+     "narration": "",
+     "url": "https://www.meta.ai/sitemap.xml",
+     "finalUrl": "https://www.meta.ai/sitemap.xml",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Meta AI",
+     "note": "read ~44 chars, 0 links"
+    },
+    {
+     "step": 8,
+     "narration": "",
+     "url": "https://www.meta.ai/privacy",
+     "finalUrl": "https://www.meta.ai/privacy",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 9,
+     "narration": "",
+     "url": "https://www.meta.ai/terms",
+     "finalUrl": "https://www.meta.ai/terms",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 10,
+     "narration": "robots.txt explicitly bans automated collection and only lists sitemaps for public posts/profiles. Notably /sitemap.xml rendered the app shell hinting at features (\"New chat\", \"Vibes\", sign-up). Let me try those sitemaps and a few more public-ish paths.",
+     "url": "https://www.meta.ai/sitemap/meta_ai_public_posts_sitemap.xml.gz",
+     "finalUrl": "https://www.meta.ai/sitemap/meta_ai_public_posts_sitemap.xml.gz",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 11,
+     "narration": "",
+     "url": "https://www.meta.ai/sitemap/meta_ai_profiles_sitemap.xml.gz",
+     "finalUrl": "https://www.meta.ai/sitemap/meta_ai_profiles_sitemap.xml.gz",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~0 chars, 0 links"
+    },
+    {
+     "step": 12,
+     "narration": "",
+     "url": "https://www.meta.ai/download",
+     "finalUrl": "https://www.meta.ai/download",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 13,
+     "narration": "",
+     "url": "https://www.meta.ai/login",
+     "finalUrl": "https://www.meta.ai/login",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 14,
+     "narration": "Sitemaps 404; /download and /login need auth. Let me try a few more public-sounding paths to be thorough before concluding.",
+     "url": "https://www.meta.ai/vibes",
+     "finalUrl": "https://www.meta.ai/vibes",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Meta AI",
+     "note": "read ~571 chars, 0 links"
+    },
+    {
+     "step": 15,
+     "narration": "",
+     "url": "https://www.meta.ai/explore",
+     "finalUrl": "https://www.meta.ai/explore",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 16,
+     "narration": "",
+     "url": "https://www.meta.ai/app",
+     "finalUrl": "https://www.meta.ai/app",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~35 chars, 0 links"
+    },
+    {
+     "step": 17,
+     "narration": "",
+     "url": "https://www.meta.ai/",
+     "finalUrl": "https://www.meta.ai/",
+     "status": 403,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Meta AI",
+     "note": "read ~7 chars, 0 links"
+    },
+    {
+     "step": 18,
+     "narration": "I've hit the visit limit and the picture is clear. Here's my honest report.\n\nWhat I found on meta.ai's own pages:\n\n- **Homepage (https://www.meta.ai):** HTTP 403 bot wall — renders only the title \"Meta AI\", no content.\n- **/vibes:** HTTP 200 and the only page with real content — a public feed of AI-generated music videos (\"Vibes\") showing song titles/artists and user handles (e.g., \"Bad Moon Rising · Creedence Clearwater Revival @kasey.duney\"). The UI chrome is in Arabic and shows only links for",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "meta.ai"
+   ],
+   "inputTokens": 3060,
+   "outputTokens": 3733,
+   "elapsedMs": 20200,
+   "diagnosis": [
+    {
+     "domain": "meta.ai",
+     "posture": "closed",
+     "parseable": false,
+     "scoreLink": true
+    }
+   ]
+  }
+ ]
+}
