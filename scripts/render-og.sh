@@ -3,6 +3,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 CHROME="${CHROME:-google-chrome}"
-"$CHROME" --headless=new --disable-gpu --hide-scrollbars --window-size=1200,630 --virtual-time-budget=4000 \
+"$CHROME" --headless=new --disable-gpu --no-sandbox --hide-scrollbars --window-size=1200,630 --virtual-time-budget=4000 \
   --screenshot="$PWD/assets/og.png" "file://$PWD/scripts/og-card.html" 2>/dev/null
 echo "assets/og.png: $(identify -format '%wx%h' assets/og.png 2>/dev/null || echo rendered)"
+# If headless Chrome hangs (it does in some WSL setups), render it by hand instead:
+# serve scripts/og-card.html, screenshot it in a real browser, then
+#   convert shot.jpg -crop 1200x630+0+0 +repage -resize 1200x630! PNG24:assets/og.png

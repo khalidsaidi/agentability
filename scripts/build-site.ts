@@ -249,6 +249,22 @@ gtag('config', 'G-55RKNLGPNT');
   .hero-cta { display: inline-block; margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: 1rem; background: var(--hazard); color: #111 !important; text-decoration: none; padding: 12px 22px; border-radius: 999px; transition: transform .15s; }
   .hero-cta:hover { transform: translateY(-2px) rotate(-1deg); }
   @media (max-width: 640px) { .hide-sm { display: none; } }
+  /* the scoreboard is the answer to the headline, so the two read as one unit.
+     Named thisweek, not answer — .answer is already the agent's report card. */
+  .thisweek { margin-top: 34px; padding-top: 22px; border-top: 2px solid var(--line); }
+  .thisweek-label { font-family: var(--mono); font-size: .74rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--hazard); }
+  .thisweek .board { margin-top: 14px; }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 30px; }
+  .hero-actions .hero-cta { margin-top: 0; }
+  .hero-alt { display: inline-block; font-family: var(--display); font-weight: 700; font-size: 1rem; color: var(--ink) !important;
+    text-decoration: none; padding: 12px 20px; border: 1px solid #3a3d4d; border-radius: 999px; transition: border-color .15s, transform .15s; }
+  .hero-alt:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .share { font-family: var(--display); font-weight: 700; font-size: 1rem; color: var(--dim); background: none; cursor: pointer;
+    padding: 12px 20px; border: 1px dashed #3a3d4d; border-radius: 999px; transition: color .15s, border-color .15s, transform .15s; }
+  .share:hover { color: var(--ink); border-color: var(--ink); transform: translateY(-2px); }
+  .share.done { color: var(--win); border-color: var(--win); border-style: solid; }
+  .orient { margin-top: 18px; font-size: .92rem; color: var(--dim); max-width: 72ch; }
+  .orient a { color: var(--link); }
   /* guides */
   .guide h2 { margin-top: 44px; }
   .guide h3 { font-family: var(--display); font-weight: 700; font-size: 1.08rem; margin: 28px 0 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
@@ -288,6 +304,36 @@ ${opts.body}
     }
   }, true);
   document.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('.share') : null;
+    if (btn) {
+      var url = btn.getAttribute('data-share-url');
+      var title = btn.getAttribute('data-share-title') || document.title;
+      var label = btn.querySelector('.share-label');
+      var say = function (text, ok) {
+        if (!label) return;
+        label.textContent = text;
+        btn.classList.toggle('done', !!ok);
+        setTimeout(function () { label.textContent = 'Share'; btn.classList.remove('done'); }, 2400);
+      };
+      var copy = function () {
+        if (!navigator.clipboard) { say(url, false); return; }
+        navigator.clipboard.writeText(url).then(function () {
+          say('Link copied', true);
+          send('share', { method: 'clipboard', page_path: location.pathname });
+        }, function () { say('Copy failed', false); });
+      };
+      // Native share where it works; a cancelled sheet is a decision, not a failure,
+      // but a broken one must still leave the visitor with a link.
+      if (navigator.share) {
+        navigator.share({ title: title, text: title, url: url }).then(
+          function () { send('share', { method: 'native', page_path: location.pathname }); },
+          function (err) { if (!err || err.name !== 'AbortError') copy(); }
+        );
+      } else {
+        copy();
+      }
+      return;
+    }
     var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
     if (!a) return;
     if (a.href.indexOf('issues/new') !== -1) send('audit_request_click', { page_path: location.pathname });
@@ -677,40 +723,59 @@ async function main() {
   const tickerSpans = latest
     ? `<span>no retries</span><span>no editing</span><span>no cherry-picking</span><span>read-only <b>http get</b> — no javascript, no logins, no forms</span><span>agent: <b>${esc(latest.model)}</b></span><span>producer: <b>${latest.producedBy === "seed" ? "seed tasks (producer offline)" : esc(latest.producerModel ?? LEGACY_PRODUCER_MODEL)}</b>${latest.producedBy === "seed" ? "" : " + live search"}</span><span>every transcript published verbatim</span>`
     : "";
+  // The hero is a question the scoreboard answers. A first-time visitor has to learn
+  // three things before anything else: what this site is, what question it exists to
+  // answer, and what today's answer is. Everything else waits.
+  const shareBtn = (url: string, title: string, cls = "share") =>
+    `<button class="${cls}" type="button" data-share-url="${esc(url)}" data-share-title="${esc(title)}"><span class="share-label">Share</span></button>`;
+
   const fieldtestHero = latest
     ? `
-<p class="eyebrow rise"><span class="live"></span>The Agent Field Test · episode of ${prettyDate(latest.date)} · new every week, fully autonomous</p>
-<h1 class="rise d1">We send an AI agent to run your <span class="hl">errands</span> on the real web. Then we publish <span class="hl">everything</span>.</h1>
-<p class="lede rise d2">An AI producer reads the week's news and invents real tasks — find the true price, cancel the
-subscription, reach a human, pick a product. A real agent (${esc(latest.model)}) attempts them with read-only web
-access. Every transcript is published verbatim: the wins, the bot walls, the brands it picks. (We pay for the API
-calls for fun.)</p>
-<a class="hero-cta rise d3" href="/fieldtest/${latest.date}/">Watch this week's episode →</a>
-<div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
-<div class="board">
-  <div>
-    <div class="score">${latest.stats.completed}<i>/${latest.stats.tasks}</i></div>
-    <span class="caption">errands the agent finished this week</span>
+<p class="eyebrow rise"><span class="live"></span>Agentability · an open experiment on the agentic web · new results every week</p>
+<h1 class="rise d1">Can AI agents <span class="hl">actually</span> use the web?</h1>
+<p class="lede rise d2"><b>We find out in public, every week.</b> An AI producer invents ten everyday errands — find the
+true price, cancel the subscription, reach a human, pick between brands — and a real AI agent attempts them using
+nothing but plain web requests: no logins, no JavaScript, no human help. Every transcript is published verbatim, wins
+and failures alike. Alongside the show, ${s ? s.audited : "113"} well-known sites are scored on how usable they
+actually are for an agent.</p>
+<div class="thisweek rise d3">
+  <p class="thisweek-label">This week's answer · episode of ${prettyDate(latest.date)}</p>
+  <div class="board">
+    <div>
+      <div class="score">${latest.stats.completed}<i>/${latest.stats.tasks}</i></div>
+      <span class="caption">errands the agent actually finished</span>
+    </div>
+    <p class="runline"><b>${latest.stats.wallsHit}</b> bot walls · <b>${latest.stats.pageVisits}</b> pages read · <b>${latest.stats.domainsVisited}</b> sites visited</p>
   </div>
-  <p class="runline"><b>${latest.stats.wallsHit}</b> bot walls · <b>${latest.stats.pageVisits}</b> pages read · <b>${latest.stats.domainsVisited}</b> sites visited</p>
+  <div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
 </div>
-<div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
-<h2>Where it got interesting</h2>
+<div class="hero-actions rise d4">
+  <a class="hero-cta" href="/fieldtest/${latest.date}/">Read this week's transcripts →</a>
+  <a class="hero-alt" href="/ai-index/">See all ${s ? s.audited : ""} site scores</a>
+  ${shareBtn(SITE, "Can AI agents actually use the web? Agentability tests it in public, every week.")}
+</div>
+<p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
+<a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
+<a href="/docs/">take the raw data</a></p>
+<div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
+<h2>Where it got interesting this week</h2>
 ${segCards(latest)}`
     : `
-<p class="eyebrow"><span class="live"></span>The Agent Field Test · first episode in production</p>
-<h1>We send an AI agent to run your <span class="hl">errands</span> on the real web. Then we publish <span class="hl">everything</span>.</h1>
-<p class="lede">A weekly, fully autonomous show: an AI producer invents real errands, a real agent attempts them with
-read-only web access, and the full transcripts are published here — wins, bot walls, and all.</p>`;
+<p class="eyebrow"><span class="live"></span>Agentability · an open experiment on the agentic web</p>
+<h1>Can AI agents <span class="hl">actually</span> use the web?</h1>
+<p class="lede"><b>We find out in public, every week.</b> An AI producer invents ten everyday errands, a real AI agent
+attempts them with read-only web access, and every transcript is published verbatim — wins and failures alike. The
+first episode is in production.</p>`;
   // Only worth splitting the table when the two halves can't overlap.
   const bottomFive = summary && summary.leaderboard.length > 12 ? summary.leaderboard.slice(-5) : [];
   const landingBody = `${fieldtestHero}
 ${summary && s
     ? `
-<h2>The reference data: the AI-Readiness Index</h2>
-<p class="lede">Behind the show sits the panel: ${s.audited} well-known sites audited weekly against the conventions
-real AI agents rely on — <code>llms.txt</code>, crawler policy, parseable content, structured data, MCP. When the
-agent hits a wall, the index usually already predicted it.</p>
+<h2>The other half: ${s.audited} sites, scored</h2>
+<p class="lede">The errands come from a standing panel of ${s.audited} well-known sites, each audited every week against the
+conventions real AI agents rely on — <code>llms.txt</code>, crawler policy, content you can read without a browser,
+structured data, MCP. Every site gets a public report with a score and the exact fix for each failed check. When the
+agent hits a wall in an episode, the index has usually already predicted it.</p>
 <div class="figs">
   <div class="fig"><b>${s.averageScore}/100</b><small>average readiness score</small></div>
   <div class="fig"><b>${s.pctLlmsTxt}%</b><small>publish llms.txt</small></div>
@@ -736,10 +801,10 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
   await fsp.writeFile(
     path.join(OUT, "index.html"),
     shell({
-      title: "Agentability — we send AI agents to use the real web",
+      title: "Agentability — can AI agents actually use the web?",
       description: latest
-        ? `The Agent Field Test: a real AI agent runs real errands on the real web weekly, transcripts published verbatim. This episode: ${latest.stats.completed}/${latest.stats.tasks} tasks done, ${latest.stats.wallsHit} bot walls.`
-        : "A weekly autonomous show plus an open index: real AI agents attempt real web tasks, and 100+ well-known sites are audited for AI-agent readiness.",
+        ? `An open experiment, run weekly in public: a real AI agent attempts ten everyday web errands and every transcript is published verbatim. This week it finished ${latest.stats.completed} of ${latest.stats.tasks} and hit ${latest.stats.wallsHit} bot walls. Plus ${s ? s.audited : 113} sites scored for AI-agent readiness.`
+        : "An open experiment: a real AI agent attempts everyday web errands each week with every transcript published verbatim, alongside an index of well-known sites scored for AI-agent readiness.",
       canonicalPath: "/",
       body: landingBody,
       jsonLd: {
@@ -986,6 +1051,10 @@ web access. Each block below is named for the site it ran against, and coloured 
   <p class="runline"><b>${ep.stats.wallsHit}</b> bot walls · <b>${ep.stats.pageVisits}</b> pages read · <b>${ep.stats.domainsVisited}</b> sites visited · we pay for these API calls, for fun</p>
 </div>
 <div class="stripwrap">${resultStrip(ep, "")}</div>
+<div class="hero-actions">
+  ${shareBtn(`${SITE}/fieldtest/${ep.date}/`, `An AI agent was given ${ep.stats.tasks} everyday web errands and finished ${ep.stats.completed}. Every transcript published verbatim.`)}
+  <a class="hero-alt" href="/">What is this?</a>
+</div>
 ${ep.runs.map(taskCard).join("\n")}
 <div class="cta">Every transcript above is verbatim — no retries, no editing, no cherry-picking. Method, limits, and
 rules: <a href="/methodology/">methodology</a>. Raw episode JSON: <a href="/data/fieldtest/${esc(ep.date)}.json">open data</a>.</div>`,
