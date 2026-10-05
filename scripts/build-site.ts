@@ -4,6 +4,7 @@
 
 import fsp from "node:fs/promises";
 import fs from "node:fs";
+import vm from "node:vm";
 import path from "node:path";
 import { rootDomain, hostOf } from "./lib/domains";
 import { GUIDES, type GuideContext } from "./lib/guides";
@@ -63,7 +64,18 @@ window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
 gtag('js', new Date());
-gtag('config', 'G-55RKNLGPNT');
+// content_group is a native GA4 reporting dimension — it groups every page by kind
+// without needing a custom dimension, so reports split home/episode/guide/report.
+var p = location.pathname;
+var ag = p === '/' ? 'home'
+  : /^\\/fieldtest\\/\\d/.test(p) ? 'episode'
+  : p.indexOf('/fieldtest') === 0 ? 'episode_index'
+  : p.indexOf('/guides/') === 0 && p !== '/guides/' ? 'guide'
+  : p.indexOf('/ai-index/site/') === 0 ? 'site_report'
+  : p.indexOf('/ai-index') === 0 ? 'index'
+  : 'other';
+window.__agPageType = ag;
+gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-55RKNLGPNT"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,17 +306,42 @@ ${opts.body}
 </div>
 <script>
 (function () {
-  function send(name, params) { try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {} }
-  // Did they actually read a transcript? The core engagement signal.
+  var TYPE = window.__agPageType || 'other';
+  var EPISODE = (location.pathname.match(/\\/fieldtest\\/(\\d{4}-\\d{2}-\\d{2})/) || [])[1] || '';
+  var GUIDE = location.pathname.indexOf('/guides/') === 0 ? location.pathname.split('/')[2] || '' : '';
+  var SITE = location.pathname.indexOf('/ai-index/site/') === 0 ? location.pathname.split('/')[3] || '' : '';
+
+  // Every event carries the same base dimensions so any report can be sliced by
+  // page kind, episode or guide without another custom dimension per event.
+  function send(name, params) {
+    try {
+      if (!window.gtag) return;
+      var p = params || {};
+      p.page_type = TYPE;
+      p.page_path = location.pathname;
+      if (EPISODE) p.episode_date = EPISODE;
+      if (GUIDE) p.guide_slug = GUIDE;
+      if (SITE && !p.site_domain) p.site_domain = SITE;
+      gtag('event', name, p);
+    } catch (e) {}
+  }
+  window.__agSend = send;
+
+  // --- transcript and brief opens (the core engagement signals)
   document.addEventListener('toggle', function (e) {
     var d = e.target;
-    if (d && d.tagName === 'DETAILS' && d.open && !d.classList.contains('brief')) {
-      var card = d.closest ? d.closest('.task') : null;
-      send('playbyplay_open', { task_id: card && card.id ? card.id.replace('task-', '') : 'unknown', page_path: location.pathname });
-    }
+    if (!d || d.tagName !== 'DETAILS' || !d.open) return;
+    var card = d.closest ? d.closest('.task') : null;
+    var task = card && card.id ? card.id.replace('task-', '') : 'unknown';
+    send(d.classList.contains('brief') ? 'brief_open' : 'playbyplay_open', { task_id: task });
   }, true);
+
+  // --- clicks: share, strip cells, brand chips, index rows, nav, CTAs, outbound
   document.addEventListener('click', function (e) {
-    var btn = e.target && e.target.closest ? e.target.closest('.share') : null;
+    var t = e.target;
+    if (!t || !t.closest) return;
+
+    var btn = t.closest('.share');
     if (btn) {
       var url = btn.getAttribute('data-share-url');
       var title = btn.getAttribute('data-share-title') || document.title;
@@ -319,25 +356,82 @@ ${opts.body}
         if (!navigator.clipboard) { say(url, false); return; }
         navigator.clipboard.writeText(url).then(function () {
           say('Link copied', true);
-          send('share', { method: 'clipboard', page_path: location.pathname });
+          send('share', { method: 'clipboard' });
         }, function () { say('Copy failed', false); });
       };
-      // Native share where it works; a cancelled sheet is a decision, not a failure,
-      // but a broken one must still leave the visitor with a link.
       if (navigator.share) {
         navigator.share({ title: title, text: title, url: url }).then(
-          function () { send('share', { method: 'native', page_path: location.pathname }); },
+          function () { send('share', { method: 'native' }); },
           function (err) { if (!err || err.name !== 'AbortError') copy(); }
         );
-      } else {
-        copy();
-      }
+      } else { copy(); }
       return;
     }
-    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+
+    var strip = t.closest('.strip a');
+    if (strip) {
+      var cls = strip.className || '';
+      send('strip_click', {
+        site_domain: (strip.querySelector('.b') || {}).textContent || '',
+        segment_outcome: cls.indexOf('o-completed') > -1 ? 'completed' : cls.indexOf('o-partial') > -1 ? 'partial' : 'failed'
+      });
+    }
+    var chip = t.closest('.sites a.st');
+    if (chip) send('site_chip_click', { site_domain: (chip.textContent || '').trim() });
+    var seg = t.closest('a.seg');
+    if (seg) send('segment_card_click', { site_domain: (seg.querySelector('.w') || {}).textContent || '' });
+    var appear = t.closest('.appear a');
+    if (appear) send('episode_backlink_click', {});
+
+    var a = t.closest('a[href]');
     if (!a) return;
-    if (a.href.indexOf('issues/new') !== -1) send('audit_request_click', { page_path: location.pathname });
-    else if (a.host && a.host !== location.host) send('outbound_click', { link_domain: a.host, page_path: location.pathname });
+    var href = a.getAttribute('href') || '';
+    if (a.closest('nav.top')) send('nav_click', { cta: (a.textContent || '').trim() });
+    if (a.classList.contains('hero-cta') || a.classList.contains('hero-alt')) send('hero_cta_click', { cta: (a.textContent || '').trim() });
+    if (a.closest('.orient')) send('orient_click', { cta: (a.textContent || '').trim() });
+    if (href.indexOf('/ai-index/site/') === 0 && a.closest('table')) send('index_row_click', { site_domain: href.split('/')[3] || '' });
+    if (href.indexOf('/guides/') === 0) send('guide_link_click', { cta: (a.textContent || '').trim().slice(0, 60) });
+    if (href.indexOf('/feed.xml') > -1) send('feed_click', {});
+    if (href.indexOf('issues/new') !== -1) send('audit_request_click', {});
+    else if (a.host && a.host !== location.host) send('outbound_click', { link_domain: a.host });
+  });
+
+  // --- copying a curl command from a guide is real intent to implement
+  document.addEventListener('copy', function (e) {
+    var sel = document.getSelection();
+    var node = sel && sel.anchorNode;
+    var pre = node && node.parentElement && node.parentElement.closest ? node.parentElement.closest('pre') : null;
+    if (pre) send('code_copy', {});
+  });
+
+  // --- scroll depth: GA's built-in only fires at 90%, which tells you nothing about
+  // where people actually stop. These quartiles do, and each fires once.
+  var marks = [25, 50, 75, 100], hit = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var max = (h.scrollHeight - h.clientHeight);
+    if (max <= 0) return;
+    var pct = Math.min(100, Math.round(((window.scrollY || h.scrollTop) / max) * 100));
+    for (var i = 0; i < marks.length; i++) {
+      var m = marks[i];
+      if (pct >= m && !hit[m]) { hit[m] = 1; send('scroll_depth', { scroll_depth: String(m) }); }
+    }
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // --- did they actually read it? bottom reached and 30s spent.
+  var started = Date.now(), readSent = 0;
+  addEventListener('scroll', function () {
+    if (readSent || !hit[75]) return;
+    if (Date.now() - started > 30000) { readSent = 1; send('read_complete', {}); }
+  }, { passive: true });
+
+  // --- how long the page actually held them, sent once on the way out
+  addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'hidden' || window.__agLeft) return;
+    window.__agLeft = 1;
+    send('page_exit', { seconds_on_page: String(Math.round((Date.now() - started) / 1000)) });
   });
 })();
 </script>
@@ -1322,6 +1416,26 @@ ${episodes
     }),
     "utf8"
   );
+
+    // The inline analytics script lives inside a TS template literal, where a single
+  // un-doubled backslash silently becomes a broken regex and kills ALL tracking.
+  // Parse every generated inline script so that can never reach production again.
+  let checked = 0;
+  for (const page of ["index.html", `fieldtest/${latest ? latest.date : ""}/index.html`, "guides/ai-seo-vs-geo-vs-aeo/index.html", "ai-index/index.html"]) {
+    const file = path.join(OUT, page);
+    if (!fs.existsSync(file)) continue;
+    const html = await fsp.readFile(file, "utf8");
+    for (const [, body] of html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
+      if (body.trim().startsWith("{")) continue; // JSON-LD, not code
+      try {
+        new vm.Script(body);
+      } catch (error) {
+        throw new Error(`Inline script in ${page} does not parse — ${String((error as Error).message)}`);
+      }
+      checked += 1;
+    }
+  }
+  console.log(`Inline scripts parsed: ${checked} OK`);
 
   console.log(`Built static site → ${OUT} (${summary ? summary.leaderboard.length : 0} site reports)`);
 }
