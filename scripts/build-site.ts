@@ -881,7 +881,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
       await fsp.writeFile(
         path.join(dir, "index.html"),
         shell({
-          title: `${r.domain} — AI readiness score ${r.score}/100`,
+          title: `${r.domain} AI visibility score: ${r.score}/100`,
           description: `${r.domain} scores ${r.score}/100 (${r.grade}) for AI-agent readiness${r.paradox ? " — and publishes llms.txt while blocking AI crawlers" : ""}. Full check-by-check report.`,
           canonicalPath: `/ai-index/site/${r.domain}/`,
           body: `

@@ -27,9 +27,9 @@ const curl = (cmd: string) => `<pre><code>${cmd.replace(/&/g, "&amp;").replace(/
 export const GUIDES: Guide[] = [
   {
     slug: "ai-readiness-audit-checklist",
-    title: "AI Readiness Audit Checklist for Websites",
+    title: "AI SEO Checklist: 8 Checks AI Agents Run on Your Site",
     description:
-      "The eight checks a real AI agent needs your site to pass — llms.txt, crawler policy, readable HTML, structured data, sitemap, reachable pricing and support, MCP and OpenAPI — with a 60-second self-test for each.",
+      "An AI readiness audit checklist you can run yourself in an hour: the eight checks that decide whether AI agents can read, understand and act on your site — llms.txt, crawler policy, readable HTML, structured data, sitemap, reachable pricing and support, MCP and OpenAPI — each with a 60-second curl test and the exact fix.",
     updated: "2026-09-14",
     body: (ctx) => `
 <p class="lede">AI agents are the web's newest audience, and most sites fail them in the same handful of ways. This is the
@@ -112,7 +112,7 @@ fix for each failure. Not on the panel? <a href="https://github.com/khalidsaidi/
   },
   {
     slug: "llms-txt-openapi-for-ai-agents",
-    title: "llms.txt and OpenAPI for AI Agents",
+    title: "llms.txt and OpenAPI: the AI Visibility Setup Guide",
     description:
       "How to write an llms.txt that AI agents can actually use, publish OpenAPI and MCP so they can act, and serve the file correctly from FastAPI, Django, Express, Hono, Next.js, Laravel, Rails, Go, ASP.NET and more.",
     updated: "2026-09-14",
@@ -233,10 +233,83 @@ ${curl("curl -sI https://yourdomain.com/llms.txt | grep -i '^content-type'\ncurl
 scores on the <a href="/ai-index/">Index</a>.</div>`,
   },
   {
-    slug: "technical-seo-for-ai-discovery",
-    title: "Technical SEO for AI Discovery",
+    slug: "ai-seo-vs-geo-vs-aeo",
+    title: "AI SEO vs GEO vs AEO: What Actually Matters",
     description:
-      "Search engines and AI agents want mostly the same things from your site — but agents fail in different places. Server rendering, bot walls, structured data, one-hop navigation, and how to measure it with real agent transcripts.",
+      "Generative engine optimization, answer engine optimization, AI SEO and AI visibility are four names for mostly the same work. Here is what the labels mean, where they genuinely differ, and the eight things that decide whether an AI can use your site at all — measured across 113 real sites every week.",
+    updated: "2026-10-05",
+    body: (ctx) => `
+<p class="lede">Four labels are competing to name the same job: <b>AI SEO</b>, <b>GEO</b> (generative engine optimization),
+<b>AEO</b> (answer engine optimization) and <b>AI visibility</b>. Vendors will tell you they are different disciplines.
+Mostly they are not. Underneath all four sits one question with a measurable answer: <b>can a machine fetch your page,
+read it, and act on what it says?</b> We measure exactly that on ${ctx.audited} well-known sites every week, and send a
+real agent out to try. Here is what the labels actually mean and which parts are worth your time.</p>
+
+<h2>What each term means</h2>
+<ul>
+<li><b>AI SEO</b> — the broadest and most-searched label. Usually means "everything you do so AI systems surface your
+site", which spans classic technical SEO, content, and the machine-readable surfaces below.</li>
+<li><b>GEO — generative engine optimization</b> — aimed at being cited inside generated answers (ChatGPT, Gemini,
+Perplexity, AI Overviews). Emphasis on being quotable: clear claims, facts near the top, citable structure.</li>
+<li><b>AEO — answer engine optimization</b> — older term, from the featured-snippet and voice-assistant era. Emphasis on
+directly answering a specific question in a parseable block.</li>
+<li><b>AI visibility</b> — the measurement side: are you actually appearing in AI answers, and how often. A reporting
+category more than a technique.</li>
+</ul>
+
+<h2>The honest version: one job, three layers</h2>
+<p class="lede">Strip the branding and every one of these resolves to the same stack, in strict order of dependency.
+Each layer is worthless if the one below it fails.</p>
+<ul>
+<li><b>1 · Reachable</b> — a plain HTTP request gets your page, not a bot challenge, not a login. If an agent cannot
+fetch it, nothing above this matters. This is where most sites actually fail.</li>
+<li><b>2 · Readable</b> — the answer is in the served HTML, not assembled by JavaScript afterwards. Prices, plans,
+cancellation steps, contact details.</li>
+<li><b>3 · Quotable</b> — once a machine can read it, structure makes it citable: a direct answer near the top,
+schema.org JSON-LD, a curated <code>llms.txt</code>, stable URLs.</li>
+</ul>
+<p class="lede">GEO and AEO advice is almost entirely layer 3. That advice is sound — and completely wasted if you fail
+layers 1 or 2, which is the situation for a large share of the sites we audit.</p>
+
+<h2>What the data says</h2>
+<p class="lede">Across ${ctx.audited} well-known sites, average score <b>${ctx.averageScore}/100</b>:</p>
+<ul>
+<li><b>${ctx.pctBlockingSomeAI}%</b> block at least one major AI crawler in <code>robots.txt</code>, and
+<b>${ctx.pctClosed}%</b> block essentially all of them. For those, every hour spent on GEO tactics is spent behind a
+locked door.</li>
+<li>Only <b>${ctx.pctLlmsTxt}%</b> publish an <code>llms.txt</code> — the cheapest layer-3 win there is.</li>
+<li>In our weekly <a href="/fieldtest/">Field Test</a>, the errands that fail almost never fail for lack of clever
+content. They fail on JavaScript-only pricing pages, bot walls on help centers, and cancellation flows you cannot
+even read without logging in.${ctx.latestEpisode ? ` In the <a href="/fieldtest/${ctx.latestEpisode.date}/">latest episode</a> the agent hit ${ctx.latestEpisode.wallsHit} bot walls across ${ctx.latestEpisode.pageVisits} page reads.` : ""}</li>
+</ul>
+
+<h2>So what should you actually do?</h2>
+<p class="lede">In this order. Stop when you run out of time — the order is the point.</p>
+<ul>
+<li><b>Unblock deliberately.</b> Open your <code>robots.txt</code> and decide, on purpose, which AI crawlers you allow.
+Blocking everything is a legitimate business choice; blocking by accident is not.</li>
+<li><b>Server-render the money pages.</b> Pricing, support, cancellation, legal. One curl should show the numbers.</li>
+<li><b>Link those four from the homepage</b> with real anchors in the HTML.</li>
+<li><b>Ship <code>llms.txt</code> and JSON-LD.</b> An afternoon's work, and it is the whole of what most GEO guides sell you.</li>
+<li><b>Then</b> worry about quotability, phrasing, and being cited.</li>
+</ul>
+
+<h2>How to measure it without buying anything</h2>
+<p class="lede">You do not need an AI-visibility subscription to find out whether you are reachable and readable. Fetch
+your own pages the way an agent does:</p>
+<pre><code>curl -sL https://yourdomain.com/pricing | grep -o '\$[0-9]*' | head</code></pre>
+<p class="lede">No prices, or a page titled "Just a moment", is your answer. Then look up your site on the
+<a href="/ai-index/">Index</a> for a check-by-check report, and read the
+<a href="/guides/ai-readiness-audit-checklist/">full checklist</a> for the fix to each failure.</p>
+
+<div class="cta"><b>The short answer to "AEO vs GEO":</b> pick whichever word your team likes, then go fix layers 1 and 2
+first. The labels are marketing; the eight checks are not.</div>`,
+  },
+  {
+    slug: "technical-seo-for-ai-discovery",
+    title: "AI SEO: How to Get Your Site Read by AI Agents",
+    description:
+      "Technical SEO for AI discovery: search engines and AI agents want mostly the same things from your site — but agents fail in different places. Server rendering, bot walls, structured data, one-hop navigation, and how to measure your AI visibility with real agent transcripts.",
     updated: "2026-09-14",
     body: (ctx) => `
 <p class="lede">Classic technical SEO asks whether a crawler can find, fetch and understand your pages. AI discovery asks the same

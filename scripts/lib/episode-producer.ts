@@ -10,7 +10,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { FieldTask } from "./field-agent";
 import { CostBudget } from "./cost-budget";
-import { searchWeb, visitPage } from "./web-tools";
+import { searchWeb, visitPage, trendingSearches } from "./web-tools";
 
 export const PRODUCER_MODEL = "deepseek-v4-pro";
 const MAX_RESEARCH_ROUNDS = 8;
@@ -37,6 +37,12 @@ const RESEARCH_TOOLS: Anthropic.Tool[] = [
       properties: { url: { type: "string", description: "Absolute URL" } },
       required: ["url"],
     },
+  },
+  {
+    name: "trending",
+    description:
+      "What the US is searching right now (Google Trends). Most entries are news, sport or politics and make no errand — use it to spot the few that do: a company in the news, a price change, a product launch, a service people are suddenly trying to cancel or reach.",
+    input_schema: { type: "object", properties: {}, required: [] },
   },
 ];
 
@@ -77,7 +83,8 @@ on agentability.org where a real AI agent does everyday web tasks with read-only
 requests: no logins, no JavaScript, no forms, no purchases) and the full transcript is published
 verbatim. Your job: design this week's 10 tasks so the episode is CURRENT, human, and dramatic.
 
-First, use web search (a few searches) to find out what's actually happening this week: product
+First, call "trending" once to see what the country is actually searching today, then use web search (a few
+searches) to find out what's actually happening this week: product
 launches, price changes or hikes people are angry about, subscription controversies, things people
 are trying to cancel, viral complaints about companies being hard to reach. Then design tasks that
 ride those stories — an episode about THIS week, not about the eternal web.
@@ -199,6 +206,12 @@ export async function produceEpisodeTasks(
               ? hits.map((h) => `- ${h.title}\n  ${h.url}\n  ${h.snippet}`).join("\n")
               : "No results.";
           console.log(`  producer searched: ${String(input.query || "").slice(0, 80)} → ${hits.length} hits${error ? ` (${error})` : ""}`);
+        } else if (call.name === "trending") {
+          const { topics, error } = await trendingSearches();
+          content = error
+            ? `Trending unavailable: ${error}`
+            : topics.map((t) => `- ${t.topic} (${t.traffic} searches) — ${t.headline}`).join("\n") || "No trends returned.";
+          console.log(`  producer read Google Trends → ${topics.length} topics${error ? ` (${error})` : ""}`);
         } else if (call.name === "visit") {
           const view = await visitPage(String(input.url || ""));
           content = view.ok || view.text

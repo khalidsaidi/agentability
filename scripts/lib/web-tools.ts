@@ -191,3 +191,39 @@ export async function searchWeb(query: string, limit = 8): Promise<{ hits: Searc
     clearTimeout(timer);
   }
 }
+
+export type TrendingTopic = { topic: string; traffic: string; headline: string };
+
+// What the US is actually searching right now, from Google Trends' public RSS.
+// The producer uses it to ground an episode in live demand rather than guessing
+// what the week was about — most entries are news, so it filters for errand-shaped ones.
+export async function trendingSearches(geo = "US", limit = 20): Promise<{ topics: TrendingTopic[]; error?: string }> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(`https://trends.google.com/trending/rss?geo=${encodeURIComponent(geo)}`, {
+      signal: controller.signal,
+      headers: { "user-agent": UA, accept: "application/rss+xml,application/xml,*/*" },
+    });
+    if (!response.ok) return { topics: [], error: `HTTP ${response.status}` };
+    const xml = (await response.text()).slice(0, MAX_BYTES);
+    const topics: TrendingTopic[] = [];
+    for (const block of xml.split("<item>").slice(1)) {
+      const pick = (tag: string) => new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(block)?.[1] ?? "";
+      const topic = stripText(pick("title"));
+      if (!topic) continue;
+      topics.push({
+        topic,
+        traffic: stripText(pick("ht:approx_traffic")),
+        headline: stripText(pick("ht:news_item_title")).slice(0, 160),
+      });
+      if (topics.length >= limit) break;
+    }
+    return { topics };
+  } catch (error: any) {
+    const message = String(error?.message || error);
+    return { topics: [], error: /abort/i.test(message) ? `timed out after ${FETCH_TIMEOUT_MS / 1000}s` : message.slice(0, 160) };
+  } finally {
+    clearTimeout(timer);
+  }
+}
