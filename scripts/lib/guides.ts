@@ -40,7 +40,7 @@ way to test each one yourself in about a minute. The panel's average right now i
 <p class="lede">Not a chatbot, not an API key, not a partnership. A production AI agent working on someone's behalf makes plain
 HTTP requests and reads what comes back. It cannot run your JavaScript, solve your bot challenge, or click through a
 cookie wall. If the answer to "what does this cost?" only exists after a script executes, the agent never sees it — and
-in our weekly <a href="/fieldtest/">Field Test</a>, that is the single most common reason an errand fails.</p>
+in our daily <a href="/fieldtest/">Field Test</a>, that is the single most common reason an errand fails.</p>
 
 <h2>The checklist</h2>
 
@@ -278,7 +278,7 @@ layers 1 or 2, which is the situation for a large share of the sites we audit.</
 <b>${ctx.pctClosed}%</b> block essentially all of them. For those, every hour spent on GEO tactics is spent behind a
 locked door.</li>
 <li>Only <b>${ctx.pctLlmsTxt}%</b> publish an <code>llms.txt</code> — the cheapest layer-3 win there is.</li>
-<li>In our weekly <a href="/fieldtest/">Field Test</a>, the errands that fail almost never fail for lack of clever
+<li>In our daily <a href="/fieldtest/">Field Test</a>, the errands that fail almost never fail for lack of clever
 content. They fail on JavaScript-only pricing pages, bot walls on help centers, and cancellation flows you cannot
 even read without logging in.${ctx.latestEpisode ? ` In the <a href="/fieldtest/${ctx.latestEpisode.date}/">latest episode</a> the agent hit ${ctx.latestEpisode.wallsHit} bot walls across ${ctx.latestEpisode.pageVisits} page reads.` : ""}</li>
 </ul>

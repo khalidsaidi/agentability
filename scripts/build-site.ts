@@ -45,7 +45,7 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <title>${esc(opts.title)}</title>
 <meta name="description" content="${esc(opts.description)}">
 <link rel="canonical" href="${SITE}${opts.canonicalPath}">
-<link rel="alternate" type="application/rss+xml" title="The Agent Field Test — weekly episodes" href="${SITE}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="The Agent Field Test — daily episodes" href="${SITE}/feed.xml">
 <meta property="og:title" content="${esc(opts.title)}">
 <meta property="og:description" content="${esc(opts.description)}">
 <meta property="og:url" content="${SITE}${opts.canonicalPath}">
@@ -599,7 +599,7 @@ function renderReport(raw: string): string {
 const FIELD_FAQ: Array<{ q: string; a: string }> = [
   {
     q: "Can AI agents actually use websites in 2026?",
-    a: "Sometimes. In our weekly field tests a production agent completes most simple errands (finding real prices, comparing plans) but is regularly stopped by bot walls, login-only pages, and JavaScript-only content — every attempt is published verbatim in the episodes.",
+    a: "Sometimes. In our daily field tests a production agent completes most simple errands (finding a kick-off time, a price, an official statement) but is regularly stopped by bot walls, login-only pages, and JavaScript-only content — every attempt is published verbatim in the episodes.",
   },
   {
     q: "Is the Agent Field Test edited or scripted?",
@@ -825,15 +825,15 @@ async function main() {
 
   const fieldtestHero = latest
     ? `
-<p class="eyebrow rise"><span class="live"></span>Agentability · an open experiment on the agentic web · new results every week</p>
+<p class="eyebrow rise"><span class="live"></span>Agentability · an open experiment on the agentic web · a new episode every day</p>
 <h1 class="rise d1">Can AI agents <span class="hl">actually</span> use the web?</h1>
-<p class="lede rise d2"><b>We find out in public, every week.</b> An AI producer invents ten everyday errands — find the
-true price, cancel the subscription, reach a human, pick between brands — and a real AI agent attempts them using
-nothing but plain web requests: no logins, no JavaScript, no human help. Every transcript is published verbatim, wins
-and failures alike. Alongside the show, ${s ? s.audited : "113"} well-known sites are scored on how usable they
+<p class="lede rise d2"><b>We find out in public, every day.</b> An AI producer reads what the world is searching that morning and turns it
+into ten real errands — what time is kick-off and on which channel, what magnitude was the quake, what does it cost,
+what actually happened — and a real AI agent attempts them using nothing but plain web requests: no logins, no
+JavaScript, no human help. Every transcript is published verbatim, wins and failures alike. Alongside the show, ${s ? s.audited : "113"} well-known sites are scored on how usable they
 actually are for an agent.</p>
 <div class="thisweek rise d3">
-  <p class="thisweek-label">This week's answer · episode of ${prettyDate(latest.date)}</p>
+  <p class="thisweek-label">Today's answer · episode of ${prettyDate(latest.date)}</p>
   <div class="board">
     <div>
       <div class="score">${latest.stats.completed}<i>/${latest.stats.tasks}</i></div>
@@ -844,7 +844,7 @@ actually are for an agent.</p>
   <div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
 </div>
 <div class="hero-actions rise d4">
-  <a class="hero-cta" href="/fieldtest/${latest.date}/">Read this week's transcripts →</a>
+  <a class="hero-cta" href="/fieldtest/${latest.date}/">Read today's transcripts →</a>
   <a class="hero-alt" href="/ai-index/">See all ${s ? s.audited : ""} site scores</a>
   ${shareBtn(SITE, "Can AI agents actually use the web? Agentability tests it in public, every week.")}
 </div>
@@ -852,7 +852,7 @@ actually are for an agent.</p>
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
 <a href="/docs/">take the raw data</a></p>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
-<h2>Where it got interesting this week</h2>
+<h2>Where it got interesting</h2>
 ${segCards(latest)}`
     : `
 <p class="eyebrow"><span class="live"></span>Agentability · an open experiment on the agentic web</p>
@@ -1094,7 +1094,7 @@ transcript? Open an issue — everything is versioned in public.</p>`;
     shell({
       title: "The Agent Field Test — episodes",
       description:
-        "A weekly autonomous show: an AI producer invents real web errands, a real agent attempts them read-only, and every transcript is published verbatim.",
+        "A daily autonomous show: an AI producer turns the day's trending searches into real web errands, a real agent attempts them read-only, and every transcript is published verbatim.",
       canonicalPath: "/fieldtest/",
       body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · The Agent Field Test</p>
@@ -1363,7 +1363,7 @@ nothing you can't test with curl.</p>
 <title>The Agent Field Test</title>
 <link>${SITE}/fieldtest/</link>
 <atom:link href="${SITE}/feed.xml" rel="self" type="application/rss+xml"/>
-<description>A weekly autonomous show: an AI producer invents real web errands, a real agent attempts them read-only, and every transcript is published verbatim.</description>
+<description>A daily autonomous show: an AI producer turns the day's trending searches into real web errands, a real agent attempts them read-only, and every transcript is published verbatim.</description>
 <language>en</language>
 ${latest ? `<lastBuildDate>${rfc822(latest.generatedAt)}</lastBuildDate>` : ""}
 ${episodes

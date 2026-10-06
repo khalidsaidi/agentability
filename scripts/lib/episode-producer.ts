@@ -17,7 +17,10 @@ const MAX_RESEARCH_ROUNDS = 8;
 // Anthropic's server-side search capped itself at a handful of uses; these tools
 // don't, so the loop must: after this many research rounds the only tool left is
 // propose_tasks, and the call is forced.
-const RESEARCH_ROUNDS_BEFORE_FORCING = 4;
+const RESEARCH_ROUNDS_BEFORE_FORCING = 5;
+// Tasks built without reading a page carry invented start URLs, which the
+// sanitiser then throws out — leaving an episode of seed tasks.
+const MIN_RESEARCH_CALLS = 4;
 
 const RESEARCH_TOOLS: Anthropic.Tool[] = [
   {
@@ -78,52 +81,75 @@ function producerPrompt(opts: {
   blockedDomains: string[];
   pastTitles: string[];
 }): string {
-  return `Today is ${opts.today}. You are the producer of "The Agent Field Test" — a weekly public show
-on agentability.org where a real AI agent does everyday web tasks with read-only access (plain GET
-requests: no logins, no JavaScript, no forms, no purchases) and the full transcript is published
-verbatim. Your job: design this week's 10 tasks so the episode is CURRENT, human, and dramatic.
+  return `Today is ${opts.today}. You are the producer of "The Agent Field Test" — a daily public show
+on agentability.org where a real AI agent is sent out onto the live web with read-only access (plain
+GET requests: no logins, no JavaScript, no forms, no purchases) and the full transcript is published
+verbatim, win or fail. Your job: design today's 10 errands so the episode is about TODAY.
 
-First, call "trending" once to see what the country is actually searching today, then use web search (a few
-searches) to find out what's actually happening this week: product
-launches, price changes or hikes people are angry about, subscription controversies, things people
-are trying to cancel, viral complaints about companies being hard to reach. Then design tasks that
-ride those stories — an episode about THIS week, not about the eternal web.
+Start by calling "trending" to see what people are actually searching right now across several
+countries. Those topics are your raw material, and ALL of them are fair game — sport, breaking news,
+entertainment, disasters, politics, people, products, anything. Use "search" and "visit" to find out
+what the story actually is before you build a task on it.
 
-Rules for great episodes:
-- Tasks are errands a normal person would delegate to an assistant: what does this really cost now,
-  how do I cancel this, how do I reach a human, which of these should I buy, what does this policy
-  actually say. NOT developer trivia (no context windows, parameter counts, API limits).
-- Name real, well-known brands people care about. Prefer the audited panel below, but 3-4 tasks may
-  use other famous sites (airlines, ticketing, streaming, retail, banks-adjacent-but-read-only) when
-  the week's news makes a better story. Never invent domains.
-- Mix: about 6 "find" tasks, 3 "choose" tasks (3-4 candidate brands each), and exactly 1 "stunt".
-- The stunt should send the agent somewhere it will very likely be blocked or lost — sites known to
-  wall off agents are listed below. The comedy/tragedy of the wall IS the story.
-- Everything must be answerable in principle from public pages, read-only, nothing destructive, no
-  accounts, no personal data, and safe to publish.
-- Avoid repeating past episode topics: ${opts.pastTitles.length ? opts.pastTitles.join(" · ") : "(none yet)"}.
-- Prompts must be self-contained (the agent sees nothing else, and has NO web search — only page
-  fetches), concrete, and start from URLs that actually exist (homepages are safest). If a task
-  depends on this week's news, put the needed context in the prompt itself.
+For each topic worth using, ask the only question that matters: **what would a real person ask an
+assistant to go and find out about this?** Then write that as the errand. Shapes, not subjects:
+- a fixture is trending  -> "What time does it kick off in UK time, and which channel is showing it?"
+- an earthquake trends   -> "What magnitude, where exactly, and is there a tsunami warning?"
+- a person trends        -> "What actually happened — from a source that isn't paywalled?"
+- a show or film trends  -> "Where can I watch it, and what does that cost?"
+- a product trends       -> "What does it actually cost and when can I get one?"
+- an outage trends       -> "Is it still down, and has the company said anything?"
 
-Audited panel: ${opts.panelDomains.join(", ")}
+The test is always the same: can an agent armed with nothing but plain GET requests actually find
+this out on the open web? When it cannot — paywalls, bot walls, JavaScript-only scores, login-gated
+help pages — that failure IS the episode. Pick topics that will put that to the test.
 
-Sites known to block or wall AI agents (stunt material): ${opts.blockedDomains.join(", ") || "(none known)"}
+Rules:
+- Errands a normal person would delegate. Not developer trivia (no context windows, token limits).
+- Name real sites that actually exist. Never invent a domain. Homepages are the safest start URLs.
+- Mix: about 6 "find" tasks, 3 "choose" tasks (3-4 real candidate sites each), exactly 1 "stunt".
+- The stunt should send the agent somewhere it will very likely be blocked. The wall is the story.
+- Everything answerable in principle from public pages: read-only, no accounts, no personal data,
+  nothing destructive, safe to publish. Avoid tasks that require a human's private information.
+- On a grim story (a disaster, a death, a crime) keep the errand factual and respectful — what
+  happened, where to find official information — never ghoulish.
+- Do not repeat recent episode topics: ${opts.pastTitles.length ? opts.pastTitles.join(" · ") : "(none yet)"}.
+- Prompts must be self-contained. The agent sees nothing but your prompt and has NO web search — only
+  page fetches — so put today's context in the prompt itself and give it real starting URLs.
 
-Research first, then call propose_tasks once with the 10 tasks.`;
+The audited panel below is useful for the stunt and for any errand where a site's agent-readiness is
+the point, but you are NOT limited to it: ${opts.panelDomains.join(", ")}
+
+Sites known to block or wall AI agents (prime stunt material): ${opts.blockedDomains.join(", ") || "(none known)"}
+
+Research first — call "trending", then at least four "search"/"visit" calls — and only then call
+propose_tasks once with the 10 tasks. Every startUrl must be a real page you have seen load, or the
+task will be thrown away.`;
 }
 
-function sanitizeTask(raw: any): FieldTask | null {
-  if (!raw || typeof raw !== "object") return null;
+function sanitizeTask(raw: any, reasons: string[] = []): FieldTask | null {
+  if (!raw || typeof raw !== "object") { reasons.push("not an object"); return null; }
   const kind = raw.kind === "choose" || raw.kind === "stunt" ? raw.kind : "find";
   const id = String(raw.id || "").toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 60);
   const title = String(raw.title || "").slice(0, 90);
   const prompt = String(raw.prompt || "").slice(0, 900);
+  // Accept bare hosts and http:// — a producer that found a real page should not
+  // lose the task to a missing scheme.
   const startUrls = (Array.isArray(raw.startUrls) ? raw.startUrls : [])
     .map((u: unknown) => String(u).trim())
+    .map((u: string) => (/^https?:\/\//i.test(u) ? u : u ? `https://${u}` : ""))
+    .map((u: string) => u.replace(/^http:\/\//i, "https://"))
     .filter((u: string) => /^https:\/\/[a-z0-9.-]+\.[a-z]{2,}/i.test(u))
     .slice(0, 4);
-  if (!id || !title || !prompt || !startUrls.length) return null;
+  if (!id || !title || !prompt || !startUrls.length) {
+    reasons.push(
+      `${raw.id || "(no id)"}: ` +
+        [!id && "bad id", !title && "no title", !prompt && "no prompt", !startUrls.length && `no valid startUrls (${JSON.stringify(raw.startUrls ?? null)})`]
+          .filter(Boolean)
+          .join(", ")
+    );
+    return null;
+  }
   const candidates = Array.isArray(raw.candidates)
     ? raw.candidates.map((c: unknown) => String(c).toLowerCase().replace(/^www\./, "").trim()).filter(Boolean).slice(0, 5)
     : undefined;
@@ -159,6 +185,7 @@ export async function produceEpisodeTasks(
     // here and their results go back as tool_results until propose_tasks arrives;
     // a turn that ends in prose without any tool call is nudged once.
     let toolUse: Anthropic.ToolUseBlock | undefined;
+    let researched = 0;
     for (let round = 0; round < MAX_RESEARCH_ROUNDS && !toolUse; round++) {
       // This model costs ~4x the agent's; a research loop must not run away.
       if (budget.exhausted) throw new Error("spend ceiling reached before tasks were produced");
@@ -186,10 +213,29 @@ export async function produceEpisodeTasks(
       toolUse = response.content.find(
         (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "propose_tasks"
       );
+      if (toolUse && researched < MIN_RESEARCH_CALLS && !forcing) {
+        // Proposing before looking anything up produces invented URLs. Send it back.
+        messages.push({ role: "assistant", content: response.content });
+        messages.push({
+          role: "user",
+          content: [
+            {
+              type: "tool_result" as const,
+              tool_use_id: toolUse.id,
+              is_error: true,
+              content:
+                "Rejected: you have not researched yet. Use search and visit first to find out what today's trending stories actually are and to get real URLs that load. Then call propose_tasks.",
+            },
+          ],
+        });
+        toolUse = undefined;
+        continue;
+      }
       if (toolUse) break;
       messages.push({ role: "assistant", content: response.content });
 
       const research = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
+      researched += research.filter((c) => c.name === "search" || c.name === "visit").length;
       if (!research.length) {
         if (!forcing) messages.push({ role: "user", content: "Good — now call propose_tasks exactly once with the 10 finished tasks." });
         continue;
@@ -226,7 +272,11 @@ export async function produceEpisodeTasks(
       messages.push({ role: "user", content: results });
     }
     const raw = (toolUse?.input as any)?.tasks;
-    const tasks = (Array.isArray(raw) ? raw : []).map(sanitizeTask).filter((t): t is FieldTask => t !== null);
+    const reasons: string[] = [];
+    const tasks = (Array.isArray(raw) ? raw : [])
+      .map((t: any) => sanitizeTask(t, reasons))
+      .filter((t): t is FieldTask => t !== null);
+    if (reasons.length) console.error(`  ${reasons.length} task(s) rejected: ${reasons.slice(0, 4).join(" | ")}`);
     const seen = new Set<string>();
     const unique = tasks.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true)));
     if (unique.length >= 6) return { tasks: unique.slice(0, 10), producedBy: "producer" };

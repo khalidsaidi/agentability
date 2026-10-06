@@ -84,7 +84,9 @@ async function main() {
     .filter((l) => l && !l.startsWith("#"));
   const pastTitles: string[] = [];
   try {
-    for (const file of (await fsp.readdir(EPISODES_DIR)).sort().reverse().slice(0, 6)) {
+    // Daily cadence needs a longer memory than weekly did, or the producer starts
+    // repeating itself inside a fortnight.
+    for (const file of (await fsp.readdir(EPISODES_DIR)).sort().reverse().slice(0, 21)) {
       if (!file.endsWith(".json")) continue;
       const ep = JSON.parse(await fsp.readFile(path.join(EPISODES_DIR, file), "utf8"));
       for (const r of ep.runs ?? []) pastTitles.push(String(r.title));
