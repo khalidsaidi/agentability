@@ -302,7 +302,8 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
 <a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. Open data, no signup, no cost.
-<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a></footer>
+<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a>
+<br />Sister project: <a href="https://rootfetch.com/">RootFetch, domain extension statistics</a></footer>
 </div>
 <script>
 (function () {
