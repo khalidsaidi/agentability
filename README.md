@@ -2,12 +2,14 @@
 
 **We send AI agents to use the real web. Then we publish everything.**
 
-Two weekly, fully autonomous productions:
+Two fully autonomous productions:
 
-1. **The Agent Field Test** — an AI producer invents real errands (find the true
-   price, cancel the subscription, reach a human, pick a product between brands),
-   and a real agent attempts them with read-only web access. Transcripts are
-   published verbatim: wins, honest give-ups, bot walls, what it cost in tokens.
+1. **The Agent Field Test** (daily) — an AI producer reads what the world is
+   searching that morning and turns it into ten real errands: what time is
+   kick-off and on which channel, what magnitude was the quake, what does it
+   cost, what actually happened. A real agent attempts them with read-only web
+   access. Transcripts are published verbatim: wins, honest give-ups, bot walls,
+   what it cost in tokens.
 2. **The AI-Readiness Index** — ~113 well-known sites audited weekly against the
    conventions real AI agents rely on in 2026, with grades, postures, and open data.
 
@@ -17,9 +19,9 @@ Data: https://agentability.org/data/summary.json
 
 ## The Field Test rules
 
-- **Autonomous end to end**: producer model invents each episode's tasks from the
-  audited panel (avoiding past topics); the agent attempts them. No human writes,
-  selects, or edits an episode.
+- **Autonomous end to end**: the producer reads Google Trends and the day's news,
+  then invents each episode's tasks (avoiding recent topics); the agent attempts
+  them. No human writes, selects, or edits an episode.
 - **Read-only by construction**: the agent's only tool is a plain HTTP GET — no
   JavaScript, no logins, no forms, no purchases.
 - **Hard limits**: ≤14 page visits per task, a fixed token budget per episode,
@@ -51,7 +53,7 @@ in `data/index/history/` is an adoption time series for the agentic web.
 - `scripts/lib/field-agent.ts` + `scripts/lib/episode-producer.ts` — the Field Test agent and its AI producer
 - `scripts/run-ai-index.ts` / `scripts/run-fieldtest.ts` — batch runners; write `data/`
 - `scripts/build-site.ts` — generates the entire static site into `dist-static/`
-- `.github/workflows/` — weekly crons in public-repo CI (free): `ai-index` (Mon), `fieldtest` (Wed), `deploy` (on push)
+- `.github/workflows/` — crons in public-repo CI (free): `ai-index` (weekly, Mon), `fieldtest` (daily), `deploy` (on push)
 - Firebase **Hosting only** (free tier; the project deliberately runs without billing)
 - The Field Test's API calls are the only running cost — we pay for those for fun
 

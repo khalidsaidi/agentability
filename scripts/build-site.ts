@@ -21,6 +21,9 @@ const SITE = "https://agentability.org";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
 // Bump when evergreen copy (methodology, docs, support, privacy) changes; it feeds sitemap lastmod.
 const SITE_CONTENT_UPDATED = "2026-09-14";
+// A daily feed that carries every episode ever grows without bound and readers
+// re-download it on every poll. Thirty is roughly a month of the show.
+const FEED_ITEMS = 30;
 const OG_IMAGE = path.join(REPO_ROOT, "assets/og.png");
 // Episodes recorded before producerModel existed (Aug–Sep 2026) were produced by Opus 5.
 const LEGACY_PRODUCER_MODEL = "claude-opus-5";
@@ -291,6 +294,8 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .guides-list a { display: block; border: 1px solid var(--line); background: var(--panel); border-radius: 16px; padding: 18px 20px; text-decoration: none; color: var(--ink); transition: transform .18s; }
   .guides-list a:hover { transform: translateY(-2px); color: var(--ink); }
   .guides-list .t { display: block; font-family: var(--display); font-weight: 700; font-size: 1.12rem; margin-bottom: 6px; }
+  .archive-month { font-family: var(--display); font-weight: 700; font-size: 1.05rem; margin: 34px 0 2px; display: flex; align-items: baseline; gap: 10px; }
+  .archive-month span { font-family: var(--mono); font-size: .72rem; font-weight: 400; letter-spacing: .06em; color: var(--dim); }
   .guides-list .d { display: block; color: var(--dim); font-size: .93rem; max-width: 70ch; }
 </style>
 </head>
@@ -1079,17 +1084,34 @@ transcript? Open an issue — everything is versioned in public.</p>`;
 
   // ---------- The Agent Field Test ----------
   await fsp.mkdir(path.join(OUT, "fieldtest"), { recursive: true });
-  const archiveRows = episodes
+  // Grouped by month: at a daily cadence a flat table is 365 rows a year, but every
+  // episode must keep an internal link or the older ones become orphan pages.
+  const byMonth = new Map<string, Episode[]>();
+  for (const ep of episodes) {
+    const key = ep.date.slice(0, 7);
+    byMonth.set(key, [...(byMonth.get(key) ?? []), ep]);
+  }
+  const monthName = (key: string) =>
+    new Date(`${key}-01T12:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  const archiveRows = [...byMonth.entries()]
     .map(
-      (ep) => `<tr>
+      ([key, eps]) => `<h3 class="archive-month">${monthName(key)} <span>${eps.length} episode${eps.length === 1 ? "" : "s"}</span></h3>
+<table>
+<thead><tr><th>Episode</th><th class="num">Finished</th><th class="num">Bot walls</th><th class="num">Pages read</th><th class="num">Sites</th></tr></thead>
+<tbody>${eps
+        .map(
+          (ep) => `<tr>
   <td><a href="/fieldtest/${esc(ep.date)}/">${prettyDate(ep.date)}</a></td>
   <td class="num">${ep.stats.completed}/${ep.stats.tasks}</td>
   <td class="num">${ep.stats.wallsHit}</td>
   <td class="num">${ep.stats.pageVisits}</td>
   <td class="num">${ep.stats.domainsVisited}</td>
 </tr>`
+        )
+        .join("\n")}</tbody></table>`
     )
     .join("\n");
+
   await fsp.writeFile(
     path.join(OUT, "fieldtest/index.html"),
     shell({
@@ -1103,9 +1125,7 @@ transcript? Open an issue — everything is versioned in public.</p>`;
 <p class="lede">The web's newest users are AI agents — so every week we make one run real errands: find the true
 price, cancel the thing, reach a human, pick a product. Read-only access, hard step limits, transcripts published
 verbatim. The producer inventing the tasks is an AI too: no human touches an episode from cron to publish.</p>
-${episodes.length ? `<table>
-<thead><tr><th>Episode</th><th class="num">Completed</th><th class="num">Bot walls</th><th class="num">Pages read</th><th class="num">Sites</th></tr></thead>
-<tbody>${archiveRows}</tbody></table>` : `<p class="lede">First episode is in production — the weekly run publishes it here automatically.</p>`}
+${episodes.length ? archiveRows : `<p class="lede">First episode is in production — the daily run publishes it here automatically.</p>`}
 <div class="cta"><b>Want your site in an episode?</b> Everyday tasks on real brands are invented weekly by the producer
 from <a href="/ai-index/">the audited panel</a>. <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Get on the panel</a>.</div>
 <h2>Questions people ask</h2>
@@ -1368,6 +1388,7 @@ nothing you can't test with curl.</p>
 <language>en</language>
 ${latest ? `<lastBuildDate>${rfc822(latest.generatedAt)}</lastBuildDate>` : ""}
 ${episodes
+  .slice(0, FEED_ITEMS)
   .map(
     (ep) => `<item>
 <title>${esc(`Episode of ${prettyDate(ep.date)}: ${ep.stats.completed}/${ep.stats.tasks} errands done, ${ep.stats.wallsHit} bot walls`)}</title>
