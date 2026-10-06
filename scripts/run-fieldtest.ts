@@ -106,6 +106,14 @@ async function main() {
   const budget = new CostBudget(EPISODE_BUDGET_USD);
   const { tasks, producedBy } = await produceEpisodeTasks(client, panelDomains, blockedDomains, pastTitles, budget);
   console.log(`Episode tasks by ${producedBy}: ${tasks.map((t) => t.id).join(", ")}`);
+  // At a weekly cadence a seed fallback was a rare blip. Daily, two failures in a
+  // week publishes the identical canned episode twice — visibly broken, and
+  // duplicate pages for search. A missing day is the cheaper failure, and failing
+  // here rather than after the run saves the whole agent spend.
+  if (producedBy === "seed") {
+    console.error("::error::Producer fell back to seed tasks — refusing to run a canned episode. Nothing written, nothing spent on the agent.");
+    process.exit(1);
+  }
   const runs: Array<TaskRun & { diagnosis: Diagnosis[] }> = [];
 
   for (const task of tasks) {
@@ -135,9 +143,6 @@ async function main() {
     const firstError = runs.find((r) => r.error)?.error ?? "no error recorded";
     console.error(`::error::Agent loaded zero pages across ${runs.length} tasks — refusing to publish. First error: ${firstError.slice(0, 300)}`);
     process.exit(1);
-  }
-  if (producedBy === "seed") {
-    console.warn("::warning::Producer fell back to seed tasks — the AI producer did not run this week.");
   }
 
   const inputTokens = runs.reduce((acc, r) => acc + r.inputTokens, 0);
