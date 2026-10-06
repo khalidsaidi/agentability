@@ -46,7 +46,10 @@ jobs:
         run: |
           git config user.name "fieldtest-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/fieldtest data/logos
+          # data/index/results too: an episode audits the sites it tested so it can
+          # explain why one beat the agent. The curated panel (domains.txt) is not
+          # touched — only new result files appear.
+          git add data/fieldtest data/logos data/index/results
           git diff --cached --quiet || git commit -m "chore: daily Agent Field Test episode [skip ci]"
           # A 10-minute run races anything pushed to main meanwhile; land on top of it.
           git pull --rebase origin main

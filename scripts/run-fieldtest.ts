@@ -7,11 +7,14 @@
 // the Anthropic SDK is the client and only the base URL differs.
 
 import fsp from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { runFieldTask, AGENT_MODEL, type TaskRun } from "./lib/field-agent";
 import { CostBudget } from "./lib/cost-budget";
 import { produceEpisodeTasks, PRODUCER_MODEL } from "./lib/episode-producer";
+import { evaluateSite } from "./lib/evaluate-site";
+import { rootDomain, hostOf } from "./lib/domains";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
@@ -64,6 +67,60 @@ async function preflight(client: Anthropic): Promise<void> {
     console.error("Refusing to run an episode the agent cannot actually attempt.");
     process.exit(1);
   }
+}
+
+// The producer now picks topics from the whole web, so most sites an episode
+// touches are not on the audited panel and get no diagnosis. Rather than let the
+// two halves of the site drift apart, audit what the agent actually met: every
+// new domain is scored, written to the Index, and added to the panel so the
+// weekly run keeps it fresh. Evaluation is plain HTTP — no model, no cost.
+const MAX_NEW_AUDITS = 12;
+// The agent reaches these as tooling, not as sites under test.
+const AGENT_INFRASTRUCTURE = new Set(["duckduckgo.com", "jina.ai", "archive.org", "google.com", "bing.com"]);
+
+// Only the sites an episode genuinely tested: the brands a task was aimed at, and
+// anything that walled the agent. Every incidental link an agent follows would
+// bury the results in one-off news URLs within a week.
+function sitesWorthAuditing(runs: Array<TaskRun & { diagnosis: Diagnosis[] }>): string[] {
+  const worth = new Set<string>();
+  for (const run of runs) {
+    for (const url of run.startUrls ?? []) {
+      const host = hostOf(url);
+      if (host) worth.add(rootDomain(host));
+    }
+    for (const candidate of run.candidates ?? []) worth.add(rootDomain(candidate));
+    // A site that blocks the agent is exactly what the Index exists to record.
+    for (const step of run.steps) {
+      if (!step.botWall) continue;
+      const host = hostOf(step.finalUrl || step.url);
+      if (host) worth.add(rootDomain(host));
+    }
+  }
+  return [...worth].filter((d) => d && !AGENT_INFRASTRUCTURE.has(d));
+}
+
+async function auditNewDomains(candidates: string[], panel: Set<string>): Promise<string[]> {
+  const fresh = candidates
+    .filter((d) => !panel.has(d))
+    .filter((d) => !fs.existsSync(path.join(RESULTS_DIR, `${d}.json`)))
+    .slice(0, MAX_NEW_AUDITS);
+  const added: string[] = [];
+  for (const domain of fresh) {
+    try {
+      const record = await evaluateSite(domain);
+      if (record.status !== "complete") continue;
+      await fsp.writeFile(path.join(RESULTS_DIR, `${domain}.json`), JSON.stringify(record, null, 1), "utf8");
+      added.push(domain);
+      console.log(`    audited ${domain}: ${record.score}/100 (${record.posture})`);
+    } catch (error) {
+      console.log(`    could not audit ${domain}: ${String((error as Error).message).slice(0, 80)}`);
+    }
+  }
+  // Deliberately NOT added to domains.txt: the panel is a curated list of
+  // well-known sites, and appending a dozen one-off hosts a day would both change
+  // what the Index is and make the weekly re-audit grow without bound. The result
+  // file is enough for the episode to explain why a site beat the agent.
+  return added;
 }
 
 async function main() {
@@ -143,6 +200,14 @@ async function main() {
     const firstError = runs.find((r) => r.error)?.error ?? "no error recorded";
     console.error(`::error::Agent loaded zero pages across ${runs.length} tasks — refusing to publish. First error: ${firstError.slice(0, 300)}`);
     process.exit(1);
+  }
+
+  // Audit the new sites this episode met, then re-run diagnosis so the episode
+  // records what the Index now knows about them.
+  const newlyAudited = await auditNewDomains(sitesWorthAuditing(runs), new Set(panelDomains));
+  if (newlyAudited.length) {
+    console.log(`Audited ${newlyAudited.length} site(s) this episode met: ${newlyAudited.join(", ")}`);
+    for (const run of runs) run.diagnosis = await diagnose(run.domainsVisited);
   }
 
   const inputTokens = runs.reduce((acc, r) => acc + r.inputTokens, 0);
