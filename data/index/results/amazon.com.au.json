@@ -1,0 +1,110 @@
+{
+ "domain": "amazon.com.au",
+ "checkedAt": "2026-10-07T21:23:15.432Z",
+ "status": "complete",
+ "elapsedMs": 5266,
+ "score": 35,
+ "grade": "Closed by policy",
+ "posture": "closed",
+ "paradox": false,
+ "checks": [
+  {
+   "id": "A1",
+   "title": "llms.txt for AI readers",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
+  },
+  {
+   "id": "A2",
+   "title": "AI crawler access policy",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+  },
+  {
+   "id": "A3",
+   "title": "Content readable without a browser",
+   "status": "pass",
+   "points": 25,
+   "maxPoints": 25,
+   "detail": "Plain fetch of the homepage yields ~600 words of visible text."
+  },
+  {
+   "id": "A4",
+   "title": "Structured data (schema.org JSON-LD)",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "No machine-readable entity markup on the homepage."
+  },
+  {
+   "id": "A5",
+   "title": "Sitemap discoverable",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 10,
+   "detail": "No sitemap found."
+  },
+  {
+   "id": "A6",
+   "title": "Everyday agent tasks reachable from the homepage",
+   "status": "warn",
+   "points": 10,
+   "maxPoints": 20,
+   "detail": "Found from homepage: support/contact, legal/privacy."
+  },
+  {
+   "id": "B1",
+   "title": "MCP server advertised",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+  },
+  {
+   "id": "B2",
+   "title": "OpenAPI description published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  }
+ ],
+ "robots": [
+  {
+   "bot": "GPTBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ClaudeBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "PerplexityBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Google-Extended",
+   "policy": "blocked"
+  },
+  {
+   "bot": "CCBot",
+   "policy": "blocked"
+  }
+ ],
+ "signals": {
+  "llmsTxt": false,
+  "mcp": false,
+  "openapi": false,
+  "structuredData": false,
+  "sitemap": false,
+  "parseableText": true
+ }
+}

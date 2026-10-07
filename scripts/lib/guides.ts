@@ -33,7 +33,7 @@ export const GUIDES: Guide[] = [
     updated: "2026-09-14",
     body: (ctx) => `
 <p class="lede">AI agents are the web's newest audience, and most sites fail them in the same handful of ways. This is the
-checklist we score ${ctx.audited} well-known sites against every week — the same eight checks, in the same order, with a
+checklist we score the ${ctx.audited} most-visited sites on the web against every week — the same eight checks, in the same order, with a
 way to test each one yourself in about a minute. The panel's average right now is <b>${ctx.averageScore}/100</b>.</p>
 
 <h2>What an agent actually needs</h2>
@@ -236,13 +236,13 @@ scores on the <a href="/ai-index/">Index</a>.</div>`,
     slug: "ai-seo-vs-geo-vs-aeo",
     title: "AI SEO vs GEO vs AEO: What Actually Matters",
     description:
-      "Generative engine optimization, answer engine optimization, AI SEO and AI visibility are four names for mostly the same work. Here is what the labels mean, where they genuinely differ, and the eight things that decide whether an AI can use your site at all — measured across 113 real sites every week.",
+      "Generative engine optimization, answer engine optimization, AI SEO and AI visibility are four names for mostly the same work. Here is what the labels mean, where they genuinely differ, and the eight things that decide whether an AI can use your site at all — measured across the most-visited sites on the web, audited every week.",
     updated: "2026-10-05",
     body: (ctx) => `
 <p class="lede">Four labels are competing to name the same job: <b>AI SEO</b>, <b>GEO</b> (generative engine optimization),
 <b>AEO</b> (answer engine optimization) and <b>AI visibility</b>. Vendors will tell you they are different disciplines.
 Mostly they are not. Underneath all four sits one question with a measurable answer: <b>can a machine fetch your page,
-read it, and act on what it says?</b> We measure exactly that on ${ctx.audited} well-known sites every week, and send a
+read it, and act on what it says?</b> We measure exactly that on the ${ctx.audited} most-visited sites on the web every week, and send a
 real agent out to try. Here is what the labels actually mean and which parts are worth your time.</p>
 
 <h2>What each term means</h2>
@@ -272,7 +272,7 @@ schema.org JSON-LD, a curated <code>llms.txt</code>, stable URLs.</li>
 layers 1 or 2, which is the situation for a large share of the sites we audit.</p>
 
 <h2>What the data says</h2>
-<p class="lede">Across ${ctx.audited} well-known sites, average score <b>${ctx.averageScore}/100</b>:</p>
+<p class="lede">Across the ${ctx.audited} most-visited sites on the web, average score <b>${ctx.averageScore}/100</b>:</p>
 <ul>
 <li><b>${ctx.pctBlockingSomeAI}%</b> block at least one major AI crawler in <code>robots.txt</code>, and
 <b>${ctx.pctClosed}%</b> block essentially all of them. For those, every hour spent on GEO tactics is spent behind a

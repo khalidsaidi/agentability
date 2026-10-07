@@ -613,7 +613,7 @@ const FIELD_FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Which websites block AI agents?",
-    a: 'Our <a href="/ai-index/">AI-Readiness Index</a> audits 113 well-known sites weekly; sites like meta.ai are "closed by policy" (their robots.txt blocks all major AI crawlers), and field-test episodes regularly hit Cloudflare-style bot challenges on others.',
+    a: 'Our <a href="/ai-index/">AI-Readiness Index</a> audits the most-visited sites on the web every week — the list is derived from Google\'s Chrome usage data, not hand-picked. Some sites are "closed by policy" (their robots.txt blocks all major AI crawlers), and field-test episodes regularly hit Cloudflare-style bot challenges on others.',
   },
   {
     q: "What tools does the agent get?",
@@ -836,8 +836,8 @@ async function main() {
 <p class="lede rise d2"><b>We find out in public, every day.</b> An AI producer reads what the world is searching that morning and turns it
 into ten real errands — what time is kick-off and on which channel, what magnitude was the quake, what does it cost,
 what actually happened — and a real AI agent attempts them using nothing but plain web requests: no logins, no
-JavaScript, no human help. Every transcript is published verbatim, wins and failures alike. Alongside the show, ${s ? s.audited : "113"} well-known sites are scored on how usable they
-actually are for an agent.</p>
+JavaScript, no human help. Every transcript is published verbatim, wins and failures alike. Alongside the show, the ${s ? s.audited : ""} most-visited sites on the web are scored on how usable
+they actually are for an agent.</p>
 <div class="thisweek rise d3">
   <p class="thisweek-label">Today's answer · episode of ${prettyDate(latest.date)}</p>
   <div class="board">
@@ -871,8 +871,8 @@ first episode is in production.</p>`;
   const landingBody = `${fieldtestHero}
 ${summary && s
     ? `
-<h2>The other half: ${s.audited} sites, scored</h2>
-<p class="lede">The errands come from a standing panel of ${s.audited} well-known sites, each audited every week against the
+<h2>The other half: the ${s.audited} most-visited sites, scored</h2>
+<p class="lede">Every week the ${s.audited} most-visited sites on the web are audited against the
 conventions real AI agents rely on — <code>llms.txt</code>, crawler policy, content you can read without a browser,
 structured data, MCP. Every site gets a public report with a score and the exact fix for each failed check. When the
 agent hits a wall in an episode, the index has usually already predicted it.</p>
@@ -903,7 +903,7 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
     shell({
       title: "Agentability — can AI agents actually use the web?",
       description: latest
-        ? `An open experiment, run weekly in public: a real AI agent attempts ten everyday web errands and every transcript is published verbatim. This week it finished ${latest.stats.completed} of ${latest.stats.tasks} and hit ${latest.stats.wallsHit} bot walls. Plus ${s ? s.audited : 113} sites scored for AI-agent readiness.`
+        ? `An open experiment, run weekly in public: a real AI agent attempts ten everyday web errands and every transcript is published verbatim. This week it finished ${latest.stats.completed} of ${latest.stats.tasks} and hit ${latest.stats.wallsHit} bot walls. Plus the ${s ? s.audited : ""} most-visited sites on the web scored for AI-agent readiness.`
         : "An open experiment: a real AI agent attempts everyday web errands each week with every transcript published verbatim, alongside an index of well-known sites scored for AI-agent readiness.",
       canonicalPath: "/",
       body: landingBody,
@@ -933,7 +933,7 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
         body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · AI-Readiness Index · updated ${generated}</p>
 <h1>The AI-Readiness Index</h1>
-<p class="lede">${s.audited} well-known sites, ranked by how usable they are for AI agents. Average ${s.averageScore}/100.
+<p class="lede">The ${s.audited} most-visited sites on the web, ranked by how usable they are for AI agents. Average ${s.averageScore}/100.
 Checks: llms.txt, AI-crawler policy, content parseability, structured data, sitemap, task reachability, plus MCP/OpenAPI bonuses —
 <a href="/methodology/">methodology</a>.</p>
 ${leaderboardTable(summary.leaderboard)}
@@ -1036,6 +1036,21 @@ ${(appearances.get(r.domain) ?? []).length
 <h1>How scoring works</h1>
 <p class="lede">Eight checks, all against public surfaces, all reproducible with plain HTTP requests. No invented
 standards: every check is traceable to a convention that real AI systems use in 2026.</p>
+
+<h2>Which sites are audited, and why those</h2>
+<p class="lede">The panel is derived, not hand-picked. Every rebuild takes the current
+<a href="https://tranco-list.eu/" rel="nofollow noopener">Tranco</a> top 5,000 — a daily, citable ranking built from
+five independent sources — and keeps only the domains that also appear in Google's
+<a href="https://developer.chrome.com/docs/crux" rel="nofollow noopener">Chrome UX Report</a> top 10,000, which measures
+real visits by real Chrome users. Two independent rankings have to agree before a site is in.</p>
+<p class="lede">Two things are then removed. <b>Infrastructure</b>: CDNs, DNS, ad servers, API hosts and login walls —
+nobody is ever sent to <code>gtld-servers.net</code> to find a price, so scoring it tells you nothing.
+<b>Pornography and piracy</b>: neither ranking carries a category, and Google publishes none, so each domain is
+classified once by a model and the verdict is cached and published alongside the data. You can check every call we
+made in <code>/data/classification.json</code>, and the exact source list is recorded in
+<code>/data/panel-source.json</code> with the Tranco list ID, so anyone can rebuild the identical panel.</p>
+<p class="lede">This replaced a hand-typed list of 113 sites that was mostly AI startups — which could not honestly
+answer the question this site asks, because it was not the web people actually use.</p>
 <table>
 <thead><tr><th>Check</th><th>What &amp; why</th><th class="num">Points</th></tr></thead>
 <tbody>
@@ -1421,6 +1436,12 @@ ${episodes
   await fsp.mkdir(path.join(OUT, "data/history"), { recursive: true });
   await fsp.mkdir(path.join(OUT, "data/fieldtest"), { recursive: true });
   if (summary) await fsp.writeFile(path.join(OUT, "data/summary.json"), JSON.stringify(summary, null, 1), "utf8");
+  // How the panel was chosen, and every adult/piracy call made — published so the
+  // selection is auditable rather than taken on trust.
+  for (const f of ["classification.json", "panel-source.json"]) {
+    const src = path.join(REPO_ROOT, "data/index", f);
+    if (fs.existsSync(src)) await fsp.copyFile(src, path.join(OUT, "data", f));
+  }
   for (const h of history) {
     await fsp.writeFile(path.join(OUT, `data/history/${h.date}.json`), JSON.stringify(h, null, 1), "utf8");
   }

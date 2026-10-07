@@ -10,7 +10,8 @@ Two fully autonomous productions:
    cost, what actually happened. A real agent attempts them with read-only web
    access. Transcripts are published verbatim: wins, honest give-ups, bot walls,
    what it cost in tokens.
-2. **The AI-Readiness Index** — ~113 well-known sites audited weekly against the
+2. **The AI-Readiness Index** — the most-visited sites on the web (derived from
+   Google's Chrome usage data crossed with Tranco, not hand-picked) audited weekly against the
    conventions real AI agents rely on in 2026, with grades, postures, and open data.
 
 Live: https://agentability.org · Field Test: https://agentability.org/fieldtest/ ·
