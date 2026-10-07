@@ -1,11 +1,11 @@
 {
  "domain": "jio.com",
- "checkedAt": "2026-10-07T21:24:44.603Z",
+ "checkedAt": "2026-10-07T22:53:06.738Z",
  "status": "complete",
- "elapsedMs": 6326,
- "score": 90,
- "grade": "A",
- "posture": "open",
+ "elapsedMs": 6858,
+ "score": 83,
+ "grade": "B",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: CCBot."
   },
   {
    "id": "A3",
@@ -84,7 +84,7 @@
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
@@ -96,7 +96,7 @@
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {

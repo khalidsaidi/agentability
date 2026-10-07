@@ -96,9 +96,28 @@ async function main() {
     }));
 
   const pct = (n: number) => (complete.length ? Math.round((n / complete.length) * 100) : 0);
+  // AAPOR's rule, applied to websites: a domain whose DNS does not resolve was
+  // never an eligible website, so it leaves the denominator. A site that times
+  // out, loops or refuses IS eligible and IS a result — "an agent cannot use
+  // this" is the sharpest answer this index produces, so it gets counted and
+  // published rather than quietly dropped.
+  const offline = records.filter((r) => r.status !== "complete" && (r as any).failure === "offline");
+  const noResponse = records.filter((r) => r.status !== "complete" && (r as any).failure !== "offline");
+  const eligible = records.length - offline.length;
+  const pctOf = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0);
+
   const stats = {
     audited: complete.length,
+    eligible,
+    outOfScope: offline.length,
     unreachable: records.length - complete.length,
+    noResponse: noResponse.length,
+    // Of every eligible site, the share that would not answer an agent at all.
+    pctNoResponse: pctOf(noResponse.length, eligible),
+    noResponseBreakdown: ["timeout", "tls", "redirect-loop", "refused"].reduce(
+      (acc, kind) => ({ ...acc, [kind]: noResponse.filter((r) => (r as any).failure === kind).length }),
+      {} as Record<string, number>
+    ),
     averageScore: complete.length
       ? Math.round(complete.reduce((acc, r) => acc + r.score, 0) / complete.length)
       : 0,

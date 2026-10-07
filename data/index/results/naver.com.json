@@ -1,11 +1,11 @@
 {
  "domain": "naver.com",
- "checkedAt": "2026-10-07T21:25:14.288Z",
+ "checkedAt": "2026-10-07T22:53:31.678Z",
  "status": "complete",
- "elapsedMs": 12140,
- "score": 15,
- "grade": "F",
- "posture": "open",
+ "elapsedMs": 2318,
+ "score": 0,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {

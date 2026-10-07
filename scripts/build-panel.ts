@@ -142,7 +142,22 @@ async function main() {
   console.log(`  ${eligible.length - unseen.length} already classified, ${unseen.length} new`);
   await classify(unseen, verdicts);
 
-  const panel = eligible.filter((d) => verdicts[d] === "ok").sort();
+  // A domain whose DNS does not resolve is not a website that scored badly, it is
+  // not a website. Drop what the last run proved offline so it stops inflating
+  // the panel and diluting every percentage.
+  const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
+  const offline = new Set<string>();
+  if (fs.existsSync(RESULTS_DIR)) {
+    for (const file of await fsp.readdir(RESULTS_DIR)) {
+      if (!file.endsWith(".json")) continue;
+      try {
+        const r = JSON.parse(await fsp.readFile(path.join(RESULTS_DIR, file), "utf8"));
+        if (r.status !== "complete" && r.failure === "offline") offline.add(r.domain);
+      } catch { /* unreadable result, treat as unknown */ }
+    }
+  }
+  const panel = eligible.filter((d) => verdicts[d] === "ok" && !offline.has(d)).sort();
+  if (offline.size) console.log(`  ${offline.size} domain(s) dropped: DNS does not resolve`);
   const droppedNotInCrux = candidates.length - eligible.length;
   const removed = eligible.filter((d) => verdicts[d] === "porn" || verdicts[d] === "piracy");
   const unknown = eligible.filter((d) => !verdicts[d]);
@@ -164,6 +179,7 @@ async function main() {
         droppedNotInCrux,
         droppedInfrastructure: droppedInfra,
         droppedAdultOrPiracy: removed.length,
+        droppedOffline: offline.size,
         unclassified: unknown.length,
         classifier: CLASSIFIER,
       },

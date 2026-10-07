@@ -1,20 +1,20 @@
 {
  "domain": "bloomberg.com",
- "checkedAt": "2026-10-07T21:23:32.790Z",
+ "checkedAt": "2026-10-07T22:52:05.611Z",
  "status": "complete",
- "elapsedMs": 4364,
- "score": 80,
+ "elapsedMs": 2353,
+ "score": 70,
  "grade": "Closed by policy",
  "posture": "closed",
- "paradox": true,
+ "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 41596 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~37295 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~37550 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "pass",
-   "points": 15,
+   "points": 20,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact, docs/api, legal/privacy."
+   "detail": "Found from homepage: pricing, support/contact, docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -100,7 +100,7 @@
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "structuredData": true,

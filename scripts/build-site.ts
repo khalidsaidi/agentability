@@ -447,6 +447,7 @@ ${opts.body}
 
 type Summary = {
   generatedAt: string;
+  // stats also carries eligible / outOfScope / noResponse / pctNoResponse.
   stats: Record<string, number>;
   unreachable: string[];
   leaderboard: Array<{
@@ -881,6 +882,7 @@ agent hits a wall in an episode, the index has usually already predicted it.</p>
   <div class="fig"><b>${s.pctLlmsTxt}%</b><small>publish llms.txt</small></div>
   <div class="fig"><b>${s.pctBlockingSomeAI}%</b><small>block at least one AI crawler</small></div>
   <div class="fig"><b>${s.pctClosed}%</b><small>closed to AI by policy</small></div>
+  ${s.pctNoResponse ? `<div class="fig"><b>${s.pctNoResponse}%</b><small>wouldn't answer at all</small></div>` : ""}
 </div>
 <h2>The five best, and the five worst</h2>
 <p class="lede">Ranked ${s.audited} deep. The top of the table is a wall of hundreds — the bottom is where agents
@@ -937,6 +939,10 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
 Checks: llms.txt, AI-crawler policy, content parseability, structured data, sitemap, task reachability, plus MCP/OpenAPI bonuses —
 <a href="/methodology/">methodology</a>.</p>
 ${leaderboardTable(summary.leaderboard)}
+${s.noResponse ? `<p class="lede" style="margin-top:18px"><b>${s.noResponse} of ${s.eligible} sites are not in this table</b> because they never
+answered. They timed out, looped, or refused the request outright — ${s.pctNoResponse}% of everything we tried. A site an agent
+cannot reach at all is the bluntest answer to the question this index asks, so it is counted here rather than quietly dropped.
+Domains whose DNS does not resolve are excluded entirely: they were never websites.</p>` : ""}
 ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-size:.85rem">Unreachable this run: ${summary.unreachable.map(esc).join(", ")}.</p>` : ""}
 <div class="cta">Your site missing or mis-scored? <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Open an issue</a> — audits are free, from public surfaces only, and re-run weekly.</div>`,
         jsonLd: {

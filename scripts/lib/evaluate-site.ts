@@ -22,6 +22,9 @@ export type SiteEvaluation = {
   domain: string;
   checkedAt: string;
   status: "complete" | "error";
+  // Why a site produced no score. "offline" = DNS does not resolve, so it was
+  // never an eligible website; the rest are real sites an agent could not use.
+  failure?: "offline" | "timeout" | "tls" | "redirect-loop" | "refused";
   elapsedMs: number;
   score: number;
   grade: string;
@@ -50,7 +53,9 @@ const FETCH_TIMEOUT_MS = 15000;
 // The AI crawlers/agents that matter in 2026 — all real, all documented.
 const AI_BOTS = ["GPTBot", "ClaudeBot", "Claude-User", "PerplexityBot", "Google-Extended", "CCBot"];
 
-async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: number; text: string; contentType: string }> {
+type FailureKind = "offline" | "timeout" | "tls" | "redirect-loop" | "refused";
+
+async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: number; text: string; contentType: string; reason?: FailureKind }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
@@ -64,8 +69,15 @@ async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: 
     const buf = await response.arrayBuffer();
     const text = new TextDecoder("utf-8", { fatal: false }).decode(buf.slice(0, 2 * 1024 * 1024));
     return { ok: response.ok, status: response.status, text, contentType };
-  } catch {
-    return { ok: false, status: 0, text: "", contentType: "" };
+  } catch (error: any) {
+    const cause = String(error?.cause?.code || error?.cause?.message || error?.name || "");
+    const reason: FailureKind =
+      /ENOTFOUND|EAI_AGAIN|ERR_NAME/.test(cause) ? "offline"
+      : /ALTNAME|CERT|TLS|SSL/i.test(cause) ? "tls"
+      : /redirect count/i.test(cause) ? "redirect-loop"
+      : /Abort/i.test(cause) ? "timeout"
+      : "refused";
+    return { ok: false, status: 0, text: "", contentType: "", reason };
   } finally {
     clearTimeout(timer);
   }
@@ -152,8 +164,16 @@ function gradeFor(score: number, posture: string): string {
 export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
   const started = Date.now();
   const checkedAt = new Date().toISOString();
-  const origin = `https://${domain}`;
   const checks: SiteCheck[] = [];
+
+  // Plenty of sites only serve (or only hold a certificate for) the www host.
+  // Giving up on the bare domain scores them as unreachable for our own reasons.
+  let origin = `https://${domain}`;
+  const bare = await get(`${origin}/`, "text/html");
+  if (!bare.ok && bare.status === 0 && !domain.startsWith("www.")) {
+    const withWww = await get(`https://www.${domain}/`, "text/html");
+    if (withWww.ok || withWww.status !== 0) origin = `https://www.${domain}`;
+  }
 
   try {
     // Fetch everything we need up front, in parallel.
@@ -168,7 +188,9 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     ]);
 
     if (!home.ok && home.status === 0) {
-      throw new Error("homepage unreachable");
+      const err = new Error("homepage unreachable") as Error & { failure?: FailureKind };
+      err.failure = home.reason ?? "refused";
+      throw err;
     }
 
     // --- A1: llms.txt (llmstxt.org convention) — 15 pts
@@ -342,6 +364,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       robots: [],
       signals: { llmsTxt: false, mcp: false, openapi: false, structuredData: false, sitemap: false, parseableText: false },
       error: String(error?.message || error).slice(0, 200),
+      failure: (error?.failure as FailureKind) ?? "refused",
     };
   }
 }
