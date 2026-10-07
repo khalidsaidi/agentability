@@ -161,9 +161,18 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .runline { margin: 0 0 8px; font-family: var(--mono); font-size: .78rem; letter-spacing: .04em; color: var(--dim); }
   .runline b { color: var(--ink); font-weight: 600; }
   /* index figures: same data, deliberately not the same shape as the scoreboard */
-  .figs { display: flex; flex-wrap: wrap; gap: 16px 40px; margin-top: 20px; }
+  /* a grid, not a flex row: five figures used to wrap 4 + 1 and orphan the last one */
+  .figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 18px 24px; margin-top: 20px; }
   .fig b { display: block; font-family: var(--display); font-weight: 800; font-size: 2rem; line-height: 1.05; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .fig small { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+  /* grade spread: with 1,200+ sites the ranking ties at the top, so show the shape instead */
+  .dist { display: flex; height: 18px; border-radius: 5px; overflow: hidden; background: #22242e; margin-top: 20px; }
+  .dist span { display: block; min-width: 2px; }
+  .dist-key { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 12px 0 0; padding: 0; list-style: none;
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .04em; color: var(--dim); }
+  .dist-key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; }
+  .dist-key b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   /* tables */
   table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .92rem; }
   th { text-align: left; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px; border-bottom: 1px solid var(--line); }
@@ -743,6 +752,32 @@ ${note ? `<span class="o">${note}</span>` : ""}
     .join("\n")}</div>`;
 }
 
+// With 1,215 sites and 25 of them tied on a perfect 100, "the top five" was just
+// the alphabet. The spread of grades is the honest shape of the panel.
+const GRADE_COLORS: Record<string, string> = {
+  A: "#46e094", B: "#9ad94f", C: "#ffd028", D: "#ff9a3c", F: "#ff6058", "Closed by policy": "#7e8296",
+};
+
+function gradeSpread(rows: Summary["leaderboard"]): string {
+  const order = ["A", "B", "C", "D", "F", "Closed by policy"];
+  const counts = new Map<string, number>();
+  for (const r of rows) counts.set(r.grade, (counts.get(r.grade) ?? 0) + 1);
+  const present = order.filter((g) => counts.get(g));
+  const bars = present
+    .map((g) => {
+      const n = counts.get(g) as number;
+      return `<span style="width:${((n / rows.length) * 100).toFixed(2)}%;background:${GRADE_COLORS[g] ?? "#7e8296"}" title="${esc(g)} — ${n} sites"></span>`;
+    })
+    .join("");
+  const key = present
+    .map((g) => {
+      const n = counts.get(g) as number;
+      return `<li><i style="background:${GRADE_COLORS[g] ?? "#7e8296"}"></i><b>${n}</b>&nbsp;${esc(g === "Closed by policy" ? "closed by policy" : `grade ${g}`)}</li>`;
+    })
+    .join("");
+  return `<div class="dist">${bars}</div><ul class="dist-key">${key}</ul>`;
+}
+
 function leaderboardTable(rows: Summary["leaderboard"]): string {
   return `<table>
 <thead><tr><th class="num">#</th><th>Site</th><th class="num">Score</th><th>Grade</th><th class="hide-sm">Signals</th></tr></thead>
@@ -869,6 +904,8 @@ attempts them with read-only web access, and every transcript is published verba
 first episode is in production.</p>`;
   // Only worth splitting the table when the two halves can't overlap.
   const bottomFive = summary && summary.leaderboard.length > 12 ? summary.leaderboard.slice(-5) : [];
+  // Everyone tied at the ceiling: a set, not a ranking, so it is shown as one.
+  const perfect = summary ? summary.leaderboard.filter((r) => r.score === 100) : [];
   const landingBody = `${fieldtestHero}
 ${summary && s
     ? `
@@ -884,11 +921,13 @@ agent hits a wall in an episode, the index has usually already predicted it.</p>
   <div class="fig"><b>${s.pctClosed}%</b><small>closed to AI by policy</small></div>
   ${s.pctNoResponse ? `<div class="fig"><b>${s.pctNoResponse}%</b><small>wouldn't answer at all</small></div>` : ""}
 </div>
-<h2>The five best, and the five worst</h2>
-<p class="lede">Ranked ${s.audited} deep. The top of the table is a wall of hundreds — the bottom is where agents
-actually get stuck.</p>
-${leaderboardTable(summary.leaderboard.slice(0, 5))}
-${bottomFive.length ? `<p class="runline" style="margin:26px 0 0">↓ ranks ${bottomFive[0].rank}–${bottomFive[bottomFive.length - 1].rank} of ${s.audited}</p>
+<h2>Who is ready, and who is not</h2>
+<p class="lede">${perfect.length} sites answer every check perfectly, so the top of the ranking is a ${perfect.length}-way
+tie and tells you nothing. The spread, and the bottom, do.</p>
+${gradeSpread(summary.leaderboard)}
+${perfect.length ? `<p class="runline" style="margin:28px 0 0">Perfect ${perfect[0].score}/100 — ${perfect.length} site${perfect.length > 1 ? "s" : ""}</p>
+<div class="chips">${perfect.map((r) => `<span class="chip"><a href="/ai-index/site/${esc(r.domain)}/">${esc(r.domain)}</a></span>`).join("")}</div>` : ""}
+${bottomFive.length ? `<p class="runline" style="margin:28px 0 0">Where agents get stuck — ranks ${bottomFive[0].rank}–${bottomFive[bottomFive.length - 1].rank} of ${s.audited}</p>
 ${leaderboardTable(bottomFive)}` : ""}
 <p style="margin-top:14px"><a href="/ai-index/">Full ranked index of ${s.audited} sites →</a></p>
 <div class="cta"><b>Work on one of these sites?</b> Every failed check on your report page has a concrete fix, and scores

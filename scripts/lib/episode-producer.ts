@@ -13,7 +13,7 @@ import { CostBudget } from "./cost-budget";
 import { searchWeb, visitPage, trendingSearches } from "./web-tools";
 
 export const PRODUCER_MODEL = "deepseek-v4-pro";
-const MAX_RESEARCH_ROUNDS = 8;
+const MAX_RESEARCH_ROUNDS = 10;
 // Anthropic's server-side search capped itself at a handful of uses; these tools
 // don't, so the loop must: after this many research rounds the only tool left is
 // propose_tasks, and the call is forced.
@@ -236,8 +236,24 @@ export async function produceEpisodeTasks(
 
       const research = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
       researched += research.filter((c) => c.name === "search" || c.name === "visit").length;
+      // Once forcing starts the research tools are no longer offered, but the model
+      // can still emit a call for one. Running it anyway rewards the stall and burns
+      // one of the few rounds left — that is exactly how 2026-10-07 produced nothing.
+      if (forcing && research.length) {
+        messages.push({
+          role: "user",
+          content: research.map((call) => ({
+            type: "tool_result" as const,
+            tool_use_id: call.id,
+            is_error: true,
+            content: "Research is closed and this tool no longer exists. The only tool available is propose_tasks — call it now with the 10 tasks built from what you have already read.",
+          })),
+        });
+        console.log(`  research closed — refused ${research.length} late ${research.length === 1 ? "call" : "calls"}`);
+        continue;
+      }
       if (!research.length) {
-        if (!forcing) messages.push({ role: "user", content: "Good — now call propose_tasks exactly once with the 10 finished tasks." });
+        messages.push({ role: "user", content: "Call propose_tasks exactly once with the 10 finished tasks." });
         continue;
       }
       const results: Anthropic.ToolResultBlockParam[] = [];
