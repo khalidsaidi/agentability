@@ -142,11 +142,13 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .stripwrap { margin-top: 22px; }
   /* one row on a wide screen; wraps to a grid rather than crushing the names on a phone */
   .strip { display: flex; flex-wrap: wrap; gap: 4px; }
-  .strip a { flex: 1 1 84px; min-width: 0; height: 68px; border-radius: 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-    padding: 6px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: #111; text-decoration: none; transition: transform .15s; }
+  .strip a { flex: 1 1 84px; min-width: 0; height: 82px; border-radius: 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    padding: 7px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: #111; text-decoration: none; transition: transform .15s; }
   .strip a > span { display: flex; align-items: baseline; gap: 4px; max-width: 100%; min-width: 0; }
-  /* a white chip behind the mark so any brand colour reads on green and on yellow */
-  .logo { flex: none; width: 20px; height: 20px; object-fit: contain; background: #fff; border-radius: 5px; padding: 2px; }
+  /* a white chip behind the mark so any brand colour reads on green and on yellow.
+     At 20px the marks disappeared into the green; they need room and a shadow to lift. */
+  .logo { flex: none; width: 30px; height: 30px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3); }
   .logo.sm { width: 16px; height: 16px; border-radius: 4px; padding: 1px; align-self: center; }
   .logo.mark { display: inline-flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 800; font-size: .82rem; line-height: 1; color: #4a4d5c; }
   .logo.sm.mark { font-size: .66rem; }
