@@ -143,7 +143,8 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   /* one row on a wide screen; wraps to a grid rather than crushing the names on a phone */
   .strip { display: flex; flex-wrap: wrap; gap: 4px; }
   .strip a { flex: 1 1 84px; min-width: 0; height: 82px; border-radius: 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-    padding: 7px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: #111; text-decoration: none; transition: transform .15s; }
+    padding: 7px; font-family: var(--mono); font-size: .68rem; font-weight: 600; color: var(--ink); text-decoration: none; transition: transform .15s;
+    border: 1px solid transparent; }
   .strip a > span { display: flex; align-items: baseline; gap: 4px; max-width: 100%; min-width: 0; }
   /* a white chip behind the mark so any brand colour reads on green and on yellow.
      At 20px the marks disappeared into the green; they need room and a shadow to lift. */
@@ -154,10 +155,15 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .logo.sm.mark { font-size: .66rem; }
   .strip a .b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .strip a em { flex: none; font-style: normal; opacity: .55; }
-  .strip a:hover { transform: translateY(-4px); color: #111; }
+  .strip a:hover { transform: translateY(-4px); }
+  /* Solid swatches for the legend; the cells themselves are tinted, because ten
+     blocks of full-strength green drowned the brand marks sitting on them. */
   .o-completed { background: var(--win); }
   .o-partial { background: var(--hazard); }
   .o-failed { background: var(--alert); }
+  .strip a.o-completed { background: rgba(70,224,148,.13); border-color: rgba(70,224,148,.45); box-shadow: inset 0 3px 0 var(--win); }
+  .strip a.o-partial { background: rgba(255,208,40,.13); border-color: rgba(255,208,40,.45); box-shadow: inset 0 3px 0 var(--hazard); }
+  .strip a.o-failed { background: rgba(255,96,88,.13); border-color: rgba(255,96,88,.5); box-shadow: inset 0 3px 0 var(--alert); }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 11px; font-family: var(--mono); font-size: .72rem; letter-spacing: .04em; color: var(--dim); }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: 0; }
   .runline { margin: 0 0 8px; font-family: var(--mono); font-size: .78rem; letter-spacing: .04em; color: var(--dim); }
