@@ -181,6 +181,14 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .dist-key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; }
   .dist-key b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  /* 1,215 rows and no way to find your own site — the commonest reason anyone opens this page */
+  .lookup { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+  .lookup input { flex: 1 1 auto; min-width: 0; max-width: 420px; padding: 11px 14px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+    font-family: var(--mono); font-size: .88rem; }
+  .lookup input:focus { outline: none; border-color: var(--win); box-shadow: 0 0 0 3px rgba(70,224,148,.15); }
+  .lookup input::placeholder { color: #6a6d7e; }
+  .lookup span { font-family: var(--mono); font-size: .76rem; letter-spacing: .04em; color: var(--dim); }
   /* tables */
   table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .92rem; }
   th { text-align: left; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px; border-bottom: 1px solid var(--line); }
@@ -976,16 +984,55 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
     await fsp.writeFile(
       path.join(OUT, "ai-index/index.html"),
       shell({
-        title: "The AI-Readiness Index — full rankings",
-        description: `All ${s.audited} sites ranked by AI-agent readiness. ${failShare}% score under 55/100. Updated ${generated}.`,
+        // Search Console says the demand is "ai agent readiness checker / checklist /
+        // assessment" — queries this page answers but never said the words for.
+        title: "AI Agent Readiness Checker — look up any site's score",
+        description: `Check how ready any site is for AI agents: llms.txt, AI-crawler policy, readable content, structured data, MCP. ${s.audited} sites scored, ${failShare}% under 55/100. Free, updated ${generated}.`,
         canonicalPath: "/ai-index/",
         body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · AI-Readiness Index · updated ${generated}</p>
-<h1>The AI-Readiness Index</h1>
-<p class="lede">The ${s.audited} most-visited sites on the web, ranked by how usable they are for AI agents. Average ${s.averageScore}/100.
-Checks: llms.txt, AI-crawler policy, content parseability, structured data, sitemap, task reachability, plus MCP/OpenAPI bonuses —
-<a href="/methodology/">methodology</a>.</p>
+<h1>AI agent readiness checker</h1>
+<p class="lede">The AI-Readiness Index: the ${s.audited} most-visited sites on the web, each scored on how usable it actually is
+for an AI agent. Average ${s.averageScore}/100. Checks: llms.txt, AI-crawler policy, content parseability, structured data,
+sitemap, task reachability, plus MCP/OpenAPI bonuses — <a href="/methodology/">methodology</a>.</p>
+<div class="lookup">
+  <input id="sitefind" type="search" placeholder="Type a domain — cursor.com, bbc.co.uk, shopify.com…" autocomplete="off" spellcheck="false" aria-label="Find a site in the index">
+  <span id="findcount" aria-live="polite"></span>
+</div>
 ${leaderboardTable(summary.leaderboard)}
+<script>
+(function () {
+  var box = document.getElementById('sitefind');
+  var out = document.getElementById('findcount');
+  if (!box) return;
+  var rows = [].slice.call(document.querySelectorAll('tbody tr'));
+  var keys = rows.map(function (tr) { return (tr.textContent || '').toLowerCase(); });
+  var total = rows.length;
+  function run() {
+    var q = box.value.trim().toLowerCase();
+    var n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var hit = !q || keys[i].indexOf(q) > -1;
+      rows[i].style.display = hit ? '' : 'none';
+      if (hit) n++;
+    }
+    out.textContent = q ? n + ' of ' + total : '';
+    return { q: q, n: n };
+  }
+  box.addEventListener('input', run);
+  // One event per settled search, not per keystroke.
+  var timer;
+  box.addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      var r = run();
+      if (r.q.length > 1 && window.gtag) {
+        gtag('event', 'site_lookup', { search_term: r.q, results: r.n, page_type: 'index' });
+      }
+    }, 900);
+  });
+})();
+</script>
 ${s.noResponse ? `<p class="lede" style="margin-top:18px"><b>${s.noResponse} of ${s.eligible} sites are not in this table</b> because they never
 answered. They timed out, looped, or refused the request outright — ${s.pctNoResponse}% of everything we tried. A site an agent
 cannot reach at all is the bluntest answer to the question this index asks, so it is counted here rather than quietly dropped.
