@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- Metallic gold gradient -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+    </linearGradient>
+    <!-- Highlight gradient for 3D effect -->
+    <linearGradient id="goldHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff8dc;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#ffd700;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#8b6914;stop-opacity:0.2" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Dark background (will show in browser tab) -->
+  <rect width="100" height="100" rx="20" fill="#1e293b"/>
+  
+  <!-- TV Icon (centered, 3x bigger for favicon) -->
+  <g transform="translate(10, 10) scale(1.5)">
+    <!-- TV Screen (main rectangle) -->
+    <rect x="0" y="5" width="35" height="25" rx="2" fill="url(#goldGradient)" stroke="#b8860b" stroke-width="0.5"/>
+    <rect x="2" y="7" width="31" height="21" rx="1" fill="url(#goldHighlight)"/>
+    
+    <!-- Rabbit-ear Antennas -->
+    <line x1="5" y1="5" x2="2" y2="-3" stroke="url(#goldGradient)" stroke-width="2" stroke-linecap="round"/>
+    <line x1="30" y1="5" x2="33" y2="-3" stroke="url(#goldGradient)" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Tuning dials/vents (5 horizontal lines on right side) -->
+    <line x1="38" y1="8" x2="42" y2="8" stroke="url(#goldGradient)" stroke-width="1" stroke-linecap="round"/>
+    <line x1="38" y1="12" x2="42" y2="12" stroke="url(#goldGradient)" stroke-width="1" stroke-linecap="round"/>
+    <line x1="38" y1="16" x2="42" y2="16" stroke="url(#goldGradient)" stroke-width="1" stroke-linecap="round"/>
+    <line x1="38" y1="20" x2="42" y2="20" stroke="url(#goldGradient)" stroke-width="1" stroke-linecap="round"/>
+    <line x1="38" y1="24" x2="42" y2="24" stroke="url(#goldGradient)" stroke-width="1" stroke-linecap="round"/>
+    
+    <!-- Circular button below dials -->
+    <circle cx="40" cy="28" r="2" fill="url(#goldGradient)" stroke="#b8860b" stroke-width="0.3"/>
+    
+    <!-- TV Base/Feet -->
+    <rect x="8" y="30" width="19" height="3" rx="1" fill="url(#goldGradient)"/>
+    <rect x="10" y="33" width="4" height="2" rx="0.5" fill="url(#goldGradient)"/>
+    <rect x="21" y="33" width="4" height="2" rx="0.5" fill="url(#goldGradient)"/>
+  </g>
+</svg>
