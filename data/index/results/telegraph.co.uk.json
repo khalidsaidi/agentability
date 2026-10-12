@@ -1,9 +1,9 @@
 {
  "domain": "telegraph.co.uk",
- "checkedAt": "2026-10-07T22:54:21.915Z",
+ "checkedAt": "2026-10-12T15:57:19.478Z",
  "status": "complete",
- "elapsedMs": 1663,
- "score": 15,
+ "elapsedMs": 1063,
+ "score": 60,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~1759 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact."
+   "detail": "Found from homepage: support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -103,8 +103,8 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

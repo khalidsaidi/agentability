@@ -1,10 +1,10 @@
 {
  "domain": "intuit.com",
- "checkedAt": "2026-10-07T22:53:03.161Z",
+ "checkedAt": "2026-10-12T15:52:33.145Z",
  "status": "complete",
- "elapsedMs": 16143,
- "score": 90,
- "grade": "A",
+ "elapsedMs": 595,
+ "score": 40,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~691 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact, legal/privacy."
+   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
   },
   {
    "id": "B1",
@@ -103,8 +103,8 @@
   "llmsTxt": true,
   "mcp": false,
   "openapi": false,
-  "structuredData": true,
+  "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

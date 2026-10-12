@@ -1,10 +1,10 @@
 {
  "domain": "triunfobet.com",
- "checkedAt": "2026-10-07T22:54:29.688Z",
+ "checkedAt": "2026-10-12T15:57:43.670Z",
  "status": "complete",
- "elapsedMs": 390,
- "score": 15,
- "grade": "F",
+ "elapsedMs": 367,
+ "score": 55,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~321 words of visible text."
   },
   {
    "id": "A4",
@@ -43,18 +43,18 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 0,
+   "points": 5,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: legal/privacy."
   },
   {
    "id": "B1",
@@ -104,7 +104,7 @@
   "mcp": false,
   "openapi": false,
   "structuredData": false,
-  "sitemap": false,
-  "parseableText": false
+  "sitemap": true,
+  "parseableText": true
  }
 }

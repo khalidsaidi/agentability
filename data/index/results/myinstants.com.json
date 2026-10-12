@@ -1,11 +1,11 @@
 {
  "domain": "myinstants.com",
- "checkedAt": "2026-10-07T22:53:30.750Z",
+ "checkedAt": "2026-10-12T15:54:19.224Z",
  "status": "complete",
- "elapsedMs": 1802,
- "score": 55,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 412,
+ "score": 70,
+ "grade": "B",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~205 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~211 words of visible text."
   },
   {
    "id": "A4",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "partial"
   }
  ],
  "signals": {
