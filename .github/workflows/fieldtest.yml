@@ -5,7 +5,16 @@ on:
     # Daily at 13:23 UTC — deliberately outside DeepSeek peak hours (01:00-04:00
     # and 06:00-10:00 UTC on weekdays), which cost about double.
     - cron: "23 13 * * *"
+    # GitHub dropped the 13:23 fire outright on 2026-10-12 — not late, never created.
+    # A second fire costs nothing: the guard job below exits the moment it sees that
+    # today's episode is already committed, which is the normal case.
+    - cron: "23 17 * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Run even if today's episode already exists (re-do a bad episode)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -15,7 +24,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Two scheduled fires a day, one episode. Workflow-level concurrency holds a second
+  # run until the first has committed and pushed, so by the time this guard checks out
+  # main the answer is reliable.
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      needed: ${{ steps.check.outputs.needed }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: check
+        run: |
+          today="$(date -u +%F)"
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "forced — running even though an episode may exist"
+            echo "needed=yes" >> "$GITHUB_OUTPUT"
+          elif [ -f "data/fieldtest/episodes/$today.json" ]; then
+            echo "episode for $today already published — nothing to do"
+            echo "needed=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "no episode for $today yet — running"
+            echo "needed=yes" >> "$GITHUB_OUTPUT"
+          fi
+
   episode:
+    needs: guard
+    if: needs.guard.outputs.needed == 'yes'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
