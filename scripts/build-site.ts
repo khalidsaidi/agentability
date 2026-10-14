@@ -41,6 +41,44 @@ function scoreColor(score: number): string {
   return "#ff6058";
 }
 
+// What this site specifically has to do about each check it did not pass.
+// Google's scaled-content policy turns on whether a page is worth reading, and a
+// report that names the score but not the remedy is not. Every string here is
+// built from this site's own measured result.
+function fixFor(domain: string, c: { id: string; title: string; status: string; detail: string }, robots: Array<{ bot: string; policy: string }>): string | null {
+  if (c.status === "pass") return null;
+  const blocked = robots.filter((p) => p.policy !== "allowed");
+  switch (c.id) {
+    case "A1":
+      return `Serve a plain-text file at <code>https://${esc(domain)}/llms.txt</code> listing the pages an agent most often needs — pricing, docs, support, account management — each as a one-line description and an absolute URL. It is read by an agent arriving cold with no idea of your structure. Fifteen points, and most teams ship it in an afternoon.`;
+    case "A2":
+      return blocked.length
+        ? `Your <code>robots.txt</code> currently refuses ${esc(blocked.map((p) => p.bot).join(", "))}. If that is deliberate, this score is the cost and the trade is yours to make. If it is inherited from an old rule or a security plugin — which is the commonest cause we see — those agents cannot read ${esc(domain)} on a user's behalf at all.`
+        : `Make the policy explicit in <code>robots.txt</code> rather than leaving it implied. An agent that cannot tell whether it is welcome usually treats silence as a wall.`;
+    case "A3":
+      return `${esc(c.detail)} An agent fetches the page and reads what comes back; it does not run your JavaScript. Server-render the main content, or serve the same text to a plain request. This is the heaviest check on the board at 25 points, and the one that most often decides whether an agent can use a site at all.`;
+    case "A4":
+      return `Add schema.org JSON-LD to the homepage — <code>Organization</code> at minimum, plus <code>Product</code> or <code>Article</code> where they apply. It is how an agent learns what ${esc(domain)} is without inferring it from prose.`;
+    case "A5":
+      return `Serve <code>https://${esc(domain)}/sitemap.xml</code> and point to it from <code>robots.txt</code>. Without it an agent has to guess your URL structure from whatever the homepage happens to link.`;
+    case "A6": {
+      // The check reports what it found; a remedy has to name what is missing.
+      const all = ["pricing", "support/contact", "docs/api", "legal/privacy"];
+      const found = c.detail.startsWith("Found from homepage:")
+        ? all.filter((t) => c.detail.includes(t))
+        : [];
+      const missing = all.filter((t) => !found.includes(t));
+      return `An agent could not reach ${esc(missing.join(", "))} from the ${esc(domain)} homepage${found.length ? `, though ${esc(found.join(" and "))} ${found.length === 1 ? "was" : "were"} fine` : ""}. These are what agents are sent to find most often. Each needs a plain link an agent can follow from the homepage in one hop — not behind a menu that only appears once JavaScript runs, and not solely in a logged-in view.`;
+    }
+    case "B1":
+      return `Optional, and rare — ${""}only a handful of the sites we track run one. An MCP server lets an agent act on ${esc(domain)} through a defined interface instead of scraping it. Advertise it at <code>/.well-known/mcp/server-card.json</code>.`;
+    case "B2":
+      return `Optional. If ${esc(domain)} has a public API, publishing an OpenAPI document at <code>/openapi.json</code> lets an agent call it correctly without a human reading your docs first.`;
+    default:
+      return null;
+  }
+}
+
 // An embeddable badge per audited site. This is the only distribution channel
 // here that compounds: a company that scores well puts it on their own page,
 // and that is a link back plus a billboard we did not have to ask for.
@@ -221,6 +259,21 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   /* "We audit anyone who asks" only counts if it is said where people look. */
   .askline { margin: 10px 0 0; font-size: .85rem; color: var(--dim); }
   .askline a { color: var(--win); }
+  /* The remedy for each failed check, and the score's own history. These are what
+     make a report page worth opening; without them it is a number and a template. */
+  .fixes { margin: 18px 0 0; padding: 0 0 0 1.1em; }
+  .fixes li { margin-bottom: 16px; padding-left: 6px; }
+  .fixes li b { color: var(--ink); }
+  .fixes .pts { font-family: var(--mono); font-size: .72rem; color: var(--dim); margin-left: 10px; }
+  .fixes li p { margin: 5px 0 0; color: var(--dim); }
+  .fixes code { font-family: var(--mono); font-size: .86em; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 4px; padding: 1px 5px; color: var(--ink); overflow-wrap: anywhere; }
+  .spark { display: flex; align-items: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .spark span { display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    min-width: 48px; height: 96px; }
+  .spark i { display: block; width: 24px; border-radius: 3px 3px 0 0; }
+  .spark b { font-family: var(--mono); font-size: .76rem; margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .spark em { font-family: var(--mono); font-size: .66rem; font-style: normal; color: var(--dim); letter-spacing: .04em; }
   /* Embeddable badge: the snippet has to be grabbable in one click. */
   .badgeshow { margin: 18px 0 20px; }
   .snipl { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
@@ -870,6 +923,16 @@ async function main() {
     }
   }
 
+  // Per-domain score history. 97 sites moved between the last two runs alone, so
+  // a page that shows its own trajectory carries something no other page has.
+  type Point = { date: string; score: number };
+  const scoreHistory = new Map<string, Point[]>();
+  for (const snap of history as unknown as Array<{ date: string; sites?: Array<{ domain: string; score: number }> }>) {
+    for (const s of snap.sites ?? []) {
+      scoreHistory.set(s.domain, [...(scoreHistory.get(s.domain) ?? []), { date: snap.date, score: s.score }]);
+    }
+  }
+
   const episodes: Episode[] = [];
   if (fs.existsSync(EPISODES_DIR)) {
     for (const file of (await fsp.readdir(EPISODES_DIR)).sort().reverse()) {
@@ -1157,7 +1220,15 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
 <p><span class="scorebig" style="color:${scoreColor(r.score)}">${r.score}</span><span style="color:#667085">/100</span>
 &nbsp; <span class="chip">${esc(r.grade)}</span>${rank ? ` <span class="chip">#${rank} of ${s.audited}</span>` : ""}
 ${r.paradox ? ' <span class="chip paradox">the paradox: courts AI, blocks AI</span>' : ""}</p>
-<p class="lede">Audited ${(r as any).carriedForward ? `${new Date(r.checkedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} (site unreachable during the latest run — showing the last successful audit)` : generated} from public surfaces only. Can AI agents discover, read, and act on
+<p class="lede">Audited ${(() => {
+  const own = new Date(r.checkedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+  if ((r as any).carriedForward) return `${own} (site unreachable during the latest run — showing the last successful audit)`;
+  // The panel is rebuilt from popularity data, so sites drop out of it. Their
+  // reports stay up — the URLs are indexed and removing them has cost us before —
+  // but the page has to say it is a historical result, not today's.
+  const sameRun = summary && r.checkedAt.slice(0, 10) === summary.generatedAt.slice(0, 10);
+  return sameRun ? generated : `${own} — ${esc(r.domain)} has since dropped out of the panel, so this is the last audit we ran rather than today's`;
+})()} from public surfaces only. Can AI agents discover, read, and act on
 ${esc(r.domain)}? Check by check:</p>
 ${robotsRow}
 <table>
@@ -1179,6 +1250,35 @@ ${(appearances.get(r.domain) ?? []).length
         )
         .join("")}</ul>`
     : ""}
+${(() => {
+  const fixes = r.checks.map((c: any) => ({ c, fix: fixFor(r.domain, c, r.robots) })).filter((x: any) => x.fix);
+  if (!fixes.length) return "";
+  const core = fixes.filter((x: any) => x.c.id[0] === "A");
+  return `<h2>What ${esc(r.domain)} would have to change</h2>
+<p class="lede">${core.length
+    ? `${core.length} check${core.length > 1 ? "s" : ""} cost ${esc(r.domain)} points. Each one below is the specific remedy for what we measured, not general advice.`
+    : `Nothing required — the core checks all pass. What is left is optional.`}</p>
+<ol class="fixes">${fixes
+    .map((x: any) => `<li><b>${esc(x.c.title)}</b><span class="pts">${x.c.points}/${x.c.maxPoints}</span><p>${x.fix}</p></li>`)
+    .join("")}</ol>`;
+})()}
+${(() => {
+  const pts = scoreHistory.get(r.domain) ?? [];
+  if (pts.length < 2) return "";
+  const first = pts[0];
+  const last = pts[pts.length - 1];
+  const delta = last.score - first.score;
+  const since = new Date(first.date).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" });
+  const line = delta === 0
+    ? `Unchanged at ${last.score}/100 since ${since}.`
+    : `${delta > 0 ? "Up" : "Down"} ${Math.abs(delta)} point${Math.abs(delta) === 1 ? "" : "s"} since ${since}.`;
+  return `<h2>How this score has moved</h2>
+<p class="lede">${line} Every audit is a fresh fetch, so a change here means something on ${esc(r.domain)} changed.</p>
+<div class="spark">${pts
+    .map((p) => `<span><i style="height:${Math.max(3, p.score)}%;background:${scoreColor(p.score)}" title="${esc(p.date)}: ${p.score}/100"></i>
+<b>${p.score}</b><em>${new Date(p.date).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</em></span>`)
+    .join("")}</div>`;
+})()}
 <h2>Put this score on your site</h2>
 <p class="lede">The badge reads live from this page, so it updates itself when the score changes. Free, no attribution
 required beyond the link it already carries.</p>
