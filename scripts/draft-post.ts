@@ -61,6 +61,32 @@ async function main() {
     }
   }
 
+  // A 403 alone does not mean a site singled out an agent. Most of these are edge
+  // bot-protection that refuses every automated client. Re-fetch each wall claiming
+  // to be Chrome: if that is refused too, the honest claim is "blocks all automation",
+  // not "blocks AI" — and the second claim is the one that gets a measurement project
+  // called a liar in public.
+  // The comparison has to vary the user-agent and nothing else. curl against node
+  // fetch is not a control — the edge fingerprints the client, and curl is refused
+  // whatever UA it sends, which reads as "blocks everyone" when it is not true.
+  const BROWSER_UA =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+  const GPTBOT_UA = "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1; +https://openai.com/gptbot";
+  // Refusal is 401/403/429. A 404 to the browser means the page simply is not there,
+  // which still shows the bot was turned away rather than the page being missing for all.
+  const REFUSED = new Set([401, 403, 429]);
+  async function statusAs(url: string, ua: string): Promise<number> {
+    try {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 15000);
+      const res = await fetch(url, { headers: { "user-agent": ua }, signal: ctl.signal, redirect: "follow" });
+      clearTimeout(timer);
+      return res.status;
+    } catch {
+      return 0;
+    }
+  }
+
   const summary = fs.existsSync(SUMMARY_PATH) ? JSON.parse(await fsp.readFile(SUMMARY_PATH, "utf8")) : null;
   const scoreOf = new Map<string, number>(
     (summary?.leaderboard ?? []).map((r: { domain: string; score: number }) => [r.domain, r.score])
@@ -82,6 +108,13 @@ async function main() {
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 12);
 
+  for (const w of wallLines) {
+    const c = w as typeof w & { control: number; gptbot: number; selective: boolean };
+    c.control = await statusAs(w.url, BROWSER_UA);
+    c.gptbot = REFUSED.has(w.status) ? await statusAs(w.url, GPTBOT_UA) : 0;
+    c.selective = REFUSED.has(w.status) && c.control > 0 && !REFUSED.has(c.control);
+  }
+
   const brief = [
     `Episode date: ${ep.date}`,
     `Tasks attempted: ${ep.stats.tasks}. Finished cleanly: ${ep.stats.completed}. Partial: ${ep.stats.partial}. Failed: ${ep.stats.failed}.`,
@@ -90,13 +123,21 @@ async function main() {
     "The errands the agent was given, and how each ended:",
     ...ep.runs.map((r) => `- [${r.outcome}] ${r.title}`),
     "",
-    "Sites that refused or broke, with the HTTP status the agent actually received:",
-    ...wallLines.map(
-      (w) =>
-        `- ${w.host} returned ${w.status}${w.note ? ` (${w.note})` : ""}${
-          w.score !== undefined ? `; it scores ${w.score}/100 on our AI-readiness index` : ""
-        }`
-    ),
+    "Sites that refused or broke, with the HTTP status the agent actually received.",
+    "Each was re-fetched by a client calling itself Chrome, as a control:",
+    ...wallLines.map((w) => {
+      const c = w as typeof w & { control: number; gptbot: number; selective: boolean };
+      const control = c.selective
+        ? `the SAME request calling itself Chrome got ${c.control}${
+            c.gptbot ? `, and calling itself GPTBot got ${c.gptbot}` : ""
+          } — so this site turns away named agents and serves ordinary visitors. You may say it blocks AI agents.`
+        : c.control === 0
+          ? `the control request did not complete, so we cannot say who is being refused. Do not characterise this one.`
+          : `calling itself Chrome got ${c.control} too — this refuses all automated clients, not AI specifically. Say "no AI agent can read it", never "it blocks AI".`;
+      return `- ${w.host} returned ${w.status}${w.note ? ` (${w.note})` : ""}; ${control}${
+        w.score !== undefined ? ` It scores ${w.score}/100 on our AI-readiness index.` : ""
+      }`;
+    }),
     summary ? `\nIndex context: ${summary.stats.audited} sites scored, average ${summary.stats.averageScore}/100, ${summary.stats.pctClosed}% closed to AI agents by policy.` : "",
   ].join("\n");
 
@@ -120,6 +161,10 @@ async function main() {
       "Hard rules:",
       `- Each post must be under ${LIMIT} characters including spaces and line breaks.`,
       "- Use ONLY facts from the brief. Never invent a site, a number, a status code or a cause.",
+      "- The brief says, for each refusal, whether the site treated the agent differently from a",
+      "  client calling itself Chrome. Where it did NOT, you may say the site refuses automated",
+      "  visitors, or that no AI agent can read it — never that it blocks AI, targets AI, or singles",
+      "  AI out. That distinction is the project's credibility; getting it wrong hands critics the story.",
       "- No hashtags, no emoji, no links, no questions to the reader, no 'thread below'.",
       "- Open with the concrete finding. No throat-clearing and no 'Did you know'.",
       "",
