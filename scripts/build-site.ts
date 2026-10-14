@@ -41,6 +41,32 @@ function scoreColor(score: number): string {
   return "#ff6058";
 }
 
+// An embeddable badge per audited site. This is the only distribution channel
+// here that compounds: a company that scores well puts it on their own page,
+// and that is a link back plus a billboard we did not have to ask for.
+function badgeSvg(domain: string, score: number, grade: string): string {
+  const label = "AI-READY";
+  const value = `${score}/100`;
+  const lw = 72;
+  const rw = Math.round(18 + value.length * 7.4);
+  const w = lw + rw;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="20" role="img" aria-label="${label}: ${value}">
+<title>${esc(domain)} scores ${score} out of 100 (grade ${esc(grade)}) for AI-agent readiness</title>
+<linearGradient id="g" x2="0" y2="100%"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-opacity=".12"/></linearGradient>
+<clipPath id="r"><rect width="${w}" height="20" rx="4" fill="#fff"/></clipPath>
+<g clip-path="url(#r)">
+<rect width="${lw}" height="20" fill="#1c1e27"/>
+<rect x="${lw}" width="${rw}" height="20" fill="${scoreColor(score)}"/>
+<rect width="${w}" height="20" fill="url(#g)"/>
+</g>
+<g font-family="Verdana,DejaVu Sans,Geneva,sans-serif" font-size="11" text-anchor="middle">
+<text x="${lw / 2}" y="14" fill="#eceef5" font-weight="600">${label}</text>
+<text x="${lw + rw / 2}" y="14" fill="#15161d" font-weight="700">${value}</text>
+</g>
+</svg>
+`;
+}
+
 function shell(opts: { title: string; description: string; canonicalPath: string; body: string; jsonLd?: object }): string {
   return `<!doctype html>
 <html lang="en">
@@ -195,6 +221,14 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   /* "We audit anyone who asks" only counts if it is said where people look. */
   .askline { margin: 10px 0 0; font-size: .85rem; color: var(--dim); }
   .askline a { color: var(--win); }
+  /* Embeddable badge: the snippet has to be grabbable in one click. */
+  .badgeshow { margin: 18px 0 20px; }
+  .snipl { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--dim); margin: 14px 0 6px; }
+  .snip { width: 100%; max-width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+    font-family: var(--mono); font-size: .78rem; }
+  .snip:focus { outline: none; border-color: var(--win); }
   /* tables */
   table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .92rem; }
   th { text-align: left; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px; border-bottom: 1px solid var(--line); }
@@ -1105,6 +1139,12 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
         : "";
       const dir = path.join(OUT, "ai-index/site", r.domain);
       await fsp.mkdir(dir, { recursive: true });
+      await fsp.mkdir(path.join(OUT, "badge"), { recursive: true });
+      await fsp.writeFile(path.join(OUT, "badge", `${r.domain}.svg`), badgeSvg(r.domain, r.score, r.grade), "utf8");
+      const badgeUrl = `${SITE}/badge/${r.domain}.svg`;
+      const reportUrl = `${SITE}/ai-index/site/${r.domain}/`;
+      const embedHtml = `<a href="${reportUrl}"><img src="${badgeUrl}" alt="AI-Ready ${r.score}/100 — ${r.domain} on the Agentability AI-Readiness Index" height="20"></a>`;
+      const embedMd = `[![AI-Ready ${r.score}/100](${badgeUrl})](${reportUrl})`;
       await fsp.writeFile(
         path.join(dir, "index.html"),
         shell({
@@ -1139,6 +1179,15 @@ ${(appearances.get(r.domain) ?? []).length
         )
         .join("")}</ul>`
     : ""}
+<h2>Put this score on your site</h2>
+<p class="lede">The badge reads live from this page, so it updates itself when the score changes. Free, no attribution
+required beyond the link it already carries.</p>
+<p class="badgeshow"><img src="/badge/${esc(r.domain)}.svg" width="${72 + Math.round(18 + `${r.score}/100`.length * 7.4)}" height="20"
+  alt="AI-Ready ${r.score} out of 100 for ${esc(r.domain)}"></p>
+<p class="snipl">HTML</p>
+<input class="snip" readonly onclick="this.select()" value="${esc(embedHtml)}">
+<p class="snipl">Markdown</p>
+<input class="snip" readonly onclick="this.select()" value="${esc(embedMd)}">
 <div class="cta"><b>Work on ${esc(r.domain)}?</b> Each failed check maps to a concrete fix in the
 <a href="/methodology/">methodology</a> — most ship in under an hour. Scores refresh weekly;
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Re-audit:%20${esc(r.domain)}&labels=audit-request">request a re-run</a> after you deploy.</div>`,
