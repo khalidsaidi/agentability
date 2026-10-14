@@ -1,9 +1,9 @@
 {
  "domain": "hostinger.com",
- "checkedAt": "2026-10-12T15:52:00.001Z",
+ "checkedAt": "2026-10-14T05:08:18.920Z",
  "status": "complete",
- "elapsedMs": 515,
- "score": 98,
+ "elapsedMs": 720,
+ "score": 100,
  "grade": "A",
  "posture": "selective",
  "paradox": false,
@@ -59,10 +59,10 @@
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "skip",
-   "points": 0,
+   "status": "pass",
+   "points": 5,
    "maxPoints": 5,
-   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+   "detail": "Serves /.well-known/mcp/server-card.json."
   },
   {
    "id": "B2",
@@ -101,7 +101,7 @@
  ],
  "signals": {
   "llmsTxt": true,
-  "mcp": false,
+  "mcp": true,
   "openapi": true,
   "structuredData": true,
   "sitemap": true,

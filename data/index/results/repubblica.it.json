@@ -1,20 +1,20 @@
 {
  "domain": "repubblica.it",
- "checkedAt": "2026-10-12T15:56:05.236Z",
+ "checkedAt": "2026-10-14T05:12:25.481Z",
  "status": "complete",
- "elapsedMs": 1537,
- "score": 70,
+ "elapsedMs": 1451,
+ "score": 55,
  "grade": "Closed by policy",
  "posture": "closed",
- "paradox": true,
+ "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 2327 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3929 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~3572 words of visible text."
   },
   {
    "id": "A4",
@@ -100,7 +100,7 @@
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "structuredData": true,
