@@ -24,6 +24,24 @@ import { rootDomain } from "./lib/domains";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const DOMAINS_PATH = path.join(REPO_ROOT, "data/index/domains.txt");
+const SUBMITTED_PATH = path.join(REPO_ROOT, "data/index/submitted.txt");
+
+// A hand-maintained domain list: one per line, blank lines and # comments ignored.
+async function readList(file: string): Promise<string[]> {
+  try {
+    return [
+      ...new Set(
+        (await fsp.readFile(file, "utf8"))
+          .split(/\r?\n/)
+          .map((l) => l.trim().toLowerCase())
+          .filter((l) => l && !l.startsWith("#"))
+          .map((l) => l.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, ""))
+      ),
+    ];
+  } catch {
+    return [];
+  }
+}
 const VERDICTS_PATH = path.join(REPO_ROOT, "data/index/classification.json");
 const PROVENANCE_PATH = path.join(REPO_ROOT, "data/index/panel-source.json");
 // Google's own Chrome-usage ranking (top-10k bucket), cached because CrUX
@@ -156,7 +174,19 @@ async function main() {
       } catch { /* unreadable result, treat as unknown */ }
     }
   }
-  const panel = eligible.filter((d) => verdicts[d] === "ok" && !offline.has(d)).sort();
+  // Sites people asked us to audit. Popularity data will never contain them, and
+  // this file is the only reason they survive a rebuild — the panel below is
+  // written from scratch every run. They are classified and audited identically.
+  const submitted = (await readList(SUBMITTED_PATH)).filter((d) => !eligible.includes(d));
+  if (submitted.length) {
+    const unclassified = submitted.filter((d) => !verdicts[d]);
+    if (unclassified.length) await classify(unclassified, verdicts);
+    console.log(`  ${submitted.length} submitted domain(s) merged into the panel`);
+  }
+
+  const panel = [...eligible, ...submitted]
+    .filter((d) => verdicts[d] === "ok" && !offline.has(d))
+    .sort();
   if (offline.size) console.log(`  ${offline.size} domain(s) dropped: DNS does not resolve`);
   const droppedNotInCrux = candidates.length - eligible.length;
   const removed = eligible.filter((d) => verdicts[d] === "porn" || verdicts[d] === "piracy");

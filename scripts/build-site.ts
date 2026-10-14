@@ -18,6 +18,9 @@ const LOGOS_DIR = path.join(REPO_ROOT, "data/logos");
 const LOGOS_MANIFEST = path.join(LOGOS_DIR, "manifest.json");
 const OUT = path.join(REPO_ROOT, "dist-static");
 const SITE = "https://agentability.org";
+// Anyone can ask for a site to be scored. The form prefills the title; the
+// filter box on /ai-index/ appends the domain someone just failed to find.
+const ISSUE_NEW = "https://github.com/khalidsaidi/agentability/issues/new?template=audit-request.yml";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
 // Bump when evergreen copy (methodology, docs, support, privacy) changes; it feeds sitemap lastmod.
 const SITE_CONTENT_UPDATED = "2026-09-14";
@@ -189,6 +192,9 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .lookup input:focus { outline: none; border-color: var(--win); box-shadow: 0 0 0 3px rgba(70,224,148,.15); }
   .lookup input::placeholder { color: #6a6d7e; }
   .lookup span { font-family: var(--mono); font-size: .76rem; letter-spacing: .04em; color: var(--dim); }
+  /* "We audit anyone who asks" only counts if it is said where people look. */
+  .askline { margin: 10px 0 0; font-size: .85rem; color: var(--dim); }
+  .askline a { color: var(--win); }
   /* tables */
   table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: .92rem; }
   th { text-align: left; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px; border-bottom: 1px solid var(--line); }
@@ -992,19 +998,22 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
         body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · AI-Readiness Index · updated ${generated}</p>
 <h1>AI agent readiness checker</h1>
-<p class="lede">The AI-Readiness Index: the ${s.audited} most-visited sites on the web, each scored on how usable it actually is
-for an AI agent. Average ${s.averageScore}/100. Checks: llms.txt, AI-crawler policy, content parseability, structured data,
-sitemap, task reachability, plus MCP/OpenAPI bonuses — <a href="/methodology/">methodology</a>.</p>
+<p class="lede">The AI-Readiness Index: the ${s.audited} most-visited sites on the web — plus any site someone asked us to score —
+each measured on how usable it actually is for an AI agent. Average ${s.averageScore}/100. Checks: llms.txt, AI-crawler policy,
+content parseability, structured data, sitemap, task reachability, plus MCP/OpenAPI bonuses — <a href="/methodology/">methodology</a>.</p>
 <div class="lookup">
   <input id="sitefind" type="search" placeholder="Type a domain — cursor.com, bbc.co.uk, shopify.com…" autocomplete="off" spellcheck="false" aria-label="Find a site in the index">
   <span id="findcount" aria-live="polite"></span>
 </div>
+<p class="askline" id="askline">Missing a site? <a id="asklink" href="${ISSUE_NEW}">Ask us to audit it</a> — anyone can, it is free, and
+the score is whatever the checks find.</p>
 ${leaderboardTable(summary.leaderboard)}
 <script>
 (function () {
   var box = document.getElementById('sitefind');
   var out = document.getElementById('findcount');
   if (!box) return;
+  var ASK_URL = '${ISSUE_NEW}';
   var rows = [].slice.call(document.querySelectorAll('tbody tr'));
   var keys = rows.map(function (tr) { return (tr.textContent || '').toLowerCase(); });
   var total = rows.length;
@@ -1017,6 +1026,24 @@ ${leaderboardTable(summary.leaderboard)}
       if (hit) n++;
     }
     out.textContent = q ? n + ' of ' + total : '';
+    // Nothing matched: the commonest reason is that the site simply is not on the
+    // panel yet, so offer the request instead of an empty table.
+    var ask = document.getElementById('askline');
+    var link = document.getElementById('asklink');
+    if (ask && link) {
+      var looksLikeDomain = /^[a-z0-9.-]+\\.[a-z]{2,}$/.test(q);
+      if (q && n === 0) {
+        // Build the href as a string and use that string. Reading it back off the
+        // element returns a normalised URL, and interpolating that re-encodes the
+        // percent signs — the title arrived as "Audit%20request%253A".
+        var href = ASK_URL + (looksLikeDomain ? '&title=' + encodeURIComponent('Audit request: ' + q) : '');
+        ask.innerHTML = looksLikeDomain
+          ? 'No match for <b>' + q + '</b>. <a id="asklink" href="' + href + '">Ask us to audit ' + q + '</a> — free, and we audit anyone who asks.'
+          : 'No match. <a id="asklink" href="' + ASK_URL + '">Ask us to audit a site</a> — free, and we audit anyone who asks.';
+      } else if (!q) {
+        ask.innerHTML = 'Missing a site? <a id="asklink" href="' + ASK_URL + '">Ask us to audit it</a> — anyone can, it is free, and the score is whatever the checks find.';
+      }
+    }
     return { q: q, n: n };
   }
   box.addEventListener('input', run);

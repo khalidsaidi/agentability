@@ -1,0 +1,35 @@
+name: Audit request — add a site to the Index
+description: Ask us to score any site on how ready it is for AI agents. Free, and we audit anyone who asks.
+title: "Audit request: "
+labels: ["audit-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We audit any site anyone asks about, and add it to the public Index.
+        No charge, and no way to buy a better score — the checks are the same
+        seven we run on the 1,200 most-visited sites on the web, and the
+        [methodology](https://agentability.org/methodology/) is public.
+  - type: input
+    id: domain
+    attributes:
+      label: Domain
+      description: One bare domain. No https://, no www., no path.
+      placeholder: example.com
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything we should know?
+      description: Optional. An agent-facing endpoint we might miss, or what you are trying to find out.
+      placeholder: We serve an MCP server at mcp.example.com and an OpenAPI doc at /openapi.json.
+    validations:
+      required: false
+  - type: checkboxes
+    id: understood
+    attributes:
+      label: Before you submit
+      options:
+        - label: I understand the score is whatever the checks find, and a low one gets published too.
+          required: true
