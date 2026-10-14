@@ -67,6 +67,22 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: npm run fieldtest
 
+      # Three ready-to-post drafts from what the agent actually hit today, so there
+      # is always one waiting. Costs about $0.003. Never worth failing an episode for.
+      - name: Draft today's post
+        continue-on-error: true
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          npm run post | tee /tmp/post.txt
+          {
+            echo "## Today's post drafts"
+            echo
+            echo '```'
+            sed -n '/^\[/,$p' /tmp/post.txt | sed '/^Written →/d'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # New brands appear every week. Grab their marks once; a failure here is never
       # worth blocking an episode over — the strip just falls back to a monogram.
       - name: Cache brand logos for any new sites
