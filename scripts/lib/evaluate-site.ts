@@ -177,12 +177,16 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
 
   try {
     // Fetch everything we need up front, in parallel.
-    const [home, robots, llms, sitemapDirect, mcpWellKnown, openapiWellKnown, openapiRoot] = await Promise.all([
+    const [home, robots, llms, sitemapDirect, mcpWellKnown, mcpServerCard, openapiWellKnown, openapiRoot] = await Promise.all([
       get(`${origin}/`, "text/html"),
       get(`${origin}/robots.txt`, "text/plain"),
       get(`${origin}/llms.txt`, "text/plain"),
       get(`${origin}/sitemap.xml`, "application/xml"),
       get(`${origin}/.well-known/mcp.json`, "application/json"),
+      // The current MCP spec puts the server card here; /.well-known/mcp.json is
+      // the older path. Probing only the old one scored Apify as having no MCP
+      // server while it served a valid card and named it in its llms.txt.
+      get(`${origin}/.well-known/mcp/server-card.json`, "application/json"),
       get(`${origin}/.well-known/openapi.json`, "application/json"),
       get(`${origin}/openapi.json`, "application/json"),
     ]);
@@ -300,14 +304,64 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     });
 
     // --- B1: MCP endpoint — +5 bonus
-    const mcp = mcpWellKnown.ok && mcpWellKnown.text.trim().startsWith("{");
+    // Three ways a site can advertise one, strongest first: a server card on
+    // either well-known path, or an endpoint named in the site's own llms.txt
+    // that answers when asked. Probing only /.well-known/mcp.json scored Apify
+    // as having no MCP server while it served a valid card and named it in
+    // llms.txt, so this check reads the declaration too.
+    // An MCP endpoint behind auth answers 401/403, and a streamable-http one
+    // often answers 405/406 to a plain GET. None of those mean "absent".
+    const MCP_ALIVE = new Set([200, 401, 403, 405, 406]);
+    let mcp = false;
+    let mcpDetail = "No MCP advertisement (bonus check — most sites skip this).";
+    if (mcpServerCard.ok && mcpServerCard.text.trim().startsWith("{")) {
+      mcp = true;
+      mcpDetail = "Serves /.well-known/mcp/server-card.json.";
+    } else if (mcpWellKnown.ok && mcpWellKnown.text.trim().startsWith("{")) {
+      mcp = true;
+      mcpDetail = "Serves /.well-known/mcp.json.";
+    } else if (llmsBody) {
+      // Only a dedicated endpoint host counts (mcp.example.com). A path that
+      // merely contains "mcp" is almost always documentation about MCP —
+      // cursor.com's llms.txt lists five such pages and runs no server at them —
+      // and a docs page answering 200 would be a false pass.
+      const declared = [
+        ...new Set(
+          (llmsBody.match(/https:\/\/[^\s<>()[\]"']+/g) ?? [])
+            .map((u) => u.replace(/[.,;:]+$/, ""))
+            .filter((u) => {
+              try {
+                return new URL(u).hostname.startsWith("mcp.");
+              } catch {
+                return false;
+              }
+            })
+            .map((u) => new URL(u).origin)
+        ),
+      ].slice(0, 3);
+      for (const base of declared) {
+        const host = new URL(base).host;
+        const card = await get(`${base}/.well-known/mcp/server-card.json`, "application/json");
+        if (card.ok && card.text.trim().startsWith("{")) {
+          mcp = true;
+          mcpDetail = `llms.txt names an MCP server at ${host}, which serves a valid server card.`;
+          break;
+        }
+        const live = await get(base, "application/json");
+        if (MCP_ALIVE.has(live.status)) {
+          mcp = true;
+          mcpDetail = `llms.txt names an MCP server at ${host} — reachable (HTTP ${live.status}).`;
+          break;
+        }
+      }
+    }
     checks.push({
       id: "B1",
       title: "MCP server advertised",
       status: mcp ? "pass" : "skip",
       points: mcp ? 5 : 0,
       maxPoints: 5,
-      detail: mcp ? "Serves /.well-known/mcp.json." : "No MCP advertisement (bonus check — most sites skip this).",
+      detail: mcpDetail,
     });
 
     // --- B2: OpenAPI — +5 bonus
