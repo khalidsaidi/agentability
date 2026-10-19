@@ -166,7 +166,7 @@ export async function produceEpisodeTasks(
   try {
     const params = {
       model: PRODUCER_MODEL,
-      max_tokens: 9000,
+      max_tokens: 16000, // thinking tokens share this budget; 9000 truncated propose_tasks on 2026-10-19
       tools: [PRODUCER_TOOL, ...RESEARCH_TOOLS],
     };
     const messages: Anthropic.MessageParam[] = [
@@ -186,6 +186,7 @@ export async function produceEpisodeTasks(
     // a turn that ends in prose without any tool call is nudged once.
     let toolUse: Anthropic.ToolUseBlock | undefined;
     let researched = 0;
+    let truncatedRetries = 0;
     for (let round = 0; round < MAX_RESEARCH_ROUNDS && !toolUse; round++) {
       // This model costs ~4x the agent's; a research loop must not run away.
       if (budget.exhausted) throw new Error("spend ceiling reached before tasks were produced");
@@ -213,6 +214,14 @@ export async function produceEpisodeTasks(
       toolUse = response.content.find(
         (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "propose_tasks"
       );
+      if (response.stop_reason === "max_tokens") console.error(`  producer turn hit max_tokens (round ${round}, ${response.usage.output_tokens} output tokens)`);
+      if (toolUse && response.stop_reason === "max_tokens" && truncatedRetries < 2) {
+        // A cut-off propose_tasks yields half-empty tasks; ask again rather than fall back to seeds.
+        truncatedRetries++;
+        toolUse = undefined;
+        round--;
+        continue;
+      }
       if (toolUse && researched < MIN_RESEARCH_CALLS && !forcing) {
         // Proposing before looking anything up produces invented URLs. Send it back.
         messages.push({ role: "assistant", content: response.content });
