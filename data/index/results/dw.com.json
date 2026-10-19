@@ -1,11 +1,11 @@
 {
  "domain": "dw.com",
- "checkedAt": "2026-10-14T05:06:46.684Z",
+ "checkedAt": "2026-10-19T13:45:49.918Z",
  "status": "complete",
- "elapsedMs": 4689,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 15604,
+ "score": 15,
+ "grade": "F",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -104,7 +104,7 @@
   "mcp": false,
   "openapi": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }

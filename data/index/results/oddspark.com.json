@@ -1,11 +1,11 @@
 {
  "domain": "oddspark.com",
- "checkedAt": "2026-10-14T05:11:03.424Z",
+ "checkedAt": "2026-10-19T13:50:05.278Z",
  "status": "complete",
- "elapsedMs": 6359,
- "score": 48,
- "grade": "D",
- "posture": "selective",
+ "elapsedMs": 16655,
+ "score": 55,
+ "grade": "C",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~192 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~205 words of visible text."
   },
   {
    "id": "A4",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
  "signals": {

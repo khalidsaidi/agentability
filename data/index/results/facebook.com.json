@@ -1,11 +1,11 @@
 {
  "domain": "facebook.com",
- "checkedAt": "2026-10-14T05:07:11.065Z",
+ "checkedAt": "2026-10-19T13:46:11.111Z",
  "status": "complete",
- "elapsedMs": 798,
- "score": 45,
- "grade": "D",
- "posture": "selective",
+ "elapsedMs": 2877,
+ "score": 37,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: Claude-User, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -76,11 +76,11 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
@@ -88,11 +88,11 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",

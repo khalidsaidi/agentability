@@ -1,10 +1,10 @@
 {
  "domain": "temu.com",
- "checkedAt": "2026-10-14T05:13:51.093Z",
+ "checkedAt": "2026-10-19T14:04:36.517Z",
  "status": "complete",
- "elapsedMs": 1295,
- "score": 75,
- "grade": "B",
+ "elapsedMs": 805,
+ "score": 52,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "warn",
+   "points": 12,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~187 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~137 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -76,23 +76,23 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
@@ -104,7 +104,7 @@
   "mcp": false,
   "openapi": false,
   "structuredData": true,
-  "sitemap": true,
-  "parseableText": true
+  "sitemap": false,
+  "parseableText": false
  }
 }

@@ -1,11 +1,11 @@
 {
  "domain": "theqoo.net",
- "checkedAt": "2026-10-14T05:13:55.672Z",
+ "checkedAt": "2026-10-19T13:52:50.885Z",
  "status": "complete",
- "elapsedMs": 908,
- "score": 50,
- "grade": "D",
- "posture": "open",
+ "elapsedMs": 911,
+ "score": 35,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -76,11 +76,11 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
@@ -92,11 +92,11 @@
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {

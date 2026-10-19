@@ -1,10 +1,10 @@
 {
  "domain": "alamy.com",
- "checkedAt": "2026-10-14T05:04:15.352Z",
+ "checkedAt": "2026-10-19T13:43:22.965Z",
  "status": "complete",
- "elapsedMs": 1204,
- "score": 15,
- "grade": "F",
+ "elapsedMs": 2532,
+ "score": 70,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~556 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: support/contact, docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -76,35 +76,35 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": false,
-  "parseableText": false
+  "parseableText": true
  }
 }
