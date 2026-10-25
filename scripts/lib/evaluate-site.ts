@@ -2,6 +2,8 @@
 // in 2026. Every check is citable; no invented standards, no dead specs.
 // Zero dependencies: Node 20 global fetch only.
 
+import { rootDomain } from "./domains";
+
 export type CheckStatus = "pass" | "warn" | "fail" | "skip";
 
 export type SiteCheck = {
@@ -284,14 +286,88 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     });
 
     // --- A6: Everyday agent tasks (deterministic) — 20 pts
-    const homeLower = home.text.toLowerCase();
-    const tasks: Array<{ name: string; pattern: RegExp }> = [
-      { name: "pricing", pattern: /href=["'][^"']*(pricing|plans)[^"']*["']|>\s*pricing\s*</i },
-      { name: "support/contact", pattern: /href=["'][^"']*(contact|support|help)[^"']*["']/i },
-      { name: "docs/api", pattern: /href=["'][^"']*(docs|documentation|developer|api)[^"']*["']/i },
-      { name: "legal/privacy", pattern: /href=["'][^"']*(privacy|terms|legal)[^"']*["']/i },
+    //
+    // Matching a bare substring anywhere in an href was wrong twice over.
+    // "api" is inside "googleapis", so every site with a Google Fonts preconnect
+    // scored a free point for publishing developer docs it does not have —
+    // kbag.se was credited for href="https://fonts.googleapis.com". And the
+    // words were English only, on a panel that is the most-visited sites in the
+    // world, so a Swedish shop linking kontakt and villkor scored zero for
+    // pages it serves perfectly well.
+    //
+    // So: look at path segments of the site's own links, not raw substrings,
+    // and know the words in the languages the panel actually contains.
+    const TASK_WORDS: Array<{ name: string; words: string[] }> = [
+      {
+        name: "pricing",
+        words: ["pricing", "prices", "price", "plans", "tarif", "tarifs", "tarife", "preise", "preis",
+          "precios", "precio", "prezzi", "prezzo", "priser", "prijzen", "cennik", "abonnements", "abonnemang"],
+      },
+      {
+        name: "support/contact",
+        words: ["contact", "contacts", "support", "help", "helpdesk", "kontakt", "kontakta", "contacto",
+          "contatti", "contato", "kontakty", "assistance", "assistenza", "ayuda", "hilfe", "hjalp",
+          "customer-service", "kundservice", "kundtjanst", "iletisim"],
+      },
+      {
+        name: "docs/api",
+        words: ["docs", "doc", "documentation", "documentatie", "dokumentation", "developer", "developers",
+          "api", "apis", "api-docs", "devcenter", "utvecklare", "entwickler"],
+      },
+      {
+        name: "legal/privacy",
+        words: ["privacy", "privacidad", "privacidade", "privacy-policy", "integritetspolicy", "integritet",
+          "terms", "tos", "legal", "impressum", "datenschutz", "mentions-legales", "villkor", "vilkar",
+          "allmanna-villkor", "privatlivspolitik", "cgu", "cgv", "termini", "terminos", "regulamin",
+          "voorwaarden", "kvkk"],
+      },
     ];
-    const found = tasks.filter((t) => t.pattern.test(homeLower));
+    // Only the site's own links count: a third-party asset or widget host is not
+    // this site publishing anything.
+    const ownHrefs: string[] = [];
+    for (const m of home.text.matchAll(/href=["']([^"']+)["']/gi)) {
+      const raw = m[1].trim();
+      if (!raw || raw.startsWith("#") || /^(mailto|tel|javascript):/i.test(raw)) continue;
+      try {
+        const url = new URL(raw, `${origin}/`);
+        // Same registrable domain, so help.shopify.com and docs.example.com count —
+        // a support centre on a subdomain is still this site publishing it — while
+        // fonts.googleapis.com and checkout.stripe.com do not.
+        if (rootDomain(url.hostname) !== rootDomain(new URL(origin).hostname)) continue;
+        ownHrefs.push([url.hostname, url.pathname, url.search].join(" ").toLowerCase());
+      } catch {
+        /* unparseable href */
+      }
+    }
+    // Two sets, because how much latitude a word deserves depends on its length.
+    // Hostname labels are segments in their own right: help.shopify.com is where
+    // Shopify's support actually lives, and "help" has to be findable there.
+    const segments = new Set<string>(); // "mentions-legales", "help", "docs"
+    const parts = new Set<string>(); // dash/underscore parts: "mentions", "legales"
+    for (const href of ownHrefs) {
+      for (const seg of href.split(/[/?&=.\s]+/)) {
+        if (!seg) continue;
+        segments.add(seg);
+        for (const part of seg.split(/[-_]+/)) if (part) parts.add(part);
+      }
+    }
+    // A short generic token must be the entire segment: /api is a developer area,
+    // "delphine-papin" is a journalist and "midterms-2026" is an election. A longer
+    // word may be a part, and may carry an inflection — French contacter, Swedish
+    // kontakta — which is why only words over five letters get prefix latitude.
+    const hasWord = (w: string): boolean =>
+      w.length <= 5
+        ? segments.has(w)
+        : segments.has(w) || parts.has(w) || [...parts].some((p) => p.startsWith(w));
+    // Visible anchor text, as a fallback for a link whose URL is an opaque id.
+    const anchorText = [...home.text.matchAll(/<a\b[^>]*>([\s\S]{0,80}?)<\/a>/gi)]
+      .map((m) => m[1].replace(/<[^>]+>/g, " ").toLowerCase())
+      .join(" | ");
+    const found = TASK_WORDS.filter(
+      (t) =>
+        t.words.some(hasWord) ||
+        t.words.some((w) => w.length > 5 && new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(anchorText))
+    );
     checks.push({
       id: "A6",
       title: "Everyday agent tasks reachable from the homepage",
