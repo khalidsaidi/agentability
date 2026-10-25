@@ -1,11 +1,11 @@
 {
  "domain": "dogdrip.net",
- "checkedAt": "2026-10-19T13:45:38.109Z",
+ "checkedAt": "2026-10-25T21:25:46.502Z",
  "status": "complete",
- "elapsedMs": 1640,
- "score": 55,
- "grade": "C",
- "posture": "open",
+ "elapsedMs": 2640,
+ "score": 45,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1309 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1281 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: legal/privacy."
+   "detail": "Found from homepage: docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "blocked"
   }
  ],
  "signals": {

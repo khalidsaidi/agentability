@@ -1,11 +1,11 @@
 {
  "domain": "rtl.de",
- "checkedAt": "2026-10-19T13:51:36.777Z",
+ "checkedAt": "2026-10-25T21:32:12.792Z",
  "status": "complete",
- "elapsedMs": 1743,
- "score": 58,
- "grade": "C",
- "posture": "selective",
+ "elapsedMs": 3534,
+ "score": 65,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~56937 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~59427 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: support/contact, docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -80,7 +80,7 @@
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",

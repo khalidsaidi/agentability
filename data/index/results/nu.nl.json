@@ -1,9 +1,9 @@
 {
  "domain": "nu.nl",
- "checkedAt": "2026-10-19T13:50:03.529Z",
+ "checkedAt": "2026-10-25T21:30:34.847Z",
  "status": "complete",
- "elapsedMs": 3260,
- "score": 47,
+ "elapsedMs": 1859,
+ "score": 52,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2083 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2216 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: legal/privacy."
+   "detail": "Found from homepage: support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -84,7 +84,7 @@
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",

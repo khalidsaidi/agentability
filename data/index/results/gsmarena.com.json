@@ -1,11 +1,11 @@
 {
  "domain": "gsmarena.com",
- "checkedAt": "2026-10-19T13:47:00.094Z",
+ "checkedAt": "2026-10-25T21:27:11.154Z",
  "status": "complete",
- "elapsedMs": 11899,
- "score": 45,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 9911,
+ "score": 60,
+ "grade": "C",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1025 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1147 words of visible text."
   },
   {
    "id": "A4",
@@ -76,11 +76,11 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
@@ -88,7 +88,7 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
@@ -96,7 +96,7 @@
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "partial"
   }
  ],
  "signals": {

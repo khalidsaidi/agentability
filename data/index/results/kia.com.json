@@ -1,20 +1,20 @@
 {
  "domain": "kia.com",
- "checkedAt": "2026-10-19T13:48:11.059Z",
+ "checkedAt": "2026-10-25T21:28:35.596Z",
  "status": "complete",
- "elapsedMs": 2591,
- "score": 85,
- "grade": "A",
+ "elapsedMs": 3747,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 3237 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: legal/privacy."
+   "detail": "Found from homepage: support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -100,7 +100,7 @@
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "structuredData": true,

@@ -1,11 +1,11 @@
 {
  "domain": "eenadu.net",
- "checkedAt": "2026-10-19T13:45:58.153Z",
+ "checkedAt": "2026-10-25T21:26:12.375Z",
  "status": "complete",
- "elapsedMs": 1835,
- "score": 15,
- "grade": "F",
- "posture": "open",
+ "elapsedMs": 1979,
+ "score": 60,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,42 +19,42 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2020 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: pricing, legal/privacy."
   },
   {
    "id": "B1",
@@ -76,35 +76,35 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
-  "sitemap": false,
-  "parseableText": false
+  "structuredData": true,
+  "sitemap": true,
+  "parseableText": true
  }
 }

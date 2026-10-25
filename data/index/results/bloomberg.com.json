@@ -1,20 +1,20 @@
 {
  "domain": "bloomberg.com",
- "checkedAt": "2026-10-19T13:44:29.732Z",
+ "checkedAt": "2026-10-25T21:24:35.128Z",
  "status": "complete",
- "elapsedMs": 1997,
- "score": 10,
+ "elapsedMs": 3848,
+ "score": 80,
  "grade": "Closed by policy",
  "posture": "closed",
- "paradox": false,
+ "paradox": true,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 44931 chars and links."
   },
   {
    "id": "A2",
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~36954 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: pricing, support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -100,11 +100,11 @@
   }
  ],
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

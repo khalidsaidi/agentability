@@ -1,10 +1,10 @@
 {
  "domain": "inven.co.kr",
- "checkedAt": "2026-10-19T13:47:42.242Z",
+ "checkedAt": "2026-10-25T21:28:04.581Z",
  "status": "complete",
- "elapsedMs": 14352,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 22739,
+ "score": 65,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~8320 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~8272 words of visible text."
   },
   {
    "id": "A4",
@@ -43,18 +43,18 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: legal/privacy."
+   "detail": "Found from homepage: docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -76,27 +76,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -104,7 +104,7 @@
   "mcp": false,
   "openapi": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

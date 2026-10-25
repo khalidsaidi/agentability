@@ -1,11 +1,11 @@
 {
  "domain": "lichess.org",
- "checkedAt": "2026-10-19T13:48:46.150Z",
+ "checkedAt": "2026-10-25T21:29:10.351Z",
  "status": "complete",
- "elapsedMs": 519,
- "score": 35,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 494,
+ "score": 50,
+ "grade": "D",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~513 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~593 words of visible text."
   },
   {
    "id": "A4",
@@ -76,11 +76,11 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
@@ -92,11 +92,11 @@
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "partial"
   }
  ],
  "signals": {

@@ -1,11 +1,11 @@
 {
  "domain": "loteriasdominicanas.com",
- "checkedAt": "2026-10-19T13:48:52.540Z",
+ "checkedAt": "2026-10-25T21:29:16.935Z",
  "status": "complete",
- "elapsedMs": 222,
- "score": 25,
- "grade": "F",
- "posture": "open",
+ "elapsedMs": 244,
+ "score": 10,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -76,11 +76,11 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
@@ -92,11 +92,11 @@
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {
