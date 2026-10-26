@@ -38,10 +38,15 @@ export type SiteEvaluation = {
     llmsTxt: boolean;
     mcp: boolean;
     openapi: boolean;
+    ucp: boolean;
     structuredData: boolean;
     sitemap: boolean;
     parseableText: boolean;
   };
+  // Which e-commerce platform served the page, where it is detectable. UCP is a
+  // Shopify default, so a bare "UCP: yes" says nothing about the merchant
+  // without this beside it.
+  platform?: "Shopify" | "WooCommerce" | "BigCommerce" | "Salesforce" | "Wix" | "Squarespace" | "Magento";
   error?: string;
   // Set by the runner when a transiently unreachable domain reuses its last
   // successful audit instead of dropping off the index.
@@ -154,6 +159,19 @@ function parseRobots(robotsTxt: string): { policies: RobotsPolicy[]; sitemaps: s
   return { policies, sitemaps };
 }
 
+// Detected from the homepage we already fetched, so it costs nothing.
+function platformOf(html: string, headerBlob: string): SiteEvaluation["platform"] {
+  const h = `${html.slice(0, 200_000)} ${headerBlob}`.toLowerCase();
+  if (/cdn\.shopify\.com|x-shopify|shopify-digital-wallet|myshopify\.com/.test(h)) return "Shopify";
+  if (/woocommerce/.test(h)) return "WooCommerce";
+  if (/bigcommerce/.test(h)) return "BigCommerce";
+  if (/demandware|dwstatic|salesforce commerce/.test(h)) return "Salesforce";
+  if (/static\.wixstatic\.com|wix-code/.test(h)) return "Wix";
+  if (/squarespace/.test(h)) return "Squarespace";
+  if (/magento|mage-init/.test(h)) return "Magento";
+  return undefined;
+}
+
 function gradeFor(score: number, posture: string): string {
   if (posture === "closed") return "Closed by policy";
   if (score >= 85) return "A";
@@ -179,7 +197,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
 
   try {
     // Fetch everything we need up front, in parallel.
-    const [home, robots, llms, sitemapDirect, mcpWellKnown, mcpServerCard, openapiWellKnown, openapiRoot] = await Promise.all([
+    const [home, robots, llms, sitemapDirect, mcpWellKnown, mcpServerCard, openapiWellKnown, openapiRoot, ucpWellKnown, ucpJson] = await Promise.all([
       get(`${origin}/`, "text/html"),
       get(`${origin}/robots.txt`, "text/plain"),
       get(`${origin}/llms.txt`, "text/plain"),
@@ -191,6 +209,8 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       get(`${origin}/.well-known/mcp/server-card.json`, "application/json"),
       get(`${origin}/.well-known/openapi.json`, "application/json"),
       get(`${origin}/openapi.json`, "application/json"),
+      get(`${origin}/.well-known/ucp`, "application/json"),
+      get(`${origin}/.well-known/ucp.json`, "application/json"),
     ]);
 
     if (!home.ok && home.status === 0) {
@@ -464,6 +484,52 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       detail: openapi ? "Valid OpenAPI document found." : "No OpenAPI document (bonus check — only relevant for APIs).",
     });
 
+    // --- B3: UCP commerce profile — +5 bonus
+    //
+    // The one agentic-commerce standard that can actually be verified from
+    // outside. ACP, the OpenAI/Stripe protocol, is approval-gated and delivered
+    // as a product feed, so no endpoint exists to check and nobody — including
+    // the trade press quoting adoption figures for it — can confirm a merchant
+    // supports it. UCP publishes a profile at a well-known path, so it can.
+    //
+    // Note what a pass does and does not mean: Shopify serves this for its
+    // merchants, so for a Shopify store it records a platform default rather
+    // than anything the merchant did. The commerce view reports the platform
+    // alongside for that reason.
+    let ucp: { version?: string; services: string[]; ap2: boolean } | null = null;
+    for (const candidate of [ucpWellKnown, ucpJson]) {
+      if (!candidate.ok || !candidate.text.trim().startsWith("{")) continue;
+      try {
+        const doc = JSON.parse(candidate.text);
+        if (!doc?.ucp) continue;
+        const services = Object.keys(doc.ucp.services ?? {});
+        const caps = Object.keys(doc.ucp.capabilities ?? {});
+        ucp = {
+          version: typeof doc.ucp.version === "string" ? doc.ucp.version : undefined,
+          services: services.length ? services : caps,
+          // AP2 rides inside UCP as signed payment mandates; the signing keys
+          // sit beside the profile.
+          ap2: Array.isArray(doc.keys) && doc.keys.length > 0,
+        };
+        break;
+      } catch {
+        /* not JSON */
+      }
+    }
+    checks.push({
+      id: "B3",
+      title: "UCP commerce profile published",
+      status: ucp ? "pass" : "skip",
+      points: ucp ? 5 : 0,
+      maxPoints: 5,
+      detail: ucp
+        ? `Serves a UCP profile${ucp.version ? ` (version ${ucp.version})` : ""}${
+            ucp.services.length ? ` declaring ${ucp.services.join(", ")}` : ""
+          }${ucp.ap2 ? ", with signing keys for AP2 payment mandates" : ""}.`
+        : "No UCP profile (bonus check — agentic commerce, relevant to shops).",
+    });
+
+    const platform = platformOf(home.text, home.contentType);
     const score = Math.min(100, checks.reduce((acc, c) => acc + c.points, 0));
     const paradox = llmsTxt && blocked.length >= 2;
 
@@ -478,7 +544,8 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       paradox,
       checks,
       robots: policies,
-      signals: { llmsTxt, mcp, openapi, structuredData, sitemap, parseableText: parseable },
+      signals: { llmsTxt, mcp, openapi, ucp: Boolean(ucp), structuredData, sitemap, parseableText: parseable },
+      ...(platform ? { platform } : {}),
     };
   } catch (error: any) {
     return {
@@ -492,7 +559,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       paradox: false,
       checks,
       robots: [],
-      signals: { llmsTxt: false, mcp: false, openapi: false, structuredData: false, sitemap: false, parseableText: false },
+      signals: { llmsTxt: false, mcp: false, openapi: false, ucp: false, structuredData: false, sitemap: false, parseableText: false },
       error: String(error?.message || error).slice(0, 200),
       failure: (error?.failure as FailureKind) ?? "refused",
     };

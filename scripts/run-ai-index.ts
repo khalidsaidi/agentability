@@ -93,6 +93,8 @@ async function main() {
       paradox: r.paradox,
       llmsTxt: r.signals.llmsTxt,
       mcp: r.signals.mcp,
+      ucp: r.signals.ucp,
+      ...(r.platform ? { platform: r.platform } : {}),
     }));
 
   const pct = (n: number) => (complete.length ? Math.round((n / complete.length) * 100) : 0);

@@ -11,6 +11,7 @@ import { GUIDES, type GuideContext } from "./lib/guides";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
+const COMMERCE_PATH = path.join(REPO_ROOT, "data/index/commerce.json");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
 const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
@@ -256,6 +257,14 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .lookup input:focus { outline: none; border-color: var(--win); box-shadow: 0 0 0 3px rgba(70,224,148,.15); }
   .lookup input::placeholder { color: #6a6d7e; }
   .lookup span { font-family: var(--mono); font-size: .76rem; letter-spacing: .04em; color: var(--dim); }
+  /* Commerce view: a stat strip and two chip variants the main index does not use. */
+  .meter2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 24px; }
+  .meter2 div { background: var(--panel); padding: 14px 15px; min-width: 0; }
+  .meter2 b { display: block; font-family: var(--mono); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+  .meter2 span { display: block; font-size: .74rem; color: var(--dim); margin-top: 3px; text-wrap: balance; }
+  .chip.ucp { background: rgba(70,224,148,.14); border-color: rgba(70,224,148,.45); color: var(--win); }
+  .chip.dim { color: var(--dim); }
   /* "We audit anyone who asks" only counts if it is said where people look. */
   .askline { margin: 10px 0 0; font-size: .85rem; color: var(--dim); }
   .askline a { color: var(--win); }
@@ -420,7 +429,7 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 <body><div class="wrap">
 <header class="top">
   <a class="brand" href="/">agent<span>ability</span></a>
-  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
+  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/shops/">Shops</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
@@ -577,8 +586,34 @@ type Summary = {
     paradox: boolean;
     llmsTxt: boolean;
     mcp: boolean;
+    ucp?: boolean;
+    platform?: string;
   }>;
 };
+
+// The commerce table. Deliberately not the same columns as the main index:
+// platform sits next to the UCP column because Shopify switches UCP on for its
+// merchants, so without it the ranking would mostly be reporting who uses
+// Shopify and calling it a readiness score.
+function shopsTable(rows: Summary["leaderboard"]): string {
+  return `<table>
+<thead><tr><th class="num">#</th><th>Shop</th><th class="num">Score</th><th>Grade</th><th class="hide-sm">Platform</th><th>Agentic checkout</th></tr></thead>
+<tbody>
+${rows
+  .map(
+    (r, i) => `<tr>
+  <td class="num">${i + 1}</td>
+  <td><a href="/ai-index/site/${esc(r.domain)}/">${esc(r.domain)}</a> ${postureChip(r)}</td>
+  <td class="num"><span class="bar"><span style="width:${Math.max(2, r.score)}%;background:${scoreColor(r.score)}"></span></span>${r.score}</td>
+  <td><span class="chip">${esc(r.grade)}</span></td>
+  <td class="hide-sm">${r.platform ? `<span class="chip">${esc(r.platform)}</span>` : '<span class="chip dim">own build</span>'}</td>
+  <td>${r.ucp ? '<span class="chip ucp">UCP</span>' : '<span class="chip dim">none</span>'}${r.mcp ? ' <span class="chip">MCP</span>' : ""}</td>
+</tr>`
+  )
+  .join("\n")}
+</tbody>
+</table>`;
+}
 
 function postureChip(row: { posture: string; paradox: boolean }): string {
   if (row.paradox) return `<span class="chip paradox" title="Publishes llms.txt while blocking AI crawlers">paradox</span>`;
@@ -1306,6 +1341,75 @@ required beyond the link it already carries.</p>
     }
   }
 
+  // ---------- Shops: can an agent actually buy? ----------
+  // A view, not a second index. Membership comes from the model verdict cached
+  // in commerce.json, and every row links to the report page the site already
+  // has — no new per-site URLs, because moving or duplicating those has cost
+  // this site its search traffic once before.
+  if (summary && s && fs.existsSync(COMMERCE_PATH)) {
+    const verdicts: Record<string, string> = JSON.parse(await fsp.readFile(COMMERCE_PATH, "utf8"));
+    const shops = summary.leaderboard.filter((r) => verdicts[r.domain] === "shop");
+    if (shops.length) {
+      const withUcp = shops.filter((r) => r.ucp);
+      const shopify = shops.filter((r) => r.platform === "Shopify");
+      const ucpNotShopify = withUcp.filter((r) => r.platform !== "Shopify");
+      const avg = Math.round(shops.reduce((acc, r) => acc + r.score, 0) / shops.length);
+      await fsp.mkdir(path.join(OUT, "shops"), { recursive: true });
+      await fsp.writeFile(
+        path.join(OUT, "shops/index.html"),
+        shell({
+          title: "Agentic commerce readiness — can an AI agent buy from these shops?",
+          description: `${shops.length} online shops scored on whether an AI agent can read them and check out. ${withUcp.length} publish a UCP profile. Average ${avg}/100. Free, updated ${generated}.`,
+          canonicalPath: "/shops/",
+          body: `
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Agentic commerce · updated ${generated}</p>
+<h1>Can an AI agent buy from these shops?</h1>
+<p class="lede">${shops.length} of the ${s.audited} sites we have audited sell something. These are their scores, plus whether
+they publish a <a href="https://ucp.dev/" rel="nofollow">UCP</a> profile — the one agentic-commerce standard that can be
+verified from outside. Average ${avg}/100.</p>
+
+<div class="meter2">
+  <div><b>${shops.length}</b><span>shops audited</span></div>
+  <div><b>${withUcp.length}</b><span>publish a UCP profile</span></div>
+  <div><b>${shopify.length}</b><span>on Shopify</span></div>
+  <div><b>${ucpNotShopify.length}</b><span>UCP without Shopify</span></div>
+</div>
+
+<p class="lede" style="margin-top:26px"><b>Read the UCP column with the platform column.</b> Shopify publishes a UCP profile
+on behalf of its merchants, so a Shopify shop passes without anyone there deciding anything.
+${ucpNotShopify.length
+  ? `The ${ucpNotShopify.length} shop${ucpNotShopify.length === 1 ? "" : "s"} below that publish${ucpNotShopify.length === 1 ? "es" : ""} UCP on their own
+infrastructure — ${ucpNotShopify.slice(0, 4).map((r) => esc(r.domain)).join(", ")}${ucpNotShopify.length > 4 ? " and others" : ""} — chose to.`
+  : "No shop here publishes UCP on its own infrastructure yet."}
+The rest of the score is the same seven checks as the main <a href="/ai-index/">index</a>, which measure things no platform
+hands you: whether your prices survive a fetch without JavaScript, whether an agent can reach your basket, whether your
+products carry structured data.</p>
+
+<p class="lede"><b>What is deliberately not scored here.</b> ACP, the OpenAI and Stripe protocol, is approval-gated and
+delivered as a product feed, so there is no endpoint to test and no way for anyone outside to confirm a merchant supports
+it — including the trade press quoting adoption figures for it. We would rather publish nothing than a number we cannot
+reproduce. <a href="/methodology/">Methodology</a>.</p>
+
+${shopsTable(shops)}
+
+<div class="cta"><b>Run a shop?</b> Every row links to a full report with the specific fixes for whatever it failed.
+Not listed? <a href="${ISSUE_NEW}">Ask us to audit it</a> — free, and we audit anyone who asks.</div>`,
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            name: "Agentic commerce readiness",
+            description: `${shops.length} online shops scored on AI-agent readiness and UCP adoption.`,
+            url: `${SITE}/shops/`,
+            dateModified: summary.generatedAt,
+            creator: { "@type": "Organization", name: "Agentability", url: SITE },
+          },
+        }),
+        "utf8"
+      );
+      console.log(`Shops page: ${shops.length} shops, ${withUcp.length} with UCP (${ucpNotShopify.length} not Shopify)`);
+    }
+  }
+
   // ---------- Methodology ----------
   const methodologyBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Methodology</p>
@@ -1655,6 +1759,7 @@ nothing you can't test with curl.</p>
     ["/docs/", SITE_CONTENT_UPDATED],
     ["/support/", SITE_CONTENT_UPDATED],
     ["/privacy/", SITE_CONTENT_UPDATED],
+    ...(fs.existsSync(path.join(OUT, "shops/index.html")) ? [["/shops/", indexDate] as [string, string]] : []),
     ...domains.map((d): [string, string] => [`/ai-index/site/${d}/`, indexDate]),
   ];
   await fsp.writeFile(
