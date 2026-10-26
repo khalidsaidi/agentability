@@ -1246,8 +1246,15 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
       await fsp.writeFile(
         path.join(dir, "index.html"),
         shell({
-          title: `${r.domain} AI visibility score: ${r.score}/100`,
-          description: `${r.domain} scores ${r.score}/100 (${r.grade}) for AI-agent readiness${r.paradox ? " — and publishes llms.txt while blocking AI crawlers" : ""}. Full check-by-check report.`,
+          // These are the only pages on this site that rank — Search Console has
+          // them at position 8-9 for the domain's own name, while every hub page
+          // ranks nowhere. So the title has to earn the click, not just name the
+          // page: lead with the question someone would actually ask about a site,
+          // and put the score where it reads as an answer.
+          title: `Is ${r.domain} ready for AI agents? ${r.score}/100`,
+          description: `${r.domain} scores ${r.score}/100 (${r.grade}) for AI-agent readiness — ${
+            r.checks.filter((c: any) => c.status === "pass").length
+          } of ${r.checks.length} checks passed${r.paradox ? ", and it publishes llms.txt while blocking AI crawlers" : ""}. Can an agent read it, and what would it take to fix? Free check-by-check report.`,
           canonicalPath: `/ai-index/site/${r.domain}/`,
           body: `
 <p class="eyebrow"><a href="/ai-index/" style="text-decoration:none;color:inherit">← AI-Readiness Index</a></p>

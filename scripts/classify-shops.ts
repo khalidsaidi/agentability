@@ -24,7 +24,31 @@ import Anthropic from "@anthropic-ai/sdk";
 const REPO_ROOT = path.resolve(__dirname, "..");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const COMMERCE_PATH = path.join(REPO_ROOT, "data/index/commerce.json");
-const CLASSIFIER = "deepseek-v4-pro";
+// Two providers, because one of them kept not answering. DeepSeek terminated
+// most of these requests at the gateway — a 10-domain batch would answer in 20s
+// or never return at all, and a single request once held the process for seven
+// hours. Anthropic's Haiku is the reliable path for a bulk classifier like this
+// and costs cents for the whole panel ($0.10/$0.50 per MTok), so it is preferred
+// when its key is present; DeepSeek stays as the fallback so CI keeps working
+// where only that secret is configured.
+const PROVIDERS = [
+  {
+    name: "deepseek",
+    model: "deepseek-v4-pro",
+    envVar: "DEEPSEEK_API_KEY",
+    baseURL: "https://api.deepseek.com/anthropic" as string | undefined,
+  },
+  // Only used when DEEPSEEK_API_KEY is absent and this one is deliberately set.
+  // This project runs on DeepSeek for cost reasons and must keep doing so by
+  // default: nothing here should start billing another provider on its own just
+  // because a key happens to exist in the environment.
+  {
+    name: "haiku",
+    model: "claude-haiku-5-5",
+    envVar: "ANTHROPIC_API_KEY",
+    baseURL: undefined as string | undefined,
+  },
+];
 // 10, after measuring rather than guessing. Time and output per request scale
 // with how ambiguous the domains are, not just how many: batches of 25 ran
 // 19s/1,341 tokens for easy ones and 68s/4,603 for hard ones, and the long tail
@@ -32,23 +56,29 @@ const CLASSIFIER = "deepseek-v4-pro";
 // (build-panel.ts still uses 50 for its porn/piracy filter and will hit the same
 // wall when its cache next misses in bulk.)
 const BATCH = 10;
+// Enforced with Promise.race, not by the SDK — see the comment at the call site.
+const HARD_TIMEOUT_MS = 120_000;
 
 type Verdict = "shop" | "not-shop";
 type Verdicts = Record<string, Verdict>;
 
 async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
   if (!unseen.length) return;
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    console.warn(`::warning::DEEPSEEK_API_KEY not set — ${unseen.length} domain(s) left unjudged.`);
+  const provider = PROVIDERS.find((p) => process.env[p.envVar]);
+  if (!provider) {
+    console.warn(
+      `::warning::no classifier key set (${PROVIDERS.map((p) => p.envVar).join(" or ")}) — ${unseen.length} domain(s) left unjudged.`
+    );
     return;
   }
+  const apiKey = process.env[provider.envVar] as string;
+  console.log(`classifier: ${provider.model}`);
   // A request with no deadline hung this script for seven hours on its fourth
   // batch: alive, holding the connection, writing nothing. Every call now has a
   // ceiling and gives up rather than waiting forever.
   const client = new Anthropic({
     apiKey,
-    baseURL: "https://api.deepseek.com/anthropic",
+    ...(provider.baseURL ? { baseURL: provider.baseURL } : {}),
     timeout: 180_000,
     maxRetries: 2,
   });
@@ -62,6 +92,18 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
     `self-serve purchase, or a tool that is free only.\n` +
     `Judge the site, not the brand: a carmaker's brochure site is not-shop; its online store is.\n` +
     `Format one per line: domain|shop or domain|not-shop\n\n${chunk.join("\n")}`;
+
+  // A stall must be loud. Twice this script hung silently and I reported it as
+  // "still running" because the process existed — which proves nothing.
+  let lastProgress = Date.now();
+  const watchdog = setInterval(() => {
+    const idle = Math.round((Date.now() - lastProgress) / 1000);
+    if (idle > 600) {
+      console.error(`::error::classify-shops stalled — nothing judged for ${idle}s. Verdicts so far are saved; re-run to resume.`);
+      process.exit(1);
+    }
+  }, 60_000);
+  watchdog.unref();
 
   const total = Math.ceil(unseen.length / BATCH);
   for (let i = 0; i < unseen.length; i += BATCH) {
@@ -78,13 +120,33 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
     let response: Anthropic.Message | null = null;
     for (let attempt = 1; attempt <= 3 && !response; attempt++) {
       try {
-        response = await client.messages.create({
-          // This model thinks before answering and thinking comes out of the same
-          // budget, so a tight ceiling returns an empty response and no error.
-          model: CLASSIFIER,
-          max_tokens: 16000,
-          messages: [{ role: "user", content: prompt(chunk) }],
-        });
+        // The SDK's own `timeout` does not reliably fire here: twice this script
+        // sat on a single request for seven hours, process alive, zero CPU, no
+        // error, no retry. So the deadline is enforced outside the SDK, where
+        // nothing can swallow it. The request is abandoned, not awaited.
+        const ctl = new AbortController();
+        const deadline = new Promise<never>((_, reject) =>
+          setTimeout(() => {
+            ctl.abort();
+            reject(new Error(`no response in ${HARD_TIMEOUT_MS / 1000}s`));
+          }, HARD_TIMEOUT_MS).unref()
+        );
+        response = await Promise.race([
+          client.messages.create(
+            {
+              // Both models think before answering and thinking comes out of this
+              // budget, so a tight ceiling returns an empty response and no error.
+              model: provider.model,
+              max_tokens: 8000,
+              // Low effort is right for a yes/no classification; DeepSeek has no
+              // equivalent knob, so it only goes to the Anthropic model.
+              ...(provider.name === "haiku" ? { output_config: { effort: "low" as const } } : {}),
+              messages: [{ role: "user", content: prompt(chunk) }],
+            },
+            { signal: ctl.signal }
+          ),
+          deadline,
+        ]);
       } catch (error: any) {
         const why = String(error?.message || error).slice(0, 70);
         if (attempt === 3) {
@@ -111,10 +173,12 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
       got += 1;
     }
     console.log(`  batch ${n}/${total}: ${got}/${chunk.length} judged in ${Math.round((Date.now() - started) / 1000)}s`);
+    lastProgress = Date.now();
     // Save after every batch: a long run that dies halfway should not throw
     // away the verdicts already paid for.
     await save(verdicts);
   }
+  clearInterval(watchdog);
 }
 
 async function save(verdicts: Verdicts): Promise<void> {
