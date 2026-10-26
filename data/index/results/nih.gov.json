@@ -1,9 +1,9 @@
 {
  "domain": "nih.gov",
- "checkedAt": "2026-10-25T21:30:26.669Z",
+ "checkedAt": "2026-10-26T03:47:00.150Z",
  "status": "complete",
- "elapsedMs": 366,
- "score": 25,
+ "elapsedMs": 1391,
+ "score": 15,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,8 +111,9 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }

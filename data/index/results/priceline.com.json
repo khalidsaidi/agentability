@@ -1,10 +1,10 @@
 {
  "domain": "priceline.com",
- "checkedAt": "2026-10-25T21:31:46.945Z",
+ "checkedAt": "2026-10-26T03:48:25.421Z",
  "status": "complete",
- "elapsedMs": 1788,
- "score": 75,
- "grade": "B",
+ "elapsedMs": 3131,
+ "score": 60,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,15 +30,15 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2613 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~179 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,7 +111,8 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "structuredData": true,
+  "ucp": false,
+  "structuredData": false,
   "sitemap": true,
   "parseableText": true
  }

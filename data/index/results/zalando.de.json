@@ -1,9 +1,9 @@
 {
  "domain": "zalando.de",
- "checkedAt": "2026-10-25T21:35:29.828Z",
+ "checkedAt": "2026-10-26T03:52:48.330Z",
  "status": "complete",
- "elapsedMs": 16437,
- "score": 50,
+ "elapsedMs": 2611,
+ "score": 45,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": true,
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 5,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact, legal/privacy."
+   "detail": "Found from homepage: legal/privacy."
   },
   {
    "id": "B1",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,6 +111,7 @@
   "llmsTxt": true,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": false,
   "sitemap": false,
   "parseableText": true

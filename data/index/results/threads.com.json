@@ -1,9 +1,9 @@
 {
  "domain": "threads.com",
- "checkedAt": "2026-10-25T21:33:35.254Z",
+ "checkedAt": "2026-10-26T03:50:39.352Z",
  "status": "complete",
- "elapsedMs": 2726,
- "score": 35,
+ "elapsedMs": 2640,
+ "score": 22,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "warn",
+   "points": 12,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~227 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~66 words of visible text."
   },
   {
    "id": "A4",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,8 +111,9 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

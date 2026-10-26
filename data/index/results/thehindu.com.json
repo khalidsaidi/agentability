@@ -1,9 +1,9 @@
 {
  "domain": "thehindu.com",
- "checkedAt": "2026-10-25T21:33:31.826Z",
+ "checkedAt": "2026-10-26T03:50:31.898Z",
  "status": "complete",
- "elapsedMs": 699,
- "score": 60,
+ "elapsedMs": 1940,
+ "score": 65,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2580 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2558 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact, legal/privacy."
+   "detail": "Found from homepage: pricing, support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,6 +111,7 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": true,
   "sitemap": true,
   "parseableText": true

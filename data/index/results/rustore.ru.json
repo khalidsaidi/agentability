@@ -1,8 +1,8 @@
 {
  "domain": "rustore.ru",
- "checkedAt": "2026-10-25T21:32:16.326Z",
+ "checkedAt": "2026-10-26T03:49:01.262Z",
  "status": "complete",
- "elapsedMs": 5895,
+ "elapsedMs": 10687,
  "score": 80,
  "grade": "B",
  "posture": "open",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1842 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1845 words of visible text."
   },
   {
    "id": "A4",
@@ -71,38 +71,47 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": true,
   "sitemap": true,
   "parseableText": true

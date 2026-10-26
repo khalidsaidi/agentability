@@ -1,20 +1,20 @@
 {
  "domain": "kia.com",
- "checkedAt": "2026-10-25T21:28:35.596Z",
+ "checkedAt": "2026-10-26T03:45:00.126Z",
  "status": "complete",
- "elapsedMs": 3747,
- "score": 75,
- "grade": "B",
+ "elapsedMs": 3039,
+ "score": 90,
+ "grade": "A",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 3237 chars and links."
   },
   {
    "id": "A2",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -100,9 +108,10 @@
   }
  ],
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": true,
   "sitemap": true,
   "parseableText": true

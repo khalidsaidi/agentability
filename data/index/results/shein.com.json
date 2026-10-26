@@ -1,20 +1,20 @@
 {
  "domain": "shein.com",
- "checkedAt": "2026-10-25T21:32:40.310Z",
+ "checkedAt": "2026-10-26T03:49:31.522Z",
  "status": "complete",
- "elapsedMs": 3081,
- "score": 80,
- "grade": "B",
+ "elapsedMs": 16008,
+ "score": 52,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 63742 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "warn",
+   "points": 12,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~160 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~147 words of visible text."
   },
   {
    "id": "A4",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -100,11 +108,12 @@
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": true,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

@@ -1,9 +1,9 @@
 {
  "domain": "si.com",
- "checkedAt": "2026-10-25T21:32:48.707Z",
+ "checkedAt": "2026-10-26T03:49:38.442Z",
  "status": "complete",
- "elapsedMs": 1774,
- "score": 85,
+ "elapsedMs": 3601,
+ "score": 90,
  "grade": "A",
  "posture": "open",
  "paradox": false,
@@ -14,7 +14,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "Present with 11922 chars and links."
+   "detail": "Present with 12028 chars and links."
   },
   {
    "id": "A2",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~40271 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2571 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: legal/privacy."
+   "detail": "Found from homepage: pricing, legal/privacy."
   },
   {
    "id": "B1",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,6 +111,7 @@
   "llmsTxt": true,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": true,
   "sitemap": true,
   "parseableText": true
