@@ -109,7 +109,7 @@ function badgeSvg(domain: string, score: number, grade: string): string {
 `;
 }
 
-function shell(opts: { title: string; description: string; canonicalPath: string; body: string; jsonLd?: object }): string {
+function shell(opts: { title: string; description: string; canonicalPath: string; body: string; jsonLd?: object; noindex?: boolean }): string {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -118,7 +118,7 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <meta name="google-site-verification" content="UwlyIMgY4AbelS-xVcScH18Jmk1-ojfzvD3vZOi1vTk">
 <title>${esc(opts.title)}</title>
 <meta name="description" content="${esc(opts.description)}">
-<link rel="canonical" href="${SITE}${opts.canonicalPath}">
+${opts.noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<link rel="canonical" href="${SITE}${opts.canonicalPath}">
 <link rel="alternate" type="application/rss+xml" title="The Agent Field Test — daily episodes" href="${SITE}/feed.xml">
 <meta property="og:title" content="${esc(opts.title)}">
 <meta property="og:description" content="${esc(opts.description)}">
@@ -1228,7 +1228,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
       ? JSON.parse(await fsp.readFile(VERDICTS_PATH, "utf8"))
       : {};
     const files = (await fsp.readdir(RESULTS_DIR)).filter((f) => f.endsWith(".json"));
-    let filteredOut = 0;
+    const filteredDomains: string[] = [];
     for (const file of files) {
       const r = JSON.parse(await fsp.readFile(path.join(RESULTS_DIR, file), "utf8"));
       if (r.status !== "complete") continue;
@@ -1236,7 +1236,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
       // has not reached it, not that it is adult or gambling.
       const verdict = contentVerdicts[r.domain];
       if (verdict && verdict !== "ok") {
-        filteredOut += 1;
+        filteredDomains.push(r.domain);
         continue;
       }
       const rank = summary.leaderboard.find((x) => x.domain === r.domain)?.rank;
@@ -1366,6 +1366,43 @@ required beyond the link it already carries.</p>
         "utf8"
       );
     }
+
+    // A filtered domain's page stops being generated, and the URL still has to
+    // tell Google something. A 301 to /ai-index/ was the wrong instruction: a
+    // redirect asks Google to MERGE the old URL into the target, which would
+    // attach gambling-query relevance to the index page — the opposite of
+    // removing it. (Commit 26dfcbc's 301s were right for pages we wanted to keep
+    // ranking; these we want gone, which is a different instruction.)
+    //
+    // "Remove this from your index" is noindex. Firebase static hosting cannot
+    // return 410 without Cloud Functions, and this project deliberately runs
+    // hosting-only, so each filtered URL serves a bare noindex stub instead:
+    // nothing about the site it used to describe, nothing worth keeping, and an
+    // explicit instruction to drop it. Once Search Console reports them gone,
+    // these stubs can be deleted outright.
+    for (const domain of filteredDomains) {
+      const dir = path.join(OUT, "ai-index/site", domain);
+      await fsp.mkdir(dir, { recursive: true });
+      await fsp.writeFile(
+        path.join(dir, "index.html"),
+        shell({
+          title: "Page removed",
+          description: "This report is no longer published.",
+          canonicalPath: `/ai-index/site/${domain}/`,
+          noindex: true,
+          body: `
+<p class="eyebrow"><a href="/ai-index/" style="text-decoration:none;color:inherit">← AI-Readiness Index</a></p>
+<h1>This report is no longer published</h1>
+<p class="lede">The Index covers the most-visited sites on the web, minus pornography, piracy and gambling. This domain
+falls into one of those categories, so its report has been withdrawn and this page asks search engines to drop it.
+How the panel is selected, and every classification behind it, is in the <a href="/methodology/">methodology</a>.</p>
+<div class="cta"><b>Looking for a site's score?</b> <a href="/ai-index/">Search the Index</a> — ${s.audited} sites,
+free, updated weekly.</div>`,
+        }),
+        "utf8"
+      );
+    }
+    console.log(`Content filter: ${filteredDomains.length} domains withdrawn (noindex stubs)`);
   }
 
   // ---------- Shops: can an agent actually buy? ----------
@@ -1733,7 +1770,18 @@ nothing you can't test with curl.</p>
   }
 
   // ---------- Machine surfaces (dogfood) ----------
-  const domains = summary ? summary.leaderboard.map((r) => r.domain) : [];
+  // The sitemap has to agree with the pages. A withdrawn domain still sits in
+  // summary.json until the next index run rebuilds the panel, and listing a URL
+  // in the sitemap while that URL says noindex are contradictory instructions —
+  // so filter here too rather than waiting a week for the panel to catch up.
+  const sitemapVerdicts: Record<string, string> = fs.existsSync(VERDICTS_PATH)
+    ? JSON.parse(await fsp.readFile(VERDICTS_PATH, "utf8"))
+    : {};
+  const domains = summary
+    ? summary.leaderboard
+        .map((r) => r.domain)
+        .filter((d) => !sitemapVerdicts[d] || sitemapVerdicts[d] === "ok")
+    : [];
   await fsp.writeFile(
     path.join(OUT, "llms.txt"),
     [

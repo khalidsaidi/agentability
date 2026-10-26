@@ -103,7 +103,11 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
             content:
               `For each domain say porn, piracy, gambling, or ok.\n` +
               `piracy = illegal streaming/download of film, TV, anime, manga, music, software, cracked apps.\n` +
-              `gambling = betting, casino, satta matka, lottery, poker, sportsbook, or odds/tipster sites.\n` +
+              `gambling = the site's own purpose is betting or gaming for money: a bookmaker, casino,\n` +
+              `satta matka or lottery-results site, poker room, sportsbook, prediction market, or a\n` +
+              `tipster/odds service. Judge the site's primary purpose, not whether gambling is mentioned:\n` +
+              `a bank or government agency that happens to also run a national lottery is ok, and so are\n` +
+              `news, sports-results, statistics and survey sites.\n` +
               `Format one per line: domain|porn or domain|piracy or domain|gambling or domain|ok\n\n${chunk.join("\n")}`,
           },
         ],
