@@ -1,10 +1,10 @@
 {
  "domain": "playhop.com",
- "checkedAt": "2026-10-07T22:53:47.590Z",
+ "checkedAt": "2026-10-26T13:30:14.992Z",
  "status": "complete",
- "elapsedMs": 4312,
- "score": 42,
- "grade": "D",
+ "elapsedMs": 3237,
+ "score": 25,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "warn",
-   "points": 12,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~54 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact."
+   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
   },
   {
    "id": "B1",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,10 +111,9 @@
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": false,
   "sitemap": true,
   "parseableText": false
- },
- "carriedForward": true,
- "carriedForwardAt": "2026-10-26T04:04:39.670Z"
+ }
 }

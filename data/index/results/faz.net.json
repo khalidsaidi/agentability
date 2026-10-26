@@ -1,9 +1,9 @@
 {
  "domain": "faz.net",
- "checkedAt": "2026-10-26T03:42:55.112Z",
+ "checkedAt": "2026-10-26T13:25:06.526Z",
  "status": "complete",
- "elapsedMs": 4045,
- "score": 0,
+ "elapsedMs": 2838,
+ "score": 55,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~5053 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: pricing, support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": false,
-  "parseableText": false
+  "parseableText": true
  }
 }

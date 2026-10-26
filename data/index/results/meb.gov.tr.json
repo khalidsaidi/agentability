@@ -1,11 +1,11 @@
 {
  "domain": "meb.gov.tr",
- "checkedAt": "2026-10-26T04:01:15.064Z",
+ "checkedAt": "2026-10-26T13:28:07.023Z",
  "status": "complete",
- "elapsedMs": 13230,
- "score": 30,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 31143,
+ "score": 45,
+ "grade": "D",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1347 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1342 words of visible text."
   },
   {
    "id": "A4",
@@ -84,11 +84,11 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
@@ -96,15 +96,15 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
  "signals": {

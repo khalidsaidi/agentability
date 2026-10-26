@@ -1,9 +1,9 @@
 {
  "domain": "screener.in",
- "checkedAt": "2026-10-26T03:49:21.195Z",
+ "checkedAt": "2026-10-26T13:31:22.647Z",
  "status": "complete",
- "elapsedMs": 3135,
- "score": 55,
+ "elapsedMs": 3030,
+ "score": 65,
  "grade": "C",
  "posture": "open",
  "paradox": false,
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -84,27 +84,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "signals": {
@@ -113,7 +113,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }
