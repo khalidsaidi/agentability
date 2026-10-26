@@ -12,6 +12,9 @@ import { GUIDES, type GuideContext } from "./lib/guides";
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
 const COMMERCE_PATH = path.join(REPO_ROOT, "data/index/commerce.json");
+// The porn/piracy/gambling verdicts build-panel.ts caches. Page generation has
+// to honour them too — see the comment at the site-report loop.
+const VERDICTS_PATH = path.join(REPO_ROOT, "data/index/classification.json");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
 const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
@@ -1215,10 +1218,27 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
       "utf8"
     );
 
+    // The content filter has to apply here too, not just to the panel.
+    // build-panel.ts keeps only domains judged "ok", but these pages are built
+    // from the results directory, which keeps every domain ever audited — so a
+    // site filtered out of the ranked table months ago still had a public report
+    // page. janitorai.com was judged "porn" and was still served at
+    // /ai-index/site/janitorai.com/ until this check existed.
+    const contentVerdicts: Record<string, string> = fs.existsSync(VERDICTS_PATH)
+      ? JSON.parse(await fsp.readFile(VERDICTS_PATH, "utf8"))
+      : {};
     const files = (await fsp.readdir(RESULTS_DIR)).filter((f) => f.endsWith(".json"));
+    let filteredOut = 0;
     for (const file of files) {
       const r = JSON.parse(await fsp.readFile(path.join(RESULTS_DIR, file), "utf8"));
       if (r.status !== "complete") continue;
+      // Unjudged domains still get a page: a missing verdict means the classifier
+      // has not reached it, not that it is adult or gambling.
+      const verdict = contentVerdicts[r.domain];
+      if (verdict && verdict !== "ok") {
+        filteredOut += 1;
+        continue;
+      }
       const rank = summary.leaderboard.find((x) => x.domain === r.domain)?.rank;
       const checksRows = r.checks
         .map(

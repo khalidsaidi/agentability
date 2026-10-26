@@ -8,7 +8,7 @@
 // a list that changes daily.
 //
 // Popularity is all any of these sources give — none of them, Google's included,
-// carries a category field. So porn and piracy are removed by asking a model,
+// carries a category field. So porn, piracy and gambling are removed by asking a model,
 // once per domain, and caching the verdict. A cache rather than a blocklist:
 // tomorrow's new entrants get judged on arrival instead of waiting for someone
 // to maintain a list.
@@ -63,7 +63,7 @@ const INFRASTRUCTURE =
 // Login walls and API hosts: an agent sent here learns nothing about the brand.
 const NOT_A_DESTINATION = /^(accounts|admin|adsmanager|adssettings|auth|login|signin|sso|api|cdn|static|assets|img|media|mail|webmail|smtp|mx|ns\d|wap|ads?)\./i;
 
-type Verdicts = Record<string, "ok" | "porn" | "piracy">;
+type Verdicts = Record<string, "ok" | "porn" | "piracy" | "gambling">;
 
 async function trancoTop(): Promise<{ hosts: string[]; listId: string }> {
   const meta = await fetch("https://tranco-list.eu/api/lists/date/latest", {
@@ -101,9 +101,10 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
           {
             role: "user",
             content:
-              `For each domain say porn, piracy, or ok.\n` +
+              `For each domain say porn, piracy, gambling, or ok.\n` +
               `piracy = illegal streaming/download of film, TV, anime, manga, music, software, cracked apps.\n` +
-              `Format one per line: domain|porn or domain|piracy or domain|ok\n\n${chunk.join("\n")}`,
+              `gambling = betting, casino, satta matka, lottery, poker, sportsbook, or odds/tipster sites.\n` +
+              `Format one per line: domain|porn or domain|piracy or domain|gambling or domain|ok\n\n${chunk.join("\n")}`,
           },
         ],
       });
@@ -112,7 +113,7 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
         .map((b) => b.text)
         .join("\n");
       for (const line of text.split("\n")) {
-        const m = /([a-z0-9][a-z0-9.-]*\.[a-z]{2,})\s*[|:=-]\s*(porn|piracy|ok)/i.exec(line);
+        const m = /([a-z0-9][a-z0-9.-]*\.[a-z]{2,})\s*[|:=-]\s*(porn|piracy|gambling|ok)/i.exec(line);
         if (m) verdicts[m[1].toLowerCase()] = m[2].toLowerCase() as Verdicts[string];
       }
     } catch (error) {
@@ -189,7 +190,7 @@ async function main() {
     .sort();
   if (offline.size) console.log(`  ${offline.size} domain(s) dropped: DNS does not resolve`);
   const droppedNotInCrux = candidates.length - eligible.length;
-  const removed = eligible.filter((d) => verdicts[d] === "porn" || verdicts[d] === "piracy");
+  const removed = eligible.filter((d) => verdicts[d] && verdicts[d] !== "ok");
   const unknown = eligible.filter((d) => !verdicts[d]);
 
   await fsp.writeFile(DOMAINS_PATH, panel.join("\n") + "\n", "utf8");
@@ -208,7 +209,7 @@ async function main() {
         cruxListSize: crux.size,
         droppedNotInCrux,
         droppedInfrastructure: droppedInfra,
-        droppedAdultOrPiracy: removed.length,
+        droppedByContentFilter: removed.length,
         droppedOffline: offline.size,
         unclassified: unknown.length,
         classifier: CLASSIFIER,
@@ -220,7 +221,7 @@ async function main() {
   );
 
   console.log(
-    `\nPanel: ${panel.length} sites  (removed ${removed.length} adult/piracy, ${droppedNotInCrux} not in CrUX, ${unknown.length} unclassified)\n` +
+    `\nPanel: ${panel.length} sites  (removed ${removed.length} adult/piracy/gambling, ${droppedNotInCrux} not in CrUX, ${unknown.length} unclassified)\n` +
       `Source: Tranco ${listId}, top ${TAKE} → ${DOMAINS_PATH}`
   );
 }
