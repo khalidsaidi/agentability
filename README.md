@@ -74,4 +74,4 @@ Dispute a check or a transcript: open an issue — everything is versioned in pu
 
 ## License
 
-MIT
+Apache License 2.0 — see [LICENSE](LICENSE).
