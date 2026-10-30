@@ -1,10 +1,10 @@
 {
  "domain": "temu.com",
- "checkedAt": "2026-10-26T13:39:15.215Z",
+ "checkedAt": "2026-10-30T21:11:13.245Z",
  "status": "complete",
- "elapsedMs": 153,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 1360,
+ "score": 65,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,34 +27,34 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~206 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -84,23 +84,23 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
-  "sitemap": true,
-  "parseableText": false
+  "structuredData": true,
+  "sitemap": false,
+  "parseableText": true
  }
 }

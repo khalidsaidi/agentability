@@ -1,11 +1,11 @@
 {
  "domain": "ptt.cc",
- "checkedAt": "2026-10-26T13:30:32.214Z",
+ "checkedAt": "2026-10-30T21:09:26.864Z",
  "status": "complete",
- "elapsedMs": 2275,
- "score": 27,
- "grade": "F",
- "posture": "open",
+ "elapsedMs": 1985,
+ "score": 12,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -84,15 +84,15 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
@@ -100,11 +100,11 @@
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {

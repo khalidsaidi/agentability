@@ -1,11 +1,11 @@
 {
  "domain": "express.co.uk",
- "checkedAt": "2026-10-26T13:25:01.025Z",
+ "checkedAt": "2026-10-30T21:04:07.977Z",
  "status": "complete",
- "elapsedMs": 69,
- "score": 15,
- "grade": "F",
- "posture": "open",
+ "elapsedMs": 625,
+ "score": 65,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,42 +19,42 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, CCBot."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~2733 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "Found from homepage: pricing, support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -84,19 +84,19 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
@@ -104,7 +104,7 @@
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
  "signals": {
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
-  "sitemap": false,
-  "parseableText": false
+  "structuredData": true,
+  "sitemap": true,
+  "parseableText": true
  }
 }

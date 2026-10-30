@@ -1,11 +1,11 @@
 {
  "domain": "goodhousekeeping.com",
- "checkedAt": "2026-10-26T13:25:47.526Z",
+ "checkedAt": "2026-10-30T21:04:55.901Z",
  "status": "complete",
- "elapsedMs": 1199,
- "score": 80,
+ "elapsedMs": 1661,
+ "score": 73,
  "grade": "B",
- "posture": "open",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: PerplexityBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1359 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1299 words of visible text."
   },
   {
    "id": "A4",
@@ -96,15 +96,15 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "blocked"
   }
  ],
  "signals": {

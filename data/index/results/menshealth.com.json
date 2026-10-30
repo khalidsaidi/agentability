@@ -1,11 +1,11 @@
 {
  "domain": "menshealth.com",
- "checkedAt": "2026-10-26T13:28:14.737Z",
+ "checkedAt": "2026-10-30T21:07:16.618Z",
  "status": "complete",
- "elapsedMs": 980,
- "score": 80,
- "grade": "B",
- "posture": "open",
+ "elapsedMs": 1050,
+ "score": 68,
+ "grade": "C",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: PerplexityBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1483 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1572 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: pricing, docs/api, legal/privacy."
+   "detail": "Found from homepage: docs/api, legal/privacy."
   },
   {
    "id": "B1",
@@ -96,15 +96,15 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "blocked"
   }
  ],
  "signals": {
