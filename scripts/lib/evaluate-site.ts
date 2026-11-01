@@ -496,9 +496,17 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     // pricing page. At most four extra fetches per site, once a week.
     const CONFIRM: Record<string, RegExp> = {
       pricing: /(\$|€|£|¥|\bprice|\bpricing|\bplans?\b|per month|\/mo\b|kostenlos|preis|tarif|precio|prezzo|kr\b|gratis|free tier|abonnement)/i,
-      "support/contact": /(contact|support|help ?cent|faq|kontakt|hilfe|ayuda|assistance|e-?mail|telefon|phone|\+\d[\d ()-]{6,})/i,
-      "docs/api": /(api|endpoint|documentation|developer|sdk|reference|authentication|curl |http request)/i,
-      "legal/privacy": /(privacy|cookie|terms|gdpr|datenschutz|impressum|personuppgift|rgpd|processing of personal)/i,
+      // A support page offers a way to reach someone. Requiring only the word
+      // "support" credited grow.google/certificates/it-support/ — a course about
+      // becoming an IT support technician — as Google's customer support.
+      "support/contact":
+        /(contact ?(us|form)?|kontakt|contacto|contatta|yhteystiedot|help ?cent|helpdesk|customer (service|support|care)|kundtjanst|asiakaspalvelu|service ?client|e-?mail|@[a-z0-9.-]+\.[a-z]{2,}|telefon|phone|\+\d[\d ()-]{6,}|live ?chat|raise a ticket|support ?ticket)/i,
+      "docs/api": /(api|endpoint|documentation|documentación|developer|sdk|reference|authentication|curl |http request)/i,
+      // Accented forms matter: clarin.com's "Términos y condiciones" page failed
+      // on "terms" and was then credited as support instead, because its URL
+      // sits under /ayuda/.
+      "legal/privacy":
+        /(privacy|privacidad|privacidade|cookie|terms|términos|terminos|condiciones|condições|gdpr|datenschutz|impressum|personuppgift|tietosuoja|käyttöehdot|rgpd|mentions légales|processing of personal)/i,
     };
     type Hit = { name: string; url?: string; status?: number; confirmed: boolean; note: string };
     const hits: Hit[] = [];
@@ -506,6 +514,29 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       const best = urlForCategory(t.words);
       const url = best?.url;
       const matchedWord = best?.word ?? "";
+      // One URL can be nominated by two categories — /ayuda/terminos-condiciones
+      // is "help" to one and "terms" to the other. The last path segment says
+      // what the page is, so the other category does not get to claim it.
+      if (url && matchedWord) {
+        const lastSeg = (() => {
+          try {
+            const segs = new URL(url).pathname.split("/").filter(Boolean);
+            return (segs[segs.length - 1] ?? "").toLowerCase();
+          } catch {
+            return "";
+          }
+        })();
+        const ownerElsewhere = TASK_WORDS.find(
+          (other) =>
+            other.name !== t.name &&
+            other.words.some((w) => lastSeg === w || lastSeg.split(/[-_.]+/).some((b) => b === w || (w.length > 4 && b.startsWith(w))))
+        );
+        const minePresent = t.words.some((w) => lastSeg.split(/[-_.]+/).some((b) => b === w || (w.length > 4 && b.startsWith(w))));
+        if (ownerElsewhere && !minePresent) {
+          hits.push({ name: t.name, url, confirmed: false, note: `that link is ${ownerElsewhere.name}, not ${t.name}` });
+          continue;
+        }
+      }
       // Anchor text is the fallback when the URL is an opaque id; nothing to fetch.
       if (!url) {
         const inAnchor = t.words.some(
