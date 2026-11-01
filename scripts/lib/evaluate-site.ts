@@ -515,10 +515,17 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         continue;
       }
       const page = await get(url, "text/html");
-      if (page.status === 0 || page.status >= 400) {
-        // The link exists but we could not read it. A block or a timeout is not
-        // the site failing a check, so credit the link and say it is unverified.
+      // Being blocked is not the site's failure, so a wall still counts and is
+      // marked unverified. A 404 is different: the page is not there, and
+      // crediting it was wrong. api.marksandspencer.com answers 404 with an API
+      // gateway fault and was scoring Marks & Spencer a developer-docs point.
+      const BLOCKED = new Set([401, 403, 429, 451]);
+      if (page.status === 0 || BLOCKED.has(page.status) || page.status >= 500) {
         hits.push({ name: t.name, url, status: page.status, confirmed: true, note: page.status ? `link returns ${page.status}, content unverified` : "link unreachable, content unverified" });
+        continue;
+      }
+      if (page.status >= 400) {
+        hits.push({ name: t.name, url, status: page.status, confirmed: false, note: `link returns ${page.status} — the page is not there` });
         continue;
       }
       const body = stripToText(page.text).slice(0, 20000);
