@@ -342,13 +342,15 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       {
         name: "pricing",
         words: ["pricing", "prices", "price", "plans", "tarif", "tarifs", "tarife", "preise", "preis",
-          "precios", "precio", "prezzi", "prezzo", "priser", "prijzen", "cennik", "abonnements", "abonnemang"],
+          "precios", "precio", "prezzi", "prezzo", "priser", "prijzen", "cennik", "abonnements",
+          "abonnemang", "hinnasto", "hinnat", "priser", "precos"],
       },
       {
         name: "support/contact",
         words: ["contact", "contacts", "support", "help", "helpdesk", "kontakt", "kontakta", "contacto",
           "contatti", "contato", "kontakty", "assistance", "assistenza", "ayuda", "hilfe", "hjalp",
-          "customer-service", "kundservice", "kundtjanst", "iletisim"],
+          "customer-service", "kundservice", "kundtjanst", "iletisim", "yhteystiedot", "yhteystieto",
+          "asiakaspalvelu", "kundeservice", "obsluga-klienta", "atendimento", "servicio-al-cliente"],
       },
       {
         name: "docs/api",
@@ -360,7 +362,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         words: ["privacy", "privacidad", "privacidade", "privacy-policy", "integritetspolicy", "integritet",
           "terms", "tos", "legal", "impressum", "datenschutz", "mentions-legales", "villkor", "vilkar",
           "allmanna-villkor", "privatlivspolitik", "cgu", "cgv", "termini", "terminos", "regulamin",
-          "voorwaarden", "kvkk"],
+          "voorwaarden", "kvkk", "tietosuoja", "kayttoehdot", "personvern", "privatliv"],
       },
     ];
     // Only the site's own links count: a third-party asset or widget host is not
@@ -369,6 +371,9 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     for (const m of home.text.matchAll(/href=["']([^"']+)["']/gi)) {
       const raw = m[1].trim();
       if (!raw || raw.startsWith("#") || /^(mailto|tel|javascript):/i.test(raw)) continue;
+      // A script is not a documentation page. fortune.com scored docs/api off
+      // /api/tinypass.min.js, which is a paywall bundle.
+      if (/\.(js|mjs|css|json|xml|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|pdf|zip|mp4|webm)(\?|$)/i.test(raw)) continue;
       try {
         const url = new URL(raw, `${origin}/`);
         // Same registrable domain, so help.shopify.com and docs.example.com count —
@@ -478,9 +483,13 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     const hits: Hit[] = [];
     for (const t of TASK_WORDS) {
       let url: string | undefined;
+      let matchedWord = "";
       for (const w of t.words) {
         url = urlForWord(w);
-        if (url) break;
+        if (url) {
+          matchedWord = w;
+          break;
+        }
       }
       // Anchor text is the fallback when the URL is an opaque id; nothing to fetch.
       if (!url) {
@@ -498,7 +507,14 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         continue;
       }
       const body = stripToText(page.text).slice(0, 20000);
-      const ok = CONFIRM[t.name].test(body);
+      // Two ways to confirm. The category vocabulary is English-leaning, so a
+      // genuine Finnish contact page — "Yhteystiedot | Iltalehti", 571 words,
+      // not one English contact word in it — failed on content alone. A
+      // destination whose own <title> echoes the word that nominated it is
+      // strong evidence in any language, and still rejects lemonde.fr's news
+      // story, whose title is about shipping and not "tarifs".
+      const title = (/<title[^>]*>([\s\S]{0,160}?)<\/title>/i.exec(page.text)?.[1] ?? "").toLowerCase();
+      const ok = CONFIRM[t.name].test(body) || (matchedWord.length > 4 && title.includes(matchedWord));
       hits.push({ name: t.name, url, status: page.status, confirmed: ok, note: ok ? "confirmed" : "page does not read as this" });
     }
     const found = hits.filter((h) => h.confirmed);
@@ -516,7 +532,9 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       detail:
         (found.length
           ? `Reached from homepage: ${found.map((h) => `${h.name}${short(h.url)}`).join(", ")}.`
-          : "None of pricing, support, docs, or legal are reachable from the homepage.") +
+          : home.ok
+            ? "None of pricing, support, docs, or legal are reachable from the homepage."
+            : `The homepage itself returned ${home.status} to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing.`) +
         (rejected.length ? ` Link found but not confirmed: ${rejected.map((h) => `${h.name}${short(h.url)}`).join(", ")}.` : ""),
     });
 
