@@ -1,6 +1,11 @@
 name: deploy
 
 on:
+  # Lets a deploy be re-run without a dummy commit. Needed because an index run
+  # dispatched before a push checks out the old code and can overwrite a newer
+  # deploy with a stale render — which is exactly how 46 withdrawn domains
+  # reappeared in the public tables after they had been verified gone.
+  workflow_dispatch:
   push:
     branches: [main]
     paths-ignore:
