@@ -1519,8 +1519,10 @@ five independent sources — and keeps only the domains that also appear in Goog
 real visits by real Chrome users. Two independent rankings have to agree before a site is in.</p>
 <p class="lede">Two things are then removed. <b>Infrastructure</b>: CDNs, DNS, ad servers, API hosts and login walls —
 nobody is ever sent to <code>gtld-servers.net</code> to find a price, so scoring it tells you nothing.
-<b>Pornography and piracy</b>: neither ranking carries a category, and Google publishes none, so each domain is
-classified once by a model and the verdict is cached and published alongside the data. You can check every call we
+<b>Pornography, piracy and gambling</b>: neither ranking carries a category, and Google publishes none, so each
+domain is classified once by a model and the verdict is cached and published alongside the data. Hand corrections to
+those verdicts live in a separate file with a reason each, so <code>classification.json</code> stays the model's own
+output and nothing is quietly edited into it. You can check every call we
 made in <code>/data/classification.json</code>, and the exact source list is recorded in
 <code>/data/panel-source.json</code> with the Tranco list ID, so anyone can rebuild the identical panel.</p>
 <p class="lede">This replaced a hand-typed list of 113 sites that was mostly AI startups — which could not honestly
@@ -1534,14 +1536,29 @@ answer the question this site asks, because it was not the web people actually u
 <tr><td><span class="chip">A4</span></td><td><b>Structured data</b> — valid schema.org JSON-LD so machines learn what the entity is.</td><td class="num">15</td></tr>
 <tr><td><span class="chip">A5</span></td><td><b>Sitemap</b> — advertised in robots.txt or served at /sitemap.xml.</td><td class="num">10</td></tr>
 <tr><td><span class="chip">A6</span></td><td><b>Everyday agent tasks</b> — pricing, support, docs, and legal reachable from the homepage; the links an assistant needs for the questions people actually ask.</td><td class="num">20</td></tr>
-<tr><td><span class="chip">B1</span></td><td><b>MCP server</b> advertised at /.well-known/mcp.json — bonus; the emerging standard for callable sites.</td><td class="num">+5</td></tr>
+<tr><td><span class="chip">B1</span></td><td><b>MCP server</b> — a server card at <code>/.well-known/mcp/server-card.json</code> or <code>/.well-known/mcp.json</code>, or a dedicated <code>mcp.</code> host named in llms.txt and confirmed live. An auth wall counts as present; a 404 does not. Bonus.</td><td class="num">+5</td></tr>
 <tr><td><span class="chip">B2</span></td><td><b>OpenAPI</b> document published — bonus; only relevant where an API exists.</td><td class="num">+5</td></tr>
+<tr><td><span class="chip">B3</span></td><td><b>UCP commerce profile</b> at <code>/.well-known/ucp</code> — the Universal Commerce Protocol, which tells an agent what it can buy and how to pay. Bonus.</td><td class="num">+5</td></tr>
 </tbody>
 </table>
 <h2>Grades</h2>
 <p class="lede">A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40 · F &lt; 40. Sites whose robots.txt blocks essentially all AI crawlers
 are labeled <b>“Closed by policy”</b> instead of graded — refusing agents is a legitimate choice, and we report it as
 one rather than pretending it's a defect.</p>
+<h2>How wrong are these numbers</h2>
+<p class="lede">Every rule here is a guess about someone else's site, so each one has a measured error rate rather
+than an assurance. The samples are drawn with a fixed seed, so anyone can redraw the identical sample and re-judge it;
+the full record, with each interval and what it does not cover, is at <code>/data/validation.json</code>.</p>
+<table>
+<thead><tr><th>Rule</th><th>Measured</th><th>What the bound does not cover</th></tr></thead>
+<tbody>
+<tr><td><b>A6</b> everyday tasks</td><td>0 errors in 56 decisions on a held-out sample, 95% CI 0–6.4%</td><td>Measured after two fixes; the same rule scored 10% (CI 4.0–23.1) before them. Readable sites only.</td></tr>
+<tr><td><b>Content filter</b>, removed side</td><td>4 of 53 removed wrongly, 7.5%, 95% CI 3.0–17.9%</td><td>—</td></tr>
+<tr><td><b>Content filter</b>, kept side</td><td>0 of 44 readable kept wrongly, 95% CI 0–8.0%</td><td>A third of sampled sites could not be read at all, so nothing is known about them.</td></tr>
+<tr><td><b>Platform detection</b></td><td>0 of 3 wrong labels, 0 of 14 missed</td><td>Samples that small bound almost nothing: CI 0–56.2% and 0–21.5%.</td></tr>
+<tr><td><b>Shop membership</b></td><td>1 of 20 wrong, 5%, 95% CI 0.9–23.6%</td><td>Where the line sits — retail only, or anything you can buy from — is a judgement, not an error.</td></tr>
+</tbody>
+</table>
 <h2>The Agent Field Test</h2>
 <p class="lede">The weekly <a href="/fieldtest/">Field Test</a> is the empirical companion to the Index: instead of
 checking plumbing, it watches a real agent try real errands. The rules:</p>
@@ -1686,6 +1703,10 @@ no rate-limit games. Cite it, chart it, build on it.</p>
 <tbody>
 <tr><td><code>/data/summary.json</code></td><td>The latest run: aggregate stats (average score, llms.txt adoption, blocking and closed percentages, paradox count) plus the full ranked leaderboard with score, grade, posture, and signal flags per domain.</td></tr>
 <tr><td><code>/data/history/{YYYY-MM-DD}.json</code></td><td>One snapshot per weekly run — the adoption time series. Week zero is 2026-08-27.</td></tr>
+<tr><td><code>/data/classification.json</code></td><td>One verdict per domain — ok, porn, piracy or gambling — exactly as the classifier returned it. What the panel filter acted on.</td></tr>
+<tr><td><code>/data/classification-overrides.json</code></td><td>The hand corrections to those verdicts, with a reason for each, kept separate so the file above stays the model's own output.</td></tr>
+<tr><td><code>/data/validation.json</code></td><td>The measured error rate of each rule, with its sample size, seed, confidence interval and the limits of what it bounds.</td></tr>
+<tr><td><code>/data/panel-source.json</code></td><td>The exact inputs the panel was derived from, including the Tranco list ID, so the identical panel can be rebuilt.</td></tr>
 </tbody>
 </table>
 <p class="lede">Raw per-site check results live in the repository under
@@ -1922,7 +1943,7 @@ ${episodes
   if (summary) await fsp.writeFile(path.join(OUT, "data/summary.json"), JSON.stringify(summary, null, 1), "utf8");
   // How the panel was chosen, and every adult/piracy call made — published so the
   // selection is auditable rather than taken on trust.
-  for (const f of ["classification.json", "panel-source.json"]) {
+  for (const f of ["classification.json", "panel-source.json", "validation.json", "classification-overrides.json"]) {
     const src = path.join(REPO_ROOT, "data/index", f);
     if (fs.existsSync(src)) await fsp.copyFile(src, path.join(OUT, "data", f));
   }
