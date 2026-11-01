@@ -1,10 +1,10 @@
 {
  "domain": "playinboss.com",
- "checkedAt": "2026-10-30T21:09:11.347Z",
+ "checkedAt": "2026-11-01T21:36:24.861Z",
  "status": "complete",
- "elapsedMs": 3904,
- "score": 75,
- "grade": "B",
+ "elapsedMs": 3029,
+ "score": 15,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,34 +27,34 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1669 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact, legal/privacy."
+   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
   },
   {
    "id": "B1",
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
-  "sitemap": true,
-  "parseableText": true
+  "structuredData": false,
+  "sitemap": false,
+  "parseableText": false
  }
 }
