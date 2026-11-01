@@ -1,9 +1,9 @@
 {
  "domain": "thetimes.com",
- "checkedAt": "2026-11-01T22:21:47.435Z",
+ "checkedAt": "2026-11-01T22:55:56.680Z",
  "status": "complete",
- "elapsedMs": 3193,
- "score": 50,
+ "elapsedMs": 1823,
+ "score": 10,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,34 +27,34 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~4519 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~14 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/static/contact-us/), legal/privacy."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
   },
   {
    "id": "B1",
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
-  "sitemap": false,
-  "parseableText": true
+  "structuredData": false,
+  "sitemap": true,
+  "parseableText": false
  }
 }
