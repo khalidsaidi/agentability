@@ -971,6 +971,21 @@ async function main() {
     ? new Date(summary.generatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })
     : null;
 
+  // The content filter has to reach the tables, not just the pages. Withdrawing
+  // a report left the domain listed as a row on /ai-index/ and /shops/, linking
+  // to its own withdrawal stub — 46 of them, including the gambling and adult
+  // names the filter exists to remove. domains.txt still carries them until the
+  // next `npm run panel`, so the list is filtered here where it is rendered.
+  if (summary) {
+    const verdicts = readVerdicts();
+    const before = summary.leaderboard.length;
+    summary.leaderboard = summary.leaderboard
+      .filter((r) => !verdicts[r.domain] || verdicts[r.domain] === "ok")
+      .map((r, i) => ({ ...r, rank: i + 1 }));
+    const dropped = before - summary.leaderboard.length;
+    if (dropped) console.log(`Content filter: ${dropped} withdrawn domain(s) removed from the ranked tables`);
+  }
+
   const history: Array<{ date: string } & Record<string, number>> = [];
   if (fs.existsSync(HISTORY_DIR)) {
     for (const file of (await fsp.readdir(HISTORY_DIR)).sort()) {
