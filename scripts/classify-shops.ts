@@ -85,11 +85,19 @@ async function classify(unseen: string[], verdicts: Verdicts): Promise<void> {
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const prompt = (chunk: string[]) =>
     `For each domain say shop or not-shop.\n` +
-    `shop = you can buy goods or services on the site itself: a retailer, a brand selling direct, ` +
-    `a marketplace, a grocery or food-delivery service, a ticket or travel booking site, ` +
-    `or a business selling a paid subscription or plan to the public.\n` +
-    `not-shop = news, reference, social, government, sport, banking, a company site with no ` +
-    `self-serve purchase, or a tool that is free only.\n` +
+    // "a business selling a paid subscription" was in this prompt and is not what
+    // the classifier does: it calls ekstrabladet.dk and independent.co.uk
+    // not-shop, which is right — taken literally that clause makes every
+    // paywalled newspaper, every SaaS and Spotify a shop, and /shops/ becomes
+    // half the web rather than a page about buying things. The rule below is the
+    // one actually being applied, written down so it is a rule and not a taste.
+    `shop = the site's primary purpose is selling goods or services to the public, and a ` +
+    `visitor can start a purchase on the site: a retailer, a brand selling direct, a marketplace, ` +
+    `a grocery or food-delivery service, a ticket or travel booking site, a telecom or hosting ` +
+    `provider selling plans, or software sold self-serve.\n` +
+    `not-shop = news, reference, social, government, sport, banking, or a free tool — even when ` +
+    `it sells a subscription. A newspaper behind a paywall is a newspaper. A company site with no ` +
+    `self-serve purchase is not a shop.\n` +
     `Judge the site, not the brand: a carmaker's brochure site is not-shop; its online store is.\n` +
     `Format one per line: domain|shop or domain|not-shop\n\n${chunk.join("\n")}`;
 

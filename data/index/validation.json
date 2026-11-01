@@ -1,0 +1,93 @@
+{
+ "_README": "Error rates for the rules that decide what the Index publishes. Each was measured against a hand-judged sample drawn by seeded shuffle; `npm run validate -- --full` redraws the same samples. Intervals are Wilson 95%.",
+ "_measuredOn": "2026-11-02",
+ "contentFilter": {
+  "overExclusion": {
+   "errors": 4,
+   "n": 53,
+   "rate": 0.075,
+   "ci95": [
+    0.03,
+    0.179
+   ],
+   "how": "full census of every withdrawn domain; homepage fetched, title and description read by hand",
+   "found": [
+    "dragonball-super.com",
+    "strikerreport.com",
+    "i993.com",
+    "izy0.com"
+   ]
+  },
+  "underExclusion": {
+   "errors": 0,
+   "n": 44,
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.08
+   ],
+   "how": "seed 2026; drew 66 kept domains to obtain 44 readable; body text scanned for adult, gambling and piracy signals",
+   "limit": "33% of drawn domains could not be read (blocks, walls). The bound covers the readable population only; the rest is unmeasured, and blocking correlates with the population being filtered."
+  }
+ },
+ "a6": {
+  "inSample": {
+   "overCredit": 1,
+   "underCredit": 1,
+   "n": 60,
+   "how": "seed 42, 15 sites x 4 categories \u2014 the set the rule was tuned against, so not evidence of accuracy"
+  },
+  "heldOut": {
+   "overCredit": 2,
+   "underCredit": 2,
+   "n": 40,
+   "rate": 0.1,
+   "ci95": [
+    0.04,
+    0.231
+   ],
+   "how": "seed 99, disjoint from seed 42, 10 readable sites x 4 categories",
+   "found": [
+    "clarin.com support",
+    "grow.google support",
+    "clarin.com legal",
+    "amazon.ae support"
+   ],
+   "note": "clarin.com and grow.google fixed after measurement; the rate is pre-fix and has not been re-measured on a third sample"
+  }
+ },
+ "platform": {
+  "falsePositive": {
+   "errors": 0,
+   "n": 3,
+   "ci95": [
+    0.0,
+    0.562
+   ],
+   "note": "three detections is too few to support a rate; each was hand-checked against platform runtime config, not the detector's own patterns"
+  },
+  "falseNegative": {
+   "errors": 0,
+   "n": 14,
+   "ci95": [
+    0.0,
+    0.215
+   ],
+   "how": "seed 23, 20 drawn, 14 readable"
+  }
+ },
+ "shopMembership": {
+  "errors": 1,
+  "n": 20,
+  "rate": 0.05,
+  "ci95": [
+   0.009,
+   0.236
+  ],
+  "how": "seed 11, 20 domains marked shop, judged by hand",
+  "found": [
+   "newgrounds.com \u2014 a free content portal"
+  ],
+  "boundary": "A shop is a site whose primary purpose is selling goods or services to the public and where a visitor can start a purchase. News, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription. Whether to narrow this to retail only is a product decision, not a measurement one."
+ }
+}
