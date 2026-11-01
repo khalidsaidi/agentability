@@ -1,11 +1,11 @@
 {
  "domain": "sciencedirect.com",
- "checkedAt": "2026-11-01T21:37:29.811Z",
+ "checkedAt": "2026-11-01T22:20:29.940Z",
  "status": "complete",
- "elapsedMs": 464,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 878,
+ "score": 15,
+ "grade": "F",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -84,27 +84,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -113,7 +113,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }

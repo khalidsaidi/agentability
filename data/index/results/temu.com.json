@@ -1,10 +1,10 @@
 {
  "domain": "temu.com",
- "checkedAt": "2026-10-30T21:11:13.245Z",
+ "checkedAt": "2026-11-01T22:28:37.139Z",
  "status": "complete",
- "elapsedMs": 1360,
- "score": 65,
- "grade": "C",
+ "elapsedMs": 2174,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~206 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~202 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -54,7 +54,7 @@
    "status": "warn",
    "points": 10,
    "maxPoints": 20,
-   "detail": "Found from homepage: support/contact, legal/privacy."
+   "detail": "Reached from homepage: support/contact (/contact-us.html), legal/privacy (/bgp-privacy-policy-and-setting.html)."
   },
   {
    "id": "B1",
@@ -84,23 +84,23 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
@@ -113,9 +113,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
- },
- "carriedForward": true,
- "carriedForwardAt": "2026-11-01T21:51:46.574Z"
+ }
 }
