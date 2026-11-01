@@ -365,7 +365,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     ];
     // Only the site's own links count: a third-party asset or widget host is not
     // this site publishing anything.
-    const ownHrefs: string[] = [];
+    const ownHrefs: Array<{ key: string; url: string }> = [];
     for (const m of home.text.matchAll(/href=["']([^"']+)["']/gi)) {
       const raw = m[1].trim();
       if (!raw || raw.startsWith("#") || /^(mailto|tel|javascript):/i.test(raw)) continue;
@@ -375,7 +375,8 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         // a support centre on a subdomain is still this site publishing it — while
         // fonts.googleapis.com and checkout.stripe.com do not.
         if (rootDomain(url.hostname) !== rootDomain(new URL(origin).hostname)) continue;
-        ownHrefs.push([url.hostname, url.pathname, url.search].join(" ").toLowerCase());
+        url.hash = "";
+        ownHrefs.push({ key: [url.hostname, url.pathname, url.search].join(" ").toLowerCase(), url: url.href });
       } catch {
         /* unparseable href */
       }
@@ -383,41 +384,140 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     // Two sets, because how much latitude a word deserves depends on its length.
     // Hostname labels are segments in their own right: help.shopify.com is where
     // Shopify's support actually lives, and "help" has to be findable there.
-    const segments = new Set<string>(); // "mentions-legales", "help", "docs"
-    const parts = new Set<string>(); // dash/underscore parts: "mentions", "legales"
+    // Path depth decides between competing candidates; defined before the loop
+    // that uses it, because a const referenced earlier throws at runtime while the
+    // type-checker says nothing.
+    // A pricing page is /pricing or /tarifs. An article about prices is
+    // /economie/article/2026/10/31/penurie-de-navires-et-tarifs-record-... —
+    // six segments and a hundred-character slug. Utility pages are shallow and
+    // short, so anything article-shaped is not a candidate at all, however well
+    // its slug matches and however convincingly the page then confirms.
+    const looksEditorial = (u: string) => {
+      try {
+        const { pathname } = new URL(u);
+        const segs = pathname.split("/").filter(Boolean);
+        return segs.length >= 4 || segs.some((x) => x.length > 40) || /\/(19|20)\d\d\/\d\d?\//.test(pathname);
+      } catch {
+        return true;
+      }
+    };
+    const depth = (u: string) => {
+      try {
+        const { pathname } = new URL(u);
+        return [pathname.split("/").filter(Boolean).length, pathname.length];
+      } catch {
+        return [99, 999];
+      }
+    };
+    const segments = new Map<string, string>(); // "mentions-legales" -> the URL it came from
+    const parts = new Map<string, string>(); // "mentions" -> the URL it came from
     for (const href of ownHrefs) {
-      for (const seg of href.split(/[/?&=.\s]+/)) {
+      for (const seg of href.key.split(/[/?&=.\s]+/)) {
         if (!seg) continue;
-        segments.add(seg);
-        for (const part of seg.split(/[-_]+/)) if (part) parts.add(part);
+        // Keep the shallowest URL seen for each token, for the same reason.
+        const better = (existing: string | undefined, next: string) => {
+          if (!existing) return next;
+          const [se, le] = depth(existing);
+          const [sn, ln] = depth(next);
+          return sn < se || (sn === se && ln < le) ? next : existing;
+        };
+        segments.set(seg, better(segments.get(seg), href.url));
+        for (const part of seg.split(/[-_]+/)) if (part) parts.set(part, better(parts.get(part), href.url));
       }
     }
     // A short generic token must be the entire segment: /api is a developer area,
     // "delphine-papin" is a journalist and "midterms-2026" is an election. A longer
     // word may be a part, and may carry an inflection — French contacter, Swedish
     // kontakta — which is why only words over five letters get prefix latitude.
-    const hasWord = (w: string): boolean =>
-      w.length <= 5
-        ? segments.has(w)
-        : segments.has(w) || parts.has(w) || [...parts].some((p) => p.startsWith(w));
+    // Returns the URL that matched, so the check can go and look at it.
+    //
+    // When several match, take the shallowest path. A utility page lives at
+    // /pricing or /tarifs; lemonde.fr otherwise scored "pricing" off a news
+    // article whose slug happened to contain "tarifs-record", and the article
+    // confirmed because it is about prices and quotes euros. Depth is the signal
+    // that separates a site's pricing page from a story about prices.
+    const urlForWord = (w: string): string | undefined => {
+      const cands: string[] = [];
+      if (segments.has(w)) cands.push(segments.get(w) as string);
+      if (w.length > 5) {
+        if (parts.has(w)) cands.push(parts.get(w) as string);
+        for (const [p, u] of parts) if (p.startsWith(w)) cands.push(u);
+      }
+      const usable = cands.filter((u) => !looksEditorial(u));
+      if (!usable.length) return undefined;
+      cands.length = 0;
+      cands.push(...usable);
+      if (!cands.length) return undefined;
+      return cands.sort((a, b) => {
+        const [sa, la] = depth(a);
+        const [sb, lb] = depth(b);
+        return sa - sb || la - lb;
+      })[0];
+    };
     // Visible anchor text, as a fallback for a link whose URL is an opaque id.
     const anchorText = [...home.text.matchAll(/<a\b[^>]*>([\s\S]{0,80}?)<\/a>/gi)]
       .map((m) => m[1].replace(/<[^>]+>/g, " ").toLowerCase())
       .join(" | ");
-    const found = TASK_WORDS.filter(
-      (t) =>
-        t.words.some(hasWord) ||
-        t.words.some((w) => w.length > 5 && new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(anchorText))
-    );
+    // Every scoring bug this file has had was in a check that guessed from a
+    // pattern — "api" inside googleapis, "plans" inside bons-plans-reductions,
+    // cdn.shopify.com in an img src. The checks that fetch one thing and report
+    // what came back have never had one. So A6 stops guessing: the slug only
+    // nominates a candidate, and the candidate has to be fetched and look like
+    // the thing it claims to be before it scores.
+    //
+    // Confirmation runs on the destination page, which is a far stronger signal
+    // than the slug: a blog post at /blog/our-new-pricing no longer passes for a
+    // pricing page. At most four extra fetches per site, once a week.
+    const CONFIRM: Record<string, RegExp> = {
+      pricing: /(\$|€|£|¥|\bprice|\bpricing|\bplans?\b|per month|\/mo\b|kostenlos|preis|tarif|precio|prezzo|kr\b|gratis|free tier|abonnement)/i,
+      "support/contact": /(contact|support|help ?cent|faq|kontakt|hilfe|ayuda|assistance|e-?mail|telefon|phone|\+\d[\d ()-]{6,})/i,
+      "docs/api": /(api|endpoint|documentation|developer|sdk|reference|authentication|curl |http request)/i,
+      "legal/privacy": /(privacy|cookie|terms|gdpr|datenschutz|impressum|personuppgift|rgpd|processing of personal)/i,
+    };
+    type Hit = { name: string; url?: string; status?: number; confirmed: boolean; note: string };
+    const hits: Hit[] = [];
+    for (const t of TASK_WORDS) {
+      let url: string | undefined;
+      for (const w of t.words) {
+        url = urlForWord(w);
+        if (url) break;
+      }
+      // Anchor text is the fallback when the URL is an opaque id; nothing to fetch.
+      if (!url) {
+        const inAnchor = t.words.some(
+          (w) => w.length > 5 && new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(anchorText)
+        );
+        if (inAnchor) hits.push({ name: t.name, confirmed: true, note: "named in link text" });
+        continue;
+      }
+      const page = await get(url, "text/html");
+      if (page.status === 0 || page.status >= 400) {
+        // The link exists but we could not read it. A block or a timeout is not
+        // the site failing a check, so credit the link and say it is unverified.
+        hits.push({ name: t.name, url, status: page.status, confirmed: true, note: page.status ? `link returns ${page.status}, content unverified` : "link unreachable, content unverified" });
+        continue;
+      }
+      const body = stripToText(page.text).slice(0, 20000);
+      const ok = CONFIRM[t.name].test(body);
+      hits.push({ name: t.name, url, status: page.status, confirmed: ok, note: ok ? "confirmed" : "page does not read as this" });
+    }
+    const found = hits.filter((h) => h.confirmed);
+    const short = (u?: string) => {
+      if (!u) return "";
+      try { const x = new URL(u); return ` (${x.pathname === "/" ? x.host : x.pathname})`; } catch { return ""; }
+    };
+    const rejected = hits.filter((h) => !h.confirmed);
     checks.push({
       id: "A6",
       title: "Everyday agent tasks reachable from the homepage",
       status: found.length >= 3 ? "pass" : found.length >= 2 ? "warn" : "fail",
       points: found.length * 5,
       maxPoints: 20,
-      detail: found.length
-        ? `Found from homepage: ${found.map((t) => t.name).join(", ")}.`
-        : "None of pricing, support, docs, or legal are linked from the homepage.",
+      detail:
+        (found.length
+          ? `Reached from homepage: ${found.map((h) => `${h.name}${short(h.url)}`).join(", ")}.`
+          : "None of pricing, support, docs, or legal are reachable from the homepage.") +
+        (rejected.length ? ` Link found but not confirmed: ${rejected.map((h) => `${h.name}${short(h.url)}`).join(", ")}.` : ""),
     });
 
     // --- B1: MCP endpoint — +5 bonus
