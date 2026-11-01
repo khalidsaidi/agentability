@@ -414,20 +414,23 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         return [99, 999];
       }
     };
-    const segments = new Map<string, string>(); // "mentions-legales" -> the URL it came from
-    const parts = new Map<string, string>(); // "mentions" -> the URL it came from
+    // Every URL per token, not one. Keeping only the shortest discarded the
+    // better candidate before ranking could see it: johnlewis.com links both
+    // /customer-services/prices-and-payment/price-promise and .../gift-cards,
+    // both carrying the token "prices", and gift-cards won by being one
+    // character shorter. Ranking happens later, over the whole category.
+    const segments = new Map<string, string[]>(); // "mentions-legales" -> URLs
+    const parts = new Map<string, string[]>(); // "mentions" -> URLs
+    const add = (m: Map<string, string[]>, k: string, u: string) => {
+      const list = m.get(k);
+      if (!list) m.set(k, [u]);
+      else if (!list.includes(u) && list.length < 12) list.push(u);
+    };
     for (const href of ownHrefs) {
       for (const seg of href.key.split(/[/?&=.\s]+/)) {
         if (!seg) continue;
-        // Keep the shallowest URL seen for each token, for the same reason.
-        const better = (existing: string | undefined, next: string) => {
-          if (!existing) return next;
-          const [se, le] = depth(existing);
-          const [sn, ln] = depth(next);
-          return sn < se || (sn === se && ln < le) ? next : existing;
-        };
-        segments.set(seg, better(segments.get(seg), href.url));
-        for (const part of seg.split(/[-_]+/)) if (part) parts.set(part, better(parts.get(part), href.url));
+        add(segments, seg, href.url);
+        for (const part of seg.split(/[-_]+/)) if (part) add(parts, part, href.url);
       }
     }
     // A short generic token must be the entire segment: /api is a developer area,
@@ -441,21 +444,39 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     // article whose slug happened to contain "tarifs-record", and the article
     // confirmed because it is about prices and quotes euros. Depth is the signal
     // that separates a site's pricing page from a story about prices.
-    const urlForWord = (w: string): string | undefined => {
-      const cands: string[] = [];
-      if (segments.has(w)) cands.push(segments.get(w) as string);
-      if (w.length > 5) {
-        if (parts.has(w)) cands.push(parts.get(w) as string);
-        for (const [p, u] of parts) if (p.startsWith(w)) cands.push(u);
+    // Candidates for a whole category, ranked. Taking the first word that
+    // matched and stopping was too arbitrary: johnlewis.com matched "prices"
+    // inside /customer-services/prices-and-payment/... and then picked
+    // .../gift-cards over .../price-promise on link order alone. Ranking across
+    // the category's whole vocabulary lets the page whose final segment is
+    // actually about the thing win.
+    const urlForCategory = (words: string[]): { url: string; word: string } | undefined => {
+      const cands: Array<{ url: string; word: string }> = [];
+      for (const w of words) {
+        for (const u of segments.get(w) ?? []) cands.push({ url: u, word: w });
+        if (w.length > 5) {
+          for (const u of parts.get(w) ?? []) cands.push({ url: u, word: w });
+          for (const [pt, us] of parts) if (pt.startsWith(w)) for (const u of us) cands.push({ url: u, word: w });
+        }
       }
-      const usable = cands.filter((u) => !looksEditorial(u));
+      const usable = cands.filter((c) => !looksEditorial(c.url));
       if (!usable.length) return undefined;
-      cands.length = 0;
-      cands.push(...usable);
-      if (!cands.length) return undefined;
-      return cands.sort((a, b) => {
-        const [sa, la] = depth(a);
-        const [sb, lb] = depth(b);
+      const lastSegHit = (u: string) => {
+        try {
+          const segs = new URL(u).pathname.split("/").filter(Boolean);
+          const last = (segs[segs.length - 1] ?? "").toLowerCase();
+          const bits = [last, ...last.split(/[-_.]+/)];
+          return words.some((w) => bits.some((b) => b === w || (w.length > 4 && (b.startsWith(w) || w.startsWith(b)))));
+        } catch {
+          return false;
+        }
+      };
+      return usable.sort((a, b) => {
+        const ea = lastSegHit(a.url) ? 0 : 1;
+        const eb = lastSegHit(b.url) ? 0 : 1;
+        if (ea !== eb) return ea - eb;
+        const [sa, la] = depth(a.url);
+        const [sb, lb] = depth(b.url);
         return sa - sb || la - lb;
       })[0];
     };
@@ -482,15 +503,9 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     type Hit = { name: string; url?: string; status?: number; confirmed: boolean; note: string };
     const hits: Hit[] = [];
     for (const t of TASK_WORDS) {
-      let url: string | undefined;
-      let matchedWord = "";
-      for (const w of t.words) {
-        url = urlForWord(w);
-        if (url) {
-          matchedWord = w;
-          break;
-        }
-      }
+      const best = urlForCategory(t.words);
+      const url = best?.url;
+      const matchedWord = best?.word ?? "";
       // Anchor text is the fallback when the URL is an opaque id; nothing to fetch.
       if (!url) {
         const inAnchor = t.words.some(
