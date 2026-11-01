@@ -1712,8 +1712,8 @@ no rate-limit games. Cite it, chart it, build on it.</p>
 <p class="lede">Raw per-site check results live in the repository under
 <a href="https://github.com/khalidsaidi/agentability/tree/main/data/index/results">data/index/results/</a>, one JSON
 file per domain, refreshed by the same public CI run. The evaluator itself is
-<a href="https://github.com/khalidsaidi/agentability/blob/main/scripts/lib/evaluate-site.ts">~300 lines of dependency-free
-TypeScript</a> — reproduce any number on this site with plain HTTP requests.</p>
+<a href="https://github.com/khalidsaidi/agentability/blob/main/scripts/lib/evaluate-site.ts">one dependency-free
+TypeScript file</a> — reproduce any number on this site with plain HTTP requests.</p>
 <p class="lede">Attribution: link to <a href="/ai-index/">the Index</a> or the per-site report you're citing.</p>`;
   const supportBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
