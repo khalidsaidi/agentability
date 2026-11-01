@@ -160,15 +160,36 @@ function parseRobots(robotsTxt: string): { policies: RobotsPolicy[]; sitemaps: s
 }
 
 // Detected from the homepage we already fetched, so it costs nothing.
+// Running ON a platform is not the same as referencing one. Matching any
+// mention put biblegateway.com on Shopify because it loads a book cover from
+// cdn.shopify.com, and plex.tv because it links to its merch store at
+// plex-gear.myshopify.com. That mattered: the commerce view argues that Shopify
+// publishes UCP for its merchants while others chose it, and a wrong platform
+// column collapses the argument.
+//
+// So each platform needs a marker that only its own storefront emits — a
+// response header, its checkout bundle, its config object — or two independent
+// weaker hints. A single CDN asset is never enough on its own.
 function platformOf(html: string, headerBlob: string): SiteEvaluation["platform"] {
   const h = `${html.slice(0, 200_000)} ${headerBlob}`.toLowerCase();
-  if (/cdn\.shopify\.com|x-shopify|shopify-digital-wallet|myshopify\.com/.test(h)) return "Shopify";
-  if (/woocommerce/.test(h)) return "WooCommerce";
-  if (/bigcommerce/.test(h)) return "BigCommerce";
-  if (/demandware|dwstatic|salesforce commerce/.test(h)) return "Salesforce";
-  if (/static\.wixstatic\.com|wix-code/.test(h)) return "Wix";
-  if (/squarespace/.test(h)) return "Squarespace";
-  if (/magento|mage-init/.test(h)) return "Magento";
+  const rules: Array<{ name: NonNullable<SiteEvaluation["platform"]>; strong: RegExp[]; weak: RegExp[] }> = [
+    {
+      name: "Shopify",
+      // Only a Shopify-served storefront sets these.
+      strong: [/x-shopify-stage|x-shopid|shopify-digital-wallet|shopify\.shop\b|window\.shopify\s*=|shopifycloud\/(checkout|shop-js)/],
+      weak: [/cdn\.shopify\.com/, /myshopify\.com/, /shopify-features/, /\/cdn\/shop\//],
+    },
+    { name: "WooCommerce", strong: [/woocommerce-page|wc-ajax=|woocommerce_params/], weak: [/woocommerce/, /wp-content\/plugins\/woocommerce/] },
+    { name: "BigCommerce", strong: [/cdn\d*\.bigcommerce\.com\/s-/], weak: [/bigcommerce/, /stencil-utils/] },
+    { name: "Salesforce", strong: [/demandware\.store|dwstatic|\/on\/demandware\.store\//], weak: [/demandware/, /salesforce commerce/] },
+    { name: "Wix", strong: [/static\.parastorage\.com|wix-code|x-wix-request-id/], weak: [/static\.wixstatic\.com/, /wixsite\.com/] },
+    { name: "Squarespace", strong: [/squarespace-cdn\.com\/static|static1\.squarespace\.com|squarespace\.com\/universal/], weak: [/squarespace/] },
+    { name: "Magento", strong: [/mage\/requirejs|mage-init|magento_/], weak: [/magento/, /static\/version\d/] },
+  ];
+  for (const { name, strong, weak } of rules) {
+    if (strong.some((re) => re.test(h))) return name;
+    if (weak.filter((re) => re.test(h)).length >= 2) return name;
+  }
   return undefined;
 }
 
