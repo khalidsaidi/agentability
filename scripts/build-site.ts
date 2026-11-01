@@ -15,6 +15,23 @@ const COMMERCE_PATH = path.join(REPO_ROOT, "data/index/commerce.json");
 // The porn/piracy/gambling verdicts build-panel.ts caches. Page generation has
 // to honour them too — see the comment at the site-report loop.
 const VERDICTS_PATH = path.join(REPO_ROOT, "data/index/classification.json");
+// Hand review of those verdicts, kept separate so classification.json stays
+// exactly what the model returned and the corrections are auditable too.
+const OVERRIDES_PATH = path.join(REPO_ROOT, "data/index/classification-overrides.json");
+
+function readVerdicts(): Record<string, string> {
+  const base: Record<string, string> = fs.existsSync(VERDICTS_PATH)
+    ? JSON.parse(fs.readFileSync(VERDICTS_PATH, "utf8"))
+    : {};
+  if (fs.existsSync(OVERRIDES_PATH)) {
+    const over = JSON.parse(fs.readFileSync(OVERRIDES_PATH, "utf8")) as Record<string, { verdict?: string }>;
+    for (const [domain, entry] of Object.entries(over)) {
+      if (domain.startsWith("_") || !entry?.verdict) continue;
+      base[domain] = entry.verdict;
+    }
+  }
+  return base;
+}
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
 const EPISODES_DIR = path.join(REPO_ROOT, "data/fieldtest/episodes");
@@ -1224,9 +1241,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
     // site filtered out of the ranked table months ago still had a public report
     // page. janitorai.com was judged "porn" and was still served at
     // /ai-index/site/janitorai.com/ until this check existed.
-    const contentVerdicts: Record<string, string> = fs.existsSync(VERDICTS_PATH)
-      ? JSON.parse(await fsp.readFile(VERDICTS_PATH, "utf8"))
-      : {};
+    const contentVerdicts = readVerdicts();
     const files = (await fsp.readdir(RESULTS_DIR)).filter((f) => f.endsWith(".json"));
     const filteredDomains: string[] = [];
     for (const file of files) {
@@ -1774,9 +1789,7 @@ nothing you can't test with curl.</p>
   // summary.json until the next index run rebuilds the panel, and listing a URL
   // in the sitemap while that URL says noindex are contradictory instructions —
   // so filter here too rather than waiting a week for the panel to catch up.
-  const sitemapVerdicts: Record<string, string> = fs.existsSync(VERDICTS_PATH)
-    ? JSON.parse(await fsp.readFile(VERDICTS_PATH, "utf8"))
-    : {};
+  const sitemapVerdicts = readVerdicts();
   const domains = summary
     ? summary.leaderboard
         .map((r) => r.domain)

@@ -43,6 +43,9 @@ async function readList(file: string): Promise<string[]> {
   }
 }
 const VERDICTS_PATH = path.join(REPO_ROOT, "data/index/classification.json");
+// Hand review of the model's verdicts. Kept out of classification.json so that
+// file remains exactly what the classifier returned; both are published.
+const OVERRIDES_PATH = path.join(REPO_ROOT, "data/index/classification-overrides.json");
 const PROVENANCE_PATH = path.join(REPO_ROOT, "data/index/panel-source.json");
 // Google's own Chrome-usage ranking (top-10k bucket), cached because CrUX
 // publishes monthly. Tranco's top-5k and CrUX's top-10k agree on ~1,500 domains;
@@ -161,6 +164,16 @@ async function main() {
   const verdicts: Verdicts = fs.existsSync(VERDICTS_PATH)
     ? JSON.parse(await fsp.readFile(VERDICTS_PATH, "utf8"))
     : {};
+  if (fs.existsSync(OVERRIDES_PATH)) {
+    const over = JSON.parse(fs.readFileSync(OVERRIDES_PATH, "utf8")) as Record<string, { verdict?: Verdicts[string] }>;
+    let n = 0;
+    for (const [domain, entry] of Object.entries(over)) {
+      if (domain.startsWith("_") || !entry?.verdict) continue;
+      verdicts[domain] = entry.verdict;
+      n += 1;
+    }
+    if (n) console.log(`  ${n} reviewed override(s) applied over the model verdicts`);
+  }
   const unseen = eligible.filter((d) => !verdicts[d]);
   console.log(`  ${eligible.length - unseen.length} already classified, ${unseen.length} new`);
   await classify(unseen, verdicts);
