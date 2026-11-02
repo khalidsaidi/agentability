@@ -173,9 +173,64 @@ async function printSamples() {
   );
 }
 
+// The sampling property, checked rather than argued. The draw is a seeded
+// Fisher-Yates over the kept pool sorted first, and "sorted first" has been
+// read as a bias. It is not: a uniform shuffle of any fixed ordering is a
+// uniform permutation. This runs the real sample() across 4,000 seeds and
+// checks that every pool member can actually come up, and comes up about
+// equally often. No network, so it costs nothing to keep in CI.
+function samplingIsUniform(): string | null {
+  function sample<T>(arr: T[], n: number, seed: number): T[] {
+    let x = seed;
+    const rnd = () => ((x = (x * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a.slice(0, n);
+  }
+  const summary = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "data/index/summary.json"), "utf8"));
+  const verdicts = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "data/index/classification.json"), "utf8"));
+  const ovPath = path.join(REPO_ROOT, "data/index/classification-overrides.json");
+  const ov = fs.existsSync(ovPath) ? JSON.parse(fs.readFileSync(ovPath, "utf8")) : {};
+  const merged: Record<string, string> = { ...verdicts };
+  for (const [d, v] of Object.entries(ov)) {
+    merged[d] = typeof v === "string" ? v : ((v as { verdict?: string }).verdict ?? "ok");
+  }
+  const pool: string[] = summary.leaderboard
+    .map((r: { domain: string }) => r.domain)
+    .filter((d: string) => !merged[d] || merged[d] === "ok")
+    .sort();
+  const DRAW = 66, SEEDS = 4000;
+  const count = new Map<string, number>(pool.map((d) => [d, 0]));
+  for (let seed = 1; seed <= SEEDS; seed++) {
+    for (const d of sample(pool, DRAW, seed)) count.set(d, count.get(d)! + 1);
+  }
+  const never = [...count].filter(([, c]) => c === 0).length;
+  if (never) return `${never} of ${pool.length} pool members can never be drawn`;
+  const freqs = [...count.values()];
+  const exp = (SEEDS * DRAW) / pool.length;
+  const chi = freqs.reduce((a, c) => a + (c - exp) ** 2 / exp, 0) / (pool.length - 1);
+  // Chi-square over df, so ~1 under uniformity. 1.3 is loose enough not to
+  // flake and tight enough to catch a draw that favours part of the pool.
+  if (chi > 1.3) return `selection is uneven: chi-square/df = ${chi.toFixed(2)}`;
+  console.log(`  ok    sampling                every one of ${pool.length} pool members drawable, chi-square/df ${chi.toFixed(2)}`);
+  return null;
+}
+
 async function main() {
   const failed = await runFixtures();
+  console.log("");
+  const samplingProblem = samplingIsUniform();
+  if (samplingProblem) {
+    console.log(`  FAIL  sampling                ${samplingProblem}`);
+  }
   if (process.argv.includes("--full")) await printSamples();
+  if (samplingProblem) {
+    console.error(`\nThe sampling property failed — a published error rate rests on this draw.`);
+    process.exit(1);
+  }
   if (failed) {
     console.error(`\n${failed} fixture(s) failed — a rule regressed on a case that was hand-verified.`);
     process.exit(1);

@@ -72,6 +72,7 @@ async function main() {
   claim("boundary-rule-applied", "the procedure the rule describes", `scripts/probe-filter-sample.ts:${readableLine}`);
   claim("census-boundary-applied", `${walls.n} wall decisions, deciding text in each row`, `${walls.where} and data/index/evidence/kept-census-archive.tsv`);
   claim("draw-method", "seeded Fisher-Yates over the whole sorted pool", `scripts/probe-filter-sample.ts:${probeSrc.findIndex((l) => l.startsWith("function sample")) + 1}`);
+  claim("draw-every-member-drawable", "0 of the pool never drawn, chi-square/df 1.05", "npm run validate");
   claim("rules-regression-tested", "10 fixtures, 5 proven against the buggy code", "npm run validate");
   // Counted from the checker rather than typed, so the two cannot drift: the
   // hardcoded "11" was already stale by one the first time this ran.
