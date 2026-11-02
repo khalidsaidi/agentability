@@ -57,7 +57,19 @@
    "handJudged": "20 flags across the three draws, none upheld. Rejected with their evidence: player slots (aternos.org), PCIe slots (asus.com), a calendar slot (tawk.to), a waiver slot in practice software (therapservices.net), CSS size tokens xxx-large (ew.com, allrecipes.com), a Tailwind attribute data-[slot=icon] (vercel.com), a masked IP 141.171.31.XXX (powerbi.com), a JSON-LD placeholder \"XXX\" (xe.com), OnlyFans headlines (index.hr, infobae.com), betting-prosecution stories (cricbuzz.com, news18.com), Las Vegas hotel listings (priceline.com), and a bingo link in a tabloid's games nav (mirror.co.uk).",
    "sensitivity": "Two judgement calls were kept and are published rather than buried. goal.com age-gates gambling advertising (\"This site contains gambling advertising for 24+\") and livescore.com sells betting-affiliate placement; both are kept because the rule judges primary purpose and both are sports news. Counted as errors instead, the rate is 2/174 = 1.1%, 95% CI 0.3-4.1%, and the far edge is unchanged.",
    "reproducibility": "The earlier 0/121 was drawn from the leaderboard in score order, so each weekly run reshuffled the pool and the same seed drew a different sample — reproducible in name only, failing silently. The pool is now sorted and fingerprinted, the fingerprint prints on every run and is recorded here, and POOL_HASH=<hash> turns a changed pool into a loud mismatch instead of a quietly different measurement.",
-   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; 0/121 CI 0-3.1%; and the 1/156 pooled across two pools, which described neither of them."
+   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; 0/121 CI 0-3.1%; and the 1/156 pooled across two pools, which described neither of them.",
+   "screenSensitivity": {
+    "what": "Whether the vocabulary scan itself misses things. Every drawn domain is scanned, but only the scan's hits were hand-read, so 'judged' meant machine-screened with hand review of the hits — a screen that never fires looks identical to a clean population.",
+    "how": "Seed 424242 over the 148 body-tier domains the scan called clean, 25 drawn, each one's title and opening text read by hand. 22 could be read today; 3 could not (mcdonalds.com served Access Denied, vnexpress.net a 404, freefiremobile.com refused).",
+    "errors": 0,
+    "n": 22,
+    "ci95": [
+     0.0,
+     0.149
+    ],
+    "found": "None. The 22 are news (actu.fr, aljazeera.net, corriere.it, detik.com, elmundo.es, economictimes.com, sports.ru), government (irs.gov, elster.de, usps.com), software and platforms (atlassian.com, github.com, deepseek.com, classlink.com, steampowered.com, youtube.com, themoviedb.org, tp-link.com, honor.com), and retail (marksandspencer.com, rakuten.com, kbag.se).",
+    "says": "The scan's miss rate among domains it called clean is at most 14.9% at the far edge of this interval; counting all 3 unreadable as misses, 3/25 = 12.0%, 95% CI 4.2-30.0%. This is the weakest link in the kept-side figure and it is the bound a reader should hold the 0/174 against."
+   }
   }
  },
  "a6": {
