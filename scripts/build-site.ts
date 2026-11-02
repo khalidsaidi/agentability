@@ -1735,7 +1735,7 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
 <h1>Get help, get audited, or dispute a score</h1>
 <p class="lede"><b>Request an audit</b> — open an
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&amp;labels=audit-request">audit
-request issue</a> (or PR a line into <code>data/index/domains.txt</code>) and your site joins the next weekly run.</p>
+request issue</a> and we add your domain to <code>data/index/submitted.txt</code>, which the weekly run merges &mdash; so it joins the next one. You can also PR the line yourself into either that file or <code>data/index/domains.txt</code> and skip the wait on us. Submissions go through the same porn, piracy and gambling filter as everything else; a submission buys an audit, not a place past the rules.</p>
 <p class="lede"><b>Deployed a fix?</b> Scores refresh automatically every Monday. If you've shipped fixes and want the
 number updated sooner, say so in an issue and we'll trigger a re-run.</p>
 <p class="lede"><b>Dispute a check</b> — every check is reproducible from
