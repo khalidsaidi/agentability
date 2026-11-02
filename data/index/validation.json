@@ -26,35 +26,35 @@
   },
   "underExclusion": {
    "errors": 1,
-   "n": 111,
-   "rate": 0.009,
+   "n": 156,
+   "rate": 0.006,
    "ci95": [
-    0.002,
-    0.049
+    0.001,
+    0.035
    ],
    "found": [
-    "az24.vn — a Vietnamese lottery-results site; now excluded in classification-overrides.json"
+    "az24.vn — a Vietnamese lottery-results site, found on the second draw and now excluded in classification-overrides.json"
    ],
-   "pool": "71275ca25efe (1,176 kept domains, sorted)",
-   "how": "`npm run probe-filter` and `SEED=1337 npm run probe-filter` — two draws of 66 from the sorted kept pool, 127 distinct domains (5 overlap). A domain is called unreadable only after three surfaces give nothing: homepage on the auditor's bot UA, the same request on a browser UA, then robots.txt and sitemap.xml at HTTP 200. Body text scanned for adult, gambling and piracy vocabulary; every hit hand-judged.",
+   "how": "Three draws of 66: `npm run probe-filter`, `SEED=1337 npm run probe-filter` on pool 71275ca25efe, and `npm run probe-filter` again on pool e15d222a8342 after az24.vn was excluded. 176 distinct domains, 156 judged. The rule for 'unreadable' is printed at the top of every run, so it travels with the output.",
+   "pools": "71275ca25efe (1,176 kept) for the first two draws, e15d222a8342 (1,175) for the third — excluding az24.vn changed pool membership, which changed the draw, which is exactly what the fingerprint is for.",
+   "tiers": "133 judged on the page itself, 23 on robots/sitemap only, 20 on nothing.",
+   "sampling": "Pseudo-random with a fixed seed over the whole kept pool, not a convenience sample. The pool is sorted to canonicalise the order the shuffle acts on; sorting fixes the order, it does not select.",
    "wholePopulationBound": {
-    "errors": 33,
-    "n": 127,
-    "rate": 0.26,
+    "errors": 44,
+    "n": 176,
+    "rate": 0.25,
     "ci95": [
-     0.191,
-     0.342
+     0.192,
+     0.319
     ],
-    "how": "the far edge: the one hand-verified error, plus all 16 domains that stayed unreadable, plus all 16 judged only from robots.txt and sitemap.xml — counted as wrong keeps. Those 16 rest on URL paths, which say what a site is made of but are not the page, so a bound that leans on them is not the far edge.",
-    "says": "at the far edge of the interval, at most 34.2% of kept domains are wrongly kept. Nothing weaker than this covers the whole sample.",
-    "intermediate": "Counting only the unresolved as wrong, and trusting the robots/sitemap tier: 17/127 = 13.4%, 95% CI 8.5-20.4%."
+    "how": "the far edge: the one hand-verified error, plus all 20 domains that stayed unreadable, plus all 23 judged only from robots.txt and sitemap.xml, counted as wrong keeps. URL paths say what a site is made of but are not the page, so a bound leaning on them is not the far edge.",
+    "says": "at the far edge of the interval, at most 31.9% of kept domains are wrongly kept. Nothing weaker covers the whole sample.",
+    "intermediate": "Counting only the unresolved as wrong and trusting the robots/sitemap tier: 21/176 = 11.9%, 95% CI 7.9-17.6%."
    },
-   "sensitivity": "livescore.com is the closest call and was kept: its title and purpose are live football scores, and the rule judges primary purpose, but it runs a betting-affiliate directory. Counted as a wrong keep instead, the rate is 2/111 = 1.8%, 95% CI 0.5-6.3%.",
-   "reproducibility": "The earlier 0/121 was measured against the leaderboard in score order, so the weekly run reshuffled the pool and the same seed drew an entirely different sample — reproducible in name only, and it failed silently. The pool is now sorted and fingerprinted, the fingerprint is printed on every run and published here, and POOL_HASH=<hash> makes a changed pool say so. Two consecutive runs of seed 2026 drew the identical 66 domains; one domain's live fetch differed (gamma.app readable in one, walled in the next), and the conservative run is what is published.",
-   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; and 0/121 CI 0-3.1%, whose pool no longer exists. The honest reading is that the kept side was never 0 — the sample that would have found az24.vn had not been drawn yet.",
-   "tiers": "95 judged on the page itself, 16 on robots/sitemap only, 16 on nothing.",
-   "sampling": "Pseudo-random with a fixed seed, not a convenience sample: the full kept pool is sorted to canonicalise it, then shuffled by the seed, so every member of the pool can be drawn and the draw is identical on any machine. Sorting fixes the order the shuffle acts on; it does not select.",
-   "handJudged": "The one error, az24.vn, was judged by hand from the site's own title and navigation. livescore.com is a judgement call published as a sensitivity, not counted as an error: by the stated rule — primary purpose — a live-scores site that sells betting affiliate placement is kept."
+   "handJudged": "18 flags across the three draws, one upheld. az24.vn was judged from the site's own title (\"Ket qua xo so ba mien\" — three-region lottery results). The rest were rejected: CSS and JS tokens leaking through the scan (xxx-large, data-[slot=icon], js-slot), Las Vegas hotel listings on travel sites (kayak.com, priceline.com), a bingo link in a tabloid's games nav (mirror.co.uk), portal Jackpot games (gmx.net, libero.it, web.de), OnlyFans headlines (infobae.com, foxnews.com), a betting-app extradition story (rediff.com), hotels near casinos in a sitemap (skyscanner.net), and polybuzz.ai's own FAQ saying it bans public NSFW.",
+   "sensitivity": "livescore.com is the closest call and was kept: its title and purpose are live football scores and the rule judges primary purpose, but it sells betting-affiliate placement. Counted as an error too, the rate is 2/156 = 1.3%, 95% CI 0.4-4.6%.",
+   "reproducibility": "The earlier 0/121 was drawn from the leaderboard in score order, so each weekly run reshuffled the pool and the same seed drew a different sample — reproducible in name only, and it failed silently. The pool is now sorted and fingerprinted, the fingerprint prints on every run and is recorded here, and POOL_HASH=<hash> turns a changed pool into a loud mismatch. Two consecutive runs of seed 2026 on one pool drew the identical 66 domains; one domain's live fetch differed between them (gamma.app), and the conservative run is what is published.",
+   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; and 0/121 CI 0-3.1%, whose pool no longer exists. The honest reading of all three is not that the filter was clean and then broke, but that the draw which would have found az24.vn had not been made yet."
   }
  },
  "a6": {
