@@ -159,11 +159,25 @@ async function main() {
   const candidates: string[] = [];
   const seen = new Set<string>();
   let droppedInfra = 0;
+  // Every drop is recorded by name and reason, not just counted. The counts
+  // alone made these buckets unsamplable: panel-source.json said
+  // "droppedInfrastructure: 55" and nobody could check whether those 55 were
+  // infrastructure, which is how ad.nl, mail.ru and login.gov sat outside the
+  // Index unnoticed.
+  const drops: { domain: string; reason: string }[] = [];
   for (const host of hosts) {
-    if (isSubdomain(host) && NOT_A_DESTINATION.test(host)) { droppedInfra += 1; continue; }
+    if (isSubdomain(host) && NOT_A_DESTINATION.test(host)) {
+      droppedInfra += 1;
+      drops.push({ domain: host, reason: "login/API subdomain" });
+      continue;
+    }
     const domain = rootDomain(host);
     const infra = INFRASTRUCTURE.test(domain) && !INFRA_COMPANY_APEX.test(domain);
-    if (!domain || infra) { droppedInfra += 1; continue; }
+    if (!domain || infra) {
+      droppedInfra += 1;
+      drops.push({ domain: host, reason: domain ? "infrastructure host" : "no registrable domain" });
+      continue;
+    }
     if (seen.has(domain)) continue;
     seen.add(domain);
     candidates.push(domain);
@@ -220,9 +234,24 @@ async function main() {
     .filter((d) => verdicts[d] === "ok" && !offline.has(d))
     .sort();
   if (offline.size) console.log(`  ${offline.size} domain(s) dropped: DNS does not resolve`);
+  for (const d of offline) drops.push({ domain: d, reason: "DNS does not resolve" });
+  for (const d of candidates) if (!crux.has(d)) drops.push({ domain: d, reason: "not in the CrUX list" });
   const droppedNotInCrux = candidates.length - eligible.length;
   const removed = eligible.filter((d) => verdicts[d] && verdicts[d] !== "ok");
   const unknown = eligible.filter((d) => !verdicts[d]);
+
+  for (const d of removed) drops.push({ domain: d, reason: `content filter: ${verdicts[d]}` });
+  const DROPS_PATH = path.join(REPO_ROOT, "data/index/panel-drops.tsv");
+  await fsp.writeFile(
+    DROPS_PATH,
+    "# Every domain the panel build discarded, with why. Counts alone cannot be\n" +
+      "# sampled, and an unsampled discard bucket is where errors hide.\n" +
+      "# Columns: domain, reason.\n" +
+      drops.map((d) => `${d.domain}\t${d.reason}`).join("\n") +
+      "\n",
+    "utf8"
+  );
+  console.log(`  ${drops.length} discarded domains recorded by name in data/index/panel-drops.tsv`);
 
   await fsp.writeFile(DOMAINS_PATH, panel.join("\n") + "\n", "utf8");
   await fsp.writeFile(VERDICTS_PATH, `${JSON.stringify(verdicts, Object.keys(verdicts).sort(), 1)}\n`, "utf8");
