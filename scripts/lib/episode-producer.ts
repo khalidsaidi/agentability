@@ -194,7 +194,13 @@ export async function produceEpisodeTasks(
         messages.push({ role: "user", content: "Research is over. Call propose_tasks now with the 10 finished tasks, built from what you have already read." });
       }
       const turn = forcing
-        ? { ...params, tools: [PRODUCER_TOOL], tool_choice: { type: "any" as const } } // `tool` is rejected in thinking mode; with one tool, `any` forces it
+        ? // Forcing turn: only propose_tasks is offered and `any` makes the call
+          // mandatory. DeepSeek accepted `any` with thinking on until it started
+          // rejecting it ("Thinking mode does not support this tool_choice"),
+          // which killed the 2026-11-02 episode. Thinking is switched off for
+          // this one turn only; the research turns before it keep it. Checked
+          // live mid-conversation on both models before shipping.
+          { ...params, tools: [PRODUCER_TOOL], tool_choice: { type: "any" as const }, thinking: { type: "disabled" as const } }
         : params;
       let response: Anthropic.Message | null = null;
       let lastError: unknown;

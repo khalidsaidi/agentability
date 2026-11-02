@@ -305,14 +305,16 @@ export async function runFieldTask(client: Anthropic, task: FieldTask, budget: C
       } else {
         messages.push({ role: "user", content: finalNudge });
       }
-      // With only `finish` offered, `any` forces it — and unlike `tool`, `any`
-      // is accepted while the model's thinking mode is on.
+      // With only `finish` offered, `any` forces it. DeepSeek now rejects any
+      // forced tool_choice while thinking is on, so this one turn runs with
+      // thinking off (same fix as the producer's forcing turn).
       const response = await callWithRetry(client, {
         model: AGENT_MODEL,
         max_tokens: MAX_TOKENS_PER_CALL,
         system: SYSTEM_PROMPT,
         tools: TOOLS.filter((t) => t.name === "finish"),
         tool_choice: { type: "any" },
+        thinking: { type: "disabled" },
         messages,
       });
       run.inputTokens += response.usage.input_tokens;
