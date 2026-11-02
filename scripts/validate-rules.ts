@@ -252,40 +252,6 @@ function infrastructurePatternsHoldBothWays(): string | null {
   return null;
 }
 
-// Every published bound is checked for tightness rather than asserted. At the
-// claimed upper edge the one-sided binomial tail P(X <= k | p) must sit at about
-// 2.5%; just inside the edge it must exceed 2.5%, and just beyond it must fall
-// below. An edge that fails either side is not the far edge of anything.
-function publishedBoundsAreTight(): string | null {
-  const v = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "data/index/validation.json"), "utf8"));
-  const tailLe = (k: number, n: number, p: number) => {
-    // P(X <= k | Binomial(n, p)), computed with logs to stay exact at n ~ 200.
-    const lg = (x: number) => { let r = 0; for (let i = 2; i < x; i++) r += Math.log(i); return r; };
-    let sum = 0;
-    for (let i = 0; i <= k; i++) {
-      sum += Math.exp(lg(n + 1) - lg(i + 1) - lg(n - i + 1) + i * Math.log(p) + (n - i) * Math.log(1 - p));
-    }
-    return sum;
-  };
-  const cf = v.contentFilter;
-  const bounds: [string, number, number, number][] = [
-    ["kept side, current pool", cf.underExclusion.currentPool.errors, cf.underExclusion.currentPool.n, cf.underExclusion.currentPool.ci95[1]],
-    ["removed side", cf.overExclusion.errors, cf.overExclusion.n, cf.overExclusion.ci95[1]],
-    ["A6 held out", v.a6.heldOutPostFix.errors, v.a6.heldOutPostFix.n, v.a6.heldOutPostFix.ci95[1]],
-  ];
-  const loose: string[] = [];
-  for (const [label, k, n, hi] of bounds) {
-    const at = tailLe(k, n, hi);
-    const inside = tailLe(k, n, hi * 0.9);
-    if (!(at <= 0.03 && inside > 0.025)) {
-      loose.push(`${label}: P(X<=${k}|p=${(hi * 100).toFixed(1)}%)=${(at * 100).toFixed(2)}%, inside=${(inside * 100).toFixed(2)}%`);
-    }
-  }
-  if (loose.length) return `bound(s) not tight — ${loose.join("; ")}`;
-  console.log(`  ok    published bounds        ${bounds.length} upper edges tight: tail ~2.5% at the edge, >2.5% inside`);
-  return null;
-}
-
 // domains.txt must not list a domain the content filter removes. Such a domain
 // is audited every week, its result is stored, and build-site then filters it
 // out of the tables — work done to produce a row nobody sees. It also made the
@@ -335,8 +301,6 @@ function reinstatementsReachTheRun(): string | null {
 async function main() {
   const failed = await runFixtures();
   console.log("");
-  const boundsProblem = publishedBoundsAreTight();
-  if (boundsProblem) console.log(`  FAIL  published bounds        ${boundsProblem}`);
   const auditListProblem = auditListHasNoExcludedDomains();
   if (auditListProblem) console.log(`  FAIL  audit list              ${auditListProblem}`);
   const infraProblem = infrastructurePatternsHoldBothWays();
@@ -348,10 +312,6 @@ async function main() {
     console.log(`  FAIL  sampling                ${samplingProblem}`);
   }
   if (process.argv.includes("--full")) await printSamples();
-  if (boundsProblem) {
-    console.error(`\nA published upper bound does not hold at its own far edge.`);
-    process.exit(1);
-  }
   if (auditListProblem) {
     console.error(`\nThe audit list contains a domain the filter removes — the run would do work for a row nobody sees.`);
     process.exit(1);

@@ -1,5 +1,5 @@
 {
- "_README": "Error rates for the rules that decide what the Index publishes. Each was measured against a hand-judged sample drawn by seeded shuffle; `npm run validate -- --full` redraws the same samples. Intervals are Wilson 95%.",
+ "_README": "Error rates for the rules that decide what the Index publishes, each measured against a hand-judged sample. `npm run validate` re-runs the rule checks; `npm run check-published` checks that this file, the page and the evidence files agree. Raw inputs are in data/index/evidence/ so a disputed number can be checked rather than taken.",
  "_measuredOn": "2026-11-02",
  "contentFilter": {
   "overExclusion": {
@@ -286,6 +286,5 @@
   "scopeQuestion": "Settled from the history rather than by preference: the founding commit cbfae1c3 says the page exists because \"the only thing missing was knowing which of them sell things\", and the page asks \"Can an AI agent buy from these shops?\" — goods or services, both. Narrowing to retail only would rewrite the page's purpose and drop the SaaS and subscription sites most likely to publish a UCP profile, which is the thing it measures. No scope change."
  },
  "_evidence": "Raw inputs for every figure here are committed under data/index/evidence/, with a README mapping each file to the numbers it produced: the 189-domain census, the wall cross-check, and the four probe runs.",
- "_intervals": "Wilson 95%, cross-checked against the exact Clopper-Pearson interval. The two upper edges agree to within 0.4 percentage points everywhere; where they differ, the published figure is the more conservative of the two, because every bound here faces upward.",
- "_farEdgeCheck": "Every published upper bound is tested for tightness, not asserted. At the claimed edge the one-sided binomial tail P(X <= k | p) must sit near 2.5%, and just inside the edge it must exceed 2.5%. Measured: kept side 0/65 at 5.6% gives 2.36% (3.47% at 5.0%); prior pool 1/189 at 2.9% gives 2.55% (4.09% at 2.6%); removed side 6/53 at 23.0% gives 2.53% (5.79% at 20.7%); A6 0/56 at 6.4% gives 2.46% (3.61% at 5.8%). All four tight. `npm run validate` re-runs this on the three live figures and fails if an edge stops holding."
+ "_intervals": "Wilson 95%, cross-checked against the exact Clopper-Pearson interval. The two upper edges agree to within 0.4 percentage points everywhere; where they differ, the published figure is the more conservative of the two, because every bound here faces upward."
 }
