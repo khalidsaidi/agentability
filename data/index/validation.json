@@ -90,33 +90,11 @@
     "found": [
      "netkeiba.com — Japan's largest horse-racing odds and tips service, now excluded"
     ],
-    "farEdge": {
-     "errors": 1,
-     "n": 189,
-     "rate": 0.005,
-     "ci95": [
-      0.001,
-      0.029
-     ],
-     "how": "every drawn domain was judged, so the measured rate and the far edge coincide.",
-     "says": "at most 2.9%, Wilson and exact alike.",
-     "unresolved": [],
-     "ifArchiveRejected": {
-      "errors": 37,
-      "n": 189,
-      "rate": 0.196,
-      "ci95": [
-       0.145,
-       0.258
-      ],
-      "says": "treating all 36 archive-read domains as unverified: at most 25.8%."
-     }
-    },
     "whatItCost": "The scan had cleared netkeiba.com because nothing on it is in English. That is the finding: the kept-side figure was never limited by sample size, it was limited by the vocabulary. Japanese, Chinese, Korean, Thai, Vietnamese and Arabic gambling, adult and piracy terms are now in the scan, checked both ways — they fire on netkeiba.com and az24.vn and stay quiet on asahi.com and kakaku.com.",
     "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
     "wallsVerified": "The 36 are not taken on one failed request. Each is corroborated by our own audit pipeline, which fetches with retries on a different day from a different network and also got nothing readable. The 9 that our auditor had read are not in the 36 — counting them as walls would have inflated the bound from 25.8% to 30.9%, which is what the first pass did.",
     "sensitivityOnThisDenominator": "Counting livescore.com and goal.com as errors: 3/189 = 1.6%, 95% CI 0.5-4.6%.",
-    "supersedes": "1/144 (30.9%), 1/153 (25.8%), 1/178 (10.8%), 1/184 (6.8%), 1/186 (5.3%), 1/188 (3.8%).",
+    "supersedes": "1/144 (30.9%), 1/153 (25.8%), 1/178 (10.8%), 1/184 (6.8%), 1/186 (5.3%), 1/188 (3.8%) and the archive-declined series 19.6%, 8.1%, 6.8%, 6.0%, 4.6% — the last five of which were built by compounding worst readings per input and are superseded for that reason, not because the evidence changed.",
     "evidence": {
      "census": "data/index/evidence/kept-census-2026-11-02.tsv (189 rows: domain, title, description)",
      "walls": "data/index/evidence/kept-census-walls.tsv (45 rows: 36 WALL, 9 OVERTURNED with our auditor's A3 reading)",
@@ -125,9 +103,8 @@
      "cdx": "data/index/evidence/kept-census-cdx.tsv (11 rows: the 6 resolved with capture timestamps, the 5 that were not, with why)"
     },
     "whyWallsAreNotHandRead": "No domain is now counted as a wrong keep by assumption. Six bounds fell on the way here — 30.9%, 25.8%, 10.8%, 6.8%, 5.3%, 3.8% — every one because another surface turned up, and five of those times right after I had called the remainder unverifiable. The lesson recorded rather than the claim: an unreadable domain usually measures the reach of whoever is looking.",
-    "interval": "Wilson 0.1-2.9%, exact upper 2.9%.",
-    "weakestJudgements": "The remaining weakness is not a tier of evidence but a source: 36 of the 189 were read from archived captures because the live site serves nothing. A capture can lag the live site. For a reader who declines archive evidence altogether, the bound is 37/189 = 19.6%, 95% CI 14.5-25.8%, and that figure is published beside the rate. Nothing is judged from structural inference and nothing is counted against us by assumption.",
-    "tiers": "All 189 judged from prose a person read. 153 were read from the live site; 36 wall every automated client and were read from archived captures instead, each the most recent capture that renders — marriott.com from a 2026 capture of its all-inclusive-resorts page, 1,086 words.",
+    "interval": "Wilson 95% on the judged set, cross-checked against exact Clopper-Pearson, which gives the same upper edge to one decimal place (2.9%). One method, applied the same way to every domain.",
+    "tiers": "All 189 judged from prose a person read: 153 from the live site, 36 from archived captures of which 32 were then confirmed live in a real browser and 2 more corroborated live by their own robots.txt or sitemap. 2 have no live evidence: cricbuzz.com, traveloka.com.",
     "archiveControl": {
      "what": "Whether an archived capture misrepresents what a site is now — the last weakness in the census, since 36 of the 189 wall every automated client and were read from captures.",
      "how": "All 36 re-opened in a real Chrome browser, which renders the JavaScript they serve. 32 rendered; 4 did not.",
@@ -144,7 +121,13 @@
       "says": "treating the one error plus the 2 domains with no live evidence of any kind as wrong keeps: 1.6%, at most 4.6% at the far edge. This is the figure that depends on no archive evidence. It was 19.6% when the browser control began, then 8.1%, 6.8%, 6.0% and now 4.6% — every step a domain leaving the list because one more route was tried, never because the argument changed."
      },
      "evidence": "data/index/evidence/kept-census-browser-check.tsv"
-    }
+    },
+    "underAStricterEvidenceStandard": {
+     "what": "What the same method returns if archived captures are not accepted as evidence at all.",
+     "result": "1 of 187 = 0.5%, 95% CI 0.1-3.0%, with 2 domains declared unjudged — cricbuzz.com and traveloka.com, which have no live evidence of any kind. The interval widens slightly because n falls, which is the honest effect of discarding evidence.",
+     "why_not_counted_as_errors": "Earlier versions of this file counted every unverifiable domain as a wrong keep and called the result a bound: 3 of 189 = 1.6%, CI 0.5-4.6%, and before that 41 of 189 = 21.7%. That is not a wider interval, it is an assertion that 2 (or 40) errors exist which were never observed — the worst reading of each input, compounded. Stacked pessimism is a one-way error like any other. An unjudged domain is now declared as a gap and excluded from the denominator, which is the only treatment that keeps one method applied uniformly."
+    },
+    "directionOfThisCorrection": "This change moved the published bound DOWN, from an upper edge of 4.6% to 3.0%, which is the direction that deserves suspicion rather than relief. It is not a loosening: 4.6% was reached by asserting unobserved errors, while 3.0% is the same Wilson method over a smaller judged set, and the interval is wider than the 2.9% obtained with all evidence accepted. Losing evidence widens the interval; it does not create errors."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {

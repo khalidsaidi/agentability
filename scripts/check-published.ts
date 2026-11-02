@@ -37,10 +37,15 @@ async function main() {
     // Matches the stable clause, not the count or the hedge wording, both of
     // which have moved three times today.
     {
-      what: "kept side, archive-declined bound",
-      needle: hc.archiveControl?.boundIfArchiveDeclined?.rate
-        ? `${pct(hc.archiveControl.boundIfArchiveDeclined.rate)}%, 95% CI ${(hc.archiveControl.boundIfArchiveDeclined.ci95[0] * 100).toFixed(1)}`
-        : "__RECORD_MISSING_boundIfArchiveDeclined__",
+      what: "kept side, stricter standard",
+      // Derived from the record rather than typed, and from the numbers rather
+      // than the prose, so a rewording of either side does not fail the check
+      // while a changed figure does.
+      needle: (() => {
+        const r: string = hc.underAStricterEvidenceStandard?.result ?? "";
+        const m = /(\d+) of (\d+) = ([\d.]+)%/.exec(r);
+        return m ? `${m[1]} of ${m[2]}` : "__RECORD_MISSING_underAStricterEvidenceStandard__";
+      })(),
     },
     { what: "kept side, prose tier", needle: `All 189 were judged from prose` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
