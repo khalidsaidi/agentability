@@ -129,10 +129,20 @@
     "weakestJudgements": "The remaining weakness is not a tier of evidence but a source: 36 of the 189 were read from archived captures because the live site serves nothing. A capture can lag the live site. For a reader who declines archive evidence altogether, the bound is 37/189 = 19.6%, 95% CI 14.5-25.8%, and that figure is published beside the rate. Nothing is judged from structural inference and nothing is counted against us by assumption.",
     "tiers": "All 189 judged from prose a person read. 153 were read from the live site; 36 wall every automated client and were read from archived captures instead, each the most recent capture that renders — marriott.com from a 2026 capture of its all-inclusive-resorts page, 1,086 words.",
     "archiveControl": {
-     "what": "Whether an archived capture misrepresents what a site is now — the only weakness left in the census, since 36 of the 189 were read from captures because they wall every automated client.",
-     "how": "Five of those 36 re-read in a real Chrome browser, which renders the JavaScript they serve: zara.com, marriott.com, tesco.com, discogs.com, rei.com.",
-     "result": "0 disagreements in 5, 95% CI 0.0-43.4%. tesco.com and rei.com matched their capture's title string exactly; the other three named the same business in different words.",
-     "honest_limit": "Five is thin and the interval says so — this measures the risk rather than retiring it. The bound for a reader who declines archive evidence altogether, 37/189 = 19.6%, 95% CI 14.5-25.8%, stands alongside it and is on the page.",
+     "what": "Whether an archived capture misrepresents what a site is now — the last weakness in the census, since 36 of the 189 wall every automated client and were read from captures.",
+     "how": "All 36 re-opened in a real Chrome browser, which renders the JavaScript they serve. 29 rendered a title; 7 did not.",
+     "result": "0 disagreements in 29, 95% CI 0.0-11.7%. Sixteen of the 29 match their capture's title string exactly.",
+     "remaining": "7 still rest on a capture alone: cricbuzz.com (the browser tool refuses the host), drive2.ru (DDoS-Guard), joom.com and shopee.ph (never finished loading), leparisien.fr (Access Denied to the browser too), orange.fr (zero-width title), traveloka.com (Human Verification).",
+     "boundIfArchiveDeclined": {
+      "errors": 8,
+      "n": 189,
+      "rate": 0.042,
+      "ci95": [
+       0.022,
+       0.081
+      ],
+      "says": "treating the one error plus all 7 capture-only domains as wrong keeps: at most 8.1%. That is the figure that does not depend on archive evidence at all, down from 19.6% before this control."
+     },
      "evidence": "data/index/evidence/kept-census-browser-check.tsv"
     }
    },

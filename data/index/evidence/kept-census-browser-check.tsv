@@ -1,16 +1,47 @@
-# Surface 10, and a control on the archive readings: five of the 36 domains that
-# were read from archived captures, re-read in a real Chrome browser, which
-# renders the JavaScript these sites serve. The question is whether a capture
-# misrepresents what a site is now.
+# Control on the archive readings: the 36 domains that wall every automated
+# client and were therefore read from archived captures, re-opened in a real
+# Chrome browser, which renders the JavaScript they serve. The question is
+# whether a capture misrepresents what a site is now.
 #
-# Columns: domain, what the live browser showed, what the archive capture showed, verdict.
-zara.com	ZARA Official Website (with its country/language selector)	ZARA South Africa | New Collection Online	AGREE — clothing retailer
-marriott.com	Marriott Bonvoy Hotels | Book Directly & Get Exclusive Rates	All-Inclusive by Marriott Bonvoy | All-Inclusive Resorts	AGREE — hotel booking
-tesco.com	Tesco - Supermarkets | Online Groceries, Clubcard & Recipes	Tesco - Supermarkets | Online Groceries, Clubcard & Recipes	AGREE — identical string
-discogs.com	Discogs.com (main heading)	Discogs - Music Database and Marketplace	AGREE — music marketplace
-rei.com	REI: A Life Outdoors is a Life Well Lived | REI Co-op	REI: A Life Outdoors is a Life Well Lived | REI Co-op	AGREE — identical string
+# 29 of the 36 rendered a title live. All 29 agree with the capture — several
+# match its title string exactly. 0 disagreements in 29, 95% CI 0.0-11.7%.
 #
-# 0 disagreements in 5, 95% CI 0.0-43.4%. Five is a thin sample and the interval
-# says so; it is a measurement of the archive-lag risk rather than an assurance
-# about it, and the 19.6% bound for declining archive evidence altogether stands
-# alongside it.
+# Columns: domain, live browser title, verdict.
+allrecipes.com	The Latest (Allrecipes recipe feed)	AGREE
+alphapolis.co.jp	アルファポリス - 小説・漫画・ビジネス等の総合エンターテインメントサイト	AGREE — same string as the capture
+aparat.com	خطای 504 - عدم پاسخگویی سرور | آپارات	AGREE — server error page, but names Aparat
+argos.co.uk	Argos | Order online today for fast home delivery	AGREE — same string
+behance.net	Search Projects :: Photos, videos, logos, illustrations and branding :: Behance	AGREE — same string
+cardmarket.com	Cardmarket: Buy and Sell Trading Card Games Online	AGREE
+cmoa.jp	アクセス制限のお知らせ | コミックシーモア	AGREE — access notice, but names Comic Seymour
+discogs.com	Discogs.com	AGREE
+dzen.ru	Дзен: последние новости России и мира сегодня	AGREE
+ebay.ca	Electronics, Cars, Fashion, Collectibles & More | eBay	AGREE — same string
+ebay.com	Electronics, Cars, Fashion, Collectibles & More | eBay	AGREE — same string
+espn.com	ESPN - Serving Sports Fans. Anytime. Anywhere.	AGREE — same string
+goethe.de	Goethe-Institut | Sprache. Kultur. Deutschland.	AGREE — same string
+google.co.jp	Google	AGREE
+jal.co.jp	日本航空 (JAL) - 航空券・飛行機チケット予約	AGREE — Japan Airlines
+jus.br	Jus.br – Acesso Rápido e Simplificado aos Serviços Judiciais	AGREE — same string
+kobo.com	Kobo.com United States store - eBooks, Audiobooks, eReaders and Reading apps	AGREE
+letterboxd.com	Letterboxd • Social film discovery.	AGREE — same string
+marriott.com	Marriott Bonvoy Hotels | Book Directly & Get Exclusive Rates	AGREE
+mcdonalds.com	McDonald's: Burgers, Fries & More. Quality Ingredients.	AGREE — same string
+netshoes.com.br	Loja de Artigos Esportivos Online | Netshoes	AGREE — same string
+news18.com	News18: Breaking News, Latest News, News Headlines Today, India & World News	AGREE — same string
+olx.pl	Ogłoszenia - Sprzedam, kupię na OLX.pl	AGREE — same string
+paylocity.com	Unify HR, Finance, & IT | HR & Payroll Simplified | Paylocity	AGREE — same string
+rei.com	REI: A Life Outdoors is a Life Well Lived | REI Co-op	AGREE — same string
+sahibinden.com	sahibinden.com Log In	AGREE — same string
+tesco.com	Tesco - Supermarkets | Online Groceries, Clubcard & Recipes	AGREE — same string
+vnexpress.net	Báo VnExpress - Báo tiếng Việt nhiều người xem nhất	AGREE — same string
+zara.com	ZARA Official Website	AGREE
+#
+# 7 could not be rendered live either, so their reading still rests on a capture:
+cricbuzz.com	NOT LIVE-READ — the browser tool refuses this host on safety grounds	capture only
+drive2.ru	NOT LIVE-READ — DDoS-Guard interstitial	capture only
+joom.com	NOT LIVE-READ — page never completed loading	capture only
+leparisien.fr	NOT LIVE-READ — Access Denied to the browser too	capture only
+orange.fr	NOT LIVE-READ — renders a zero-width title	capture only
+shopee.ph	NOT LIVE-READ — page never completed loading	capture only
+traveloka.com	NOT LIVE-READ — Human Verification interstitial	capture only

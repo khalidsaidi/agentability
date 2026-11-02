@@ -38,9 +38,9 @@ async function main() {
     // which have moved three times today.
     {
       what: "kept side, archive-declined bound",
-      needle: hc.farEdge?.ifArchiveRejected?.rate
-        ? `the bound becomes ${pct(hc.farEdge.ifArchiveRejected.rate)}%`
-        : "__RECORD_MISSING_ifArchiveRejected__",
+      needle: hc.archiveControl?.boundIfArchiveDeclined?.rate
+        ? `${pct(hc.archiveControl.boundIfArchiveDeclined.rate)}%, 95% CI ${(hc.archiveControl.boundIfArchiveDeclined.ci95[0] * 100).toFixed(1)}`
+        : "__RECORD_MISSING_boundIfArchiveDeclined__",
     },
     { what: "kept side, prose tier", needle: `All 189 were judged from prose` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
