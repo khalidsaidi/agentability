@@ -67,14 +67,21 @@ async function main() {
     .split("\n")
     .filter((l) => l.includes("\t") && !l.startsWith("#"));
   const stillUnresolved = archiveRows.filter((l) => NOTHING.test(l)).length;
+  // Fifth surface: the CDX index, queried for a capture that returned HTTP 200.
+  // Only a domain that none of the five surfaces renders is truly unresolved.
+  const cdxUnresolved = fs
+    .readFileSync(path.join(dir, "kept-census-cdx.tsv"), "utf8")
+    .split("\n")
+    .filter((l) => /STILL NOTHING/.test(l)).length;
 
   console.log(`\nRecord against the evidence files in data/index/evidence/\n`);
   let fileComparisons = 0;
   for (const [what, got, want] of [
     ["census rows", census.length, hc.farEdge.n],
     ["walls the archive pass took", archiveRows.length, walls],
-    ["unresolved after archive", stillUnresolved, hc.farEdge.errors - hc.errors],
-    ["hand-read domains", census.length - stillUnresolved, hc.n],
+    ["unresolved after archive", stillUnresolved, 11],
+    ["unresolved after CDX", cdxUnresolved, hc.farEdge.errors - hc.errors],
+    ["hand-read domains", census.length - cdxUnresolved, hc.n],
   ] as const) {
     const ok = got === want;
     fileComparisons += 1;

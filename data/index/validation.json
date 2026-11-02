@@ -79,55 +79,49 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "Each of the 189 drawn domains read by hand in four passes: the live homepage (144), a browser UA and the www host for the ones our own auditor had managed to read (9 more, 8 resolved), and then the closest Internet Archive snapshot for every domain no live fetch could read (25 more). A snapshot is a readable page even where the live site walls every client, so 'unreadable' was partly my limit rather than theirs.",
+    "how": "Each of the 189 drawn domains read by hand across five surfaces: the live homepage (144); a browser UA and the www host for the 9 our own auditor had read (8 resolved); the closest Internet Archive snapshot for everything no live fetch could read (25); and then the Wayback CDX index filtered to captures that returned HTTP 200 with text/html (6 more). That last surface mattered because asking for the closest snapshot returns a capture of an error page where the site was erroring when the crawler came by — so 'no readable snapshot' was a property of my query, not of the archive.",
     "errors": 1,
-    "n": 178,
-    "rate": 0.006,
+    "n": 184,
+    "rate": 0.005,
     "ci95": [
      0.001,
-     0.031
+     0.03
     ],
     "found": [
      "netkeiba.com — Japan's largest horse-racing odds and tips service, now excluded"
     ],
     "farEdge": {
-     "errors": 12,
+     "errors": 6,
      "n": 189,
-     "rate": 0.063,
+     "rate": 0.032,
      "ci95": [
-      0.037,
-      0.108
+      0.015,
+      0.068
      ],
-     "how": "the one error plus the 11 domains that no live fetch and no archive snapshot could render.",
-     "says": "counting every one of those 11 as a wrong keep: at most 10.8%.",
+     "how": "the one error plus the 5 domains that five surfaces could not render.",
+     "says": "counting all 5 as wrong keeps: at most 6.8%, under Wilson and the exact interval alike.",
      "unresolved": [
-      "alphapolis.co.jp",
-      "behance.net",
-      "ebay.ca",
-      "google.co.jp",
       "joom.com",
       "jus.br",
-      "leparisien.fr",
       "marriott.com",
-      "mcdonalds.com",
       "netshoes.com.br",
       "zara.com"
-     ],
-     "interval": "Wilson 3.7-10.8%, exact 3.3-10.8% — the same upper edge."
+     ]
     },
     "whatItCost": "The scan had cleared netkeiba.com because nothing on it is in English. That is the finding: the kept-side figure was never limited by sample size, it was limited by the vocabulary. Japanese, Chinese, Korean, Thai, Vietnamese and Arabic gambling, adult and piracy terms are now in the scan, checked both ways — they fire on netkeiba.com and az24.vn and stay quiet on asahi.com and kakaku.com.",
     "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
     "wallsVerified": "The 36 are not taken on one failed request. Each is corroborated by our own audit pipeline, which fetches with retries on a different day from a different network and also got nothing readable. The 9 that our auditor had read are not in the 36 — counting them as walls would have inflated the bound from 25.8% to 30.9%, which is what the first pass did.",
-    "sensitivityOnThisDenominator": "livescore.com and goal.com are judgement calls kept under the primary-purpose rule, though goal.com age-gates gambling advertising and livescore.com sells betting-affiliate placement. Counted as errors: 3/178 = 1.7%, 95% CI 0.6-4.8%; the far edge becomes 14/189 = 7.4%, CI 4.5-12.1%.",
-    "supersedes": "1/144 with a 30.9% far edge (which miscounted 9 readable domains as walls) and 1/153 with a 25.8% far edge (which had not tried archive snapshots).",
+    "sensitivityOnThisDenominator": "livescore.com and goal.com are judgement calls kept under the primary-purpose rule. Counted as errors: 3/184 = 1.6%, 95% CI 0.6-4.6%; the far edge becomes 8/189 = 4.2%, CI 2.2-8.2%.",
+    "supersedes": "1/144 (far edge 30.9%, which miscounted 9 readable domains as walls), 1/153 (25.8%, before any archive pass), and 1/178 (10.8%, before the CDX index was queried for a 200 capture).",
     "evidence": {
      "census": "data/index/evidence/kept-census-2026-11-02.tsv (189 rows: domain, title, description)",
      "walls": "data/index/evidence/kept-census-walls.tsv (45 rows: 36 WALL, 9 OVERTURNED with our auditor's A3 reading)",
      "runs": "data/index/evidence/probe-final-rule.txt, probe-live-1337.txt, probe-live-5150.txt, probe-withdrawn.txt",
-     "archive": "data/index/evidence/kept-census-archive.tsv (36 rows: domain, snapshot title, snapshot URL)"
+     "archive": "data/index/evidence/kept-census-archive.tsv (36 rows: domain, snapshot title, snapshot URL)",
+     "cdx": "data/index/evidence/kept-census-cdx.tsv (11 rows: the 6 resolved with capture timestamps, the 5 that were not, with why)"
     },
-    "whyWallsAreNotHandRead": "11 domains remain that no live fetch and no archive snapshot could render. Those are not hand-read and cannot be: there is no retrievable page. They are counted as wrong keeps, which is why the far edge is 10.8% rather than the 0.6% measured. The previous 25.8% assumed 36 such domains; the archive pass showed 25 of them were my limit, not theirs.",
-    "interval": "Wilson 0.1-3.1%, exact 0.0-3.1% — the same upper edge to one decimal place."
+    "whyWallsAreNotHandRead": "5 domains remain that five surfaces could not render: joom.com and jus.br have captures that produce no title, netshoes.com.br has none in the index, marriott.com's only 200 capture is an archive.org infrastructure page rather than Marriott, and zara.com renders as a single non-breaking space. Those cannot be hand-read because no retrievable page exists, so they are counted as wrong keeps. Each previous bound — 30.9%, 25.8%, 10.8% — was lowered by finding another surface rather than by argument, which is the honest reading of this one too: 6.8% is what five surfaces leave, not a floor.",
+    "interval": "Wilson 0.1-3.0%, exact upper 3.0% — the same edge."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
