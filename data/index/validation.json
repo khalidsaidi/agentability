@@ -3,27 +3,31 @@
  "_measuredOn": "2026-11-02",
  "contentFilter": {
   "overExclusion": {
-   "errors": 4,
+   "errors": 6,
    "n": 53,
-   "rate": 0.075,
+   "rate": 0.113,
    "ci95": [
-    0.021,
-    0.182
+    0.043,
+    0.23
    ],
-   "how": "full census of every withdrawn domain; homepage fetched, title and description read by hand",
+   "how": "Census of all 53 excluded domains, re-read on 2026-11-02 with full body text through the cookie-aware fetcher. The first pass read only each homepage's title and meta description and found 4; the stronger read found 2 more.",
    "found": [
     "dragonball-super.com",
     "strikerreport.com",
     "i993.com",
-    "izy0.com"
+    "izy0.com",
+    "janitorai.com — AI character-chat platform, excluded as porn; polybuzz.ai is the same class of site and was kept",
+    "matchcast.tv — broadcast listings pointing at legitimate broadcasters, excluded as piracy"
    ],
    "note": "This is the classifier's own rate, which is what it should be: all 4 are corrected in classification-overrides.json, so the shipped pipeline removes none of them today. Checking this turned up that 2 of the 4 — dragonball-super.com and strikerreport.com — had their verdict fixed but were never put back in the audit list, so their report pages were live while they stayed out of the ranking and out of every weekly run. Both are now in submitted.txt and rejoin at the next run.",
+   "interval": "exact Clopper-Pearson 4.3-23.0%. The bound faces upward and holds at 23.0%.",
+   "direction": "This pass moved the rate UP, 7.5% to 11.3%. That is what a discard bucket examined once, one way, will do: the weaker read understated its own error rate. It could have moved down — a stronger read could have overturned one of the original 4 — and did not.",
+   "supersedes": "4 of 53 = 7.5%, exact CI 2.1-18.2%, which was read from titles and meta descriptions only.",
    "asShipped": {
     "errors": 0,
     "n": 53,
-    "note": "after overrides. The 4 raw errors are the measure of the model, not of what the site publishes."
-   },
-   "interval": "exact Clopper-Pearson, 2.1-18.2%. Wilson gives 3.0-17.9%; the exact upper edge is wider, so it is the one published."
+    "note": "All 6 are corrected in classification-overrides.json, so the shipped filter removes none of them today. The 6 measure the classifier, not the published panel."
+   }
   },
   "underExclusion": {
    "pool": "e15d222a8342 — 1,175 kept domains, the panel as published. Every figure below is measured on this one pool.",

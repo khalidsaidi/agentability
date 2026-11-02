@@ -1,7 +1,7 @@
 {
  "_README": "Human review of the model's content verdicts. classification.json stays exactly what the classifier returned; this file records where a hand check disagreed, and why, so both are auditable. Applied on top of classification.json by build-panel.ts and build-site.ts. Added only after fetching the site and reading it.",
  "_reviewedOn": "2026-11-02",
- "_method": "Full census of all 53 excluded domains: homepage fetched, title and meta description read by hand. 4 were wrong exclusions, 2 were right exclusions under the wrong label. A 40-domain random sample (seeded shuffle) of the 1,405 kept domains found 0 wrong inclusions. Re-measured 2026-11-02 against a sorted, fingerprinted pool: two seeded draws, 127 distinct domains, 111 judged, 1 wrong keep (az24.vn). A hand census of all 189 drawn domains on 2026-11-02 added netkeiba.com.",
+ "_method": "Full census of all 53 excluded domains: homepage fetched, title and meta description read by hand. 4 were wrong exclusions, 2 were right exclusions under the wrong label. A 40-domain random sample (seeded shuffle) of the 1,405 kept domains found 0 wrong inclusions. Re-measured 2026-11-02 against a sorted, fingerprinted pool: two seeded draws, 127 distinct domains, 111 judged, 1 wrong keep (az24.vn). A hand census of all 189 drawn domains on 2026-11-02 added netkeiba.com. Re-read on 2026-11-02 with full body text through the cookie-aware fetcher rather than title and description: 2 further wrong exclusions found (janitorai.com, matchcast.tv), taking the removed-side rate from 4 of 53 to 6 of 53. The weaker read understated it.",
  "dragonball-super.com": {
   "verdict": "ok",
   "was": "piracy",
@@ -39,5 +39,14 @@
  "netkeiba.com": {
   "verdict": "gambling",
   "reason": "Japan's largest horse-racing service — its own description offers JRA race cards, odds, tips, keirin and a betting-prediction contest. An odds and tips service is gambling under the rule. The classifier said ok and the English vocabulary scan could not see it; found by the hand census of 189 drawn domains on 2026-11-02."
- }
+ },
+ "janitorai.com": {
+  "verdict": "ok",
+  "reason": "An AI character-chat and collaborative-fiction platform — its own description is \"a platform for creators building immersive worlds and readers seeking living stories\", 15M+ users, and its homepage shows character bots, not adult content. Excluded as porn by the classifier. Keeping it is also what consistency requires: polybuzz.ai is the same class of site and was kept on primary-purpose grounds. Found 2026-11-02 by re-reading the excluded set with full body text instead of title and description."
+ },
+ "matchcast.tv": {
+  "verdict": "ok",
+  "reason": "A broadcast-listings site: \"Find every broadcaster showing live sports in your country — Free TV, streaming and cable listings updated daily.\" It points at legitimate broadcasters rather than hosting or aggregating streams. Excluded as piracy, presumably on \"watch free\". Found the same way."
+ },
+ "_closestCallOnTheRemovedSide": "polymarket.com stays excluded and is the closest call: \"the world's largest prediction market... profit from your knowledge by trading on future events\". Staking money on a binary outcome is betting under the stated rule, and the same rule excluded netkeiba.com as an odds service; that it is a regulated venue in some jurisdictions does not change its purpose. Counted as a correct exclusion, published here so the judgement is disputable."
 }
