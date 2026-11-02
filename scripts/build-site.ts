@@ -1500,7 +1500,7 @@ Shopify publishes a UCP profile on behalf of its merchants, so on a panel of Sho
 reporting who uses Shopify. ${shopify.length
   ? `${shopify.length} shop${shopify.length === 1 ? " here is" : "s here are"} on Shopify, so read ${shopify.length === 1 ? "that row" : "those rows"} as the platform's decision, not the merchant's.`
   : `We detect no Shopify storefront on this panel at all — these are the web's most-visited sites, and at that size shops run their own checkout — so ${withUcp.length ? `the ${withUcp.length} that publish UCP did it themselves` : "nothing here is a platform default"}.`}
-The rest of the score is the same seven checks as the main <a href="/ai-index/">index</a>, which measure things no platform
+The rest of the score is the same nine checks as the main <a href="/ai-index/">index</a>, which measure things no platform
 hands you: whether your prices survive a fetch without JavaScript, whether an agent can reach your basket, whether your
 products carry structured data.</p>
 
@@ -1757,7 +1757,7 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
   const supportBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
 <h1>Check your site&rsquo;s AI-agent readiness</h1>
-<p class="lede">Ask us to audit any site against the same eight checks as the <a href="/ai-index/">Index</a> &mdash; free, no
+<p class="lede">Ask us to audit any site against the same nine checks as the <a href="/ai-index/">Index</a> &mdash; free, no
 signup, and the report is published in public like everyone else&rsquo;s. You can also dispute a score or have it re-run
 after a fix.</p>
 <p class="lede"><b>Request an audit</b> — open an
@@ -1827,7 +1827,7 @@ and publish only what those public files say. To remove a domain from the Index,
       body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Guides</p>
 <h1>Make your site work for AI agents</h1>
-<p class="lede">Three guides, built on the same eight checks the <a href="/ai-index/">Index</a> scores ${s?.audited ?? "the panel's"} sites on every
+<p class="lede">Three guides, built on the same nine checks the <a href="/ai-index/">Index</a> scores ${s?.audited ?? "the panel's"} sites on every
 week — and on what we watch a real agent run into every week on the <a href="/fieldtest/">Field Test</a>. Nothing invented,
 nothing you can't test with curl.</p>
 <div class="guides-list">${GUIDES.map((g) => `<a href="/guides/${g.slug}/"><span class="t">${esc(g.title)}</span><span class="d">${esc(g.description)}</span></a>`).join("")}</div>`,

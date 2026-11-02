@@ -27,13 +27,13 @@ const curl = (cmd: string) => `<pre><code>${cmd.replace(/&/g, "&amp;").replace(/
 export const GUIDES: Guide[] = [
   {
     slug: "ai-readiness-audit-checklist",
-    title: "AI SEO Checklist: 8 Checks AI Agents Run on Your Site",
+    title: "AI SEO Checklist: 9 Checks AI Agents Run on Your Site",
     description:
-      "An AI readiness audit checklist you can run yourself in an hour: the eight checks that decide whether AI agents can read, understand and act on your site — llms.txt, crawler policy, readable HTML, structured data, sitemap, reachable pricing and support, MCP and OpenAPI — each with a 60-second curl test and the exact fix.",
+      "An AI readiness audit checklist you can run yourself in an hour: the nine checks that decide whether AI agents can read, understand and act on your site — llms.txt, crawler policy, readable HTML, structured data, sitemap, reachable pricing and support, MCP, OpenAPI and UCP — each with a 60-second curl test and the exact fix.",
     updated: "2026-09-14",
     body: (ctx) => `
 <p class="lede">AI agents are the web's newest audience, and most sites fail them in the same handful of ways. This is the
-checklist we score the ${ctx.audited} most-visited sites on the web against every week — the same eight checks, in the same order, with a
+checklist we score the ${ctx.audited} most-visited sites on the web against every week — the same nine checks, in the same order, with a
 way to test each one yourself in about a minute. The panel's average right now is <b>${ctx.averageScore}/100</b>.</p>
 
 <h2>What an agent actually needs</h2>
@@ -94,6 +94,12 @@ sites skip this; the ones that ship it are the ones agents can actually act on r
 <h3>B2 · Publish an OpenAPI document <span class="pts">+5 bonus</span></h3>
 <p class="lede">A reachable OpenAPI description at a stable URL, linked from your docs and your <code>llms.txt</code>. Only relevant
 if you have an API — but if you do, it is how an agent learns to call it correctly the first time.</p>
+
+<h3>B3 · Publish a UCP commerce profile <span class="pts">+5 bonus</span></h3>
+<p class="lede">Only relevant if you sell something. <a href="https://ucp.dev/" rel="nofollow">UCP</a> is the one agentic-commerce
+standard an outsider can verify: a profile an agent can fetch to learn how to browse your catalogue and check out. Shopify
+publishes one on behalf of its merchants, so on a Shopify store this arrives without you doing anything; everywhere else it
+is a decision. How the shops we audit are doing is on the <a href="/shops/">commerce page</a>.</p>
 
 <h2>What fails most, in practice</h2>
 <p class="lede">Every week a real agent attempts ten errands on real sites and we publish the transcript. The recurring killers, in
@@ -303,7 +309,7 @@ your own pages the way an agent does:</p>
 <a href="/guides/ai-readiness-audit-checklist/">full checklist</a> for the fix to each failure.</p>
 
 <div class="cta"><b>The short answer to "AEO vs GEO":</b> pick whichever word your team likes, then go fix layers 1 and 2
-first. The labels are marketing; the eight checks are not.</div>`,
+first. The labels are marketing; the nine checks are not.</div>`,
   },
   {
     slug: "technical-seo-for-ai-discovery",
