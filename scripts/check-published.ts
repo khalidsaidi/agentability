@@ -69,6 +69,7 @@ async function main() {
   const stillUnresolved = archiveRows.filter((l) => NOTHING.test(l)).length;
 
   console.log(`\nRecord against the evidence files in data/index/evidence/\n`);
+  let fileComparisons = 0;
   for (const [what, got, want] of [
     ["census rows", census.length, hc.farEdge.n],
     ["walls the archive pass took", archiveRows.length, walls],
@@ -76,6 +77,7 @@ async function main() {
     ["hand-read domains", census.length - stillUnresolved, hc.n],
   ] as const) {
     const ok = got === want;
+    fileComparisons += 1;
     if (!ok) failed += 1;
     console.log(`  ${ok ? "ok  " : "FAIL"}  ${String(what).padEnd(26)} file says ${got}, record says ${want}`);
   }
@@ -84,7 +86,8 @@ async function main() {
     console.error(`\n${failed} disagreement(s) — the page, the record and the evidence are not telling the same story.`);
     process.exit(1);
   }
-  console.log(`\nAll ${checks.length + 3} published figures agree across page, record and evidence.`);
+  // Counted, not typed: this line said 12 while 13 comparisons were running.
+  console.log(`\nAll ${checks.length + fileComparisons} published figures agree across page, record and evidence.`);
 }
 
 main().catch((e) => {

@@ -73,7 +73,11 @@ async function main() {
   claim("census-boundary-applied", `${walls.n} wall decisions, deciding text in each row`, `${walls.where} and data/index/evidence/kept-census-archive.tsv`);
   claim("draw-method", "seeded Fisher-Yates over the whole sorted pool", `scripts/probe-filter-sample.ts:${probeSrc.findIndex((l) => l.startsWith("function sample")) + 1}`);
   claim("rules-regression-tested", "10 fixtures, 5 proven against the buggy code", "npm run validate");
-  claim("page-matches-record", "11 figures compared", "npm run check-published");
+  // Counted from the checker rather than typed, so the two cannot drift: the
+  // hardcoded "11" was already stale by one the first time this ran.
+  const checkerSrc = fs.readFileSync(path.join(ROOT, "scripts/check-published.ts"), "utf8");
+  const figures = (checkerSrc.match(/\{ what: "/g) ?? []).length + (checkerSrc.match(/\["[a-z][^"]*", \w/g) ?? []).length;
+  claim("page-matches-record", `${figures} figures compared`, "npm run check-published");
 
   // The remaining misleading report pages, counted from the stored audits.
   const dir = path.join(ROOT, "data/index/results");
