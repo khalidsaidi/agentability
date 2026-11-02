@@ -132,16 +132,16 @@
      "what": "Whether an archived capture misrepresents what a site is now — the last weakness in the census, since 36 of the 189 wall every automated client and were read from captures.",
      "how": "All 36 re-opened in a real Chrome browser, which renders the JavaScript they serve. 32 rendered; 4 did not.",
      "result": "0 disagreements in 32, 95% CI 0.0-10.7%. Sixteen of the 32 match their capture's title string exactly.",
-     "remaining": "4 still rest on a capture alone: cricbuzz.com (the browser tool refuses the host), joom.com (never finished loading in six attempts), leparisien.fr (Access Denied to the browser too), traveloka.com (Human Verification on the apex and on /en-id). shopee.ph, orange.fr and drive2.ru were on this list until a retry, a portal path and a /cars/ path rendered them.",
+     "remaining": "Of the 4 that no browser could render, 2 are corroborated live by their own machine files fetched today — joom.com's sitemap indexes product pages, leparisien.fr's robots.txt names news sitemap feeds — which is structural rather than prose, and confirms the capture's identity rather than its content. 2 have no live evidence at all: cricbuzz.com (the browser tool refuses the host, and no machine file is readable) and traveloka.com (Human Verification everywhere, no machine file readable).",
      "boundIfArchiveDeclined": {
-      "errors": 5,
+      "errors": 3,
       "n": 189,
-      "rate": 0.026,
+      "rate": 0.016,
       "ci95": [
-       0.011,
-       0.06
+       0.005,
+       0.046
       ],
-      "says": "treating the one error plus all 4 capture-only domains as wrong keeps: 2.6%, at most 6.0% at the far edge. This is the figure that depends on no archive evidence at all — 19.6% before the browser control, then 8.1%, 6.8%, and now 6.0% as each retry removed a domain from the capture-only list."
+      "says": "treating the one error plus the 2 domains with no live evidence of any kind as wrong keeps: 1.6%, at most 4.6% at the far edge. This is the figure that depends on no archive evidence. It was 19.6% when the browser control began, then 8.1%, 6.8%, 6.0% and now 4.6% — every step a domain leaving the list because one more route was tried, never because the argument changed."
      },
      "evidence": "data/index/evidence/kept-census-browser-check.tsv"
     }

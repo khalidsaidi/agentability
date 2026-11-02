@@ -37,11 +37,13 @@ tesco.com	Tesco - Supermarkets | Online Groceries, Clubcard & Recipes	AGREE — 
 vnexpress.net	Báo VnExpress - Báo tiếng Việt nhiều người xem nhất	AGREE — same string
 zara.com	ZARA Official Website	AGREE
 #
-# 4 could not be rendered live either, so their reading still rests on a capture:
+# 4 could not be rendered live. Two of those four are corroborated live by
+# their own machine files instead, fetched today; two have no live evidence at
+# all and rest on a capture alone:
 cricbuzz.com	NOT LIVE-READ — the browser tool refuses this host on safety grounds	capture only
 drive2.ru	Машины. Отзывы владельцев авто с фотографиями — DRIVE2.RU — car-owner reviews. The apex serves a DDoS-Guard interstitial; /cars/ renders.	AGREE
-joom.com	NOT LIVE-READ — page never completed loading	capture only
-leparisien.fr	NOT LIVE-READ — Access Denied to the browser too	capture only
+joom.com	LIVE CORROBORATION (structural, not prose) — sitemap.xml returns 200 today and indexes product page files at /sitemap/gpt/pages/page-N.xml, which matches the capture's "Joom. Shop every day". The page itself never finished loading in six browser attempts.	sitemap.xml 200 today
+leparisien.fr	LIVE CORROBORATION (structural, not prose) — robots.txt returns 200 today naming sitemapnews and news-sitemap-index feeds, which matches the capture's "Actualités en direct et info en continu". The page is Access Denied to the browser too.	robots.txt 200 today
 orange.fr	Portail Orange | Offres Mobiles, Internet, TV, Actu & Accès compte Mail — heading "Accueil du site Orange". The title is zero-width until the portal path is loaded.	AGREE
 shopee.ph	Shopee Philippines | Buy and Sell on Mobile or Online — rendered on a second navigation; the first timed out.	AGREE
 traveloka.com	NOT LIVE-READ — Human Verification interstitial	capture only
