@@ -1517,8 +1517,7 @@ with plain HTTP requests. No invented standards: every check is traceable to a c
 <a href="https://tranco-list.eu/" rel="nofollow noopener">Tranco</a> top 5,000 — a daily, citable ranking built from
 five independent sources — and keeps only the domains that also appear in Google's
 <a href="https://developer.chrome.com/docs/crux" rel="nofollow noopener">Chrome UX Report</a> top bucket, which measures
-real visits by real Chrome users and comes to 8,234 domains as used here. Two independent rankings have to agree before
-a site is in. The exact size of every input is recorded in <code>/data/panel-source.json</code> — don't take the round
+real visits by real Chrome users and comes to 8,234 domains as used here. Two independent rankings have to agree before a site is in &mdash; which only ever removes, never adds, and 3,366 Tranco entries were dropped that way. The cost is a Chrome-shaped panel: CrUX measures Chrome users, so a site that is large in a Safari-heavy market, or behind the Great Firewall, can be in Tranco&rsquo;s top 5,000 and still absent here. Every domain the build discards is now listed by name and reason in <code>panel-drops.tsv</code>, so the bucket can be checked rather than trusted. The exact size of every input is recorded in <code>/data/panel-source.json</code> — don't take the round
 numbers in this paragraph for the ones that ran.</p>
 <p class="lede">Two things are then removed. <b>Infrastructure</b>: CDNs, DNS, ad servers, API hosts and login walls —
 nobody is ever sent to <code>gtld-servers.net</code> to find a price, so scoring it tells you nothing.
