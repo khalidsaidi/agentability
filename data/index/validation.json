@@ -104,7 +104,13 @@
     "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
     "wallsVerified": "The 36 are not taken on one failed request. Each is corroborated by our own audit pipeline, which fetches with retries on a different day from a different network and also got nothing readable. The 9 that our auditor had read are not in the 36 — counting them as walls would have inflated the bound from 25.8% to 30.9%, which is what the first pass did.",
     "sensitivityOnThisDenominator": "livescore.com and goal.com are judgement calls, kept because the rule judges primary purpose and both are sports news, though goal.com age-gates gambling advertising and livescore.com sells betting-affiliate placement. Counted as errors on this census denominator: 3/153 = 2.0%, 95% CI 0.7-5.6%. The far edge moves to 39/189 = 20.6%, CI 15.4-27.0%.",
-    "supersedes": "the first census pass, 1/144 with a 30.9% far edge, which counted 9 readable domains among the walls."
+    "supersedes": "the first census pass, 1/144 with a 30.9% far edge, which counted 9 readable domains among the walls.",
+    "evidence": {
+     "census": "data/index/evidence/kept-census-2026-11-02.tsv (189 rows: domain, title, description)",
+     "walls": "data/index/evidence/kept-census-walls.tsv (45 rows: 36 WALL, 9 OVERTURNED with our auditor's A3 reading)",
+     "runs": "data/index/evidence/probe-final-rule.txt, probe-live-1337.txt, probe-live-5150.txt, probe-withdrawn.txt"
+    },
+    "whyWallsAreNotHandRead": "A wall cannot be hand-read; that is what makes it a wall. Three user agents, two hosts and two separate days returned nothing for each of the 36, and our own audit pipeline got nothing either. The far edge therefore counts all 36 as wrong keeps — the most conservative treatment available — rather than claiming a verdict on a page nobody could retrieve."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones."
   }
@@ -180,5 +186,6 @@
    "newgrounds.com — a free content portal"
   ],
   "boundary": "A shop is a site whose primary purpose is selling goods or services to the public and where a visitor can start a purchase. News, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription. Whether to narrow this to retail only is a product decision, not a measurement one."
- }
+ },
+ "_evidence": "Raw inputs for every figure here are committed under data/index/evidence/, with a README mapping each file to the numbers it produced: the 189-domain census, the wall cross-check, and the four probe runs."
 }

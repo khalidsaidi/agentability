@@ -1,0 +1,100 @@
+Rule for "unreadable" — a domain counts as judged if ANY of these yields content, in order:
+  1. GET https://<domain>/ with "AgentabilityBot/2.0 (+https://agentability.org/methodology)"  -> >= 50 prose words
+  2. the same GET with a browser UA                               -> >= 50 prose words
+  3. the same GET against www.<domain> with a browser UA          -> >= 50 prose words
+  4. robots.txt + sitemap.xml, HTTP 200 only                      -> > 20 tokens
+A prose word excludes any token containing braces, semicolons, equals, quotes or slashes, so bundled
+JavaScript does not count as a readable page. A non-200 at step 4 is an error page, not evidence.
+
+Content filter, kept side — seed 1337, 66 drawn from 1175 kept, pool e15d222a8342
+
+  joom.com                   UNRESOLVED    robots 429 sitemap 200
+  sahibinden.com             UNRESOLVED    robots 403 sitemap 403
+  amazon.nl                  body          clean
+  therapservices.net         body          FLAG — judge by hand
+      gambling:"Slot" …t Service, Goals & Outcome Tracking Secure Video Documentation Waiver Slot Management About Us Find Your Therap Rep Hear From Our Users Ther…
+  python.org                 body          clean
+  emojipedia.org             body          clean
+  garena.com                 body          clean
+  nubank.com.br              body          clean
+  index.hr                   body          FLAG — judge by hand
+      porn:"OnlyFans" … nam je, ali milenijalci misle da će vas zbog ovih trendova biti sram OnlyFans zvijezda tvrdi da zna što odvlači gen Z od odnosa: "Nisu 18+ …
+  cardmarket.com             body          clean
+  ebay.com                   machine       clean
+  pravda.com.ua              body          clean
+  affirm.com                 body          clean
+  letterboxd.com             machine       clean
+  aol.com                    body          clean
+  steampowered.com           body          clean
+  tesco.com                  UNRESOLVED    robots 403 sitemap 403
+  yahoo.com                  body          clean
+  gumroad.com                body          clean
+  viber.com                  body          clean
+  detik.com                  body          clean
+  vedomosti.ru               body          clean
+  goal.com                   body          FLAG — judge by hand
+      gambling:"betting" …onest response. This site contains gambling advertising for 24+. Show betting ads Yes, I’m 24 or older No, I’m younger than 24 Age-restricte…
+  ms.now                     body          clean
+  nexon.com                  machine       clean
+  researchgate.net           UNRESOLVED    robots 200 sitemap 403
+  mcdonalds.com              body          clean
+  goethe.de                  machine       FLAG — judge by hand
+      porn:"xxx" … /services/
+Disallow: /kdf-server/
+Disallow: /mmo/priv/
+Disallow: /xxx/
+Disallow: /z/50/
+Disallow: /coe
+Disallow: /myg/
+Disallow: /su…
+  marinetraffic.com          body          clean
+  cricbuzz.com               body          FLAG — judge by hand
+      gambling:"betting" …, and a probe shrouded in questions Summoned at 1am, questioned about betting and gambling and separated from his phone for weeks, Mohammad …
+  wetransfer.com             machine       clean
+  temu.com                   body          clean
+  otto.de                    body          clean
+  telenet.be                 body          clean
+  johnlewis.com              body          clean
+  investing.com              body          clean
+  duckduckgo.com             body          clean
+  argos.co.uk                UNRESOLVED    robots 403 sitemap 403
+  dzen.ru                    body          clean
+  deepl.com                  body          clean
+  corriere.it                body          clean
+  cookpad.com                body          clean
+  idealista.it               machine       clean
+  sfr.fr                     body          clean
+  paylocity.com              machine       clean
+  elster.de                  body          clean
+  tenor.com                  body          clean
+  traveloka.com              UNRESOLVED    robots 405 sitemap 405
+  kbag.se                    body          clean
+  property24.com             body          clean
+  nike.com                   body          clean
+  rockstargames.com          UNRESOLVED    robots 200 sitemap 404
+  clever.com                 body          clean
+  actu.fr                    body          clean
+  istockphoto.com            body          clean
+  ew.com                     body          FLAG — judge by hand
+      porn:"xxx" …(["xx-small","x-small","small","medium","large","x-large","xx-large","xxx-large"]);nx=new Set(["larger","smaller"])});function Wf(r){let e=[…
+  stripe.com                 body          clean
+  primevideo.com             body          clean
+  craigslist.org             body          clean
+  teacherspayteachers.com    body          clean
+  mk.ru                      body          clean
+  nate.com                   body          clean
+  sport.es                   body          clean
+  asahi.com                  body          clean
+  asus.com                   body          FLAG — judge by hand
+      gambling:"slots" …ds/others/","ASUS mining motherboard features 19 PCI Express® (PCIe®) slots. With 18 PCIe x1 and one PCIe x16 slots on board, plus three zon…
+  google.co.jp               body          clean
+
+Evidence: 52 judged on page body, 7 on robots/sitemap only, 7 on nothing.
+Flagged for hand judgement: 7 (therapservices.net, index.hr, goal.com, goethe.de, cricbuzz.com, ew.com, asus.com).
+Unresolved: 7 (joom.com, sahibinden.com, tesco.com, researchgate.net, argos.co.uk, traveloka.com, rockstargames.com).
+
+Enter the hand verdicts before quoting a rate. Assuming all 7 flags are rejected:
+  judged:          0/59 wrongly kept, 95% CI 0.0%-6.1%
+  + unresolved:    7/66 at worst, 95% CI 5.2%-20.3%
+  + machine tier:  14/66 at worst, 95% CI 13.1%-32.5%
+                   — the far edge: every domain not read on its own page counted as a wrong keep.

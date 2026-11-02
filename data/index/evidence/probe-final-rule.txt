@@ -1,0 +1,90 @@
+Rule for "unreadable" — a domain counts as judged if ANY of these yields content, in order:
+  1. GET https://<domain>/ with "AgentabilityBot/2.0 (+https://agentability.org/methodology)"  -> >= 50 prose words
+  2. the same GET with a browser UA                               -> >= 50 prose words
+  3. the same GET against www.<domain> with a browser UA          -> >= 50 prose words
+  4. robots.txt + sitemap.xml, HTTP 200 only                      -> > 20 tokens
+A prose word excludes any token containing braces, semicolons, equals, quotes or slashes, so bundled
+JavaScript does not count as a readable page. A non-200 at step 4 is an error page, not evidence.
+
+Content filter, kept side — seed 2026, 66 drawn from 1175 kept, pool e15d222a8342
+
+  rightmove.co.uk            body          clean
+  rei.com                    UNRESOLVED    robots 403 sitemap 403
+  usps.com                   body          clean
+  lenta.ru                   body          clean
+  espn.com                   machine       clean
+  irs.gov                    body          clean
+  rfa.org                    body          clean
+  change.org                 body          clean
+  figma.com                  body          clean
+  staseraintv.com            body          clean
+  meteociel.fr               body          clean
+  aljazeera.net              body          clean
+  russianfood.com            body          clean
+  lg.com                     body          clean
+  kobo.com                   machine       clean
+  band.us                    machine       clean
+  elmundo.es                 body          clean
+  honor.com                  body          clean
+  amazon.ca                  body          clean
+  livescore.cz               body          clean
+  atlassian.com              body          clean
+  mirror.co.uk               body          FLAG — judge by hand
+      gambling:"Bingo" …er Stories Horoscopes Online Games Crossword Solitaire Sudoku Mahjong Bingo Sport Football Boxing UFC Cricket Rugby Union Rugby League F1 Ra…
+  vrt.be                     body          clean
+  huffpost.com               body          clean
+  google.com                 body          clean
+  vercel.com                 body          FLAG — judge by hand
+      gambling:"slot" …whitespace-nowrap py-0.5 font-medium capitalize tabular-nums **:data-[slot=icon]:block **:data-[slot=icon]:shrink-0 **:data-[slot=icon]:[-we…
+  pinduoduo.com              body          clean
+  britishairways.com         machine       clean
+  rome2rio.com               body          clean
+  wayfair.com                body          clean
+  safety.google              body          clean
+  sourceforge.net            body          clean
+  tesco.com                  UNRESOLVED    robots 403 sitemap 403
+  nfl.com                    body          clean
+  thestreet.com              machine       clean
+  shazam.com                 body          clean
+  collegeboard.org           body          clean
+  drive2.ru                  UNRESOLVED    robots 403 sitemap 403
+  facebook.com               body          clean
+  kooora.com                 body          clean
+  cmoa.jp                    UNRESOLVED    robots 0 sitemap 0
+  olx.pl                     body          clean
+  techradar.com              body          clean
+  reuters.com                machine       clean
+  amazon.ae                  body          clean
+  hola.com                   body          clean
+  allrecipes.com             body          FLAG — judge by hand
+      porn:"xxx" …(["xx-small","x-small","small","medium","large","x-large","xx-large","xxx-large"]);nx=new Set(["larger","smaller"])});function Wf(r){let e=[…
+  apify.com                  body          clean
+  vnexpress.net              body          clean
+  alphapolis.co.jp           UNRESOLVED    robots 202 sitemap 202
+  op.gg                      body          clean
+  flickr.com                 body          clean
+  marksandspencer.com        body          clean
+  wikipedia.org              body          clean
+  python.org                 body          clean
+  tradingview.com            body          clean
+  crunchyroll.com            machine       clean
+  osym.gov.tr                body          clean
+  priceline.com              body          FLAG — judge by hand
+      gambling:"Casino" …as $301 Flights from Boston to Las Vegas $293 Silver Sevens Hotel and Casino, a Wyndham Garden $50 Excalibur $52 Downtowner Boutique Hotel $…
+  webnovel.com               body          clean
+  openai.com                 body          clean
+  sports.ru                  body          clean
+  paycomonline.net           body          clean
+  picsart.com                body          clean
+  orange.fr                  machine       clean
+  springer.com               body          clean
+
+Evidence: 53 judged on page body, 8 on robots/sitemap only, 5 on nothing.
+Flagged for hand judgement: 4 (mirror.co.uk, vercel.com, allrecipes.com, priceline.com).
+Unresolved: 5 (rei.com, tesco.com, drive2.ru, cmoa.jp, alphapolis.co.jp).
+
+Enter the hand verdicts before quoting a rate. Assuming all 4 flags are rejected:
+  judged:          0/61 wrongly kept, 95% CI 0.0%-5.9%
+  + unresolved:    5/66 at worst, 95% CI 3.3%-16.5%
+  + machine tier:  13/66 at worst, 95% CI 11.9%-30.8%
+                   — the far edge: every domain not read on its own page counted as a wrong keep.

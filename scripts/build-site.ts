@@ -1559,7 +1559,9 @@ one rather than pretending it's a defect.</p>
 <h2>How wrong are these numbers</h2>
 <p class="lede">Every rule here is a guess about someone else's site, so each one has a measured error rate rather
 than an assurance. The samples are drawn with a fixed seed, so anyone can redraw the identical sample and re-judge it;
-the full record, with each interval and what it does not cover, is at <code>/data/validation.json</code>.
+the full record, with each interval and what it does not cover, is at <code>/data/validation.json</code>, and the
+raw inputs behind every figure &mdash; the full census, the wall cross-check, each probe run &mdash; are committed in
+<a href="https://github.com/khalidsaidi/agentability/tree/main/data/index/evidence">data/index/evidence/</a>.
 Where a rule could be wrong in two directions, both were measured: the filter was checked for what it removed and for
 what it kept, and A6 for links credited that an agent cannot use and real pages missed.</p>
 <table>

@@ -1,0 +1,98 @@
+Rule for "unreadable" — a domain counts as judged if ANY of these yields content, in order:
+  1. GET https://<domain>/ with "AgentabilityBot/2.0 (+https://agentability.org/methodology)"  -> >= 50 prose words
+  2. the same GET with a browser UA                               -> >= 50 prose words
+  3. the same GET against www.<domain> with a browser UA          -> >= 50 prose words
+  4. robots.txt + sitemap.xml, HTTP 200 only                      -> > 20 tokens
+A prose word excludes any token containing braces, semicolons, equals, quotes or slashes, so bundled
+JavaScript does not count as a readable page. A non-200 at step 4 is an error page, not evidence.
+
+Content filter, kept side — seed 5150, 66 drawn from 1175 kept, pool e15d222a8342
+
+  wunderground.com           body          clean
+  crunchyroll.com            machine       clean
+  rakuten.com                body          clean
+  classlink.com              body          clean
+  tradingeconomics.com       body          clean
+  behance.net                machine       clean
+  economictimes.com          body          clean
+  sourceforge.net            body          clean
+  interia.pl                 body          clean
+  youtube.com                body          clean
+  ya.ru                      body          clean
+  powerbi.com                machine       FLAG — judge by hand
+      porn:"XXX" …adOutcome', properties: { CDNFallback: outcome, clientIp: '141.171.31.XXX' } });}} catch (e) {}});</script>
+
+
+        
+    <script>
+
+  …
+  discogs.com                UNRESOLVED    robots 403 sitemap 403
+  clever.com                 body          clean
+  upstart.com                body          clean
+  inps.it                    body          clean
+  wdr.de                     body          clean
+  jal.co.jp                  UNRESOLVED    robots 403 sitemap 403
+  github.com                 body          clean
+  aparat.com                 body          clean
+  icloud.com                 machine       clean
+  news18.com                 body          FLAG — judge by hand
+      gambling:"Betting" …A Bloc Rally Against CEC Gyanesh Kumar India | | Rs 94,000-Cr Mahadev Betting Empire: Dubai Properties, Chhattisgarh Links And Saurabh Chand…
+  leparisien.fr              machine       clean
+  ebay.ca                    machine       clean
+  coxautoinc.com             body          clean
+  acesso.gov.br              machine       clean
+  mlb.com                    body          clean
+  netkeiba.com               body          clean
+  hbomax.com                 body          clean
+  aternos.org                body          FLAG — judge by hand
+      gambling:"slots" …e access with your friends and manage your server together. Unlimited slots Play with as many friends as you want without unnecessary slot l…
+  xe.com                     body          FLAG — judge by hand
+      porn:"XXX" …le":"Help centre","url":"https://help.xe.com/hc/en-gb","description":"XXX","logo":"Headset","amplitudeButtonName":"HelpCentre [Personal] [Na…
+  infobae.com                body          FLAG — judge by hand
+      porn:"OnlyFans" …a Komanche con un homenaje de flores Influencer fitness y estrella de OnlyFans murió a los 29 años en accidente de motocicleta Jennifer Lawr…
+  manualslib.com             machine       clean
+  themoviedb.org             body          clean
+  gob.mx                     body          clean
+  ilfattoquotidiano.it       body          clean
+  tumblr.com                 body          clean
+  jutarnji.hr                body          clean
+  deepseek.com               body          clean
+  paypal.com                 body          clean
+  kobo.com                   machine       clean
+  wikimedia.org              body          clean
+  tagesspiegel.de            body          clean
+  rtl.de                     body          clean
+  freefiremobile.com         body          clean
+  kakaku.com                 body          clean
+  google.de                  body          clean
+  shopee.ph                  machine       clean
+  realtor.com                machine       clean
+  zara.com                   UNRESOLVED    robots 403 sitemap 403
+  netshoes.com.br            body          clean
+  bale.ai                    body          clean
+  parade.com                 UNRESOLVED    robots 200 sitemap 403
+  linkmake.in                body          clean
+  coingecko.com              body          clean
+  amazon.nl                  body          clean
+  jus.br                     body          clean
+  viber.com                  body          clean
+  tawk.to                    body          FLAG — judge by hand
+      gambling:"slot" …o_the_first_open_slot__c18bcdb4640400ae\":\"Books into the first open slot\",\"captures_address_and_job_details__c05b84aacc7d58bd\":\"Captur…
+  tp-link.com                body          clean
+  indiamart.com              machine       clean
+  gamebanana.com             body          clean
+  wikipedia.org              body          clean
+  ssa.gov                    body          clean
+  marriott.com               machine       clean
+  ecnavi.jp                  body          clean
+
+Evidence: 49 judged on page body, 13 on robots/sitemap only, 4 on nothing.
+Flagged for hand judgement: 6 (powerbi.com, news18.com, aternos.org, xe.com, infobae.com, tawk.to).
+Unresolved: 4 (discogs.com, jal.co.jp, zara.com, parade.com).
+
+Enter the hand verdicts before quoting a rate. Assuming all 6 flags are rejected:
+  judged:          0/62 wrongly kept, 95% CI 0.0%-5.8%
+  + unresolved:    4/66 at worst, 95% CI 2.4%-14.6%
+  + machine tier:  17/66 at worst, 95% CI 16.7%-37.4%
+                   — the far edge: every domain not read on its own page counted as a wrong keep.
