@@ -586,7 +586,14 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         (found.length
           ? `Reached from homepage: ${found.map((h) => `${h.name}${short(h.url)}`).join(", ")}.`
           : home.ok
-            ? "None of pricing, support, docs, or legal are reachable from the homepage."
+            ? // A 200 that carries no readable HTML is not the same finding as a
+              // homepage whose links are genuinely missing, and 179 reports —
+              // 15% of the Index — were telling sites the second thing when the
+              // truth was the first. aliexpress.com was being told its legal
+              // pages are unreachable after a fetch that returned zero words.
+              text.split(/\s+/).filter(Boolean).length < 30
+              ? `The homepage answered ${home.status} but served almost no HTML — ${text.split(/\s+/).filter(Boolean).length} words and no links an agent could follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing.`
+              : "None of pricing, support, docs, or legal are reachable from the homepage."
             : `The homepage itself returned ${home.status} to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing.`) +
         (rejected.length ? ` Link found but not confirmed: ${rejected.map((h) => `${h.name}${short(h.url)}`).join(", ")}.` : ""),
     });

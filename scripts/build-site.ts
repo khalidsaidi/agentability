@@ -1554,9 +1554,9 @@ what it kept, and A6 for links credited that an agent cannot use and real pages 
 <table>
 <thead><tr><th>Rule</th><th>Measured</th><th>What the bound does not cover</th></tr></thead>
 <tbody>
-<tr><td><b>A6</b> everyday tasks</td><td>0 errors in 56 decisions on a held-out sample, 95% CI 0–6.4%</td><td>Measured after two fixes; the same rule scored 10% (CI 4.0–23.1) before them. Readable sites only.</td></tr>
+<tr><td><b>A6</b> everyday tasks</td><td>0 errors in 56 decisions on a held-out sample, 95% CI 0–6.4%</td><td>Measured after two fixes; the same rule scored 10% (CI 4.0–23.1) before them. Readable sites only — where a homepage serves no HTML, A6 scores zero and the report says so rather than claiming the pages are missing.</td></tr>
 <tr><td><b>Content filter</b>, removed side</td><td>4 of 53 removed wrongly, 7.5%, 95% CI 3.0–17.9%</td><td>—</td></tr>
-<tr><td><b>Content filter</b>, kept side</td><td>0 of 61 kept wrongly, 95% CI 0–5.9%. Facing the whole sample — counting every domain that stayed unreadable as a wrong keep — at most 16.5%.</td><td>5 of 66 drawn answer automated clients with a bot wall and could not be judged at all; they are what the 16.5% is made of.</td></tr>
+<tr><td><b>Content filter</b>, kept side</td><td>0 of 121 kept wrongly, 95% CI 0–3.1%, across two seeds. Facing the whole sample — counting every domain that stayed unreadable as a wrong keep — at most 12.6%.</td><td>9 of 130 drawn answer automated clients with a bot wall and could not be judged at all; they are what the 12.6% is made of.</td></tr>
 <tr><td><b>Platform detection</b></td><td>0 of 3 wrong labels, 0 of 14 missed</td><td>Samples that small bound almost nothing: CI 0–56.2% and 0–21.5%.</td></tr>
 <tr><td><b>Shop membership</b></td><td>1 of 20 wrong, 5%, 95% CI 0.9–23.6%</td><td>Where the line sits — retail only, or anything you can buy from — is a judgement, not an error.</td></tr>
 </tbody>

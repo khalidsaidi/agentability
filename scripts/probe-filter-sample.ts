@@ -37,6 +37,13 @@ const CHROME_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 const SEED = Number(process.env.SEED ?? 2026);
 const DRAW = Number(process.env.DRAW ?? 66);
+// POOL=withdrawn runs the identical procedure over the domains the filter
+// REMOVED. That is not a second error measurement — it is the control for the
+// argument that justifies this whole pass: if sites in the filtered categories
+// wall bots at the same rate as everyone else, then unreadability is not
+// correlated with the thing being filtered and discarding unreadable domains
+// was harmless after all. Measuring it is the only way to know.
+const POOL = (process.env.POOL ?? "kept") as "kept" | "withdrawn";
 const MIN_WORDS = 50;
 
 const SIGNALS: [string, RegExp][] = [
@@ -79,7 +86,18 @@ const strip = (html: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-const words = (s: string) => (s ? s.split(" ").length : 0);
+// Counts prose words only. The tag stripper above leaks code — `<[^>]+>` is
+// not a parser, and an attribute containing a ">" (a CSS child selector, a JS
+// arrow) throws off its alignment, so CSS and minified JS survive into the
+// text. That matters in the direction that hides errors: a homepage carrying
+// 2,000 words of bundled JavaScript and no sentences would otherwise count as
+// readable and be scanned clean, when in truth nothing was read. A token with
+// braces, semicolons, equals signs or dots in it is not a word.
+const prose = (s: string) =>
+  s ? s.split(" ").filter((t) => t.length > 1 && !/[{};=()[\]<>|&$`"'\/\\]|\w\.\w/.test(t)).length : 0;
+// robots.txt and sitemap.xml are URL paths by nature, so the prose test above
+// would reject the very evidence that tier rests on. Count tokens there.
+const tokens = (s: string) => (s ? s.split(" ").length : 0);
 
 type Tier = "body" | "machine" | "none";
 
@@ -91,7 +109,7 @@ async function readable(domain: string): Promise<{ tier: Tier; text: string; how
   ] as const) {
     const r = await get(`https://${host}/`, ua);
     const body = strip(r.text);
-    if (words(body) >= MIN_WORDS) return { tier: "body", text: body, how };
+    if (prose(body) >= MIN_WORDS) return { tier: "body", text: body, how };
   }
   // Machine-facing surfaces. A non-200 body is an error page, not evidence.
   const [rob, sm] = await Promise.all([
@@ -99,7 +117,7 @@ async function readable(domain: string): Promise<{ tier: Tier; text: string; how
     get(`https://${domain}/sitemap.xml`, BOT_UA),
   ]);
   const machine = [rob.status === 200 ? rob.text : "", sm.status === 200 ? sm.text : ""].join(" ").trim();
-  if (words(machine) > 20) return { tier: "machine", text: machine, how: `robots ${rob.status} sitemap ${sm.status}` };
+  if (tokens(machine) > 20) return { tier: "machine", text: machine, how: `robots ${rob.status} sitemap ${sm.status}` };
   return { tier: "none", text: "", how: `robots ${rob.status} sitemap ${sm.status}` };
 }
 
@@ -125,12 +143,18 @@ async function main() {
     merged[d] = typeof v === "string" ? v : ((v as { verdict?: string }).verdict ?? "ok");
   }
 
-  const kept: string[] = summary.leaderboard
-    .map((r: { domain: string }) => r.domain)
-    .filter((d: string) => !merged[d] || merged[d] === "ok");
-  const drawn = sample(kept, DRAW, SEED);
+  const all: string[] = summary.leaderboard.map((r: { domain: string }) => r.domain);
+  const pool: string[] =
+    POOL === "kept"
+      ? all.filter((d) => !merged[d] || merged[d] === "ok")
+      : Object.keys(merged).filter((d) => merged[d] !== "ok");
+  const drawn = POOL === "withdrawn" && DRAW >= pool.length ? pool : sample(pool, DRAW, SEED);
 
-  console.log(`Content filter, kept side — seed ${SEED}, ${drawn.length} drawn from ${kept.length} kept\n`);
+  console.log(
+    POOL === "kept"
+      ? `Content filter, kept side — seed ${SEED}, ${drawn.length} drawn from ${pool.length} kept\n`
+      : `Content filter, REMOVED side — readability control, ${drawn.length} of ${pool.length} withdrawn domains\n`
+  );
   const counts: Record<Tier, number> = { body: 0, machine: 0, none: 0 };
   const flagged: string[] = [];
   const unresolved: string[] = [];
@@ -156,6 +180,17 @@ async function main() {
     } else {
       console.log(`  ${d.padEnd(26)} ${tier.padEnd(13)} clean`);
     }
+  }
+
+  if (POOL === "withdrawn") {
+    // The control prints the tier split and stops. A vocabulary hit on a domain
+    // the filter already removed is agreement, not an error rate.
+    console.log(
+      `\nReadability of domains the filter REMOVED: ${counts.body} page body, ${counts.machine} robots/sitemap only, ` +
+        `${counts.none} nothing — ${pct(counts.none / drawn.length)} unreadable.\n` +
+        `Compare with the kept side's unreadable share to see whether discarding unreadable domains was biased.`
+    );
+    return;
   }
 
   const judged = counts.body + counts.machine;
