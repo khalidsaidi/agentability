@@ -41,3 +41,12 @@ matchcast.tv
 ad.nl
 mail.ru
 login.gov
+
+# Reinstated 2026-11-02 after sampling the panel's "offline" discard bucket.
+# Both were dropped because one audit's DNS lookup failed and nothing ever
+# re-tested them. digilocker.gov.in is India's national digital-document
+# service (live, 357 words); nfse.gov.br is Brazil's electronic invoice portal
+# (live, 1,155 words). build-panel now re-checks every offline nomination
+# serially, apex then www, before dropping it.
+digilocker.gov.in
+nfse.gov.br

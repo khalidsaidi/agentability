@@ -143,7 +143,14 @@
     "supersedes": "the 66-domain sample comparison, 13.6% vs 6.9%, p = 0.189, which compared a sample against a differently-defined kept-side figure."
    }
   },
-  "_bothDirections": "The two directions are measured by two different samples, because neither sample can see the other direction. Wrongly INCLUDED — a domain kept that should have been removed — is measured by the kept-side census: 189 drawn by seeded shuffle from the 1,174 kept, 1 error (netkeiba.com). Wrongly EXCLUDED — a domain removed that should have been kept — is measured by the removed-side census: all 53 excluded domains, 4 errors. A kept-side draw contains no excluded domains and so cannot produce an exclusion error rate; saying '0 wrongly excluded' from it would be a category error, not a measurement."
+  "_bothDirections": "The two directions are measured by two different samples, because neither sample can see the other direction. Wrongly INCLUDED — a domain kept that should have been removed — is measured by the kept-side census: 189 drawn by seeded shuffle from the 1,174 kept, 1 error (netkeiba.com). Wrongly EXCLUDED — a domain removed that should have been kept — is measured by the removed-side census: all 53 excluded domains, 4 errors. A kept-side draw contains no excluded domains and so cannot produce an exclusion error rate; saying '0 wrongly excluded' from it would be a category error, not a measurement.",
+  "_discardBucketsSampled": {
+   "removed_by_content_filter": "Census of all 53, re-read with full page text: 6 wrong exclusions, 47 confirmed correct.",
+   "dropped_as_infrastructure": "Sampled by reconstructing the candidate set from Tranco 5000 and the committed CrUX list: of the four apex domains the patterns dropped, three were real destinations (ad.nl, mail.ru, login.gov) and one was a genuine asset host (static.microsoft). All three reinstated; the patterns now apply only to genuine subdomains.",
+   "dropped_as_offline": "Sampled by name for the first time: 37 nominations, re-checked serially with three attempts and a www fallback. 27 genuinely unresolvable, 10 recovered — my own first parallel check had a 27% false-offline rate, a one-way error, so its output was re-opened. Of the 10, two were real government services wrongly dropped (digilocker.gov.in, nfse.gov.br) and are reinstated; fazenda.gov.br resolves on www but serves nothing and stays dropped with that reason; the rest are piracy, porn, lottery or asset hosts and were correctly dropped.",
+   "not_in_crux": "Definitional, not an error bucket: 3,366 Tranco entries dropped because CrUX does not list them. The cost is stated on /methodology/ — CrUX measures Chrome users, so the panel is Chrome-shaped."
+  },
+  "_correctionToAnEarlierClaim": "Earlier today I recorded morlento.vip, novelix.vip, travixo.vip and zelvora.vip as NXDOMAIN. That was wrong in detail: their www hosts resolve and return HTTP 403 AccessDenied with three words of body. The conclusion — no content, correctly dropped — stands, but the stated reason did not."
  },
  "a6": {
   "inSample": {

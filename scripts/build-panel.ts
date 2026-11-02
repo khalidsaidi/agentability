@@ -19,6 +19,7 @@
 import fsp from "node:fs/promises";
 import fs from "node:fs";
 import path from "node:path";
+import dnsPromises from "node:dns/promises";
 import Anthropic from "@anthropic-ai/sdk";
 import { rootDomain } from "./lib/domains";
 
@@ -210,15 +211,43 @@ async function main() {
   // not a website. Drop what the last run proved offline so it stops inflating
   // the panel and diluting every percentage.
   const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
-  const offline = new Set<string>();
+  // A stored audit that failed with "offline" is a nomination, not a verdict:
+  // one DNS lookup failing during one run would otherwise drop a domain from
+  // the panel forever with nothing ever re-testing it. That dropped
+  // digilocker.gov.in — India's national document service, live with 357 words —
+  // and nfse.gov.br, Brazil's electronic invoice portal. Each nomination is
+  // re-checked here, serially, three attempts, apex then www, and only a domain
+  // that fails all of that is dropped.
+  const nominatedOffline: string[] = [];
   if (fs.existsSync(RESULTS_DIR)) {
     for (const file of await fsp.readdir(RESULTS_DIR)) {
       if (!file.endsWith(".json")) continue;
       try {
         const r = JSON.parse(await fsp.readFile(path.join(RESULTS_DIR, file), "utf8"));
-        if (r.status !== "complete" && r.failure === "offline") offline.add(r.domain);
+        if (r.status !== "complete" && r.failure === "offline") nominatedOffline.push(r.domain);
       } catch { /* unreadable result, treat as unknown */ }
     }
+  }
+  const offline = new Set<string>();
+  const recovered: string[] = [];
+  for (const d of nominatedOffline) {
+    let up = false;
+    for (const host of [d, `www.${d}`]) {
+      for (let attempt = 0; attempt < 3 && !up; attempt++) {
+        try {
+          await dnsPromises.resolve(host);
+          up = true;
+        } catch {
+          await new Promise((r) => setTimeout(r, 400));
+        }
+      }
+      if (up) break;
+    }
+    if (up) recovered.push(d);
+    else offline.add(d);
+  }
+  if (recovered.length) {
+    console.log(`  ${recovered.length} domain(s) nominated offline but resolving on re-check, kept: ${recovered.join(", ")}`);
   }
   // Sites people asked us to audit. Popularity data will never contain them, and
   // this file is the only reason they survive a rebuild — the panel below is
