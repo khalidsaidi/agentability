@@ -1,8 +1,8 @@
 {
  "domain": "jewishnews.co.uk",
- "checkedAt": "2026-10-17T16:41:51.892Z",
+ "checkedAt": "2026-11-02T02:11:26.865Z",
  "status": "complete",
- "elapsedMs": 502,
+ "elapsedMs": 667,
  "score": 40,
  "grade": "D",
  "posture": "open",
@@ -14,7 +14,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "Present with 5895 chars and links."
+   "detail": "Present with 5737 chars and links."
   },
   {
    "id": "A2",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -71,6 +71,14 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -103,6 +111,7 @@
   "llmsTxt": true,
   "mcp": false,
   "openapi": false,
+  "ucp": false,
   "structuredData": false,
   "sitemap": true,
   "parseableText": false
