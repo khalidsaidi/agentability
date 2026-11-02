@@ -47,3 +47,19 @@ leparisien.fr	LIVE CORROBORATION (structural, not prose) — robots.txt returns 
 orange.fr	Portail Orange | Offres Mobiles, Internet, TV, Actu & Accès compte Mail — heading "Accueil du site Orange". The title is zero-width until the portal path is loaded.	AGREE
 shopee.ph	Shopee Philippines | Buy and Sell on Mobile or Online — rendered on a second navigation; the first timed out.	AGREE
 traveloka.com	NOT LIVE-READ — Human Verification interstitial	capture only
+#
+# Routes tried on the two domains with no live evidence, for the record, so the
+# claim "no route reaches them" can be checked rather than taken:
+#   1  GET https://<domain>/ with the auditor's bot UA
+#   2  the same with a Chrome UA
+#   3  the same against www.<domain>
+#   4  regional/sub-paths fetched live (/en-id for traveloka)
+#   5  robots.txt, plain client
+#   6  sitemap.xml, sitemapindex.xml, sitemap_index.xml, plain client
+#   7  all of 5-6 again with the cookie-aware fetcher
+#   8  Wayback "closest snapshot" API
+#   9  Wayback CDX filtered to statuscode:200 + mimetype:text/html, for the
+#      apex, for www.<domain>, for <domain>/*, and date-windowed (from=2008)
+#  10  a real Chrome browser on the apex and on regional paths
+# cricbuzz.com additionally cannot be opened by the browser tool at all: it
+# refuses the host on safety grounds, so route 10 is unavailable for it.
