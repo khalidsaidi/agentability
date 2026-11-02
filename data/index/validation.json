@@ -3,31 +3,44 @@
  "_measuredOn": "2026-11-02",
  "contentFilter": {
   "overExclusion": {
-   "errors": 6,
+   "errors": 2,
    "n": 53,
-   "rate": 0.113,
+   "rate": 0.038,
    "ci95": [
-    0.043,
-    0.23
+    0.005,
+    0.13
    ],
-   "how": "Census of all 53 excluded domains, re-read on 2026-11-02 with full body text through the cookie-aware fetcher. The first pass read only each homepage's title and meta description and found 4; the stronger read found 2 more.",
+   "how": "Census of the 53 domains the filter excluded as of 2026-11-02 evening, each re-read with full page text through the cookie-aware fetcher. 2 wrong: janitorai.com and matchcast.tv. 51 confirmed correctly excluded.",
    "found": [
-    "dragonball-super.com",
-    "strikerreport.com",
-    "i993.com",
-    "izy0.com",
     "janitorai.com — AI character-chat platform, excluded as porn; polybuzz.ai is the same class of site and was kept",
     "matchcast.tv — broadcast listings pointing at legitimate broadcasters, excluded as piracy"
    ],
    "note": "This is the classifier's own rate, which is what it should be: all 4 are corrected in classification-overrides.json, so the shipped pipeline removes none of them today. Checking this turned up that 2 of the 4 — dragonball-super.com and strikerreport.com — had their verdict fixed but were never put back in the audit list, so their report pages were live while they stayed out of the ranking and out of every weekly run. Both are now in submitted.txt and rejoin at the next run.",
-   "interval": "exact Clopper-Pearson 4.3-23.0%. The bound faces upward and holds at 23.0%.",
-   "direction": "This pass moved the rate UP, 7.5% to 11.3%. That is what a discard bucket examined once, one way, will do: the weaker read understated its own error rate. It could have moved down — a stronger read could have overturned one of the original 4 — and did not.",
+   "interval": "exact Clopper-Pearson 0.5-13.0%. The bound faces upward and holds at 13.0%.",
    "supersedes": "4 of 53 = 7.5%, exact CI 2.1-18.2%, which was read from titles and meta descriptions only.",
    "asShipped": {
     "errors": 0,
     "n": 53,
     "note": "All 6 are corrected in classification-overrides.json, so the shipped filter removes none of them today. The 6 measure the classifier, not the published panel."
-   }
+   },
+   "earlierPopulation": {
+    "result": "4 of 53 = 7.5%, exact 95% CI 2.1-18.2%",
+    "found": [
+     "dragonball-super.com",
+     "strikerreport.com",
+     "i993.com",
+     "izy0.com"
+    ],
+    "note": "A different set of 53, read in the morning from titles and meta descriptions only. Those 4 were reinstated before tonight's set was captured, so they are not in it. Same size by coincidence."
+   },
+   "correctionToAPublishedFigure": "This file published 6 of 53 = 11.3% by adding the morning census's 4 errors to tonight's 2. That pools two different populations of the same size and describes neither — the error I had just finished criticising elsewhere in this file. The correction moves the rate DOWN, 11.3% to 3.8%, which is the direction that deserves suspicion; it is right because the denominator and the numerator now refer to the same 53 domains. Found while drawing an independent sample of the confirmed exclusions, when the confirmed count came to 51 rather than the 47 that 6 of 53 implied.",
+   "independentRecheck": {
+    "what": "A census judged twice by one method and one person is not a check on that method. A seeded sample of the 51 confirmed exclusions (seed 777111, 14 domains) was re-judged from Internet Archive snapshot titles, a surface independent of the live vocabulary read that produced the verdicts. Not done in a browser: several are adult sites and the browser here is the user's own.",
+    "result": "0 exclusions overturned. 3 confirmed on the independent surface (betking.com, kolkataff.tv, sportybet.com); 9 unjudgeable through it; 2 where the exclusion outcome stands but the recorded reason is unsupported — bpexch.live and dpbosssss.boston are parked domains labelled \"gambling\". With 0 overturned in 5 judgeable cases, the upper bound on the confirmed set's error rate from this surface is 52.2%, which is weak and says so.",
+    "whatItCouldHaveFound": "It could have overturned an exclusion — a domain whose archive title showed ordinary content — and did not. It also could have, and did, find verdict labels the evidence does not support, which is a different fault from a wrong outcome and is recorded as one.",
+    "evidence": "data/index/evidence/confirmed-exclusions-recheck.tsv"
+   },
+   "direction": "Tonight's full-text re-read could have moved the rate either way: it could have overturned one of the morning's reinstatements as well as finding new errors. It found 2 new and overturned none."
   },
   "underExclusion": {
    "pool": "e15d222a8342 — 1,175 kept domains, the panel as published. Every figure below is measured on this one pool.",
