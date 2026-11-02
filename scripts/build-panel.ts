@@ -64,7 +64,20 @@ const BATCH = 50;
 const INFRASTRUCTURE =
   /(akamai|cloudfront|fastly|gstatic|googleapis|googleusercontent|googlevideo|googlesyndication|doubleclick|amazonaws|azureedge|cloudflare\.net|fbcdn|akadns|akamaiedge|edgekey|edgesuite|gtld-servers|domaincontrol|digicert|appsflyer|apple-dns|aaplimg|trafficmanager|llnwd|cdn77|jsdelivr|unpkg|rootcanal|nsone|dynect|ntp\.org|in-addr)/i;
 // Login walls and API hosts: an agent sent here learns nothing about the brand.
+// Applied ONLY to a genuine subdomain — three labels or more. These words are
+// also whole sites' own names, and matching them at the apex dropped real
+// destinations: ad.nl is Algemeen Dagblad, mail.ru is a top-100 portal, and
+// login.gov is the US government's sign-in service with a site of its own.
+// A brand-TLD asset host like static.microsoft is no longer excluded either; it
+// gets audited and scores on its merits, which is more honest than a silent
+// drop.
 const NOT_A_DESTINATION = /^(accounts|admin|adsmanager|adssettings|auth|login|signin|sso|api|cdn|static|assets|img|media|mail|webmail|smtp|mx|ns\d|wap|ads?)\./i;
+const isSubdomain = (host: string) => host.split(".").length >= 3;
+// akamai.com, fastly.com and digicert.com are companies with real marketing
+// sites; only their serving infrastructure should be dropped. None is in the
+// current CrUX list, so this is latent rather than live, but the pattern was
+// wrong in principle.
+const INFRA_COMPANY_APEX = /^(akamai|fastly|digicert)\.com$/i;
 
 type Verdicts = Record<string, "ok" | "porn" | "piracy" | "gambling">;
 
@@ -147,9 +160,10 @@ async function main() {
   const seen = new Set<string>();
   let droppedInfra = 0;
   for (const host of hosts) {
-    if (NOT_A_DESTINATION.test(host)) { droppedInfra += 1; continue; }
+    if (isSubdomain(host) && NOT_A_DESTINATION.test(host)) { droppedInfra += 1; continue; }
     const domain = rootDomain(host);
-    if (!domain || INFRASTRUCTURE.test(domain)) { droppedInfra += 1; continue; }
+    const infra = INFRASTRUCTURE.test(domain) && !INFRA_COMPANY_APEX.test(domain);
+    if (!domain || infra) { droppedInfra += 1; continue; }
     if (seen.has(domain)) continue;
     seen.add(domain);
     candidates.push(domain);

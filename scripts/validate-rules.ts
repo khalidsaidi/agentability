@@ -225,6 +225,33 @@ function samplingIsUniform(): string | null {
   return null;
 }
 
+// The panel's infrastructure patterns, both directions. They are regexes over
+// hostnames, so they can err either way: too loose and real sites vanish from
+// the Index, too tight and CDNs clutter it. Checked here because the loose
+// version silently dropped ad.nl, mail.ru and login.gov — a newspaper, a
+// top-100 portal and a government sign-in service — by matching their own
+// names as if they were subdomains. No network.
+function infrastructurePatternsHoldBothWays(): string | null {
+  const src = fs.readFileSync(path.join(REPO_ROOT, "scripts/build-panel.ts"), "utf8");
+  const infraSrc = /const INFRASTRUCTURE =\s*(\/[\s\S]*?\/i);/.exec(src)?.[1];
+  const notDestSrc = /const NOT_A_DESTINATION = (\/[\s\S]*?\/i);/.exec(src)?.[1];
+  const apexSrc = /const INFRA_COMPANY_APEX = (\/[\s\S]*?\/i);/.exec(src)?.[1];
+  if (!infraSrc || !notDestSrc || !apexSrc) return "could not read the patterns out of build-panel.ts";
+  // eslint-disable-next-line no-eval
+  const [INFRA, NOTDEST, APEX] = [infraSrc, notDestSrc, apexSrc].map((r) => eval(r) as RegExp);
+  const drop = (h: string) => (INFRA.test(h) && !APEX.test(h)) || (h.split(".").length >= 3 && NOTDEST.test(h));
+  const mustKeep = ["ad.nl", "mail.ru", "login.gov", "akamai.com", "fastly.com", "digicert.com", "cloudflare.com"];
+  const mustDrop = ["accounts.google.com", "login.microsoftonline.com", "cdn.jsdelivr.net", "api.twitter.com",
+                    "mail.google.com", "a1.akamaiedge.net", "s3.amazonaws.com", "gtld-servers.net", "ns1.dynect.net"];
+  const wrongDrops = mustKeep.filter(drop);
+  const wrongKeeps = mustDrop.filter((h) => !drop(h));
+  if (wrongDrops.length || wrongKeeps.length) {
+    return `${wrongDrops.length} real site(s) dropped (${wrongDrops.join(", ")}), ${wrongKeeps.length} infrastructure host(s) kept (${wrongKeeps.join(", ")})`;
+  }
+  console.log(`  ok    infra patterns         ${mustKeep.length} real sites kept, ${mustDrop.length} infrastructure hosts dropped`);
+  return null;
+}
+
 // Every domain a human reinstated must actually be reachable by the weekly run.
 // It wasn't: submitted.txt was merged only by `npm run panel`, which the weekly
 // workflow never calls, so four reinstatements and every audit request since the
@@ -250,6 +277,8 @@ function reinstatementsReachTheRun(): string | null {
 async function main() {
   const failed = await runFixtures();
   console.log("");
+  const infraProblem = infrastructurePatternsHoldBothWays();
+  if (infraProblem) console.log(`  FAIL  infra patterns         ${infraProblem}`);
   const reinstatementProblem = reinstatementsReachTheRun();
   if (reinstatementProblem) console.log(`  FAIL  reinstatements          ${reinstatementProblem}`);
   const samplingProblem = samplingIsUniform();
@@ -257,6 +286,10 @@ async function main() {
     console.log(`  FAIL  sampling                ${samplingProblem}`);
   }
   if (process.argv.includes("--full")) await printSamples();
+  if (infraProblem) {
+    console.error(`\nThe panel's infrastructure patterns err in one direction or the other.`);
+    process.exit(1);
+  }
   if (reinstatementProblem) {
     console.error(`\nA hand reinstatement is not reachable by the weekly run — the correction would never ship.`);
     process.exit(1);
