@@ -242,18 +242,48 @@
   }
  },
  "shopMembership": {
-  "errors": 1,
-  "n": 20,
-  "rate": 0.05,
+  "errors": 6,
+  "n": 40,
+  "rate": 0.15,
   "ci95": [
-   0.009,
-   0.236
+   0.071,
+   0.291
   ],
-  "how": "seed 11, 20 domains marked shop, judged by hand",
+  "direction": "wrongly tagged shop",
+  "how": "seed 31337, 40 of the 632 domains the classifier called shop, judged by hand against the rule committed in classify-shops.ts",
   "found": [
-   "newgrounds.com — a free content portal"
+   "flickr.com — photo community",
+   "flightaware.com — flight tracking",
+   "marinetraffic.com — ship tracking",
+   "tradingview.com — charts and market data",
+   "pittsburghpanthers.com — an athletics site; the rule names sport as not-shop",
+   "ultimate-guitar.com — chords and tabs reference"
   ],
-  "boundary": "A shop is a site whose primary purpose is selling goods or services to the public and where a visitor can start a purchase. News, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription. Whether to narrow this to retail only is a product decision, not a measurement one."
+  "otherDirection": {
+   "errors": 4,
+   "n": 40,
+   "rate": 0.1,
+   "ci95": [
+    0.04,
+    0.231
+   ],
+   "direction": "wrongly tagged not-shop",
+   "how": "seed 31337, 40 of the 939 the classifier called not-shop, judged the same way",
+   "found": [
+    "divar.ir — Iran's largest classifieds marketplace",
+    "farpost.ru — Russian classifieds marketplace",
+    "udio.com — AI music generation sold self-serve",
+    "pinecone.io — vector database sold self-serve"
+   ],
+   "note": "divar.ir and farpost.ru expose an internal inconsistency rather than a borderline call: leboncoin.fr and publi24.ro are the same kind of classifieds marketplace and were tagged shop. The rule names a marketplace, so the exclusions were wrong, not the inclusions.",
+   "effectOnThePage": "Of the 4, divar.ir and farpost.ru are in the panel and now appear on /shops/. pinecone.io and udio.com are off-panel — they have stored audits but are not in domains.txt — so correcting their verdict changes the classifier record and not the page. The rate still measures the classifier, which is what it is for."
+  },
+  "boundary": "The rule is the one committed in classify-shops.ts: a shop sells goods or services to the public and a visitor can start a purchase — retailer, brand selling direct, marketplace, grocery or food delivery, ticket or travel booking, telecom or hosting plans, or software sold self-serve. News, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription.",
+  "supersedes": "1 of 20 = 5.0%, which sampled one direction only and at half the size. Both rates are higher than that figure: 15.0% wrongly tagged shop and 10.0% wrongly tagged not-shop. The smaller sample understated the error, and it understated it in the direction that flattered the page.",
+  "asShipped": {
+   "note": "All 11 corrections are in commerce-overrides.json and applied by build-site, so /shops/ lists none of the 6 wrongly-tagged shops today and gained the 2 wrongly-excluded marketplaces that are in the panel. The two off-panel corrections cannot show on a page built from the Index. The rates measure the classifier, not the published page."
+  },
+  "scopeQuestion": "Settled from the history rather than by preference: the founding commit cbfae1c3 says the page exists because \"the only thing missing was knowing which of them sell things\", and the page asks \"Can an AI agent buy from these shops?\" — goods or services, both. Narrowing to retail only would rewrite the page's purpose and drop the SaaS and subscription sites most likely to publish a UCP profile, which is the thing it measures. No scope change."
  },
  "_evidence": "Raw inputs for every figure here are committed under data/index/evidence/, with a README mapping each file to the numbers it produced: the 189-domain census, the wall cross-check, and the four probe runs.",
  "_intervals": "Wilson 95%, cross-checked against the exact Clopper-Pearson interval. The two upper edges agree to within 0.4 percentage points everywhere; where they differ, the published figure is the more conservative of the two, because every bound here faces upward.",

@@ -12,6 +12,9 @@ import { GUIDES, type GuideContext } from "./lib/guides";
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
 const COMMERCE_PATH = path.join(REPO_ROOT, "data/index/commerce.json");
+// Hand review of those verdicts, kept separate so commerce.json stays exactly
+// what the classifier returned — the same arrangement as the content filter.
+const COMMERCE_OVERRIDES_PATH = path.join(REPO_ROOT, "data/index/commerce-overrides.json");
 // The porn/piracy/gambling verdicts build-panel.ts caches. Page generation has
 // to honour them too — see the comment at the site-report loop.
 const VERDICTS_PATH = path.join(REPO_ROOT, "data/index/classification.json");
@@ -1442,6 +1445,16 @@ free, updated weekly.</div>`,
   // this site its search traffic once before.
   if (summary && s && fs.existsSync(COMMERCE_PATH)) {
     const verdicts: Record<string, string> = JSON.parse(await fsp.readFile(COMMERCE_PATH, "utf8"));
+    if (fs.existsSync(COMMERCE_OVERRIDES_PATH)) {
+      const ov = JSON.parse(await fsp.readFile(COMMERCE_OVERRIDES_PATH, "utf8")) as Record<string, unknown>;
+      let applied = 0;
+      for (const [domain, v] of Object.entries(ov)) {
+        if (domain.startsWith("_")) continue;
+        verdicts[domain] = typeof v === "string" ? v : ((v as { verdict?: string }).verdict ?? verdicts[domain]);
+        applied += 1;
+      }
+      console.log(`Commerce overrides applied: ${applied}`);
+    }
     const shops = summary.leaderboard.filter((r) => verdicts[r.domain] === "shop");
     if (shops.length) {
       const withUcp = shops.filter((r) => r.ucp);

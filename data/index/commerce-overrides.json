@@ -1,0 +1,49 @@
+{
+ "_README": "Hand review of the shop classifier's verdicts. commerce.json stays exactly what the model returned; this file records where a hand check disagreed and why, so both are auditable. Applied on top of commerce.json by build-site.ts. Added only after reading the site.",
+ "_reviewedOn": "2026-11-02",
+ "_method": "Seeded sample, 40 from each side (seed 31337), judged against the rule committed in classify-shops.ts: a shop sells goods or services to the public and a visitor can start a purchase; news, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription. 6 of 40 wrongly tagged shop, 4 of 40 wrongly tagged not-shop.",
+ "flickr.com": {
+  "verdict": "not-shop",
+  "reason": "Photo hosting and community. A Pro subscription does not make a social site a shop; the rule excludes a free tool even when it sells one."
+ },
+ "flightaware.com": {
+  "verdict": "not-shop",
+  "reason": "Flight tracking — reference. Sells subscriptions; primary purpose is looking things up."
+ },
+ "marinetraffic.com": {
+  "verdict": "not-shop",
+  "reason": "Ship tracking — reference, same shape as flightaware.com."
+ },
+ "tradingview.com": {
+  "verdict": "not-shop",
+  "reason": "Charts and market data — reference and social. Subscriptions do not change the primary purpose."
+ },
+ "pittsburghpanthers.com": {
+  "verdict": "not-shop",
+  "reason": "Official athletics website. The rule names sport as not-shop; a team store on a subdomain is not this site's purpose."
+ },
+ "ultimate-guitar.com": {
+  "verdict": "not-shop",
+  "reason": "Chords and tabs catalogue — reference, with a Pro subscription."
+ },
+ "newgrounds.com": {
+  "verdict": "not-shop",
+  "reason": "Free games and animation portal with a supporter subscription — a free tool, which the rule excludes explicitly."
+ },
+ "divar.ir": {
+  "verdict": "shop",
+  "reason": "Iran's largest classifieds marketplace — buying and selling goods. The rule names a marketplace, and leboncoin.fr and publi24.ro were tagged shop for exactly this."
+ },
+ "farpost.ru": {
+  "verdict": "shop",
+  "reason": "Russian classifieds marketplace, same shape as leboncoin.fr."
+ },
+ "udio.com": {
+  "verdict": "shop",
+  "reason": "AI music generation sold self-serve on paid plans — software sold self-serve, which the rule names."
+ },
+ "pinecone.io": {
+  "verdict": "shop",
+  "reason": "Vector database sold self-serve on paid tiers — software sold self-serve."
+ }
+}
