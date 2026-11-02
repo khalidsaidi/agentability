@@ -1,12 +1,12 @@
 {
  "domain": "sheepesports.com",
- "checkedAt": "2026-10-23T18:04:58.715Z",
+ "checkedAt": "2026-11-02T01:23:33.837Z",
  "status": "complete",
- "elapsedMs": 462,
- "score": 40,
- "grade": "D",
- "posture": "open",
- "paradox": false,
+ "elapsedMs": 7720,
+ "score": 55,
+ "grade": "Closed by policy",
+ "posture": "closed",
+ "paradox": true,
  "checks": [
   {
    "id": "A1",
@@ -14,39 +14,39 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "Present with 2307 chars and links."
+   "detail": "Present with 3219 chars and links."
   },
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~1558 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are linked from the homepage."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
   },
   {
    "id": "B1",
@@ -71,40 +71,49 @@
    "points": 0,
    "maxPoints": 5,
    "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "blocked"
   }
  ],
  "signals": {
   "llmsTxt": true,
   "mcp": false,
   "openapi": false,
-  "structuredData": false,
-  "sitemap": true,
-  "parseableText": false
+  "ucp": false,
+  "structuredData": true,
+  "sitemap": false,
+  "parseableText": true
  }
 }
