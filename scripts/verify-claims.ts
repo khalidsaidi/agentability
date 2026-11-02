@@ -79,7 +79,7 @@ async function main() {
   // Counted from the checker rather than typed, so the two cannot drift: the
   // hardcoded "11" was already stale by one the first time this ran.
   const checkerSrc = fs.readFileSync(path.join(ROOT, "scripts/check-published.ts"), "utf8");
-  const figures = (checkerSrc.match(/\{ what: "/g) ?? []).length + (checkerSrc.match(/\["[a-z][^"]*", \w/g) ?? []).length;
+  const figures = (checkerSrc.match(/what: "/g) ?? []).length + (checkerSrc.match(/\["[a-z][^"]*", \w/g) ?? []).length;
   claim("page-matches-record", `${figures} figures compared`, "npm run check-published");
 
   // The remaining misleading report pages, counted from the stored audits.
