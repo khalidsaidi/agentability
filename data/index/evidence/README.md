@@ -8,6 +8,7 @@ taken on description.
 |---|---|
 | `kept-census-2026-11-02.tsv` | All 189 drawn domains with the title and description read for each. The kept-side rate is one error (netkeiba.com) in the 153 that could be read. |
 | `kept-census-walls.tsv` | The domains the census could not read, each cross-checked against our own stored audit. 36 corroborated, 9 overturned because our auditor had read them. The far edge counts the 36 as wrong keeps. |
+| `kept-census-archive.tsv` | The archive pass: for each of the 36 domains no live fetch could read, the closest Internet Archive snapshot. 25 resolved, 11 did not and are what the far edge is made of. |
 | `probe-final-rule.txt` | `npm run probe-filter`, seed 2026, pool e15d222a8342. Prints the rule for "unreadable" at the top. |
 | `probe-live-1337.txt` | Same, seed 1337. |
 | `probe-live-5150.txt` | Same, seed 5150. |
