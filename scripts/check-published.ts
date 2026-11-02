@@ -91,12 +91,22 @@ async function main() {
 
   console.log(`\nRecord against the evidence files in data/index/evidence/\n`);
   let fileComparisons = 0;
+  // The record no longer carries a compounded far-edge count, so these compare
+  // against the judged total and the declared-unjudged count instead. A domain
+  // with no evidence is a gap, not an error, and the checker has to agree.
+  // Marked "capture only" in the browser control: no live fetch, no browser
+  // render, and no live machine file. These are the declared gaps.
+  const noLiveEvidence = fs
+    .readFileSync(path.join(dir, "kept-census-browser-check.tsv"), "utf8")
+    .split("\n")
+    .filter((l) => /\tcapture only\s*$/.test(l)).length;
+  const unjudged = Number(/with (\d+) domains? declared unjudged/.exec(hc.underAStricterEvidenceStandard?.result ?? "")?.[1] ?? NaN);
   for (const [what, got, want] of [
-    ["census rows", census.length, hc.farEdge.n],
+    ["census rows", census.length, hc.n],
     ["walls the archive pass took", archiveRows.length, walls],
     ["unresolved after archive", stillUnresolved, 11],
-    ["unresolved after CDX", cdxUnresolved, hc.farEdge.errors - hc.errors],
-    ["hand-read domains", census.length - cdxUnresolved, hc.n],
+    ["domains with no live evidence", noLiveEvidence, Number.isNaN(unjudged) ? -1 : unjudged],
+    ["judged total", census.length, hc.n],
   ] as const) {
     const ok = got === want;
     fileComparisons += 1;
