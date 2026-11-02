@@ -1,14 +1,112 @@
 {
  "domain": "scopus.com",
- "checkedAt": "2026-11-02T01:19:18.905Z",
- "status": "error",
- "elapsedMs": 10397,
- "score": 0,
- "grade": "unreachable",
- "posture": "open",
+ "checkedAt": "2026-11-02T03:20:05.254Z",
+ "status": "complete",
+ "elapsedMs": 3479,
+ "score": 38,
+ "grade": "F",
+ "posture": "selective",
  "paradox": false,
- "checks": [],
- "robots": [],
+ "checks": [
+  {
+   "id": "A1",
+   "title": "llms.txt for AI readers",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
+  },
+  {
+   "id": "A2",
+   "title": "AI crawler access policy",
+   "status": "warn",
+   "points": 8,
+   "maxPoints": 15,
+   "detail": "robots.txt blocks: GPTBot, Google-Extended."
+  },
+  {
+   "id": "A3",
+   "title": "Content readable without a browser",
+   "status": "pass",
+   "points": 25,
+   "maxPoints": 25,
+   "detail": "Plain fetch of the homepage yields ~713 words of visible text."
+  },
+  {
+   "id": "A4",
+   "title": "Structured data (schema.org JSON-LD)",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "No machine-readable entity markup on the homepage."
+  },
+  {
+   "id": "A5",
+   "title": "Sitemap discoverable",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 10,
+   "detail": "No sitemap found."
+  },
+  {
+   "id": "A6",
+   "title": "Everyday agent tasks reachable from the homepage",
+   "status": "fail",
+   "points": 5,
+   "maxPoints": 20,
+   "detail": "Reached from homepage: support/contact (/standard/contactUs.uri)."
+  },
+  {
+   "id": "B1",
+   "title": "MCP server advertised",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+  },
+  {
+   "id": "B2",
+   "title": "OpenAPI description published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
+  }
+ ],
+ "robots": [
+  {
+   "bot": "GPTBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ClaudeBot",
+   "policy": "partial"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "PerplexityBot",
+   "policy": "partial"
+  },
+  {
+   "bot": "Google-Extended",
+   "policy": "blocked"
+  },
+  {
+   "bot": "CCBot",
+   "policy": "partial"
+  }
+ ],
  "signals": {
   "llmsTxt": false,
   "mcp": false,
@@ -16,8 +114,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": false,
-  "parseableText": false
- },
- "error": "homepage unreachable",
- "failure": "redirect-loop"
+  "parseableText": true
+ }
 }

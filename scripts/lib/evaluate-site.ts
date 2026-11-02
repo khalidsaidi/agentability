@@ -56,6 +56,8 @@ export type SiteEvaluation = {
 
 const UA = "AgentabilityBot/2.0 (+https://agentability.org/methodology)";
 const FETCH_TIMEOUT_MS = 15000;
+// Browsers allow 20; sites needing more than a dozen are looping.
+const MAX_REDIRECTS = 12;
 
 // The AI crawlers/agents that matter in 2026 — all real, all documented.
 const AI_BOTS = ["GPTBot", "ClaudeBot", "Claude-User", "PerplexityBot", "Google-Extended", "CCBot"];
@@ -66,11 +68,35 @@ async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const response = await fetch(url, {
-      headers: { "User-Agent": UA, Accept: accept },
-      redirect: "follow",
-      signal: controller.signal,
-    });
+    // Redirects are followed by hand so cookies can be carried forward. With
+    // `redirect: "follow"` and no cookie jar, a site that bounces through a
+    // region or consent redirect sets a cookie, sees it missing on the next
+    // hop and redirects again — forever. battle.net did exactly that: it was
+    // scored 0/100 as a redirect loop, while the same seven hops with the
+    // cookies kept return HTTP 200 and 48,914 words. A browser does this; an
+    // agent that doesn't is measuring its own omission.
+    let target = url;
+    const jar = new Map<string, string>();
+    let response!: Response;
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      const cookie = [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
+      response = await fetch(target, {
+        headers: { "User-Agent": UA, Accept: accept, ...(cookie ? { Cookie: cookie } : {}) },
+        redirect: "manual",
+        signal: controller.signal,
+      });
+      for (const setCookie of response.headers.getSetCookie?.() ?? []) {
+        const m = /^([^=]+)=([^;]*)/.exec(setCookie);
+        if (m) jar.set(m[1], m[2]);
+      }
+      const location = response.headers.get("location");
+      if (response.status >= 300 && response.status < 400 && location) {
+        if (hop === MAX_REDIRECTS) throw Object.assign(new Error("redirect count exceeded"), { cause: { message: "redirect count exceeded" } });
+        target = new URL(location, target).toString();
+        continue;
+      }
+      break;
+    }
     const contentType = response.headers.get("content-type") || "";
     // Cap reads at 2MB — enough for any page we care about.
     const buf = await response.arrayBuffer();

@@ -21,8 +21,8 @@
 // before each fix (git show <commit>^:scripts/lib/evaluate-site.ts):
 //
 //   proven  marksandspencer.com, iltalehti.fi, biblegateway.com, ups.com,
-//           morningstar.com — these fail on the old code, so they would have
-//           caught the bug they encode.
+//           morningstar.com, battle.net — these fail on the old code, so they
+//           would have caught the bug they encode.
 //   guard   fortune.com, lemonde.fr, stripe.com, gymshark.com, apify.com — these
 //           pass on the old code too. Not because the bug was absent, but because
 //           they read the URL out of the detail line and the old detail did not
@@ -105,6 +105,12 @@ const FIXTURES: Fixture[] = [
     what: "a bot-challenge homepage must not be reported as missing links either",
     caught: "2026-11-02: the first fix used a 30-word threshold and missed 87 reports, 61 of them challenge pages — an interstitial has more words than that",
     assert: (r) => (/^None of pricing/.test(detail(r)) ? "reported missing links from a homepage that served a bot challenge" : null),
+  },
+  {
+    domain: "battle.net",
+    what: "a site that needs a cookie to get through its own redirects must still be audited",
+    caught: "2026-11-02: scored 0 as a redirect loop; the same seven hops with cookies carried forward return 200 and 48,914 words",
+    assert: (r) => (r.status === "complete" ? null : `unreachable: ${r.failure ?? r.error}`),
   },
   {
     domain: "apify.com",
