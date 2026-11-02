@@ -252,6 +252,30 @@ function infrastructurePatternsHoldBothWays(): string | null {
   return null;
 }
 
+// domains.txt must not list a domain the content filter removes. Such a domain
+// is audited every week, its result is stored, and build-site then filters it
+// out of the tables — work done to produce a row nobody sees. It also made the
+// leaderboard count disagree with the kept-pool count.
+function auditListHasNoExcludedDomains(): string | null {
+  const verdicts = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "data/index/classification.json"), "utf8"));
+  const overrides = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "data/index/classification-overrides.json"), "utf8"));
+  const verdictOf = (d: string) => {
+    const o = overrides[d];
+    if (o !== undefined) return typeof o === "string" ? o : ((o as { verdict?: string }).verdict ?? "ok");
+    const v = verdicts[d];
+    return typeof v === "string" ? v : "ok";
+  };
+  const listed = fs
+    .readFileSync(path.join(REPO_ROOT, "data/index/domains.txt"), "utf8")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith("#"));
+  const bad = listed.filter((d) => verdictOf(d) !== "ok");
+  if (bad.length) return `${bad.length} excluded domain(s) still in the audit list: ${bad.join(", ")}`;
+  console.log(`  ok    audit list              none of its ${listed.length} domains is filtered out`);
+  return null;
+}
+
 // Every domain a human reinstated must actually be reachable by the weekly run.
 // It wasn't: submitted.txt was merged only by `npm run panel`, which the weekly
 // workflow never calls, so four reinstatements and every audit request since the
@@ -277,6 +301,8 @@ function reinstatementsReachTheRun(): string | null {
 async function main() {
   const failed = await runFixtures();
   console.log("");
+  const auditListProblem = auditListHasNoExcludedDomains();
+  if (auditListProblem) console.log(`  FAIL  audit list              ${auditListProblem}`);
   const infraProblem = infrastructurePatternsHoldBothWays();
   if (infraProblem) console.log(`  FAIL  infra patterns         ${infraProblem}`);
   const reinstatementProblem = reinstatementsReachTheRun();
@@ -286,6 +312,10 @@ async function main() {
     console.log(`  FAIL  sampling                ${samplingProblem}`);
   }
   if (process.argv.includes("--full")) await printSamples();
+  if (auditListProblem) {
+    console.error(`\nThe audit list contains a domain the filter removes — the run would do work for a row nobody sees.`);
+    process.exit(1);
+  }
   if (infraProblem) {
     console.error(`\nThe panel's infrastructure patterns err in one direction or the other.`);
     process.exit(1);
