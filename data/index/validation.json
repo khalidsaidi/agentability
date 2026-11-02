@@ -79,7 +79,7 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "All 189 drawn domains judged from prose, across nine surfaces added one at a time: the live homepage; a browser UA; the www host; the closest archive snapshot; the CDX index filtered to HTTP 200 text/html; CDX for the www host and for sub-paths; country sub-paths fetched live; CDX under www.<domain>/*; and older captures (from=2008), which is the only way to read a site that has since become a JavaScript app.",
+    "how": "All 189 drawn domains judged from prose, across nine surfaces added one at a time: the live homepage; a browser UA; the www host; the closest archive snapshot; the CDX index filtered to HTTP 200 text/html; CDX for the www host and for sub-paths; country sub-paths fetched live; CDX under www.<domain>/*; older captures (from=2008), which is the only way to read a site that has since become a JavaScript app. A tenth surface, a real browser, was used on five of the archive-read domains as a control rather than to resolve them.",
     "errors": 1,
     "n": 189,
     "rate": 0.005,
@@ -127,7 +127,14 @@
     "whyWallsAreNotHandRead": "No domain is now counted as a wrong keep by assumption. Six bounds fell on the way here — 30.9%, 25.8%, 10.8%, 6.8%, 5.3%, 3.8% — every one because another surface turned up, and five of those times right after I had called the remainder unverifiable. The lesson recorded rather than the claim: an unreadable domain usually measures the reach of whoever is looking.",
     "interval": "Wilson 0.1-2.9%, exact upper 2.9%.",
     "weakestJudgements": "The remaining weakness is not a tier of evidence but a source: 36 of the 189 were read from archived captures because the live site serves nothing. A capture can lag the live site. For a reader who declines archive evidence altogether, the bound is 37/189 = 19.6%, 95% CI 14.5-25.8%, and that figure is published beside the rate. Nothing is judged from structural inference and nothing is counted against us by assumption.",
-    "tiers": "All 189 judged from prose a person read. 153 were read from the live site; 36 wall every automated client and were read from archived captures instead, each the most recent capture that renders — marriott.com from a 2026 capture of its all-inclusive-resorts page, 1,086 words."
+    "tiers": "All 189 judged from prose a person read. 153 were read from the live site; 36 wall every automated client and were read from archived captures instead, each the most recent capture that renders — marriott.com from a 2026 capture of its all-inclusive-resorts page, 1,086 words.",
+    "archiveControl": {
+     "what": "Whether an archived capture misrepresents what a site is now — the only weakness left in the census, since 36 of the 189 were read from captures because they wall every automated client.",
+     "how": "Five of those 36 re-read in a real Chrome browser, which renders the JavaScript they serve: zara.com, marriott.com, tesco.com, discogs.com, rei.com.",
+     "result": "0 disagreements in 5, 95% CI 0.0-43.4%. tesco.com and rei.com matched their capture's title string exactly; the other three named the same business in different words.",
+     "honest_limit": "Five is thin and the interval says so — this measures the risk rather than retiring it. The bound for a reader who declines archive evidence altogether, 37/189 = 19.6%, 95% CI 14.5-25.8%, stands alongside it and is on the page.",
+     "evidence": "data/index/evidence/kept-census-browser-check.tsv"
+    }
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
