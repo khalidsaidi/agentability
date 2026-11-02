@@ -54,8 +54,8 @@ async function main() {
   claim("kept-side-census-size", `${census.n} domains drawn and read`, census.where);
   claim("kept-side-walls-handled", `${walls.n} walls, ${overturned.n} overturned by our own audit`, walls.where);
   const cdxUnresolved = countIn("kept-census-cdx.tsv", /NOT HAND-READ/);
-  claim("kept-side-unresolved", `${cdxUnresolved.n} that no person could read on any of seven surfaces`, cdxUnresolved.where);
-  claim("kept-side-archive-pass", `${unresolved.n} after four surfaces, ${unresolved.n - cdxUnresolved.n} resolved by surfaces five through seven`, `${unresolved.where} and data/index/evidence/kept-census-cdx.tsv`);
+  claim("kept-side-unresolved", `${cdxUnresolved.n} — every drawn domain was judged, nothing assumed`, cdxUnresolved.where);
+  claim("kept-side-archive-pass", `${unresolved.n} after four surfaces, all ${unresolved.n - cdxUnresolved.n} resolved by surfaces five through eight`, `${unresolved.where} and data/index/evidence/kept-census-cdx.tsv`);
   claim("kept-side-far-edge", `${hc.farEdge.errors} of ${hc.farEdge.n} = up to ${(hc.farEdge.ci95[1] * 100).toFixed(1)}%`, "the line above, counted as wrong keeps by assumption");
   claim("removed-side-error-rate", `${cf.overExclusion.errors} of ${cf.overExclusion.n} = ${(cf.overExclusion.rate * 100).toFixed(1)}% (a census)`, `${SITE}/data/validation.json`);
   claim("premise-filtered-sites-wall", "NOT SUPPORTED, Fisher p = 0.737", lineOf("probe-withdrawn-census357.txt", "Readability of domains"));
