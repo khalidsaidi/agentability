@@ -56,7 +56,7 @@ async function main() {
   const cdxUnresolved = countIn("kept-census-cdx.tsv", /NOT HAND-READ/);
   claim("kept-side-unresolved", `${cdxUnresolved.n} — every drawn domain was judged, nothing assumed`, cdxUnresolved.where);
   claim("kept-side-archive-pass", `${unresolved.n} after four surfaces, all ${unresolved.n - cdxUnresolved.n} resolved by surfaces five through eight`, `${unresolved.where} and data/index/evidence/kept-census-cdx.tsv`);
-  claim("kept-side-far-edge", `${hc.farEdge.errors} of ${hc.farEdge.n} = up to ${(hc.farEdge.ci95[1] * 100).toFixed(1)}%`, "the line above, counted as wrong keeps by assumption");
+  claim("kept-side-far-edge", `${hc.farEdge.errors} of ${hc.farEdge.n} = up to ${(hc.farEdge.ci95[1] * 100).toFixed(1)}%`, hc.farEdge.unresolved?.length ? `${hc.farEdge.unresolved.length} counted as wrong keeps by assumption` : "no domain counted against us by assumption");
   claim("removed-side-error-rate", `${cf.overExclusion.errors} of ${cf.overExclusion.n} = ${(cf.overExclusion.rate * 100).toFixed(1)}% (a census)`, `${SITE}/data/validation.json`);
   claim("premise-filtered-sites-wall", "NOT SUPPORTED, Fisher p = 0.737", lineOf("probe-withdrawn-census357.txt", "Readability of domains"));
   claim("draw-seed-2026", "53 body, 8 machine, 5 nothing", lineOf("probe-final-rule.txt", "Evidence:"));

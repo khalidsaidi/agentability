@@ -31,7 +31,10 @@ async function main() {
   const checks: Check[] = [
     { what: "kept side, rate and n", needle: `${hc.errors} of ${hc.n} kept wrongly` },
     { what: "kept side, interval", needle: `95% CI ${pct(hc.ci95[0])}` },
-    { what: "kept side, far edge", needle: `at most ${pct(hc.farEdge.ci95[1])}%` },
+    // The far edge used to be a separate, wider number because unreadable
+    // domains were counted against us. Every drawn domain is now judged, so the
+    // two coincide and the page says so rather than quoting a second figure.
+    { what: "kept side, far edge", needle: "both the measured rate and the far edge" },
     { what: "kept side, unresolved count", needle: `Nothing is counted against us by assumption` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },
