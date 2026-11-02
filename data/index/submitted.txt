@@ -1,4 +1,8 @@
-# Sites submitted for audit by their owners or by anyone who asked.
+# Sites submitted for audit by their owners or by anyone who asked, plus
+# reinstatements: domains the content filter removed by mistake, where a hand
+# review in classification-overrides.json put the verdict back to ok. Without a
+# line here the correction only fixes the verdict, and the domain stays out of
+# domains.txt and out of the ranking, so the Index never shows it again.
 #
 # The main panel is derived from popularity data (Tranco ∩ Chrome UX Report) and
 # is rewritten from scratch every time `npm run panel` runs. Anything listed here
@@ -14,3 +18,9 @@
 apify.com
 kbag.se
 nordnet.de
+
+# Reinstated 2026-11-02 after the census of excluded domains. Both were cleared
+# in classification-overrides.json and both already have live report pages, but
+# neither was back in domains.txt, so neither was being re-audited or ranked.
+dragonball-super.com
+strikerreport.com

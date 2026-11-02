@@ -16,7 +16,13 @@
     "strikerreport.com",
     "i993.com",
     "izy0.com"
-   ]
+   ],
+   "note": "This is the classifier's own rate, which is what it should be: all 4 are corrected in classification-overrides.json, so the shipped pipeline removes none of them today. Checking this turned up that 2 of the 4 \u2014 dragonball-super.com and strikerreport.com \u2014 had their verdict fixed but were never put back in the audit list, so their report pages were live while they stayed out of the ranking and out of every weekly run. Both are now in submitted.txt and rejoin at the next run.",
+   "asShipped": {
+    "errors": 0,
+    "n": 53,
+    "note": "after overrides. The 4 raw errors are the measure of the model, not of what the site publishes."
+   }
   },
   "underExclusion": {
    "errors": 0,
