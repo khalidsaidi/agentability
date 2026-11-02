@@ -614,13 +614,18 @@ type Summary = {
   }>;
 };
 
-// The commerce table. Deliberately not the same columns as the main index:
-// platform sits next to the UCP column because Shopify switches UCP on for its
-// merchants, so without it the ranking would mostly be reporting who uses
-// Shopify and calling it a readiness score.
+// The commerce table. Deliberately not the same columns as the main index: the
+// UCP column is the one agentic-commerce signal verifiable from outside.
+//
+// A platform column used to sit beside it, to stop the ranking from quietly
+// reporting who uses Shopify — Shopify switches UCP on for its merchants. It is
+// gone because on this panel it printed "own build" for every single row: these
+// are the web's most-visited sites, and at that size shops run their own
+// checkout. The detector still runs and the platform is still on each report
+// page; a column that cannot vary is not evidence, it is furniture.
 function shopsTable(rows: Summary["leaderboard"]): string {
   return `<table>
-<thead><tr><th class="num">#</th><th>Shop</th><th class="num">Score</th><th>Grade</th><th class="hide-sm">Platform</th><th>Agentic checkout</th></tr></thead>
+<thead><tr><th class="num">#</th><th>Shop</th><th class="num">Score</th><th>Grade</th><th>Agentic checkout</th></tr></thead>
 <tbody>
 ${rows
   .map(
@@ -629,7 +634,6 @@ ${rows
   <td><a href="/ai-index/site/${esc(r.domain)}/">${esc(r.domain)}</a> ${postureChip(r)}</td>
   <td class="num"><span class="bar"><span style="width:${Math.max(2, r.score)}%;background:${scoreColor(r.score)}"></span></span>${r.score}</td>
   <td><span class="chip">${esc(r.grade)}</span></td>
-  <td class="hide-sm">${r.platform ? `<span class="chip">${esc(r.platform)}</span>` : '<span class="chip dim">own build</span>'}</td>
   <td>${r.ucp ? '<span class="chip ucp">UCP</span>' : '<span class="chip dim">none</span>'}${r.mcp ? ' <span class="chip">MCP</span>' : ""}</td>
 </tr>`
   )
@@ -1468,6 +1472,7 @@ free, updated weekly.</div>`,
       const withUcp = shops.filter((r) => r.ucp);
       const shopify = shops.filter((r) => r.platform === "Shopify");
       const ucpNotShopify = withUcp.filter((r) => r.platform !== "Shopify");
+      const shopsClosed = shops.filter((r) => r.posture === "closed");
       const avg = Math.round(shops.reduce((acc, r) => acc + r.score, 0) / shops.length);
       await fsp.mkdir(path.join(OUT, "shops"), { recursive: true });
       await fsp.writeFile(
@@ -1486,16 +1491,15 @@ verified from outside. Average ${avg}/100.</p>
 <div class="meter2">
   <div><b>${shops.length}</b><span>shops audited</span></div>
   <div><b>${withUcp.length}</b><span>publish a UCP profile</span></div>
-  <div><b>${shopify.length}</b><span>on Shopify</span></div>
-  <div><b>${ucpNotShopify.length}</b><span>UCP without Shopify</span></div>
+  <div><b>${shopsClosed.length}</b><span>closed to AI agents by policy</span></div>
+  <div><b>${avg}/100</b><span>average score</span></div>
 </div>
 
-<p class="lede" style="margin-top:26px"><b>Read the UCP column with the platform column.</b> Shopify publishes a UCP profile
-on behalf of its merchants, so a Shopify shop passes without anyone there deciding anything.
-${ucpNotShopify.length
-  ? `The ${ucpNotShopify.length} shop${ucpNotShopify.length === 1 ? "" : "s"} below that publish${ucpNotShopify.length === 1 ? "es" : ""} UCP on their own
-infrastructure — ${ucpNotShopify.slice(0, 4).map((r) => esc(r.domain)).join(", ")}${ucpNotShopify.length > 4 ? " and others" : ""} — chose to.`
-  : "No shop here publishes UCP on its own infrastructure yet."}
+<p class="lede" style="margin-top:26px"><b>${ucpNotShopify.length === withUcp.length ? "Every UCP profile here was published deliberately." : "Read the UCP column with care."}</b>
+Shopify publishes a UCP profile on behalf of its merchants, so on a panel of Shopify stores this column would mostly be
+reporting who uses Shopify. ${shopify.length
+  ? `${shopify.length} shop${shopify.length === 1 ? " here is" : "s here are"} on Shopify, so read ${shopify.length === 1 ? "that row" : "those rows"} as the platform's decision, not the merchant's.`
+  : `We detect no Shopify storefront on this panel at all — these are the web's most-visited sites, and at that size shops run their own checkout — so ${withUcp.length ? `the ${withUcp.length} that publish UCP did it themselves` : "nothing here is a platform default"}.`}
 The rest of the score is the same seven checks as the main <a href="/ai-index/">index</a>, which measure things no platform
 hands you: whether your prices survive a fetch without JavaScript, whether an agent can reach your basket, whether your
 products carry structured data.</p>
