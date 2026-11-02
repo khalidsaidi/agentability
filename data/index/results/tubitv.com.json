@@ -1,20 +1,20 @@
 {
  "domain": "tubitv.com",
- "checkedAt": "2026-11-02T04:32:37.660Z",
+ "checkedAt": "2026-11-02T05:06:17.947Z",
  "status": "complete",
- "elapsedMs": 3780,
- "score": 90,
- "grade": "A",
+ "elapsedMs": 4919,
+ "score": 80,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 1535 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1243 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1232 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/static/support), legal/privacy (/static/terms)."
+   "detail": "Reached from homepage: pricing (/movies/100016659/precious), support/contact (/static/support), legal/privacy (/static/terms)."
   },
   {
    "id": "B1",
@@ -108,7 +108,7 @@
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,

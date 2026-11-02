@@ -1,9 +1,9 @@
 {
  "domain": "gosuslugi.ru",
- "checkedAt": "2026-11-02T04:36:36.678Z",
+ "checkedAt": "2026-11-02T04:59:02.701Z",
  "status": "complete",
- "elapsedMs": 18719,
- "score": 40,
+ "elapsedMs": 6792,
+ "score": 10,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~264 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~16 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/help)."
+   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -114,6 +114,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

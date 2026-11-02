@@ -1,10 +1,10 @@
 {
  "domain": "oricon.co.jp",
- "checkedAt": "2026-11-02T04:29:32.172Z",
+ "checkedAt": "2026-11-02T05:03:11.952Z",
  "status": "complete",
- "elapsedMs": 1410,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 1665,
+ "score": 60,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,34 +27,34 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~1455 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 0,
+   "points": 5,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 429 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact (/information/contact.html)."
   },
   {
    "id": "B1",
@@ -84,27 +84,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
-  "sitemap": true,
-  "parseableText": false
+  "structuredData": true,
+  "sitemap": false,
+  "parseableText": true
  }
 }
