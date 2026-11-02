@@ -1,10 +1,10 @@
 {
  "domain": "indiamart.com",
- "checkedAt": "2026-11-02T03:59:57.735Z",
+ "checkedAt": "2026-11-02T04:26:04.370Z",
  "status": "complete",
- "elapsedMs": 966,
- "score": 8,
- "grade": "F",
+ "elapsedMs": 4048,
+ "score": 48,
+ "grade": "D",
  "posture": "selective",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~818 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 429 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact (help.indiamart.com), docs/api (/impcat/legal-documentation-services.html), legal/privacy (/privacy-policy.html)."
   },
   {
    "id": "B1",
@@ -114,6 +114,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": false,
-  "parseableText": false
+  "parseableText": true
  }
 }
