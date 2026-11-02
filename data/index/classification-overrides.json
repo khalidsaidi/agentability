@@ -1,11 +1,39 @@
 {
-  "_README": "Human review of the model's content verdicts. classification.json stays exactly what the classifier returned; this file records where a hand check disagreed, and why, so both are auditable. Applied on top of classification.json by build-panel.ts and build-site.ts. Added only after fetching the site and reading it.",
-  "_reviewedOn": "2026-11-02",
-  "_method": "Full census of all 53 excluded domains: homepage fetched, title and meta description read by hand. 4 were wrong exclusions, 2 were right exclusions under the wrong label. A 40-domain random sample (seeded shuffle) of the 1,405 kept domains found 0 wrong inclusions.",
-  "dragonball-super.com": { "verdict": "ok", "was": "piracy", "reason": "Official Fuji TV site for the anime — title reads 公式サイト. The name reads like a fan piracy site; the page is the broadcaster's own." },
-  "strikerreport.com": { "verdict": "ok", "was": "gambling", "reason": "Independent football publication covering the World Cup, Premier League and MLS. No betting product." },
-  "i993.com": { "verdict": "ok", "was": "porn", "reason": "Serves 'Surveza', a survey site. Nothing adult on the page." },
-  "izy0.com": { "verdict": "ok", "was": "porn", "reason": "Serves 'Surveza', a survey site. Nothing adult on the page." },
-  "arbada.com": { "verdict": "porn", "was": "gambling", "reason": "Arabic pornography site. Excluded either way; the label was wrong." },
-  "txnhh.com": { "verdict": "porn", "was": "gambling", "reason": "Serves XNXX pornography. Excluded either way; the label was wrong." }
+ "_README": "Human review of the model's content verdicts. classification.json stays exactly what the classifier returned; this file records where a hand check disagreed, and why, so both are auditable. Applied on top of classification.json by build-panel.ts and build-site.ts. Added only after fetching the site and reading it.",
+ "_reviewedOn": "2026-11-02",
+ "_method": "Full census of all 53 excluded domains: homepage fetched, title and meta description read by hand. 4 were wrong exclusions, 2 were right exclusions under the wrong label. A 40-domain random sample (seeded shuffle) of the 1,405 kept domains found 0 wrong inclusions. Re-measured 2026-11-02 against a sorted, fingerprinted pool: two seeded draws, 127 distinct domains, 111 judged, 1 wrong keep (az24.vn).",
+ "dragonball-super.com": {
+  "verdict": "ok",
+  "was": "piracy",
+  "reason": "Official Fuji TV site for the anime — title reads 公式サイト. The name reads like a fan piracy site; the page is the broadcaster's own."
+ },
+ "strikerreport.com": {
+  "verdict": "ok",
+  "was": "gambling",
+  "reason": "Independent football publication covering the World Cup, Premier League and MLS. No betting product."
+ },
+ "i993.com": {
+  "verdict": "ok",
+  "was": "porn",
+  "reason": "Serves 'Surveza', a survey site. Nothing adult on the page."
+ },
+ "izy0.com": {
+  "verdict": "ok",
+  "was": "porn",
+  "reason": "Serves 'Surveza', a survey site. Nothing adult on the page."
+ },
+ "arbada.com": {
+  "verdict": "porn",
+  "was": "gambling",
+  "reason": "Arabic pornography site. Excluded either way; the label was wrong."
+ },
+ "txnhh.com": {
+  "verdict": "porn",
+  "was": "gambling",
+  "reason": "Serves XNXX pornography. Excluded either way; the label was wrong."
+ },
+ "az24.vn": {
+  "verdict": "gambling",
+  "reason": "Lottery results site — title reads \"Ket qua xo so ba mien\" (three-region lottery results), with live draws, Vietlott and jackpot figures. The classifier said ok; found by the kept-side sample on 2026-11-02."
+ }
 }

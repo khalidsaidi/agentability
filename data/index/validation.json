@@ -17,7 +17,7 @@
     "i993.com",
     "izy0.com"
    ],
-   "note": "This is the classifier's own rate, which is what it should be: all 4 are corrected in classification-overrides.json, so the shipped pipeline removes none of them today. Checking this turned up that 2 of the 4 \u2014 dragonball-super.com and strikerreport.com \u2014 had their verdict fixed but were never put back in the audit list, so their report pages were live while they stayed out of the ranking and out of every weekly run. Both are now in submitted.txt and rejoin at the next run.",
+   "note": "This is the classifier's own rate, which is what it should be: all 4 are corrected in classification-overrides.json, so the shipped pipeline removes none of them today. Checking this turned up that 2 of the 4 — dragonball-super.com and strikerreport.com — had their verdict fixed but were never put back in the audit list, so their report pages were live while they stayed out of the ranking and out of every weekly run. Both are now in submitted.txt and rejoin at the next run.",
    "asShipped": {
     "errors": 0,
     "n": 53,
@@ -25,34 +25,32 @@
    }
   },
   "underExclusion": {
-   "errors": 0,
-   "n": 121,
-   "rate": 0.0,
+   "errors": 1,
+   "n": 111,
+   "rate": 0.009,
    "ci95": [
-    0.0,
-    0.031
+    0.002,
+    0.049
    ],
-   "how": "`npm run probe-filter` and `SEED=1337 npm run probe-filter` \u2014 two draws, 66 each, 130 distinct domains (2 overlap). A domain is called unreadable only after three surfaces give nothing: homepage on the auditor's bot UA, the same request on a browser UA, then robots.txt and sitemap.xml at HTTP 200, whose URL paths name what a site is made of. Body text scanned for adult, gambling and piracy vocabulary; every hit hand-judged.",
-   "tiers": "100 judged on page body, 21 on robots/sitemap only, 9 on nothing. If the 21 robots/sitemap judgements are not trusted either, the worst case becomes 30/130 = 23.1%, 95% CI 16.6-31.1%.",
-   "flagged": "10 hits across both draws, all rejected by hand: XXX is the ISO 4217 code for no currency (xe.com), 'slots' are memory slots (asus.com), portals run casual Jackpot games (gmx.net, libero.it, web.de), a newspaper reported a burglary at a bingo hall (nine.com.au), an OnlyFans obituary (infobae.com), hotels near casinos in a sitemap (skyscanner.net), an ad-slot CSS class (archdaily.com), and polybuzz.ai's own FAQ saying it bans public NSFW.",
+   "found": [
+    "az24.vn — a Vietnamese lottery-results site; now excluded in classification-overrides.json"
+   ],
+   "pool": "71275ca25efe (1,176 kept domains, sorted)",
+   "how": "`npm run probe-filter` and `SEED=1337 npm run probe-filter` — two draws of 66 from the sorted kept pool, 127 distinct domains (5 overlap). A domain is called unreadable only after three surfaces give nothing: homepage on the auditor's bot UA, the same request on a browser UA, then robots.txt and sitemap.xml at HTTP 200. Body text scanned for adult, gambling and piracy vocabulary; every hit hand-judged.",
    "wholePopulationBound": {
-    "errors": 9,
-    "n": 130,
-    "rate": 0.069,
+    "errors": 17,
+    "n": 127,
+    "rate": 0.134,
     "ci95": [
-     0.037,
-     0.126
+     0.085,
+     0.204
     ],
-    "how": "assume every domain that stayed unreadable is a wrong keep: allegro.pl, britishairways.com, dickssportinggoods.com, discogs.com, eltiempo.es, iau.ir, lowes.com, macys.com, viator.com \u2014 all answer automated clients with a Cloudflare or Akamai wall.",
-    "says": "at the far edge of the interval, at most 12.6% of kept domains are wrongly kept. This is the bound that faces the whole population, not just the part that could be read."
+    "how": "the one real error plus all 16 domains that stayed unreadable, counted as wrong keeps.",
+    "says": "at the far edge of the interval, at most 20.4% of kept domains are wrongly kept."
    },
-   "control": {
-    "what": "whether sites in the filtered categories wall bots more than other sites \u2014 the premise that made pursuing the unreadable domains worth doing rather than discarding them",
-    "measured": "`POOL=withdrawn npm run probe-filter` \u2014 the identical procedure over 66 of the 357 removed domains: 9 unreadable, 13.6%, against 6.9% on the kept side.",
-    "verdict": "NOT established. The difference is +6.7 percentage points, 95% CI -2.6 to +16.1, Fisher exact p = 0.189. It points the way the argument assumed, and it is within sampling noise. The pass is still worth it on its own terms \u2014 it cut the unmeasured share from a third to 7% \u2014 but the correlation is an open question, not evidence."
-   },
-   "limits": "The vocabulary scan reads raw page text including leaked CSS and JS, which costs false alarms and is why every hit is hand-judged rather than applied. The readable threshold counts prose words only \u2014 tokens with braces, semicolons or slashes are not words \u2014 so a homepage carrying 2,000 words of bundled JavaScript and no sentences counts as unreadable rather than as clean.",
-   "supersedes": "0/44 readable, CI 0-8.0%, which covered the readable population only and left a third of the sample unmeasured; and the single-seed 0/61 with a 16.5% worst case, which rested on one draw."
+   "sensitivity": "livescore.com is the closest call and was kept: its title and purpose are live football scores, and the rule judges primary purpose, but it runs a betting-affiliate directory. Counted as a wrong keep instead, the rate is 2/111 = 1.8%, 95% CI 0.5-6.3%.",
+   "reproducibility": "The earlier 0/121 was measured against the leaderboard in score order, so the weekly run reshuffled the pool and the same seed drew an entirely different sample — reproducible in name only, and it failed silently. The pool is now sorted and fingerprinted, the fingerprint is printed on every run and published here, and POOL_HASH=<hash> makes a changed pool say so. Two consecutive runs of seed 2026 drew the identical 66 domains; one domain's live fetch differed (gamma.app readable in one, walled in the next), and the conservative run is what is published.",
+   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; and 0/121 CI 0-3.1%, whose pool no longer exists. The honest reading is that the kept side was never 0 — the sample that would have found az24.vn had not been drawn yet."
   }
  },
  "a6": {
@@ -60,7 +58,7 @@
    "overCredit": 1,
    "underCredit": 1,
    "n": 60,
-   "how": "seed 42, 15 sites x 4 categories \u2014 the set the rule was tuned against, so not evidence of accuracy"
+   "how": "seed 42, 15 sites x 4 categories — the set the rule was tuned against, so not evidence of accuracy"
   },
   "heldOut": {
    "overCredit": 2,
@@ -123,7 +121,7 @@
   ],
   "how": "seed 11, 20 domains marked shop, judged by hand",
   "found": [
-   "newgrounds.com \u2014 a free content portal"
+   "newgrounds.com — a free content portal"
   ],
   "boundary": "A shop is a site whose primary purpose is selling goods or services to the public and where a visitor can start a purchase. News, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription. Whether to narrow this to retail only is a product decision, not a measurement one."
  }

@@ -28,6 +28,7 @@
 // terms it looks for appear innocently (XXX is an ISO currency code, a PC has
 // memory slots, a newspaper reports on bingo halls).
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -144,15 +145,32 @@ async function main() {
   }
 
   const all: string[] = summary.leaderboard.map((r: { domain: string }) => r.domain);
-  const pool: string[] =
+  // Sorted, not in leaderboard order. The leaderboard is ordered by score, so
+  // every weekly run reshuffles it and the same seed drew a completely
+  // different sample — "reproducible from this seed" was false and said nothing
+  // when it broke. Sorting makes the draw depend only on who is in the pool.
+  const pool: string[] = (
     POOL === "kept"
       ? all.filter((d) => !merged[d] || merged[d] === "ok")
-      : Object.keys(merged).filter((d) => merged[d] !== "ok");
+      : Object.keys(merged).filter((d) => merged[d] !== "ok")
+  ).sort();
+  // Membership still moves as sites enter and leave the panel, so the pool is
+  // fingerprinted and the fingerprint is published next to the rate. A rate
+  // measured against a pool that no longer exists is not reproducible, and this
+  // is what makes that visible instead of silent.
+  const poolHash = crypto.createHash("sha256").update(pool.join("\n")).digest("hex").slice(0, 12);
+  const expected = process.env.POOL_HASH;
+  if (expected && expected !== poolHash) {
+    console.log(
+      `!! POOL CHANGED — expected ${expected}, got ${poolHash} (${pool.length} domains).\n` +
+        `!! The published rate was measured against a different pool. Re-judge; do not quote the old number.\n`
+    );
+  }
   const drawn = POOL === "withdrawn" && DRAW >= pool.length ? pool : sample(pool, DRAW, SEED);
 
   console.log(
     POOL === "kept"
-      ? `Content filter, kept side — seed ${SEED}, ${drawn.length} drawn from ${pool.length} kept\n`
+      ? `Content filter, kept side — seed ${SEED}, ${drawn.length} drawn from ${pool.length} kept, pool ${poolHash}\n`
       : `Content filter, REMOVED side — readability control, ${drawn.length} of ${pool.length} withdrawn domains\n`
   );
   const counts: Record<Tier, number> = { body: 0, machine: 0, none: 0 };
