@@ -1508,15 +1508,18 @@ Not listed? <a href="${ISSUE_NEW}">Ask us to audit it</a> — free, and we audit
   const methodologyBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Methodology</p>
 <h1>How scoring works</h1>
-<p class="lede">Eight checks, all against public surfaces, all reproducible with plain HTTP requests. No invented
-standards: every check is traceable to a convention that real AI systems use in 2026.</p>
+<p class="lede">Nine checks — six scored out of 100, three bonuses — all against public surfaces, all reproducible
+with plain HTTP requests. No invented standards: every check is traceable to a convention that real AI systems use in
+2026.</p>
 
 <h2>Which sites are audited, and why those</h2>
 <p class="lede">The panel is derived, not hand-picked. Every rebuild takes the current
 <a href="https://tranco-list.eu/" rel="nofollow noopener">Tranco</a> top 5,000 — a daily, citable ranking built from
 five independent sources — and keeps only the domains that also appear in Google's
-<a href="https://developer.chrome.com/docs/crux" rel="nofollow noopener">Chrome UX Report</a> top 10,000, which measures
-real visits by real Chrome users. Two independent rankings have to agree before a site is in.</p>
+<a href="https://developer.chrome.com/docs/crux" rel="nofollow noopener">Chrome UX Report</a> top bucket, which measures
+real visits by real Chrome users and comes to 8,234 domains as used here. Two independent rankings have to agree before
+a site is in. The exact size of every input is recorded in <code>/data/panel-source.json</code> — don't take the round
+numbers in this paragraph for the ones that ran.</p>
 <p class="lede">Two things are then removed. <b>Infrastructure</b>: CDNs, DNS, ad servers, API hosts and login walls —
 nobody is ever sent to <code>gtld-servers.net</code> to find a price, so scoring it tells you nothing.
 <b>Pornography, piracy and gambling</b>: neither ranking carries a category, and Google publishes none, so each
@@ -1524,7 +1527,9 @@ domain is classified once by a model and the verdict is cached and published alo
 those verdicts live in a separate file with a reason each, so <code>classification.json</code> stays the model's own
 output and nothing is quietly edited into it. You can check every call we
 made in <code>/data/classification.json</code>, and the exact source list is recorded in
-<code>/data/panel-source.json</code> with the Tranco list ID, so anyone can rebuild the identical panel.</p>
+<code>/data/panel-source.json</code> with the Tranco list ID, so anyone can rebuild the identical panel. That file
+records the last derivation, with its date — it is not re-stamped when a domain is withdrawn afterwards, so its
+<code>panelSize</code> runs ahead of the number of sites actually listed here.</p>
 <p class="lede">This replaced a hand-typed list of 113 sites that was mostly AI startups — which could not honestly
 answer the question this site asks, because it was not the web people actually use.</p>
 <table>
