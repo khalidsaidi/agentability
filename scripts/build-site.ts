@@ -1756,7 +1756,10 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
 <p class="lede">Attribution: link to <a href="/ai-index/">the Index</a> or the per-site report you're citing.</p>`;
   const supportBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
-<h1>Get help, get audited, or dispute a score</h1>
+<h1>Check your site&rsquo;s AI-agent readiness</h1>
+<p class="lede">Ask us to audit any site against the same eight checks as the <a href="/ai-index/">Index</a> &mdash; free, no
+signup, and the report is published in public like everyone else&rsquo;s. You can also dispute a score or have it re-run
+after a fix.</p>
 <p class="lede"><b>Request an audit</b> — open an
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&amp;labels=audit-request">audit
 request issue</a> and we add your domain to <code>data/index/submitted.txt</code>, which the weekly run merges &mdash; so it joins the next one. You can also PR the line yourself into either that file or <code>data/index/domains.txt</code> and skip the wait on us. Submissions go through the same porn, piracy and gambling filter as everything else; a submission buys an audit, not a place past the rules.</p>
@@ -1781,7 +1784,17 @@ and publish only what those public files say. To remove a domain from the Index,
 <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
   const smallPages: Array<{ dir: string; title: string; description: string; body: string }> = [
     { dir: "docs", title: "Data docs — Agentability", description: "How to use the AI-Readiness Index open data: JSON endpoints, history snapshots, and raw per-site results.", body: docsBody },
-    { dir: "support", title: "Support — Agentability", description: "Request an audit, dispute a check, or get your score re-run after deploying fixes.", body: supportBody },
+    // Titled for what people search, not for what the page is filed under. It
+    // was "Support — Agentability", which no one searches: the queries landing
+    // near this site are "ai readiness checker", "ai agent readiness test",
+    // "ai crawlability audit checklist". The URL is unchanged.
+    {
+      dir: "support",
+      title: "Check your site's AI-agent readiness — free audit, no signup",
+      description:
+        "Ask us to audit any site for AI-agent readiness: llms.txt, AI-crawler policy, readable content, structured data, MCP. Free, no signup, every check reproducible. Also: dispute a score or get it re-run after a fix.",
+      body: supportBody,
+    },
     { dir: "privacy", title: "Privacy — Agentability", description: "No analytics, no cookies, no accounts. Audits use only public surfaces.", body: privacyBody },
   ];
   for (const p of smallPages) {
