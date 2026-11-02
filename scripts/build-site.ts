@@ -986,7 +986,15 @@ async function main() {
       .filter((r) => !verdicts[r.domain] || verdicts[r.domain] === "ok")
       .map((r, i) => ({ ...r, rank: i + 1 }));
     const dropped = before - summary.leaderboard.length;
-    if (dropped) console.log(`Content filter: ${dropped} withdrawn domain(s) removed from the ranked tables`);
+    if (dropped) {
+      // The audited count is what every page prints — the hero caption, "see all
+      // N site scores", each report's "#r of N", /shops/'s "N of M". Filtering
+      // rows out without lowering it made the site claim 1,188 while publishing
+      // 1,186: the two excluded gambling domains stayed in the headline. One
+      // number, derived after the filter.
+      summary.stats.audited = summary.leaderboard.length;
+      console.log(`Content filter: ${dropped} withdrawn domain(s) removed from the ranked tables; audited now ${summary.stats.audited}`);
+    }
   }
 
   const history: Array<{ date: string } & Record<string, number>> = [];
