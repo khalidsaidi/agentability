@@ -79,7 +79,7 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "All 189 drawn domains judged by a person, across eight surfaces added one at a time: the live homepage; a browser UA; the www host; the closest archive snapshot; the Wayback CDX index filtered to HTTP 200 text/html captures; CDX for the www host and for sub-paths; country sub-paths fetched directly; and CDX for captures under www.<domain>/*. 187 yielded prose; 2 are judged from robots.txt and sitemap files.",
+    "how": "All 189 drawn domains judged from prose, across nine surfaces added one at a time: the live homepage; a browser UA; the www host; the closest archive snapshot; the CDX index filtered to HTTP 200 text/html; CDX for the www host and for sub-paths; country sub-paths fetched live; CDX under www.<domain>/*; and older captures (from=2008), which is the only way to read a site that has since become a JavaScript app.",
     "errors": 1,
     "n": 189,
     "rate": 0.005,
@@ -116,8 +116,8 @@
     },
     "whyWallsAreNotHandRead": "No domain is now counted as a wrong keep by assumption. Six bounds fell on the way here — 30.9%, 25.8%, 10.8%, 6.8%, 5.3%, 3.8% — every one because another surface turned up, and five of those times right after I had called the remainder unverifiable. The lesson recorded rather than the claim: an unreadable domain usually measures the reach of whoever is looking.",
     "interval": "Wilson 0.1-2.9%, exact upper 2.9%.",
-    "weakestJudgements": "marriott.com is the single weakest call and carries its own bound: counting it as a wrong keep gives 2/189 = 1.1%, 95% CI 0.3-3.8%, published beside the rate rather than folded into it. zara.com and joom.com were in this tier until CDX captures under www.<domain>/* produced prose — \"ZARA South Africa | New Collection Online\" and \"Joom. Shop every day, or whenever you feel like it\" — the seventh and eighth times a remainder I had called unverifiable turned out to be my reach rather than the sites.",
-    "tiers": "188 of the 189 judged from prose a person read — a live page, an archived capture, or a capture of a country or language sub-path. 1 judged from machine files only: marriott.com, whose robots.txt names /reservation/availabilitySearch.mi, /hotels/ and /offers/. It serves no prose anywhere reachable."
+    "weakestJudgements": "marriott.com is now the weakest, not because the evidence is structural but because the prose is 18 years old. Counting it as a wrong keep anyway gives 2/189 = 1.1%, 95% CI 0.3-3.8%, published beside the rate. zara.com, joom.com and marriott.com were each called unverifiable by me and each then yielded to another surface: a capture under www.<domain>/*, a capture of a language sub-path, and a capture from before the site became a JavaScript app. Nine surfaces in all, and the count of things I called unreadable went 36, 11, 5, 3, 1, 0.",
+    "tiers": "All 189 judged from prose a person read. The last one, marriott.com, came from a 2008 capture because every newer capture and every live path is a JavaScript shell; its robots.txt today lists /reservation/availabilitySearch.mi, /hotels/ and /offers/, so two surfaces 18 years apart agree. No domain in this census rests on structural evidence alone."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
