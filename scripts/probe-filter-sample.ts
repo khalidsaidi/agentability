@@ -47,10 +47,20 @@ const DRAW = Number(process.env.DRAW ?? 66);
 const POOL = (process.env.POOL ?? "kept") as "kept" | "withdrawn";
 const MIN_WORDS = 50;
 
+// The Latin-script terms are a net for English-language sites. They are not
+// enough on their own: a hand census of 189 drawn domains found netkeiba.com,
+// Japan's largest horse-racing odds and tips service, which this scan had
+// cleared because nothing on it is written in English. The non-Latin terms
+// below are the ones that would have caught it and its nearest neighbours.
+// Word boundaries do not apply to CJK, Thai or Arabic script, so those
+// patterns are deliberately unbounded.
 const SIGNALS: [string, RegExp][] = [
   ["porn", /\b(porn|xxx|nsfw|camgirl|webcam girls|hentai|escort|onlyfans|adult video|sex cam|milf)\b/gi],
-  ["gambling", /\b(casino|betting|bookmaker|sportsbook|poker|roulette|blackjack|slots?|jackpot|wager|bet now|free spins|baccarat|bingo)\b/gi],
+  ["porn-nonlatin", /(エロ動画|アダルト動画|無修正|성인_?동영상|色情|情色|สื่อลามก|إباحي)/gi],
+  ["gambling", /\b(casino|betting|bookmaker|sportsbook|poker|roulette|blackjack|slots?|jackpot|wager|bet now|free spins|baccarat|bingo|lottery|lotto)\b/gi],
+  ["gambling-nonlatin", /(競馬|競輪|競艇|パチンコ|オッズ|馬券|宝くじ|賭場|博彩|彩票|赌场|투토|베팅|카지노|xổ số|cá cược|نادي القمار|رهان)/gi],
   ["piracy", /\b(torrent|magnet:|watch free online|stream free|putlocker|123movies|keygen|warez|fmovies)\b/gi],
+  ["piracy-nonlatin", /(無料動画ダウンロード|漫画 ?raw|盗版|免费下载电影|phim lậu)/gi],
 ];
 
 // Same seeded shuffle as validate-rules.ts, so the draw is the published one.
