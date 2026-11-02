@@ -1,0 +1,96 @@
+Rule for "unreadable" — a domain counts as judged if ANY of these yields content, in order:
+  1. GET https://<domain>/ with "AgentabilityBot/2.0 (+https://agentability.org/methodology)"  -> >= 50 prose words
+  2. the same GET with a browser UA                               -> >= 50 prose words
+  3. the same GET against www.<domain> with a browser UA          -> >= 50 prose words
+  4. robots.txt + sitemap.xml, HTTP 200 only                      -> > 20 tokens
+A prose word excludes any token containing braces, semicolons, equals, quotes or slashes, so bundled
+JavaScript does not count as a readable page. A non-200 at step 4 is an error page, not evidence.
+
+Content filter, kept side — seed 90210, 66 drawn from 1186 kept, pool a32c472a558c
+
+  bikewale.com               body          clean
+  syosetu.org                UNRESOLVED    robots 403 sitemap 403
+  whitepages.com             body          clean
+  lichess.org                body          clean
+  shazam.com                 body          clean
+  vinted.com                 body          clean
+  amazon.fr                  body          clean
+  uidai.gov.in               body          clean
+  tradingeconomics.com       body          clean
+  nespresso.com              body          clean
+  thetrainline.com           body          clean
+  amazon.com.tr              body          clean
+  wunderground.com           body          clean
+  detik.com                  body          clean
+  autotrader.co.uk           machine       clean
+  medallia.eu                body          clean
+  fast.com                   body          clean
+  cricinfo.com               body          clean
+  cursor.com                 body          clean
+  nikkei.com                 body          FLAG — judge by hand
+      gambling-nonlatin:"競馬" …lobe CBインサイツ 36Kr DealStreetAsia モバイルの達人 教えて山本さん！ 日経サイエンス プロ野球 相撲 MLB 競馬 サッカー 高校野球 ゴルフ 格闘技 フィギュア その他スポーツ ラグビー コラム スポートピア スポーツの流儀 拝啓 ベーブ・ルース様…
+  vrbo.com                   machine       clean
+  tmz.com                    body          clean
+  myanimelist.net            body          clean
+  robinhood.com              body          clean
+  samsclub.com               body          FLAG — judge by hand
+      gambling:"slot" …:"horizontal","type":"container","content":{"id":"topContent","type":"slot","mapping":[{"type":"ZONE","options":{"refId":"contentZone1"}},{"…
+  torob.com                  body          clean
+  animanch.com               body          FLAG — judge by hand
+      gambling-nonlatin:"パチンコ" …部 読み切り漫画 感想 読み切り漫画 2026.11.02 【妖怪ウォッチ】かつて『ポケモン』を殺しかけたコンテンツの姿か？これが… 22 パチンコ 妖怪ウォッチ アニメ ネタ 2026.11.02 【ワンピース】キリンガム聖「この魔気の鎧を壊せるのは覇王色だけだ」 16 キリン…
+  skroutz.gr                 machine       clean
+  expedia.com                machine       clean
+  deadline.com               body          clean
+  youtube.com                body          clean
+  news18.com                 body          clean
+  lowes.com                  UNRESOLVED    robots 403 sitemap 403
+  index.hr                   body          FLAG — judge by hand
+      porn:"OnlyFans" … nam je, ali milenijalci misle da će vas zbog ovih trendova biti sram OnlyFans zvijezda tvrdi da zna što odvlači gen Z od odnosa: "Nisu 18+ …
+  abebooks.com               body          clean
+  jutarnji.hr                body          clean
+  libero.it                  body          FLAG — judge by hand
+      gambling:"Jackpot" …cy Google Mail Mail Plus Mail PEC Mail Personal Mail Business Tariffe Jackpot Pay SiFattura Fun Drive Shopping Mail Crea Libero Mail Shoppin…
+  asus.com                   body          FLAG — judge by hand
+      gambling:"slots" …ds/others/","ASUS mining motherboard features 19 PCI Express® (PCIe®) slots. With 18 PCIe x1 and one PCIe x16 slots on board, plus three zon…
+  wikihow.com                body          FLAG — judge by hand
+      gambling:"betting" … of Chud Am I? Cast Your Vote Hot Take 1100 votes, 18 comments Sports betting apps have ruined the fun of watching a game by making it too f…
+  correios.com.br            body          clean
+  3bmeteo.com                body          clean
+  joyn.de                    body          clean
+  donga.com                  body          clean
+  realme.com                 body          clean
+  go.com                     body          clean
+  cloud.microsoft            body          clean
+  dickssportinggoods.com     UNRESOLVED    robots 403 sitemap 403
+  mercadolibre.com.mx        body          clean
+  wayground.com              UNRESOLVED    robots 202 sitemap 202
+  futbin.com                 body          clean
+  daum.net                   body          FLAG — judge by hand
+      gambling:"SLOT" … 팝업 - 코치 마크","code":138,"nodeKey":null,"uiType":"WELCOME","nodeType":"SLOT","position":1,"attributes":{"birthday":{"jsUrl":"https://t1.daumc…
+  vietnam.vn                 body          clean
+  msn.com                    machine       clean
+  magnific.com               body          clean
+  kohls.com                  UNRESOLVED    robots 403 sitemap 403
+  spectrum.net               machine       clean
+  straitstimes.com           body          clean
+  xbox.com                   body          clean
+  dagbladet.no               body          clean
+  visualcapitalist.com       body          FLAG — judge by hand
+      gambling:"Casino" …he World’s Largest Oil Importers Money Ranked: The World s 10 Biggest Casino Destinations Mapped: Your Lifetime Tax Bill, by U.S. State Rank…
+  ifood.com.br               machine       clean
+  livedoor.com               body          clean
+  afribaba.com               UNRESOLVED    robots 403 sitemap 403
+  lemonde.fr                 body          clean
+  globo.com                  body          clean
+  archdaily.com              body          FLAG — judge by hand
+      gambling:"slot" …x}.js-afd-show-search-modal .piano-meter-placeholder{display:none}.js-slot.afd-hide{display:none !important}.afd-sidebar-widget.loading-anim…
+
+Evidence: 53 judged on page body, 7 on robots/sitemap only, 6 on nothing.
+Flagged for hand judgement: 10 (nikkei.com, samsclub.com, animanch.com, index.hr, libero.it, asus.com, wikihow.com, daum.net, visualcapitalist.com, archdaily.com).
+Unresolved: 6 (syosetu.org, lowes.com, dickssportinggoods.com, wayground.com, kohls.com, afribaba.com).
+
+Enter the hand verdicts before quoting a rate. Assuming all 10 flags are rejected:
+  judged:          0/60 wrongly kept, 95% CI 0.0%-6.0%
+  + unresolved:    6/66 at worst, 95% CI 4.2%-18.4%
+  + machine tier:  13/66 at worst, 95% CI 11.9%-30.8%
+                   — the far edge: every domain not read on its own page counted as a wrong keep.

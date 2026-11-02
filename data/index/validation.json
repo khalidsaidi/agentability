@@ -55,9 +55,9 @@
    },
    "zeroMeansWhat": "Zero errors on this pool is not evidence that the filter is clean. The one error it is known to make — az24.vn, a Vietnamese lottery-results site — was found by a draw on the previous pool and then excluded, which is what changed the pool. Read this as: after that fix, three fresh draws found nothing more, and the upper bound on what they could have missed is 2.2% among domains that could be read and 28.1% across the whole sample.",
    "priorPool": {
-    "pool": "71275ca25efe — 1,176 kept, before az24.vn was excluded",
-    "result": "two draws, 127 distinct domains, 111 judged, 1 wrong keep (az24.vn) = 0.9%, 95% CI 0.2-4.9%",
-    "why_separate": "kept apart rather than pooled with the three draws above, because a rate pooled across two different populations describes neither."
+    "pool": "e15d222a8342 — 1,175 kept, before the reinstatements",
+    "result": "1 of 189 = 0.5%, 95% CI 0.1-2.9%, across three draws (seeds 2026, 1337, 5150)",
+    "note": "The draw that found netkeiba.com. Excluding it is what changed the pool."
    },
    "handJudged": "20 flags across the three draws, none upheld. Rejected with their evidence: player slots (aternos.org), PCIe slots (asus.com), a calendar slot (tawk.to), a waiver slot in practice software (therapservices.net), CSS size tokens xxx-large (ew.com, allrecipes.com), a Tailwind attribute data-[slot=icon] (vercel.com), a masked IP 141.171.31.XXX (powerbi.com), a JSON-LD placeholder \"XXX\" (xe.com), OnlyFans headlines (index.hr, infobae.com), betting-prosecution stories (cricbuzz.com, news18.com), Las Vegas hotel listings (priceline.com), and a bingo link in a tabloid's games nav (mirror.co.uk).",
    "sensitivity": "Two judgement calls were kept and are published rather than buried. goal.com age-gates gambling advertising (\"This site contains gambling advertising for 24+\") and livescore.com sells betting-affiliate placement; both are kept because the rule judges primary purpose and both are sports news. Counted as errors instead, the rate is 2/174 = 1.1%, 95% CI 0.3-4.1%, and the far edge is unchanged.",
@@ -141,6 +141,23 @@
     "verdict": "NOT SUPPORTED. The difference is +1.7 percentage points, 95% CI -5.3 to +8.7, Fisher exact p = 0.737. Removed domains are no harder to read than kept ones. My original argument asserted the opposite and used it to justify the whole pass; the pass was still worth it — it cut the unmeasured share and found two gambling sites — but not for the reason given.",
     "evidence": "data/index/evidence/probe-withdrawn-census357.txt (full census), probe-withdrawn-sample66.txt (the earlier 66-domain sample, 13.6%, superseded)",
     "supersedes": "the 66-domain sample comparison, 13.6% vs 6.9%, p = 0.189, which compared a sample against a differently-defined kept-side figure."
+   },
+   "currentPool": {
+    "pool": "a32c472a558c — 1,186 kept domains, the panel after today's nine reinstatements",
+    "errors": 0,
+    "n": 65,
+    "rate": 0.0,
+    "ci95": [
+     0.0,
+     0.056
+    ],
+    "how": "A fresh independent draw, seed 90210, on the pool as it stands: 66 domains, 60 judged by the probe (53 on page body, 7 on robots/sitemap) and 5 of the 6 it could not read then resolved live in a real browser. Ten vocabulary flags, all rejected by hand — 競馬 in Nikkei's sports navigation, \"slot\" as a JSON layout key on samsclub.com and daum.net, パチンコ as a tag on an anime-news site, a wikiHow poll comment about betting apps, a Visual Capitalist article ranking casino destinations, and three others.",
+    "unjudged": [
+     "syosetu.org — Cloudflare interstitial on two browser attempts, no HTTP 200 html capture in the CDX index"
+    ],
+    "interval": "Wilson 95% on the judged set, 0.0-5.6%. The bound faces upward and holds at 5.6%.",
+    "why_separate": "Not pooled with the earlier draws. Those were taken on pool e15d222a8342, before nine domains were reinstated; a rate pooled across two populations describes neither. This is the current panel's figure, and it is wider than the earlier 1 of 189 because it rests on one draw rather than three.",
+    "evidence": "data/index/evidence/kept-census-fresh-90210.tsv and probe-fresh-90210.txt"
    }
   },
   "_bothDirections": "The two directions are measured by two different samples, because neither sample can see the other direction. Wrongly INCLUDED — a domain kept that should have been removed — is measured by the kept-side census: 189 drawn by seeded shuffle from the 1,174 kept, 1 error (netkeiba.com). Wrongly EXCLUDED — a domain removed that should have been kept — is measured by the removed-side census: all 53 excluded domains, 4 errors. A kept-side draw contains no excluded domains and so cannot produce an exclusion error rate; saying '0 wrongly excluded' from it would be a category error, not a measurement.",

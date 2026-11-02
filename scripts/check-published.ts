@@ -29,7 +29,20 @@ async function main() {
   const cf = v.contentFilter;
   const hc = cf.underExclusion.handCensus;
   const checks: Check[] = [
-    { what: "kept side, rate and n", needle: `${hc.errors} of ${hc.n} kept wrongly` },
+    // Two pools are published now: the panel as it stands, and the one before
+    // today's reinstatements. Both needles come from the record.
+    {
+      what: "kept side, current pool",
+      needle: cf.underExclusion.currentPool
+        ? `${cf.underExclusion.currentPool.errors} of ${cf.underExclusion.currentPool.n} kept wrongly`
+        : "__RECORD_MISSING_currentPool__",
+    },
+    {
+      what: "kept side, prior pool",
+      needle: cf.underExclusion.priorPool
+        ? (/(\d+ of \d+)/.exec(cf.underExclusion.priorPool.result ?? "")?.[1] ?? "__PRIOR_UNPARSEABLE__")
+        : "__RECORD_MISSING_priorPool__",
+    },
     { what: "kept side, interval", needle: `95% CI ${pct(hc.ci95[0])}` },
     // The far edge used to be a separate, wider number because unreadable
     // domains were counted against us. Every drawn domain is now judged, so the
