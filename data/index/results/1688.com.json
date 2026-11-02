@@ -1,9 +1,9 @@
 {
  "domain": "1688.com",
- "checkedAt": "2026-11-01T23:16:18.527Z",
+ "checkedAt": "2026-11-02T00:26:32.554Z",
  "status": "complete",
- "elapsedMs": 3739,
- "score": 25,
+ "elapsedMs": 9091,
+ "score": 15,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -30,7 +30,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
+   "detail": "The homepage answered 200 but served almost no HTML — 1 words and no links an agent could follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -113,7 +113,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }
