@@ -25,36 +25,39 @@
    }
   },
   "underExclusion": {
-   "errors": 1,
-   "n": 156,
-   "rate": 0.006,
+   "pool": "e15d222a8342 — 1,175 kept domains, the panel as published. Every figure below is measured on this one pool.",
+   "errors": 0,
+   "n": 174,
+   "rate": 0.0,
    "ci95": [
-    0.001,
-    0.035
+    0.0,
+    0.022
    ],
-   "found": [
-    "az24.vn — a Vietnamese lottery-results site, found on the second draw and now excluded in classification-overrides.json"
-   ],
-   "how": "Three draws of 66: `npm run probe-filter`, `SEED=1337 npm run probe-filter` on pool 71275ca25efe, and `npm run probe-filter` again on pool e15d222a8342 after az24.vn was excluded. 176 distinct domains, 156 judged. The rule for 'unreadable' is printed at the top of every run, so it travels with the output.",
-   "pools": "71275ca25efe (1,176 kept) for the first two draws, e15d222a8342 (1,175) for the third — excluding az24.vn changed pool membership, which changed the draw, which is exactly what the fingerprint is for.",
-   "tiers": "133 judged on the page itself, 23 on robots/sitemap only, 20 on nothing.",
-   "sampling": "Pseudo-random with a fixed seed over the whole kept pool, not a convenience sample. The pool is sorted to canonicalise the order the shuffle acts on; sorting fixes the order, it does not select.",
+   "how": "Three draws of 66 on the same pool — `npm run probe-filter` with SEED=2026, 1337 and 5150 — 189 distinct domains, 9 drawn by more than one seed, 174 judged. The rule for 'unreadable' prints at the top of every run, so it travels with the output rather than being cited to a line number.",
+   "tiers": "148 judged on the page itself, 26 on robots/sitemap paths only, 15 on nothing.",
+   "sampling": "Pseudo-random with a fixed seed over the whole kept pool. The pool is sorted first to canonicalise the order the shuffle acts on; sorting fixes the order, it does not select, and every member of the pool can be drawn.",
    "wholePopulationBound": {
-    "errors": 44,
-    "n": 176,
-    "rate": 0.25,
+    "errors": 41,
+    "n": 189,
+    "rate": 0.217,
     "ci95": [
-     0.192,
-     0.319
+     0.164,
+     0.281
     ],
-    "how": "the far edge: the one hand-verified error, plus all 20 domains that stayed unreadable, plus all 23 judged only from robots.txt and sitemap.xml, counted as wrong keeps. URL paths say what a site is made of but are not the page, so a bound leaning on them is not the far edge.",
-    "says": "at the far edge of the interval, at most 31.9% of kept domains are wrongly kept. Nothing weaker covers the whole sample.",
-    "intermediate": "Counting only the unresolved as wrong and trusting the robots/sitemap tier: 21/176 = 11.9%, 95% CI 7.9-17.6%."
+    "how": "the far edge: all 15 domains that stayed unreadable plus all 26 judged only from robots.txt and sitemap.xml, counted as wrong keeps. URL paths say what a site is made of but are not the page, so a bound leaning on them is not the far edge.",
+    "says": "at the far edge of the interval, at most 28.1% of kept domains are wrongly kept. Nothing weaker covers the whole sample.",
+    "intermediate": "Counting only the unresolved as wrong and trusting the robots/sitemap tier: 15/189 = 7.9%, 95% CI 4.9-12.7%."
    },
-   "handJudged": "18 flags across the three draws, one upheld. az24.vn was judged from the site's own title (\"Ket qua xo so ba mien\" — three-region lottery results). The rest were rejected: CSS and JS tokens leaking through the scan (xxx-large, data-[slot=icon], js-slot), Las Vegas hotel listings on travel sites (kayak.com, priceline.com), a bingo link in a tabloid's games nav (mirror.co.uk), portal Jackpot games (gmx.net, libero.it, web.de), OnlyFans headlines (infobae.com, foxnews.com), a betting-app extradition story (rediff.com), hotels near casinos in a sitemap (skyscanner.net), and polybuzz.ai's own FAQ saying it bans public NSFW.",
-   "sensitivity": "livescore.com is the closest call and was kept: its title and purpose are live football scores and the rule judges primary purpose, but it sells betting-affiliate placement. Counted as an error too, the rate is 2/156 = 1.3%, 95% CI 0.4-4.6%.",
-   "reproducibility": "The earlier 0/121 was drawn from the leaderboard in score order, so each weekly run reshuffled the pool and the same seed drew a different sample — reproducible in name only, and it failed silently. The pool is now sorted and fingerprinted, the fingerprint prints on every run and is recorded here, and POOL_HASH=<hash> turns a changed pool into a loud mismatch. Two consecutive runs of seed 2026 on one pool drew the identical 66 domains; one domain's live fetch differed between them (gamma.app), and the conservative run is what is published.",
-   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; and 0/121 CI 0-3.1%, whose pool no longer exists. The honest reading of all three is not that the filter was clean and then broke, but that the draw which would have found az24.vn had not been made yet."
+   "zeroMeansWhat": "Zero errors on this pool is not evidence that the filter is clean. The one error it is known to make — az24.vn, a Vietnamese lottery-results site — was found by a draw on the previous pool and then excluded, which is what changed the pool. Read this as: after that fix, three fresh draws found nothing more, and the upper bound on what they could have missed is 2.2% among domains that could be read and 28.1% across the whole sample.",
+   "priorPool": {
+    "pool": "71275ca25efe — 1,176 kept, before az24.vn was excluded",
+    "result": "two draws, 127 distinct domains, 111 judged, 1 wrong keep (az24.vn) = 0.9%, 95% CI 0.2-4.9%",
+    "why_separate": "kept apart rather than pooled with the three draws above, because a rate pooled across two different populations describes neither."
+   },
+   "handJudged": "20 flags across the three draws, none upheld. Rejected with their evidence: player slots (aternos.org), PCIe slots (asus.com), a calendar slot (tawk.to), a waiver slot in practice software (therapservices.net), CSS size tokens xxx-large (ew.com, allrecipes.com), a Tailwind attribute data-[slot=icon] (vercel.com), a masked IP 141.171.31.XXX (powerbi.com), a JSON-LD placeholder \"XXX\" (xe.com), OnlyFans headlines (index.hr, infobae.com), betting-prosecution stories (cricbuzz.com, news18.com), Las Vegas hotel listings (priceline.com), and a bingo link in a tabloid's games nav (mirror.co.uk).",
+   "sensitivity": "Two judgement calls were kept and are published rather than buried. goal.com age-gates gambling advertising (\"This site contains gambling advertising for 24+\") and livescore.com sells betting-affiliate placement; both are kept because the rule judges primary purpose and both are sports news. Counted as errors instead, the rate is 2/174 = 1.1%, 95% CI 0.3-4.1%, and the far edge is unchanged.",
+   "reproducibility": "The earlier 0/121 was drawn from the leaderboard in score order, so each weekly run reshuffled the pool and the same seed drew a different sample — reproducible in name only, failing silently. The pool is now sorted and fingerprinted, the fingerprint prints on every run and is recorded here, and POOL_HASH=<hash> turns a changed pool into a loud mismatch instead of a quietly different measurement.",
+   "supersedes": "0/44 readable CI 0-8.0%; the single-seed 0/61; 0/121 CI 0-3.1%; and the 1/156 pooled across two pools, which described neither of them."
   }
  },
  "a6": {
