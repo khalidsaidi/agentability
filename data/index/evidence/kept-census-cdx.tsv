@@ -1,25 +1,22 @@
-# Fifth surface: the Wayback CDX index, filtered to captures that returned
-# HTTP 200 with text/html, newest first. The earlier archive pass asked only for
-# the CLOSEST snapshot, which for several of these was a capture of an error
-# page — so "no readable snapshot" was my query, not the archive's contents.
-# Columns: domain, title from a 200 capture, capture timestamp.
-alphapolis.co.jp	アルファポリス - 小説・漫画・ビジネス等の総合エンターテインメントサイト	20261018080633
-behance.net	Search Projects :: Photos, videos, logos, illustrations and branding :: Behance	20261030132459
-ebay.ca	Electronics, Cars, Fashion, Collectibles & More | eBay	20261025062959
-google.co.jp	Google	20250714131315
-leparisien.fr	Actualités en direct et info en continu - Le Parisien	20261019130204
-mcdonalds.com	McDonald's: Burgers, Fries & More. Quality Ingredients.	20250925161123
-joom.com	STILL NOTHING — 6 candidate captures, none rendered a title	-
-jus.br	STILL NOTHING — 6 candidate captures, none rendered a title	-
-netshoes.com.br	STILL NOTHING — no captures in the index	-
-marriott.com	STILL NOTHING — the only 200 capture is an archive.org infrastructure page, not Marriott	-
-zara.com	STILL NOTHING — capture renders as a single non-breaking space	-
+# Surfaces five and six, for the 11 domains that the live fetches and the
+# closest-snapshot pass could not read. One row per domain, final status.
 #
-# Sixth surface, 2026-11-02: the machine-facing files, read by hand rather than
-# scanned. Two of the five resolved. The other three are recorded with what is
-# and is not known about them.
-marriott.com	robots.txt lists /reservation/availabilitySearch.mi, /hotels/, /offers/, /search/ — a hotel booking site	robots 200
-joom.com	sitemap.xml returns 200 and indexes product page files (/sitemap/gpt/pages/page-N.xml) — a marketplace	sitemap 200
-jus.br	NOT HAND-READ. probe-live-5150.txt:78 read its page body and the scan found nothing, but that is screened, not read. No title from any archive capture.	screened only
-netshoes.com.br	NOT HAND-READ. probe-live-5150.txt:72 read its page body, scan clean; walls every client today and has no indexed capture.	screened only
-zara.com	NOT HAND-READ. robots and sitemap both 403, no capture renders a title, probe tier UNRESOLVED.	nothing
+# Surface 5 — the Wayback CDX index filtered to captures that returned HTTP 200
+#   with text/html. The earlier pass asked only for the CLOSEST capture, which
+#   for several of these was taken while the site was erroring, so "no readable
+#   snapshot" was a property of my query rather than of the archive.
+# Surface 6 — the site's own robots.txt and sitemap.xml, read by hand rather
+#   than scanned: URL paths say what a site is made of.
+#
+# Columns: domain, what was read, where it came from.
+alphapolis.co.jp	アルファポリス - 小説・漫画・ビジネス等の総合エンターテインメントサイト	CDX capture 20261018080633
+behance.net	Search Projects :: Photos, videos, logos, illustrations and branding :: Behance	CDX capture 20261030132459
+ebay.ca	Electronics, Cars, Fashion, Collectibles & More | eBay	CDX capture 20261025062959
+google.co.jp	Google	CDX capture 20250714131315
+leparisien.fr	Actualités en direct et info en continu - Le Parisien	CDX capture 20261019130204
+mcdonalds.com	McDonald's: Burgers, Fries & More. Quality Ingredients.	CDX capture 20250925161123
+marriott.com	robots.txt lists /reservation/availabilitySearch.mi, /hotels/, /offers/, /search/ — a hotel booking site	robots.txt 200
+joom.com	sitemap.xml returns 200 and indexes product page files (/sitemap/gpt/pages/page-N.xml) — a marketplace	sitemap.xml 200
+jus.br	NOT HAND-READ — probe-live-5150.txt:78 reached its page body and the scan found nothing, but screened is not read. No archive capture renders a title.	screened only
+netshoes.com.br	NOT HAND-READ — probe-live-5150.txt:72 reached its page body, scan clean. Walls every client today, no indexed capture.	screened only
+zara.com	NOT HAND-READ — robots and sitemap both 403, every capture renders as a single non-breaking space, probe tier UNRESOLVED.	nothing
