@@ -1567,7 +1567,7 @@ what it kept, and A6 for links credited that an agent cannot use and real pages 
 <tbody>
 <tr><td><b>A6</b> everyday tasks</td><td>0 errors in 56 decisions on a held-out sample, 95% CI 0–6.4%</td><td>Measured after two fixes; the same rule scored 10% (CI 4.0–23.1) before them. Readable sites only — where a homepage serves no HTML, A6 scores zero and the report says so rather than claiming the pages are missing.</td></tr>
 <tr><td><b>Content filter</b>, removed side</td><td>4 of 53 removed wrongly, 7.5%, 95% CI 3.0–17.9%</td><td>—</td></tr>
-<tr><td><b>Content filter</b>, kept side</td><td>1 of 111 kept wrongly, 0.9%, 95% CI 0.2–4.9%, across two seeds. Facing the whole sample — counting every domain that stayed unreadable as a wrong keep — at most 20.4%.</td><td>The one error, a lottery-results site, is now excluded. 16 of 127 drawn answer automated clients with a bot wall and could not be judged at all.</td></tr>
+<tr><td><b>Content filter</b>, kept side</td><td>1 of 111 kept wrongly, 0.9%, 95% CI 0.2–4.9%, across two seeds. At the far edge — counting every domain not read on its own page as a wrong keep — at most 34.2%.</td><td>Of 127 drawn, 95 were judged on the page, 16 only from robots.txt and sitemap paths, and 16 could not be judged at all. The one error, a lottery-results site, is now excluded.</td></tr>
 <tr><td><b>Platform detection</b></td><td>0 of 3 wrong labels, 0 of 14 missed</td><td>Samples that small bound almost nothing: CI 0–56.2% and 0–21.5%.</td></tr>
 <tr><td><b>Shop membership</b></td><td>1 of 20 wrong, 5%, 95% CI 0.9–23.6%</td><td>Where the line sits — retail only, or anything you can buy from — is a judgement, not an error.</td></tr>
 </tbody>

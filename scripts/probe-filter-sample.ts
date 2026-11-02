@@ -168,6 +168,18 @@ async function main() {
   }
   const drawn = POOL === "withdrawn" && DRAW >= pool.length ? pool : sample(pool, DRAW, SEED);
 
+  // The rule for "unreadable" is printed on every run. Citing it by line number
+  // was wrong three times in one session — the file moved under each citation —
+  // so the boundary travels with the output a reader is holding.
+  console.log(
+    `Rule for "unreadable" — a domain counts as judged if ANY of these yields content, in order:\n` +
+      `  1. GET https://<domain>/ with "${BOT_UA}"  -> >= ${MIN_WORDS} prose words\n` +
+      `  2. the same GET with a browser UA                               -> >= ${MIN_WORDS} prose words\n` +
+      `  3. the same GET against www.<domain> with a browser UA          -> >= ${MIN_WORDS} prose words\n` +
+      `  4. robots.txt + sitemap.xml, HTTP 200 only                      -> > 20 tokens\n` +
+      `A prose word excludes any token containing braces, semicolons, equals, quotes or slashes, so bundled\n` +
+      `JavaScript does not count as a readable page. A non-200 at step 4 is an error page, not evidence.\n`
+  );
   console.log(
     POOL === "kept"
       ? `Content filter, kept side — seed ${SEED}, ${drawn.length} drawn from ${pool.length} kept, pool ${poolHash}\n`
@@ -214,14 +226,20 @@ async function main() {
   const judged = counts.body + counts.machine;
   const [, hiJudged] = wilson(0, judged);
   const [loAll, hiAll] = wilson(counts.none, drawn.length);
+  // Three bounds, weakest evidence first. The last one is the only one that
+  // faces the whole sample without asking anyone to trust a tier: robots.txt
+  // and sitemap paths are real evidence about what a site is made of, but they
+  // are not the page, so a bound that leans on them is not the far edge.
+  const [loWeak, hiWeak] = wilson(counts.none + counts.machine, drawn.length);
   console.log(
     `\nEvidence: ${counts.body} judged on page body, ${counts.machine} on robots/sitemap only, ${counts.none} on nothing.\n` +
       `Flagged for hand judgement: ${flagged.length}${flagged.length ? ` (${flagged.join(", ")})` : ""}.\n` +
       `Unresolved: ${counts.none}${counts.none ? ` (${unresolved.join(", ")})` : ""}.\n\n` +
       `Enter the hand verdicts before quoting a rate. Assuming all ${flagged.length} flags are rejected:\n` +
       `  judged:          0/${judged} wrongly kept, 95% CI 0.0%-${pct(hiJudged)}\n` +
-      `  whole sample:    ${counts.none}/${drawn.length} at worst (every unresolved domain counted as a wrong keep),\n` +
-      `                   95% CI ${pct(loAll)}-${pct(hiAll)} — the bound that faces the whole population.`
+      `  + unresolved:    ${counts.none}/${drawn.length} at worst, 95% CI ${pct(loAll)}-${pct(hiAll)}\n` +
+      `  + machine tier:  ${counts.none + counts.machine}/${drawn.length} at worst, 95% CI ${pct(loWeak)}-${pct(hiWeak)}\n` +
+      `                   — the far edge: every domain not read on its own page counted as a wrong keep.`
   );
 }
 
