@@ -32,7 +32,7 @@ async function main() {
     { what: "kept side, rate and n", needle: `${hc.errors} of ${hc.n} kept wrongly` },
     { what: "kept side, interval", needle: `95% CI ${pct(hc.ci95[0])}` },
     { what: "kept side, far edge", needle: `at most ${pct(hc.farEdge.ci95[1])}%` },
-    { what: "kept side, unresolved count", needle: `the ${hc.farEdge.errors - hc.errors} that none of the six surfaces` },
+    { what: "kept side, unresolved count", needle: `the ${hc.farEdge.errors - hc.errors} that none of the seven surfaces` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },
     { what: "A6 held out", needle: `0 errors in ${v.a6.heldOutPostFix.n} decisions` },

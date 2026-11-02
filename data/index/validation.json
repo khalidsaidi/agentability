@@ -79,9 +79,9 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "Each of the 189 drawn domains read by hand across six surfaces: the live homepage (144); a browser UA and the www host for the 9 our own auditor had read (8); the closest archive snapshot (25); the Wayback CDX index filtered to captures returning HTTP 200 with text/html (6); and the machine-facing robots.txt and sitemap.xml read by hand rather than scanned (2 — marriott.com's booking paths, joom.com's product sitemap). Each surface was added because the previous bound turned out to measure my reach rather than the sites.",
+    "how": "Every one of the 189 drawn domains read by a person, across seven surfaces added one at a time because each previous bound turned out to measure my reach rather than the sites: the live homepage (144); a browser UA and the www host for the 9 our own auditor had read (8); the closest archive snapshot (25); the Wayback CDX index filtered to captures returning HTTP 200 with text/html (6); the site's own robots.txt and sitemap read by hand (2); and the www host with a browser UA plus CDX queries for www and sub-paths (2).",
     "errors": 1,
-    "n": 186,
+    "n": 188,
     "rate": 0.005,
     "ci95": [
      0.001,
@@ -91,27 +91,25 @@
      "netkeiba.com — Japan's largest horse-racing odds and tips service, now excluded"
     ],
     "farEdge": {
-     "errors": 4,
+     "errors": 2,
      "n": 189,
-     "rate": 0.021,
+     "rate": 0.011,
      "ci95": [
-      0.008,
-      0.053
+      0.003,
+      0.038
      ],
-     "how": "the one error plus the 3 domains no surface let a person read.",
-     "says": "counting all 3 as wrong keeps: at most 5.3%, Wilson and exact alike.",
+     "how": "the one error plus zara.com, the only domain no surface let a person read.",
+     "says": "counting zara.com as a wrong keep: at most 3.8%, Wilson and exact alike.",
      "unresolved": [
-      "jus.br",
-      "netshoes.com.br",
       "zara.com"
      ],
-     "note": "jus.br and netshoes.com.br are not counted as read even though the probe reached their page bodies and its scan found nothing — screened is not read, and conflating the two is the error this census exists to avoid."
+     "zara": "robots.txt and sitemap.xml both 403, every archive capture renders as a single non-breaking space, the country paths /us/ and /us/en/ wall every client, and the CDX index holds no HTTP 200 html capture for the apex, the www host or any sub-path."
     },
     "whatItCost": "The scan had cleared netkeiba.com because nothing on it is in English. That is the finding: the kept-side figure was never limited by sample size, it was limited by the vocabulary. Japanese, Chinese, Korean, Thai, Vietnamese and Arabic gambling, adult and piracy terms are now in the scan, checked both ways — they fire on netkeiba.com and az24.vn and stay quiet on asahi.com and kakaku.com.",
     "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
     "wallsVerified": "The 36 are not taken on one failed request. Each is corroborated by our own audit pipeline, which fetches with retries on a different day from a different network and also got nothing readable. The 9 that our auditor had read are not in the 36 — counting them as walls would have inflated the bound from 25.8% to 30.9%, which is what the first pass did.",
-    "sensitivityOnThisDenominator": "Counting livescore.com and goal.com as errors: 3/186 = 1.6%, 95% CI 0.6-4.6%; far edge 6/189 = 3.2%, CI 1.5-6.8%.",
-    "supersedes": "1/144 (30.9%), 1/153 (25.8%), 1/178 (10.8%) and 1/184 (6.8%) — each superseded by a surface the previous one had not tried.",
+    "sensitivityOnThisDenominator": "Counting livescore.com and goal.com as errors: 3/188 = 1.6%, 95% CI 0.5-4.6%; far edge 4/189 = 2.1%, CI 0.8-5.3%.",
+    "supersedes": "1/144 (30.9%), 1/153 (25.8%), 1/178 (10.8%), 1/184 (6.8%), 1/186 (5.3%) — each superseded by a surface the previous one had not tried.",
     "evidence": {
      "census": "data/index/evidence/kept-census-2026-11-02.tsv (189 rows: domain, title, description)",
      "walls": "data/index/evidence/kept-census-walls.tsv (45 rows: 36 WALL, 9 OVERTURNED with our auditor's A3 reading)",
@@ -119,8 +117,8 @@
      "archive": "data/index/evidence/kept-census-archive.tsv (36 rows: domain, snapshot title, snapshot URL)",
      "cdx": "data/index/evidence/kept-census-cdx.tsv (11 rows: the 6 resolved with capture timestamps, the 5 that were not, with why)"
     },
-    "whyWallsAreNotHandRead": "3 domains remain that no surface lets a person read: zara.com answers 403 on robots and sitemap and renders as a non-breaking space in every capture; jus.br and netshoes.com.br were screened clean by the probe but never read. They are counted as wrong keeps. Each previous bound — 30.9%, 25.8%, 10.8%, 6.8% — came down because another surface turned up, three times after I had called the remainder unverifiable. 5.3% is what six surfaces leave, not a floor.",
-    "interval": "Wilson 0.1-3.0%, exact upper 3.0%."
+    "whyWallsAreNotHandRead": "One domain remains unread: zara.com. Five bounds have now fallen — 30.9%, 25.8%, 10.8%, 6.8%, 5.3% — every one because another surface turned up, and four of those times immediately after I had called the remainder unverifiable. So 3.8% is what seven surfaces leave and should not be read as a floor.",
+    "interval": "Wilson 0.1-3.0%, exact upper 2.9%. Wilson is the wider edge here, so it is the one published."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
