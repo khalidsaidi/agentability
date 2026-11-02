@@ -1067,10 +1067,10 @@ what actually happened — and a real AI agent attempts them using nothing but p
 JavaScript, no human help. Every transcript is published verbatim, wins and failures alike. Alongside the show, the ${s ? s.audited : ""} most-visited sites on the web are scored on how usable
 they actually are for an agent.</p>
 <div class="thisweek rise d3">
-  <p class="thisweek-label">Today's answer · episode of ${prettyDate(latest.date)}</p>
+  <p class="thisweek-label">What we found · ${s ? s.audited : ""} sites audited · episode of ${prettyDate(latest.date)}</p>
   <div class="board">
     <div>
-      <div class="score">${s ? s.pctClosed : 0}<i>%</i></div>
+      <div class="score">${s ? s.pctClosed : 0}%</div>
       <span class="caption">of the ${s ? s.audited : ""} most-visited sites are closed to AI agents by policy</span>
     </div>
     <p class="runline"><b>${s ? s.pctBlockingSomeAI : 0}%</b> block at least one AI crawler · <b>${s ? s.averageScore : 0}/100</b> average · today the agent finished <b>${latest.stats.completed}/${latest.stats.tasks}</b> errands and hit <b>${latest.stats.wallsHit}</b> bot walls</p>
