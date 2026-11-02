@@ -1,11 +1,11 @@
 {
  "domain": "nature.com",
- "checkedAt": "2026-11-02T00:34:22.335Z",
+ "checkedAt": "2026-11-02T01:03:16.557Z",
  "status": "complete",
- "elapsedMs": 2636,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 2485,
+ "score": 25,
+ "grade": "F",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
+   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -84,27 +84,27 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
  "signals": {

@@ -1,10 +1,10 @@
 {
  "domain": "huggingface.co",
- "checkedAt": "2026-11-02T00:31:38.450Z",
+ "checkedAt": "2026-11-02T01:00:14.568Z",
  "status": "complete",
- "elapsedMs": 316,
- "score": 30,
- "grade": "F",
+ "elapsedMs": 767,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~671 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 20,
    "maxPoints": 20,
-   "detail": "The homepage answered 202 but served almost no HTML — 0 words and no links an agent could follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "Reached from homepage: pricing (/pricing), support/contact (/support), docs/api (/docs), legal/privacy (/privacy)."
   },
   {
    "id": "B1",
@@ -114,6 +114,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }
