@@ -20,14 +20,28 @@
   },
   "underExclusion": {
    "errors": 0,
-   "n": 44,
+   "n": 61,
    "rate": 0.0,
    "ci95": [
     0.0,
-    0.08
+    0.059
    ],
-   "how": "seed 2026; drew 66 kept domains to obtain 44 readable; body text scanned for adult, gambling and piracy signals",
-   "limit": "33% of drawn domains could not be read (blocks, walls). The bound covers the readable population only; the rest is unmeasured, and blocking correlates with the population being filtered."
+   "how": "`npm run probe-filter` \u2014 seed 2026, 66 kept domains drawn. A domain is called unreadable only after three surfaces give nothing: homepage with the auditor's bot UA, the same request with a browser UA, then robots.txt and sitemap.xml, whose URL paths name what a site is made of. A non-200 body at that last step is an error page, not evidence, and counts as unresolved. Body text scanned for adult, gambling and piracy vocabulary; every hit hand-judged.",
+   "flagged": "7 hits, all hand-rejected: gmx.net and libero.it (portal 'Jackpot' is casual browser games), infobae.com (an OnlyFans obituary headline), polybuzz.ai (its own FAQ saying it bans public NSFW), asus.com ('slots' = memory slots), nine.com.au (a bingo-hall burglary story), xe.com (XXX is the ISO 4217 code for no currency).",
+   "wholePopulationBound": {
+    "errors": 5,
+    "n": 66,
+    "rate": 0.076,
+    "ci95": [
+     0.033,
+     0.165
+    ],
+    "how": "assume every domain that stayed unreadable is a wrong keep. 5 of 66 \u2014 britishairways.com, discogs.com, viator.com, lowes.com, allegro.pl \u2014 answer automated clients with a Cloudflare or Akamai wall.",
+    "says": "at the far edge of the interval, at most 16.5% of kept domains are wrongly kept. This is the bound that faces the whole drawn sample, not just the part that could be read."
+   },
+   "tiers": "48 judged on page body, 13 on robots/sitemap only, 5 on nothing. If the 13 robots/sitemap judgements are not trusted either, the worst case becomes 18/66 = 27.3%, 95% CI 18.0-39.0%.",
+   "supersedes": "0/44 readable, CI 0-8.0%, which covered the readable population only and left a third of the sample unmeasured. Same seed, same draw; the difference is that unreadable domains were pursued on other surfaces instead of discarded.",
+   "drift": "britishairways.com resolved on robots/sitemap in one run and not in the next, so the unresolved count moves between 4 and 5 and the worst-case bound between 14.6% and 16.5%. The more conservative run is what is published. Re-running the command reprints the tier counts, so a drift of this kind shows up rather than hiding inside a single number."
   }
  },
  "a6": {

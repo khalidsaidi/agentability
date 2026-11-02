@@ -1548,13 +1548,15 @@ one rather than pretending it's a defect.</p>
 <h2>How wrong are these numbers</h2>
 <p class="lede">Every rule here is a guess about someone else's site, so each one has a measured error rate rather
 than an assurance. The samples are drawn with a fixed seed, so anyone can redraw the identical sample and re-judge it;
-the full record, with each interval and what it does not cover, is at <code>/data/validation.json</code>.</p>
+the full record, with each interval and what it does not cover, is at <code>/data/validation.json</code>.
+Where a rule could be wrong in two directions, both were measured: the filter was checked for what it removed and for
+what it kept, and A6 for links credited that an agent cannot use and real pages missed.</p>
 <table>
 <thead><tr><th>Rule</th><th>Measured</th><th>What the bound does not cover</th></tr></thead>
 <tbody>
 <tr><td><b>A6</b> everyday tasks</td><td>0 errors in 56 decisions on a held-out sample, 95% CI 0–6.4%</td><td>Measured after two fixes; the same rule scored 10% (CI 4.0–23.1) before them. Readable sites only.</td></tr>
 <tr><td><b>Content filter</b>, removed side</td><td>4 of 53 removed wrongly, 7.5%, 95% CI 3.0–17.9%</td><td>—</td></tr>
-<tr><td><b>Content filter</b>, kept side</td><td>0 of 44 readable kept wrongly, 95% CI 0–8.0%</td><td>A third of sampled sites could not be read at all, so nothing is known about them.</td></tr>
+<tr><td><b>Content filter</b>, kept side</td><td>0 of 61 kept wrongly, 95% CI 0–5.9%. Facing the whole sample — counting every domain that stayed unreadable as a wrong keep — at most 16.5%.</td><td>5 of 66 drawn answer automated clients with a bot wall and could not be judged at all; they are what the 16.5% is made of.</td></tr>
 <tr><td><b>Platform detection</b></td><td>0 of 3 wrong labels, 0 of 14 missed</td><td>Samples that small bound almost nothing: CI 0–56.2% and 0–21.5%.</td></tr>
 <tr><td><b>Shop membership</b></td><td>1 of 20 wrong, 5%, 95% CI 0.9–23.6%</td><td>Where the line sits — retail only, or anything you can buy from — is a judgement, not an error.</td></tr>
 </tbody>
