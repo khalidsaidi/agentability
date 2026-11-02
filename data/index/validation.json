@@ -79,9 +79,9 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "Each of the 189 drawn domains read by hand across five surfaces: the live homepage (144); a browser UA and the www host for the 9 our own auditor had read (8 resolved); the closest Internet Archive snapshot for everything no live fetch could read (25); and then the Wayback CDX index filtered to captures that returned HTTP 200 with text/html (6 more). That last surface mattered because asking for the closest snapshot returns a capture of an error page where the site was erroring when the crawler came by — so 'no readable snapshot' was a property of my query, not of the archive.",
+    "how": "Each of the 189 drawn domains read by hand across six surfaces: the live homepage (144); a browser UA and the www host for the 9 our own auditor had read (8); the closest archive snapshot (25); the Wayback CDX index filtered to captures returning HTTP 200 with text/html (6); and the machine-facing robots.txt and sitemap.xml read by hand rather than scanned (2 — marriott.com's booking paths, joom.com's product sitemap). Each surface was added because the previous bound turned out to measure my reach rather than the sites.",
     "errors": 1,
-    "n": 184,
+    "n": 186,
     "rate": 0.005,
     "ci95": [
      0.001,
@@ -91,28 +91,27 @@
      "netkeiba.com — Japan's largest horse-racing odds and tips service, now excluded"
     ],
     "farEdge": {
-     "errors": 6,
+     "errors": 4,
      "n": 189,
-     "rate": 0.032,
+     "rate": 0.021,
      "ci95": [
-      0.015,
-      0.068
+      0.008,
+      0.053
      ],
-     "how": "the one error plus the 5 domains that five surfaces could not render.",
-     "says": "counting all 5 as wrong keeps: at most 6.8%, under Wilson and the exact interval alike.",
+     "how": "the one error plus the 3 domains no surface let a person read.",
+     "says": "counting all 3 as wrong keeps: at most 5.3%, Wilson and exact alike.",
      "unresolved": [
-      "joom.com",
       "jus.br",
-      "marriott.com",
       "netshoes.com.br",
       "zara.com"
-     ]
+     ],
+     "note": "jus.br and netshoes.com.br are not counted as read even though the probe reached their page bodies and its scan found nothing — screened is not read, and conflating the two is the error this census exists to avoid."
     },
     "whatItCost": "The scan had cleared netkeiba.com because nothing on it is in English. That is the finding: the kept-side figure was never limited by sample size, it was limited by the vocabulary. Japanese, Chinese, Korean, Thai, Vietnamese and Arabic gambling, adult and piracy terms are now in the scan, checked both ways — they fire on netkeiba.com and az24.vn and stay quiet on asahi.com and kakaku.com.",
     "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
     "wallsVerified": "The 36 are not taken on one failed request. Each is corroborated by our own audit pipeline, which fetches with retries on a different day from a different network and also got nothing readable. The 9 that our auditor had read are not in the 36 — counting them as walls would have inflated the bound from 25.8% to 30.9%, which is what the first pass did.",
-    "sensitivityOnThisDenominator": "livescore.com and goal.com are judgement calls kept under the primary-purpose rule. Counted as errors: 3/184 = 1.6%, 95% CI 0.6-4.6%; the far edge becomes 8/189 = 4.2%, CI 2.2-8.2%.",
-    "supersedes": "1/144 (far edge 30.9%, which miscounted 9 readable domains as walls), 1/153 (25.8%, before any archive pass), and 1/178 (10.8%, before the CDX index was queried for a 200 capture).",
+    "sensitivityOnThisDenominator": "Counting livescore.com and goal.com as errors: 3/186 = 1.6%, 95% CI 0.6-4.6%; far edge 6/189 = 3.2%, CI 1.5-6.8%.",
+    "supersedes": "1/144 (30.9%), 1/153 (25.8%), 1/178 (10.8%) and 1/184 (6.8%) — each superseded by a surface the previous one had not tried.",
     "evidence": {
      "census": "data/index/evidence/kept-census-2026-11-02.tsv (189 rows: domain, title, description)",
      "walls": "data/index/evidence/kept-census-walls.tsv (45 rows: 36 WALL, 9 OVERTURNED with our auditor's A3 reading)",
@@ -120,8 +119,8 @@
      "archive": "data/index/evidence/kept-census-archive.tsv (36 rows: domain, snapshot title, snapshot URL)",
      "cdx": "data/index/evidence/kept-census-cdx.tsv (11 rows: the 6 resolved with capture timestamps, the 5 that were not, with why)"
     },
-    "whyWallsAreNotHandRead": "5 domains remain that five surfaces could not render: joom.com and jus.br have captures that produce no title, netshoes.com.br has none in the index, marriott.com's only 200 capture is an archive.org infrastructure page rather than Marriott, and zara.com renders as a single non-breaking space. Those cannot be hand-read because no retrievable page exists, so they are counted as wrong keeps. Each previous bound — 30.9%, 25.8%, 10.8% — was lowered by finding another surface rather than by argument, which is the honest reading of this one too: 6.8% is what five surfaces leave, not a floor.",
-    "interval": "Wilson 0.1-3.0%, exact upper 3.0% — the same edge."
+    "whyWallsAreNotHandRead": "3 domains remain that no surface lets a person read: zara.com answers 403 on robots and sitemap and renders as a non-breaking space in every capture; jus.br and netshoes.com.br were screened clean by the probe but never read. They are counted as wrong keeps. Each previous bound — 30.9%, 25.8%, 10.8%, 6.8% — came down because another surface turned up, three times after I had called the remainder unverifiable. 5.3% is what six surfaces leave, not a floor.",
+    "interval": "Wilson 0.1-3.0%, exact upper 3.0%."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
