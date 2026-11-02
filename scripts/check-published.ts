@@ -35,7 +35,7 @@ async function main() {
     // domains were counted against us. Every drawn domain is now judged, so the
     // two coincide and the page says so rather than quoting a second figure.
     { what: "kept side, far edge", needle: "Counting both of those as wrong keeps instead gives" },
-    { what: "kept side, unresolved count", needle: `Nothing is counted against us by assumption` },
+    { what: "kept side, prose tier", needle: `187 were judged from prose` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },
     { what: "A6 held out", needle: `0 errors in ${v.a6.heldOutPostFix.n} decisions` },
