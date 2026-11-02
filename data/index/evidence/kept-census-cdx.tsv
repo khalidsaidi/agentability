@@ -21,4 +21,9 @@ marriott.com	robots.txt lists /reservation/availabilitySearch.mi, /hotels/, /off
 joom.com	sitemap.xml returns 200 and indexes product page files (/sitemap/gpt/pages/page-N.xml) — a marketplace	sitemap.xml 200
 jus.br	Jus.br – Acesso Rápido e Simplificado aos Serviços Judiciais — the Brazilian judiciary's services portal	www host, which served the site's HTML in response to /robots.txt
 netshoes.com.br	Loja de Artigos Esportivos Online | Netshoes — an online sports-goods retailer	www host with a browser UA
-zara.com	Serves one word of prose on every path (apex, www, /es/, /es/es/mujer-l1000.html all 200 with a JS shell). Judged from its machine surfaces instead: robots.txt 200 disallowing /xa/ /xt/ /xf/, and sitemaps/sitemap-index.xml 200 naming 1,270 child sitemaps of the form sitemap-category-<country>-<lang>.xml.gz, plus the category path /es/es/mujer-l1000.html. A multi-country retail catalogue. STRUCTURAL, NOT PROSE — the weakest judgement in this census, same tier as marriott.com and joom.com.	robots.txt 200 + sitemap-index 200
+zara.com	ZARA South Africa | New Collection Online — "Skip to main content 0 WOMAN MAN KIDS". Read as prose from an archive capture of www.zara.com/za/. The live site serves one word on every path; the apex, www, /es/ and /es/es/mujer-l1000.html are all JS shells.	CDX capture 20260207113546 of www.zara.com/za/
+#
+# Surface 8 — CDX queried for captures under www.<domain>/* rather than the
+#   apex alone. This is what resolved zara.com into prose. marriott.com and
+#   joom.com have no 200 html capture with prose under any pattern tried, so
+#   they remain judged from machine files and are the census's weakest calls.

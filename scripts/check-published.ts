@@ -34,7 +34,7 @@ async function main() {
     // The far edge used to be a separate, wider number because unreadable
     // domains were counted against us. Every drawn domain is now judged, so the
     // two coincide and the page says so rather than quoting a second figure.
-    { what: "kept side, far edge", needle: "both the measured rate and the far edge" },
+    { what: "kept side, far edge", needle: "Counting both of those as wrong keeps instead gives" },
     { what: "kept side, unresolved count", needle: `Nothing is counted against us by assumption` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },

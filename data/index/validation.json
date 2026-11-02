@@ -79,7 +79,7 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "All 189 drawn domains judged by a person, across eight surfaces added one at a time because each previous bound turned out to measure my reach rather than the sites: the live homepage; a browser UA; the www host; the closest archive snapshot; the Wayback CDX index filtered to HTTP 200 text/html captures; CDX queries for the www host and for sub-paths; country sub-paths fetched directly; and the site's own robots.txt and sitemap index read by hand where no page serves prose.",
+    "how": "All 189 drawn domains judged by a person, across eight surfaces added one at a time: the live homepage; a browser UA; the www host; the closest archive snapshot; the Wayback CDX index filtered to HTTP 200 text/html captures; CDX for the www host and for sub-paths; country sub-paths fetched directly; and CDX for captures under www.<domain>/*. 187 yielded prose; 2 are judged from robots.txt and sitemap files.",
     "errors": 1,
     "n": 189,
     "rate": 0.005,
@@ -116,7 +116,8 @@
     },
     "whyWallsAreNotHandRead": "No domain is now counted as a wrong keep by assumption. Six bounds fell on the way here — 30.9%, 25.8%, 10.8%, 6.8%, 5.3%, 3.8% — every one because another surface turned up, and five of those times right after I had called the remainder unverifiable. The lesson recorded rather than the claim: an unreadable domain usually measures the reach of whoever is looking.",
     "interval": "Wilson 0.1-2.9%, exact upper 2.9%.",
-    "weakestJudgements": "Three domains were judged from machine surfaces rather than prose, because they serve none: marriott.com (robots.txt naming /reservation/availabilitySearch.mi and /hotels/), joom.com (a sitemap indexing product pages) and zara.com (robots.txt plus a sitemap index of 1,270 sitemap-category-<country>-<lang> files). Structural evidence is thinner than prose and these are the census's weakest calls; each is recorded as such in kept-census-cdx.tsv. Counting all three as wrong keeps instead gives 4/189 = 2.1%, 95% CI 0.8-5.3%."
+    "weakestJudgements": "The 2 structural calls are the census's weakest. Counting both as wrong keeps instead of correct gives 3/189 = 1.6%, 95% CI 0.5-4.6% — published so the thinner tier has its own bound rather than being folded into the headline. zara.com was in this tier until a CDX capture of www.zara.com/za/ produced prose (\"ZARA South Africa | New Collection Online ... WOMAN MAN KIDS\"), which is the eighth surface and the sixth time a remainder I had called unverifiable turned out to be my reach.",
+    "tiers": "187 of the 189 judged from prose a person read — a live page, an archived capture, or a capture of a country sub-path. 2 judged from machine files only: marriott.com, whose robots.txt names /reservation/availabilitySearch.mi and /hotels/, and joom.com, whose sitemap indexes product pages. Neither serves prose anywhere I could reach, including CDX captures under www.<domain>/*."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
