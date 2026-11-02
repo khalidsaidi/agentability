@@ -457,7 +457,7 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
 <a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. Open data, no signup, no cost.
-<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a>
+<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Get audited</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a>
 <br />Sister project: <a href="https://rootfetch.com/">RootFetch, domain extension statistics</a></footer>
 </div>
 <script>
@@ -1096,7 +1096,7 @@ they actually are for an agent.</p>
 </div>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
-<a href="/docs/">take the raw data</a></p>
+<a href="/support/">get yours audited, free</a> · <a href="/docs/">take the raw data</a></p>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
 <h2>Where it got interesting</h2>
 ${segCards(latest)}`
