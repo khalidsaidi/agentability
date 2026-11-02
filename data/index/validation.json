@@ -78,29 +78,33 @@
    },
    "handCensus": {
     "what": "Every one of the 189 drawn domains, read by a person — not screened. This replaces the scan-plus-sample structure as the headline figure.",
-    "how": "Each domain's homepage fetched and its <title> and meta description read by hand, the same method as the census of excluded domains. 144 returned a readable title; 45 answered with a wall, a blank or an error page.",
+    "how": "Each of the 189 drawn domains fetched and its <title> and meta description read by hand, the same method as the census of excluded domains. 144 read on the first pass. The 45 that answered with a wall were then cross-checked against our own stored audits: 36 were corroborated (our auditor got nothing readable either), and 9 had in fact been read by it, so those were re-fetched with a browser UA and the www host — 8 then read. The 9th, manualslib.com, stayed walled and was judged from our stored audit of it (421 words) plus its stated function; it is the weakest judgement in the census.",
     "errors": 1,
-    "n": 144,
+    "n": 153,
     "rate": 0.007,
     "ci95": [
      0.001,
-     0.038
+     0.036
     ],
     "found": [
      "netkeiba.com — Japan's largest horse-racing odds and tips service, now excluded"
     ],
     "farEdge": {
-     "errors": 46,
+     "errors": 37,
      "n": 189,
-     "rate": 0.243,
+     "rate": 0.196,
      "ci95": [
-      0.188,
-      0.309
+      0.145,
+      0.258
      ],
-     "says": "counting every domain that answered with a wall as a wrong keep: at most 30.9%."
+     "how": "the one error plus the 36 domains that two independent fetch attempts, hours apart and with different user agents, both failed to read.",
+     "says": "counting every one of those 36 as a wrong keep: at most 25.8%."
     },
     "whatItCost": "The scan had cleared netkeiba.com because nothing on it is in English. That is the finding: the kept-side figure was never limited by sample size, it was limited by the vocabulary. Japanese, Chinese, Korean, Thai, Vietnamese and Arabic gambling, adult and piracy terms are now in the scan, checked both ways — they fire on netkeiba.com and az24.vn and stay quiet on asahi.com and kakaku.com.",
-    "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door."
+    "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
+    "wallsVerified": "The 36 are not taken on one failed request. Each is corroborated by our own audit pipeline, which fetches with retries on a different day from a different network and also got nothing readable. The 9 that our auditor had read are not in the 36 — counting them as walls would have inflated the bound from 25.8% to 30.9%, which is what the first pass did.",
+    "sensitivityOnThisDenominator": "livescore.com and goal.com are judgement calls, kept because the rule judges primary purpose and both are sports news, though goal.com age-gates gambling advertising and livescore.com sells betting-affiliate placement. Counted as errors on this census denominator: 3/153 = 2.0%, 95% CI 0.7-5.6%. The far edge moves to 39/189 = 20.6%, CI 15.4-27.0%.",
+    "supersedes": "the first census pass, 1/144 with a 30.9% far edge, which counted 9 readable domains among the walls."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones."
   }
