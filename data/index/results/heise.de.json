@@ -1,9 +1,9 @@
 {
  "domain": "heise.de",
- "checkedAt": "2026-11-02T04:59:12.700Z",
+ "checkedAt": "2026-11-02T18:53:28.554Z",
  "status": "complete",
- "elapsedMs": 6530,
- "score": 80,
+ "elapsedMs": 3735,
+ "score": 70,
  "grade": "B",
  "posture": "open",
  "paradox": false,
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~4556 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~4426 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -91,10 +91,6 @@
    "policy": "allowed"
   },
   {
-   "bot": "Claude-User",
-   "policy": "allowed"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "allowed"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "allowed"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -113,7 +121,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

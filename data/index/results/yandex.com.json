@@ -1,10 +1,10 @@
 {
  "domain": "yandex.com",
- "checkedAt": "2026-11-02T05:08:03.901Z",
+ "checkedAt": "2026-11-02T19:05:49.869Z",
  "status": "complete",
- "elapsedMs": 2246,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 5053,
+ "score": 42,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 12,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~34 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~54 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 0,
+   "points": 5,
    "maxPoints": 20,
-   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact (/support/smart-captcha/problems.html)."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "partial"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -104,6 +100,18 @@
   },
   {
    "bot": "CCBot",
+   "policy": "partial"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
    "policy": "partial"
   }
  ],

@@ -1,11 +1,11 @@
 {
  "domain": "skroutz.gr",
- "checkedAt": "2026-11-02T05:05:14.747Z",
+ "checkedAt": "2026-11-02T19:01:17.574Z",
  "status": "complete",
- "elapsedMs": 2575,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 1480,
+ "score": 18,
+ "grade": "F",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,8 +19,8 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
    "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
   },
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

@@ -8,6 +8,7 @@ import vm from "node:vm";
 import path from "node:path";
 import { rootDomain, hostOf } from "./lib/domains";
 import { GUIDES, type GuideContext } from "./lib/guides";
+import { isWalled } from "./lib/evaluate-site";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
@@ -999,6 +1000,29 @@ async function main() {
       summary.stats.audited = summary.leaderboard.length;
       console.log(`Content filter: ${dropped} withdrawn domain(s) removed from the ranked tables; audited now ${summary.stats.audited}`);
     }
+
+    // Saying no and keeping out are different things. robots.txt is a request:
+    // a reader on Hacker News pointed out that it stops nothing, and the data
+    // agrees — the sites that say no and the sites that wall a plain fetch
+    // barely overlap. So the headline counts both, and shows the split, over
+    // exactly the rows published.
+    const n = summary.leaderboard.length;
+    let walled = 0, sayClosed = 0, both = 0, refusing = 0;
+    for (const r of summary.leaderboard) {
+      const file = path.join(RESULTS_DIR, `${r.domain}.json`);
+      const w = fs.existsSync(file) ? isWalled(JSON.parse(fs.readFileSync(file, "utf8"))) : false;
+      const c = r.posture === "closed";
+      if (w) walled += 1;
+      if (c) sayClosed += 1;
+      if (w && c) both += 1;
+      if (w || c) refusing += 1;
+    }
+    const pct = (k: number) => (n ? Math.round((100 * k) / n) : 0);
+    summary.stats.pctClosed = pct(sayClosed);
+    summary.stats.pctWalled = pct(walled);
+    summary.stats.pctSayAndWall = pct(both);
+    summary.stats.pctRefusing = pct(refusing);
+    console.log(`Refusals: ${refusing}/${n} (${pct(refusing)}%) — say closed ${sayClosed}, wall ${walled}, both ${both}`);
   }
 
   const history: Array<{ date: string } & Record<string, number>> = [];
@@ -1082,10 +1106,10 @@ they actually are for an agent.</p>
   <p class="thisweek-label">What we found · ${s ? s.audited : ""} sites audited · episode of ${prettyDate(latest.date)}</p>
   <div class="board">
     <div>
-      <div class="score">${s ? s.pctClosed : 0}%</div>
-      <span class="caption">of the ${s ? s.audited : ""} most-visited sites are closed to AI agents by policy</span>
+      <div class="score">${s ? s.pctRefusing : 0}%</div>
+      <span class="caption">of the ${s ? s.audited : ""} most-visited sites turn AI agents away</span>
     </div>
-    <p class="runline"><b>${s ? s.pctBlockingSomeAI : 0}%</b> block at least one AI crawler · <b>${s ? s.averageScore : 0}/100</b> average · today the agent finished <b>${latest.stats.completed}/${latest.stats.tasks}</b> errands and hit <b>${latest.stats.wallsHit}</b> bot walls</p>
+    <p class="runline"><b>${s ? s.pctClosed : 0}%</b> say no in robots.txt · <b>${s ? s.pctWalled : 0}%</b> just wall them out · only <b>${s ? s.pctSayAndWall : 0}%</b> do both · <b>${s ? s.averageScore : 0}/100</b> average · today the agent finished <b>${latest.stats.completed}/${latest.stats.tasks}</b> errands and hit <b>${latest.stats.wallsHit}</b> bot walls</p>
   </div>
   <div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
 </div>
@@ -1122,7 +1146,7 @@ agent hits a wall in an episode, the index has usually already predicted it.</p>
   <div class="fig"><b>${s.averageScore}/100</b><small>average readiness score</small></div>
   <div class="fig"><b>${s.pctLlmsTxt}%</b><small>publish llms.txt</small></div>
   <div class="fig"><b>${s.pctBlockingSomeAI}%</b><small>block at least one AI crawler</small></div>
-  <div class="fig"><b>${s.pctClosed}%</b><small>closed to AI by policy</small></div>
+  <div class="fig"><b>${s.pctRefusing}%</b><small>turn AI agents away — ${s.pctClosed}% say so in robots.txt, ${s.pctWalled}% wall them out</small></div>
   ${s.pctNoResponse ? `<div class="fig"><b>${s.pctNoResponse}%</b><small>wouldn't answer at all</small></div>` : ""}
 </div>
 <h2>Who is ready, and who is not</h2>
@@ -1560,7 +1584,7 @@ answer the question this site asks, because it was not the web people actually u
 <thead><tr><th>Check</th><th>What &amp; why</th><th class="num">Points</th></tr></thead>
 <tbody>
 <tr><td><span class="chip">A1</span></td><td><b>llms.txt</b> — the llmstxt.org convention: a curated, plain-text entry point for AI readers. Substantive file with links required.</td><td class="num">15</td></tr>
-<tr><td><span class="chip">A2</span></td><td><b>AI-crawler policy</b> — robots.txt rules for GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot. Open access scores full points; blanket blocks score zero and are labeled “closed by policy” (a stance, not a bug — but it is what it is).</td><td class="num">15</td></tr>
+<tr><td><span class="chip">A2</span></td><td><b>AI-crawler policy</b> — robots.txt rules for five crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot) and three fetchers that run when a person asks an assistant something (Claude-User, ChatGPT-User, Perplexity-User). Open access scores full points; blocking at least two-thirds of them scores zero and is labeled “closed by policy”. That is the site&rsquo;s stated policy, not enforcement: robots.txt is a request, and some person-triggered fetchers say they do not honour it. Whether a site actually keeps a plain fetch out is A3; the headline counts a site that does either, and shows the split, because the two barely overlap.</td><td class="num">15</td></tr>
 <tr><td><span class="chip">A3</span></td><td><b>Content readable without a browser</b> — a plain fetch of the homepage must yield real text, not a JavaScript wall or a bot challenge. Agents don't run your SPA.</td><td class="num">25</td></tr>
 <tr><td><span class="chip">A4</span></td><td><b>Structured data</b> — valid schema.org JSON-LD so machines learn what the entity is.</td><td class="num">15</td></tr>
 <tr><td><span class="chip">A5</span></td><td><b>Sitemap</b> — advertised in robots.txt or served at /sitemap.xml.</td><td class="num">10</td></tr>
@@ -1594,6 +1618,7 @@ what it kept, and A6 for links credited that an agent cannot use and real pages 
 <tr><td><b>A6</b> everyday tasks</td><td>0 errors in 56 decisions on a held-out sample, 95% CI 0–6.4%</td><td>Measured after two fixes; the same rule scored 10% (CI 4.0–23.1) before them. Readable sites only — where a homepage serves no HTML, A6 scores zero and the report says so rather than claiming the pages are missing.</td></tr>
 <tr><td><b>Content filter</b>, removed side</td><td>2 of 53 removed wrongly, 3.8%, 95% CI 0.5–13.0% (exact)</td><td>A census of every withdrawn domain, not a sample, re-read with full page text: an AI character-chat platform excluded as porn, and a broadcast-listings site excluded as piracy. An earlier census of a different 53, read from titles alone, found four others. Both sets are corrected in the overrides file, so the shipped filter removes none of the six today.</td></tr>
 <tr><td><b>Content filter</b>, kept side</td><td>0 of 65 kept wrongly, 95% CI 0–5.6%, from a fresh draw on the panel as it stands after today's nine reinstatements; the previous panel gave 1 of 189 across three draws, 0.5%, 95% CI 0.1–2.9%. Every drawn domain judged by a person, across nine surfaces, from a plain fetch to date-windowed archive captures of individual sub-paths. All 189 were judged from prose a person read: 153 from the live site, and 36 that wall every automated client from their most recent archived capture that renders. Nothing rests on structural inference and nothing is counted against us by assumption. All 36 were then re-opened in a real browser as a control: 32 rendered, all 32 agreed with their capture and 16 matched its title exactly (0 of 32, 95% CI 0&ndash;10.7%); two more were corroborated live by their own robots.txt or sitemap. If you decline archived captures as evidence altogether, the same method over what remains gives 1 of 187 &mdash; 0.5%, 95% CI 0.1&ndash;3.0% &mdash; with <code>cricbuzz.com</code> and <code>traveloka.com</code> declared unjudged rather than counted as errors nobody observed.</td><td>The census found what the automated scan could not: <code>netkeiba.com</code>, Japan&rsquo;s largest horse-racing odds and tips service, cleared because nothing on it is written in English. Both it and an earlier lottery site are now excluded, and the scan has learned six more scripts. A title and a description are not a whole site, so this bounds what a site says on its own front door.</td></tr>
+<tr><td><b>Wall detection</b> (A3)</td><td>1 of 25 recorded walls was open when re-fetched; 1 of 25 recorded open homepages was walled</td><td>A seeded sample of 50 from the 2026-11-02 run, re-fetched live the same day: <code>evidence/walls-sample-2026-11-02.tsv</code>. Walls come and go, so some of this is the site changing rather than the rule. 95% CI 0.7–19.5% on each side.</td></tr>
 <tr><td><b>Platform detection</b></td><td>0 of 3 wrong labels, 0 of 14 missed</td><td>Samples that small bound almost nothing: CI 0–56.2% and 0–21.5%.</td></tr>
 <tr><td><b>Shop membership</b></td><td>6 of 40 wrong, 15%, 95% CI 7.1–29.1% — and 4 of 40 missed, 10%, 95% CI 4.0–23.1%</td><td>Both directions, 40 drawn from each side. The wrong ones were reference and social sites that sell a subscription &mdash; a flight tracker, a tabs site, a photo community &mdash; and two classifieds marketplaces that were missed while two identical ones were included. All eleven are corrected in <code>commerce-overrides.json</code> with a reason each.</td></tr>
 </tbody>

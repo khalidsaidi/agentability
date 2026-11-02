@@ -1,10 +1,10 @@
 {
  "domain": "safety.google",
- "checkedAt": "2026-11-02T05:04:43.127Z",
+ "checkedAt": "2026-11-02T19:00:27.297Z",
  "status": "complete",
- "elapsedMs": 720,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 5732,
+ "score": 15,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,34 +27,34 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1320 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy."
+   "detail": "The homepage itself returned 404 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "allowed"
   },
   {
-   "bot": "Claude-User",
-   "policy": "allowed"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "allowed"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "allowed"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -112,8 +120,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
-  "sitemap": true,
-  "parseableText": true
+  "structuredData": false,
+  "sitemap": false,
+  "parseableText": false
  }
 }

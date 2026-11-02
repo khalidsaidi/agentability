@@ -1,11 +1,11 @@
 {
  "domain": "theguardian.com",
- "checkedAt": "2026-11-02T05:05:57.981Z",
+ "checkedAt": "2026-11-02T19:02:43.654Z",
  "status": "complete",
- "elapsedMs": 3283,
- "score": 45,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 4742,
+ "score": 53,
+ "grade": "D",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: ClaudeBot, Claude-User, PerplexityBot, CCBot."
+   "detail": "robots.txt blocks: ClaudeBot, PerplexityBot, CCBot, Claude-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3348 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~3671 words of visible text."
   },
   {
    "id": "A4",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

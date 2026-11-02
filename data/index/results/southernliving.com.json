@@ -1,9 +1,9 @@
 {
  "domain": "southernliving.com",
- "checkedAt": "2026-11-02T05:05:23.026Z",
+ "checkedAt": "2026-11-02T19:01:31.859Z",
  "status": "complete",
- "elapsedMs": 416,
- "score": 15,
+ "elapsedMs": 1569,
+ "score": 10,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -104,6 +100,18 @@
   },
   {
    "bot": "CCBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
    "policy": "blocked"
   }
  ],

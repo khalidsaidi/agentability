@@ -1,26 +1,26 @@
 {
  "domain": "vinted.co.uk",
- "checkedAt": "2026-11-02T05:07:09.763Z",
+ "checkedAt": "2026-11-02T19:04:28.652Z",
  "status": "complete",
- "elapsedMs": 3418,
- "score": 50,
- "grade": "Closed by policy",
- "posture": "closed",
- "paradox": true,
+ "elapsedMs": 3387,
+ "score": 43,
+ "grade": "D",
+ "posture": "selective",
+ "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 5807 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
    "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -105,10 +101,22 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,

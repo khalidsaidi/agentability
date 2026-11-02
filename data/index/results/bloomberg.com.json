@@ -1,20 +1,20 @@
 {
  "domain": "bloomberg.com",
- "checkedAt": "2026-11-02T04:55:47.883Z",
+ "checkedAt": "2026-11-02T18:48:33.360Z",
  "status": "complete",
- "elapsedMs": 4487,
- "score": 20,
+ "elapsedMs": 10067,
+ "score": 85,
  "grade": "Closed by policy",
  "posture": "closed",
- "paradox": false,
+ "paradox": true,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 45947 chars and links."
   },
   {
    "id": "A2",
@@ -22,23 +22,23 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~37116 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,18 +51,18 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact, legal/privacy (/notices/tos)."
+   "detail": "Reached from homepage: pricing (/economics/inflation-and-prices), support/contact (/help), legal/privacy (/tos)."
   },
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "skip",
-   "points": 0,
+   "status": "pass",
+   "points": 5,
    "maxPoints": 5,
-   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+   "detail": "llms.txt names an MCP server at mcp.bloomberg.com — reachable (HTTP 403)."
   },
   {
    "id": "B2",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,15 +101,27 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {
-  "llmsTxt": false,
-  "mcp": false,
+  "llmsTxt": true,
+  "mcp": true,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

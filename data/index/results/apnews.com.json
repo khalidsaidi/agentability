@@ -1,11 +1,11 @@
 {
  "domain": "apnews.com",
- "checkedAt": "2026-11-02T04:55:00.509Z",
+ "checkedAt": "2026-11-02T18:47:32.524Z",
  "status": "complete",
- "elapsedMs": 556,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 568,
+ "score": 18,
+ "grade": "F",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, CCBot, Claude-User."
   },
   {
    "id": "A3",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

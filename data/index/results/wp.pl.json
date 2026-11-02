@@ -1,9 +1,9 @@
 {
  "domain": "wp.pl",
- "checkedAt": "2026-11-02T05:07:52.099Z",
+ "checkedAt": "2026-11-02T19:05:33.651Z",
  "status": "complete",
- "elapsedMs": 7128,
- "score": 38,
+ "elapsedMs": 12794,
+ "score": 33,
  "grade": "F",
  "posture": "selective",
  "paradox": false,
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3027 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2448 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy (/regulamin-dodawania-opinii.html)."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage. Link found but not confirmed: legal/privacy (/regulamin-dodawania-opinii.html)."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "partial"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "allowed"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {

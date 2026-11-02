@@ -1,20 +1,20 @@
 {
  "domain": "hostinger.com",
- "checkedAt": "2026-11-02T04:59:24.192Z",
+ "checkedAt": "2026-11-02T18:53:43.544Z",
  "status": "complete",
- "elapsedMs": 1516,
- "score": 100,
- "grade": "A",
+ "elapsedMs": 1477,
+ "score": 83,
+ "grade": "B",
  "posture": "selective",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 13048 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -67,10 +67,10 @@
   {
    "id": "B2",
    "title": "OpenAPI description published",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Valid OpenAPI document found."
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
   },
   {
    "id": "B3",
@@ -91,10 +91,6 @@
    "policy": "partial"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -105,12 +101,24 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": true,
-  "openapi": true,
+  "openapi": false,
   "ucp": false,
   "structuredData": true,
   "sitemap": true,

@@ -1,20 +1,20 @@
 {
  "domain": "apkpure.com",
- "checkedAt": "2026-11-02T04:54:59.793Z",
+ "checkedAt": "2026-11-02T18:47:31.552Z",
  "status": "complete",
- "elapsedMs": 1858,
- "score": 40,
- "grade": "D",
+ "elapsedMs": 972,
+ "score": 25,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 15205 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -91,10 +91,6 @@
    "policy": "partial"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -105,10 +101,22 @@
   {
    "bot": "CCBot",
    "policy": "partial"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,

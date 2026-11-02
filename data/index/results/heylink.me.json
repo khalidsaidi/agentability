@@ -1,9 +1,9 @@
 {
  "domain": "heylink.me",
- "checkedAt": "2026-11-02T04:59:16.994Z",
+ "checkedAt": "2026-11-02T18:53:32.290Z",
  "status": "complete",
- "elapsedMs": 4058,
- "score": 95,
+ "elapsedMs": 1717,
+ "score": 85,
  "grade": "A",
  "posture": "open",
  "paradox": false,
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -84,27 +84,35 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
-  },
-  {
-   "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {
@@ -113,7 +121,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

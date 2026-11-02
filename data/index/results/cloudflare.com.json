@@ -1,8 +1,8 @@
 {
  "domain": "cloudflare.com",
- "checkedAt": "2026-11-02T04:56:20.219Z",
+ "checkedAt": "2026-11-02T18:49:28.163Z",
  "status": "complete",
- "elapsedMs": 2299,
+ "elapsedMs": 2120,
  "score": 100,
  "grade": "A",
  "posture": "open",
@@ -59,18 +59,18 @@
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Serves /.well-known/mcp/server-card.json."
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
   },
   {
    "id": "B2",
    "title": "OpenAPI description published",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Valid OpenAPI document found."
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
   },
   {
    "id": "B3",
@@ -91,10 +91,6 @@
    "policy": "allowed"
   },
   {
-   "bot": "Claude-User",
-   "policy": "allowed"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "allowed"
   },
@@ -105,12 +101,24 @@
   {
    "bot": "CCBot",
    "policy": "allowed"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {
   "llmsTxt": true,
-  "mcp": true,
-  "openapi": true,
+  "mcp": false,
+  "openapi": false,
   "ucp": false,
   "structuredData": true,
   "sitemap": true,

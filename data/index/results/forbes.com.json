@@ -1,11 +1,11 @@
 {
  "domain": "forbes.com",
- "checkedAt": "2026-11-02T04:58:28.981Z",
+ "checkedAt": "2026-11-02T18:52:34.962Z",
  "status": "complete",
- "elapsedMs": 1182,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 2036,
+ "score": 18,
+ "grade": "F",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,8 +19,8 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
    "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, CCBot."
   },
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "allowed"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

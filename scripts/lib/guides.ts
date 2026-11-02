@@ -57,11 +57,11 @@ ${curl("curl -s https://yourdomain.com/llms.txt | head -20")}
 <p class="lede">See <a href="/guides/llms-txt-openapi-for-ai-agents/">llms.txt and OpenAPI for AI agents</a> for a full template.</p>
 
 <h3>A2 · Decide your AI-crawler policy on purpose <span class="pts">15 points</span></h3>
-<p class="lede">Your <code>robots.txt</code> is read by GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended and CCBot. Blocking
+<p class="lede">Your <code>robots.txt</code> is read by GPTBot, ClaudeBot, PerplexityBot, Google-Extended and CCBot, and by the fetchers that run when a person asks an assistant something: Claude-User, ChatGPT-User and Perplexity-User. Blocking
 all of them is a legitimate stance — we label it "closed by policy" and report it as one — but do it knowingly. Two
 things to know: <b>Claude-User</b> and similar agents fetch on behalf of a person who asked, which is different from a
-training crawler; and publishing <code>llms.txt</code> while blocking every AI crawler is a contradiction we flag as
-the <b>paradox</b>. ${ctx.pctBlockingSomeAI}% of the panel blocks at least one crawler; ${ctx.pctClosed}% blocks them all.</p>
+training crawler; and publishing <code>llms.txt</code> while blocking two or more of them is a contradiction we flag as
+the <b>paradox</b>. ${ctx.pctBlockingSomeAI}% of the panel blocks at least one crawler; ${ctx.pctClosed}% blocks at least two-thirds of them, which is what we call closed.</p>
 ${curl("curl -s https://yourdomain.com/robots.txt | grep -iA2 'gptbot\\|claudebot\\|claude-user\\|perplexitybot\\|google-extended\\|ccbot'")}
 
 <h3>A3 · Make the homepage readable without a browser <span class="pts">25 points</span></h3>

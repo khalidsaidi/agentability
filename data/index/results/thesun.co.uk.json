@@ -1,9 +1,9 @@
 {
  "domain": "thesun.co.uk",
- "checkedAt": "2026-11-02T05:06:01.528Z",
+ "checkedAt": "2026-11-02T19:02:49.882Z",
  "status": "complete",
- "elapsedMs": 3996,
- "score": 60,
+ "elapsedMs": 5658,
+ "score": 10,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,23 +22,23 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, Perplexity-User."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2970 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~14 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (help.thesun.co.uk), legal/privacy."
+   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "blocked"
   }
  ],
  "signals": {
@@ -112,8 +120,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
+  "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

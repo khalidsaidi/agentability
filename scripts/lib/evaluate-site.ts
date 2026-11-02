@@ -60,7 +60,20 @@ const FETCH_TIMEOUT_MS = 15000;
 const MAX_REDIRECTS = 12;
 
 // The AI crawlers/agents that matter in 2026 — all real, all documented.
-const AI_BOTS = ["GPTBot", "ClaudeBot", "Claude-User", "PerplexityBot", "Google-Extended", "CCBot"];
+// Two kinds: crawlers that collect for training or search (GPTBot, ClaudeBot,
+// PerplexityBot, Google-Extended, CCBot), and fetchers that run when a person
+// asks an assistant to look something up (Claude-User, ChatGPT-User,
+// Perplexity-User). The list had only one fetcher until a reader pointed out
+// that "closed by policy" then mostly described training crawlers, which is
+// not what an agent acting for a person runs into.
+const AI_BOTS = [
+  "GPTBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "CCBot",
+  "Claude-User", "ChatGPT-User", "Perplexity-User",
+];
+// "Closed" means blocking at least two-thirds of the bots named above. Written
+// as a fraction so adding a bot does not silently change what the word means:
+// with six bots this was 4, with eight it is 6.
+const CLOSED_AT = Math.ceil((AI_BOTS.length * 2) / 3);
 
 type FailureKind = "offline" | "timeout" | "tls" | "redirect-loop" | "refused";
 
@@ -125,6 +138,14 @@ function stripToText(html: string): string {
     .replace(/&[a-z#0-9]+;/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+// What A3 writes when the homepage turns a plain fetch away — a challenge page,
+// or a refusal like 403 or 429. Exported so the site counts walls from the
+// same rule the auditor applies, rather than re-deriving it from prose.
+export const WALL_DETAIL = "A bot challenge page blocks plain fetches — agents see a wall, not your content.";
+export function isWalled(result: { checks?: Array<{ id: string; detail: string }> }): boolean {
+  return result.checks?.find((c) => c.id === "A3")?.detail === WALL_DETAIL;
 }
 
 function looksLikeBotWall(html: string): boolean {
@@ -287,7 +308,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     const { policies, sitemaps } = robots.ok ? parseRobots(robots.text) : { policies: AI_BOTS.map((bot) => ({ bot, policy: "allowed" as const })), sitemaps: [] };
     const blocked = policies.filter((p) => p.policy === "blocked");
     const posture: SiteEvaluation["posture"] =
-      blocked.length >= 4 ? "closed" : blocked.length >= 1 ? "selective" : "open";
+      blocked.length >= CLOSED_AT ? "closed" : blocked.length >= 1 ? "selective" : "open";
     checks.push({
       id: "A2",
       title: "AI crawler access policy",
@@ -312,7 +333,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       points: parseable ? 25 : home.ok && !botWall && words >= 50 ? 12 : 0,
       maxPoints: 25,
       detail: botWall
-        ? "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+        ? WALL_DETAIL
         : `Plain fetch of the homepage yields ~${words} words of visible text.`,
     });
 

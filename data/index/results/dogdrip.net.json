@@ -1,11 +1,11 @@
 {
  "domain": "dogdrip.net",
- "checkedAt": "2026-11-02T04:57:15.816Z",
+ "checkedAt": "2026-11-02T18:50:40.585Z",
  "status": "complete",
- "elapsedMs": 3307,
- "score": 45,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 3070,
+ "score": 53,
+ "grade": "D",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,8 +19,8 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
    "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1330 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1358 words of visible text."
   },
   {
    "id": "A4",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "allowed"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "allowed"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {

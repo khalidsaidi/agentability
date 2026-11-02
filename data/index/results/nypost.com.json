@@ -1,11 +1,11 @@
 {
  "domain": "nypost.com",
- "checkedAt": "2026-11-02T05:02:41.414Z",
+ "checkedAt": "2026-11-02T18:58:24.430Z",
  "status": "complete",
- "elapsedMs": 1097,
- "score": 65,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 8424,
+ "score": 68,
+ "grade": "C",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~4268 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~4074 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Reached from homepage: pricing, support/contact (/contact/), legal/privacy (/terms/)."
+   "detail": "Reached from homepage: support/contact (/contact/), legal/privacy (/terms/)."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

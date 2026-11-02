@@ -1,11 +1,11 @@
 {
  "domain": "dcinside.com",
- "checkedAt": "2026-11-02T04:56:50.015Z",
+ "checkedAt": "2026-11-02T18:50:09.166Z",
  "status": "complete",
- "elapsedMs": 4401,
- "score": 35,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 14341,
+ "score": 43,
+ "grade": "D",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,8 +19,8 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
    "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
   },
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1112 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1095 words of visible text."
   },
   {
    "id": "A4",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "allowed"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {

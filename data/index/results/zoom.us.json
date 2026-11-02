@@ -1,9 +1,9 @@
 {
  "domain": "zoom.us",
- "checkedAt": "2026-11-02T05:08:16.078Z",
+ "checkedAt": "2026-11-02T19:06:07.842Z",
  "status": "complete",
- "elapsedMs": 921,
- "score": 90,
+ "elapsedMs": 1062,
+ "score": 85,
  "grade": "A",
  "posture": "open",
  "paradox": false,
@@ -59,10 +59,10 @@
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Serves /.well-known/mcp/server-card.json."
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
   },
   {
    "id": "B2",
@@ -91,10 +91,6 @@
    "policy": "partial"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -105,11 +101,23 @@
   {
    "bot": "CCBot",
    "policy": "partial"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {
   "llmsTxt": false,
-  "mcp": true,
+  "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,

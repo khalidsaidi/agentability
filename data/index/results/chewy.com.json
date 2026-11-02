@@ -1,9 +1,9 @@
 {
  "domain": "chewy.com",
- "checkedAt": "2026-11-02T04:56:15.572Z",
+ "checkedAt": "2026-11-02T18:49:19.670Z",
  "status": "complete",
- "elapsedMs": 820,
- "score": 30,
+ "elapsedMs": 884,
+ "score": 25,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -75,10 +75,10 @@
   {
    "id": "B3",
    "title": "UCP commerce profile published",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Serves a UCP profile (version 2026-01-23) declaring dev.ucp.shopping."
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
   }
  ],
  "robots": [
@@ -88,10 +88,6 @@
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
-  },
-  {
-   "bot": "Claude-User",
    "policy": "partial"
   },
   {
@@ -105,13 +101,25 @@
   {
    "bot": "CCBot",
    "policy": "partial"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
-  "ucp": true,
+  "ucp": false,
   "structuredData": false,
   "sitemap": true,
   "parseableText": false

@@ -1,11 +1,11 @@
 {
  "domain": "yle.fi",
- "checkedAt": "2026-11-02T05:08:06.713Z",
+ "checkedAt": "2026-11-02T19:05:55.757Z",
  "status": "complete",
- "elapsedMs": 5035,
- "score": 55,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 3850,
+ "score": 63,
+ "grade": "C",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot, ChatGPT-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1100 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1251 words of visible text."
   },
   {
    "id": "A4",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

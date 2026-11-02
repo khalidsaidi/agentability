@@ -1,9 +1,9 @@
 {
  "domain": "sciencedirect.com",
- "checkedAt": "2026-11-02T05:04:55.817Z",
+ "checkedAt": "2026-11-02T19:00:41.949Z",
  "status": "complete",
- "elapsedMs": 583,
- "score": 10,
+ "elapsedMs": 2432,
+ "score": 35,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,15 +22,15 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~893 words of visible text."
   },
   {
    "id": "A4",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "blocked"
   }
  ],
  "signals": {
@@ -114,6 +122,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

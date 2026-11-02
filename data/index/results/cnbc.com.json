@@ -1,9 +1,9 @@
 {
  "domain": "cnbc.com",
- "checkedAt": "2026-11-02T04:56:21.085Z",
+ "checkedAt": "2026-11-02T18:49:30.283Z",
  "status": "complete",
- "elapsedMs": 1714,
- "score": 50,
+ "elapsedMs": 4808,
+ "score": 55,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~233 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~223 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 0,
+   "points": 5,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
+   "detail": "Reached from homepage: pricing."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -104,6 +100,18 @@
   },
   {
    "bot": "CCBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
    "policy": "blocked"
   }
  ],

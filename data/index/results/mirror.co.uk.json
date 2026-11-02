@@ -1,11 +1,11 @@
 {
  "domain": "mirror.co.uk",
- "checkedAt": "2026-11-02T05:01:54.580Z",
+ "checkedAt": "2026-11-02T18:57:17.560Z",
  "status": "complete",
- "elapsedMs": 2654,
- "score": 60,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 3736,
+ "score": 68,
+ "grade": "C",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,8 +19,8 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
    "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, CCBot."
   },
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1227 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1314 words of visible text."
   },
   {
    "id": "A4",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

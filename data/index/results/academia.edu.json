@@ -1,11 +1,11 @@
 {
  "domain": "academia.edu",
- "checkedAt": "2026-11-02T04:54:14.757Z",
+ "checkedAt": "2026-11-02T18:46:34.369Z",
  "status": "complete",
- "elapsedMs": 533,
- "score": 10,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 681,
+ "score": 18,
+ "grade": "F",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot, Perplexity-User."
   },
   {
    "id": "A3",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -104,6 +100,18 @@
   },
   {
    "bot": "CCBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
    "policy": "blocked"
   }
  ],

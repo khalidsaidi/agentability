@@ -1,9 +1,9 @@
 {
  "domain": "lefigaro.fr",
- "checkedAt": "2026-11-02T05:01:04.264Z",
+ "checkedAt": "2026-11-02T18:55:59.804Z",
  "status": "complete",
- "elapsedMs": 3686,
- "score": 55,
+ "elapsedMs": 6297,
+ "score": 60,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot, Claude-User, ChatGPT-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~8084 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~8469 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/aide-et-contact). Link found but not confirmed: pricing (/mes-abonnements), legal/privacy (/cgv)."
+   "detail": "Reached from homepage: pricing (/mes-abonnements), support/contact (/aide-et-contact). Link found but not confirmed: legal/privacy (/cgv)."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "partial"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

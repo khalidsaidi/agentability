@@ -1,9 +1,9 @@
 {
  "domain": "elconfidencial.com",
- "checkedAt": "2026-11-02T04:57:45.435Z",
+ "checkedAt": "2026-11-02T18:51:18.838Z",
  "status": "complete",
- "elapsedMs": 3182,
- "score": 50,
+ "elapsedMs": 2970,
+ "score": 55,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, ChatGPT-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~4735 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~5219 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "Reached from homepage: docs/api (api.elconfidencial.com), legal/privacy (/politicas-de-privacidad/privacidad/)."
+   "detail": "Reached from homepage: pricing, docs/api (api.elconfidencial.com), legal/privacy (/politicas-de-privacidad/privacidad/)."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "partial"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -105,6 +101,18 @@
   {
    "bot": "CCBot",
    "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
   }
  ],
  "signals": {

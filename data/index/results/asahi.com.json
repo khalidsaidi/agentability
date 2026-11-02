@@ -1,9 +1,9 @@
 {
  "domain": "asahi.com",
- "checkedAt": "2026-11-02T04:55:08.849Z",
+ "checkedAt": "2026-11-02T18:47:42.920Z",
  "status": "complete",
- "elapsedMs": 2404,
- "score": 55,
+ "elapsedMs": 5023,
+ "score": 50,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Claude-User, PerplexityBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1208 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1212 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/hc/ja). Link found but not confirmed: pricing (/subscribe/price/), legal/privacy (/corporate/privacy-portal/)."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage. Link found but not confirmed: pricing (/subscribe/price/), support/contact (/hc/ja), legal/privacy (/corporate/privacy-portal/)."
   },
   {
    "id": "B1",
@@ -91,10 +91,6 @@
    "policy": "blocked"
   },
   {
-   "bot": "Claude-User",
-   "policy": "blocked"
-  },
-  {
    "bot": "PerplexityBot",
    "policy": "blocked"
   },
@@ -104,6 +100,18 @@
   },
   {
    "bot": "CCBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
    "policy": "blocked"
   }
  ],

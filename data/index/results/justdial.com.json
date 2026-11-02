@@ -1,11 +1,11 @@
 {
  "domain": "justdial.com",
- "checkedAt": "2026-11-02T05:00:25.930Z",
+ "checkedAt": "2026-11-02T19:08:56.369Z",
  "status": "complete",
- "elapsedMs": 779,
- "score": 8,
+ "elapsedMs": 379,
+ "score": 15,
  "grade": "F",
- "posture": "selective",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: ClaudeBot."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -88,10 +88,6 @@
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
-  },
-  {
-   "bot": "Claude-User",
    "policy": "allowed"
   },
   {
@@ -104,7 +100,19 @@
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "allowed"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "allowed"
   }
  ],
  "signals": {
