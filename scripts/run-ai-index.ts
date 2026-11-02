@@ -9,6 +9,15 @@ import { evaluateSite, type SiteEvaluation } from "./lib/evaluate-site";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const DOMAINS_PATH = path.join(REPO_ROOT, "data/index/domains.txt");
+// submitted.txt holds sites people asked us to audit, and reinstatements of
+// domains the content filter removed by mistake. It was only ever merged by
+// `npm run panel`, which the weekly run does not call — so a submission sat
+// there doing nothing until someone rebuilt the panel by hand. Four hand
+// reinstatements and every audit request since the issue form shipped were
+// silently dropped that way. The run merges it directly now.
+const SUBMITTED_PATH = path.join(REPO_ROOT, "data/index/submitted.txt");
+const VERDICTS_PATH = path.join(REPO_ROOT, "data/index/classification.json");
+const OVERRIDES_PATH = path.join(REPO_ROOT, "data/index/classification-overrides.json");
 const RESULTS_DIR = path.join(REPO_ROOT, "data/index/results");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
 const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
@@ -16,11 +25,38 @@ const HISTORY_DIR = path.join(REPO_ROOT, "data/index/history");
 const CONCURRENCY = Math.max(1, Number(process.env.INDEX_CONCURRENCY || "6"));
 
 async function main() {
-  const raw = await fsp.readFile(DOMAINS_PATH, "utf8");
-  const domains = raw
-    .split(/\r?\n/)
-    .map((l) => l.trim().toLowerCase())
-    .filter((l) => l && !l.startsWith("#"));
+  const readList = async (file: string) => {
+    try {
+      return (await fsp.readFile(file, "utf8"))
+        .split(/\r?\n/)
+        .map((l) => l.trim().toLowerCase())
+        .filter((l) => l && !l.startsWith("#"));
+    } catch {
+      return [];
+    }
+  };
+  const readJson = async (file: string) => {
+    try {
+      return JSON.parse(await fsp.readFile(file, "utf8")) as Record<string, unknown>;
+    } catch {
+      return {};
+    }
+  };
+  // A submitted domain still has to pass the content filter — a submission buys
+  // an audit, not a place past the rules.
+  const verdicts = await readJson(VERDICTS_PATH);
+  const overrides = await readJson(OVERRIDES_PATH);
+  const verdictOf = (d: string) => {
+    const o = overrides[d];
+    if (o !== undefined) return typeof o === "string" ? o : ((o as { verdict?: string }).verdict ?? "ok");
+    const v = verdicts[d];
+    return typeof v === "string" ? v : "ok";
+  };
+  const fromPanel = await readList(DOMAINS_PATH);
+  const submitted = (await readList(SUBMITTED_PATH)).filter((d) => verdictOf(d) === "ok");
+  const added = submitted.filter((d) => !fromPanel.includes(d));
+  const domains = [...fromPanel, ...added];
+  if (added.length) console.log(`Submitted/reinstated domains merged in: ${added.length} (${added.join(", ")})`);
 
   await fsp.mkdir(RESULTS_DIR, { recursive: true });
   await fsp.mkdir(HISTORY_DIR, { recursive: true });

@@ -225,14 +225,42 @@ function samplingIsUniform(): string | null {
   return null;
 }
 
+// Every domain a human reinstated must actually be reachable by the weekly run.
+// It wasn't: submitted.txt was merged only by `npm run panel`, which the weekly
+// workflow never calls, so four reinstatements and every audit request since the
+// issue form shipped sat in a file doing nothing. No network needed.
+function reinstatementsReachTheRun(): string | null {
+  const read = (f: string) => {
+    const full = path.join(REPO_ROOT, f);
+    if (!fs.existsSync(full)) return [] as string[];
+    return fs.readFileSync(full, "utf8").split(/\r?\n/).map((l) => l.trim().toLowerCase()).filter((l) => l && !l.startsWith("#"));
+  };
+  const overrides = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "data/index/classification-overrides.json"), "utf8"));
+  const reinstated = Object.entries(overrides)
+    .filter(([k]) => !k.startsWith("_"))
+    .filter(([, v]) => (typeof v === "string" ? v : ((v as { verdict?: string }).verdict ?? "ok")) === "ok")
+    .map(([k]) => k);
+  const reachable = new Set([...read("data/index/domains.txt"), ...read("data/index/submitted.txt")]);
+  const lost = reinstated.filter((d) => !reachable.has(d));
+  if (lost.length) return `${lost.length} reinstated domain(s) no run would audit: ${lost.join(", ")}`;
+  console.log(`  ok    reinstatements          all ${reinstated.length} reachable by the weekly run`);
+  return null;
+}
+
 async function main() {
   const failed = await runFixtures();
   console.log("");
+  const reinstatementProblem = reinstatementsReachTheRun();
+  if (reinstatementProblem) console.log(`  FAIL  reinstatements          ${reinstatementProblem}`);
   const samplingProblem = samplingIsUniform();
   if (samplingProblem) {
     console.log(`  FAIL  sampling                ${samplingProblem}`);
   }
   if (process.argv.includes("--full")) await printSamples();
+  if (reinstatementProblem) {
+    console.error(`\nA hand reinstatement is not reachable by the weekly run — the correction would never ship.`);
+    process.exit(1);
+  }
   if (samplingProblem) {
     console.error(`\nThe sampling property failed — a published error rate rests on this draw.`);
     process.exit(1);
