@@ -1,10 +1,10 @@
 {
  "domain": "doctolib.fr",
- "checkedAt": "2026-11-02T04:57:14.720Z",
+ "checkedAt": "2026-11-02T16:24:08.961Z",
  "status": "complete",
- "elapsedMs": 3159,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 3208,
+ "score": 60,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~253 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact (/patient_support_requests/new), legal/privacy (/privacy-settings)."
   },
   {
    "id": "B1",
@@ -114,6 +114,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

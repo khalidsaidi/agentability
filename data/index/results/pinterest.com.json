@@ -1,9 +1,9 @@
 {
  "domain": "pinterest.com",
- "checkedAt": "2026-11-02T05:03:36.844Z",
+ "checkedAt": "2026-11-02T16:30:33.049Z",
  "status": "complete",
- "elapsedMs": 3031,
- "score": 60,
+ "elapsedMs": 979,
+ "score": 25,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~259 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (help.pinterest.com), legal/privacy."
+   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -114,6 +114,6 @@
   "ucp": false,
   "structuredData": true,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

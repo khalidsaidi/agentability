@@ -1,9 +1,9 @@
 {
  "domain": "thetimes.com",
- "checkedAt": "2026-11-02T05:06:01.930Z",
+ "checkedAt": "2026-11-02T16:33:04.598Z",
  "status": "complete",
- "elapsedMs": 2339,
- "score": 10,
+ "elapsedMs": 2712,
+ "score": 55,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,34 +27,34 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~14 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~4233 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "Reached from homepage: pricing, support/contact (/help), legal/privacy."
   },
   {
    "id": "B1",
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
-  "sitemap": true,
-  "parseableText": false
+  "structuredData": true,
+  "sitemap": false,
+  "parseableText": true
  }
 }

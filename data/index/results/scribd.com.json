@@ -1,10 +1,10 @@
 {
  "domain": "scribd.com",
- "checkedAt": "2026-11-02T05:04:57.379Z",
+ "checkedAt": "2026-11-02T16:31:53.648Z",
  "status": "complete",
- "elapsedMs": 766,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 361,
+ "score": 25,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1089 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~37 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/hc/en-us). Link found but not confirmed: docs/api (/docs/Art)."
+   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -112,8 +112,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
+  "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }
