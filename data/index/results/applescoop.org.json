@@ -1,0 +1,127 @@
+{
+ "domain": "applescoop.org",
+ "checkedAt": "2026-11-02T21:24:22.354Z",
+ "status": "complete",
+ "elapsedMs": 1082,
+ "score": 88,
+ "grade": "A",
+ "posture": "selective",
+ "paradox": true,
+ "checks": [
+  {
+   "id": "A1",
+   "title": "llms.txt for AI readers",
+   "status": "pass",
+   "points": 15,
+   "maxPoints": 15,
+   "detail": "Present with 10303 chars and links."
+  },
+  {
+   "id": "A2",
+   "title": "AI crawler access policy",
+   "status": "warn",
+   "points": 8,
+   "maxPoints": 15,
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
+  },
+  {
+   "id": "A3",
+   "title": "Content readable without a browser",
+   "status": "pass",
+   "points": 25,
+   "maxPoints": 25,
+   "detail": "Plain fetch of the homepage yields ~1167 words of visible text."
+  },
+  {
+   "id": "A4",
+   "title": "Structured data (schema.org JSON-LD)",
+   "status": "pass",
+   "points": 15,
+   "maxPoints": 15,
+   "detail": "Valid JSON-LD found on the homepage."
+  },
+  {
+   "id": "A5",
+   "title": "Sitemap discoverable",
+   "status": "pass",
+   "points": 10,
+   "maxPoints": 10,
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+  },
+  {
+   "id": "A6",
+   "title": "Everyday agent tasks reachable from the homepage",
+   "status": "pass",
+   "points": 15,
+   "maxPoints": 20,
+   "detail": "Reached from homepage: pricing (/price/), support/contact (/contact/), legal/privacy (/terms/)."
+  },
+  {
+   "id": "B1",
+   "title": "MCP server advertised",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+  },
+  {
+   "id": "B2",
+   "title": "OpenAPI description published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
+  }
+ ],
+ "robots": [
+  {
+   "bot": "GPTBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ClaudeBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "PerplexityBot",
+   "policy": "partial"
+  },
+  {
+   "bot": "Google-Extended",
+   "policy": "blocked"
+  },
+  {
+   "bot": "CCBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
+  }
+ ],
+ "signals": {
+  "llmsTxt": true,
+  "mcp": false,
+  "openapi": false,
+  "ucp": false,
+  "structuredData": true,
+  "sitemap": true,
+  "parseableText": true
+ }
+}
