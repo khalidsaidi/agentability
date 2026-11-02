@@ -32,7 +32,7 @@ async function main() {
     { what: "kept side, rate and n", needle: `${hc.errors} of ${hc.n} kept wrongly` },
     { what: "kept side, interval", needle: `95% CI ${pct(hc.ci95[0])}` },
     { what: "kept side, far edge", needle: `at most ${pct(hc.farEdge.ci95[1])}%` },
-    { what: "kept side, wall count", needle: `all ${hc.farEdge.errors - hc.errors} that two separate fetches` },
+    { what: "kept side, unresolved count", needle: `the ${hc.farEdge.errors - hc.errors} that no fetch and no snapshot` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "A6 held out", needle: `0 errors in ${v.a6.heldOutPostFix.n} decisions` },
     { what: "platform false positives", needle: `0 of ${v.platform.falsePositive.n} wrong labels` },
@@ -56,12 +56,23 @@ async function main() {
     .readFileSync(path.join(dir, "kept-census-walls.tsv"), "utf8")
     .split("\n")
     .filter((l) => l.includes("\tWALL\t")).length;
+  // The archive pass is the last tier: a snapshot is a readable page even where
+  // the live site walls every client. Only a domain that neither a live fetch
+  // nor a snapshot renders is genuinely unresolved, and those are what the far
+  // edge is made of.
+  const NOTHING = /NO SNAPSHOT|snapshot had no title|\tAccess Denied\t|\tLoading\.\.\.\t|\t&nbsp;\t/;
+  const archiveRows = fs
+    .readFileSync(path.join(dir, "kept-census-archive.tsv"), "utf8")
+    .split("\n")
+    .filter((l) => l.includes("\t") && !l.startsWith("#"));
+  const stillUnresolved = archiveRows.filter((l) => NOTHING.test(l)).length;
 
   console.log(`\nRecord against the evidence files in data/index/evidence/\n`);
   for (const [what, got, want] of [
     ["census rows", census.length, hc.farEdge.n],
-    ["corroborated walls", walls, hc.farEdge.errors - hc.errors],
-    ["readable domains", census.length - walls, hc.n],
+    ["walls the archive pass took", archiveRows.length, walls],
+    ["unresolved after archive", stillUnresolved, hc.farEdge.errors - hc.errors],
+    ["hand-read domains", census.length - stillUnresolved, hc.n],
   ] as const) {
     const ok = got === want;
     if (!ok) failed += 1;
