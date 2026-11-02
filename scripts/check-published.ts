@@ -34,7 +34,9 @@ async function main() {
     // The far edge used to be a separate, wider number because unreadable
     // domains were counted against us. Every drawn domain is now judged, so the
     // two coincide and the page says so rather than quoting a second figure.
-    { what: "kept side, far edge", needle: "as a wrong keep instead gives" },
+    // Matches the stable clause, not the count or the hedge wording, both of
+    // which have moved three times today.
+    { what: "kept side, far edge", needle: "anyway gives 1.1%, 95% CI 0.3" },
     { what: "kept side, prose tier", needle: `All 189 were judged from prose` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },
