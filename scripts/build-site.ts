@@ -1546,6 +1546,12 @@ answer the question this site asks, because it was not the web people actually u
 <tr><td><span class="chip">B3</span></td><td><b>UCP commerce profile</b> at <code>/.well-known/ucp</code> — the Universal Commerce Protocol, which tells an agent what it can buy and how to pay. Bonus.</td><td class="num">+5</td></tr>
 </tbody>
 </table>
+<h2>What the checks share</h2>
+<p class="lede">A3 and A6 are not independent. A homepage that sends no readable HTML fails A3, and then fails A6
+because there are no links in it to follow — one defect, 45 of the 100 points. That is deliberate: the rubric models
+what an agent actually gets, not a set of separate tests, and an agent really is stopped twice. But it means the gap
+between a bot-walled site and an open one is wider than the number of distinct things wrong with it, so read a low
+score as "an agent gets nothing here", not as a count of defects. 179 reports, 15% of the Index, are in this position.</p>
 <h2>Grades</h2>
 <p class="lede">A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40 · F &lt; 40. Sites whose robots.txt blocks essentially all AI crawlers
 are labeled <b>“Closed by policy”</b> instead of graded — refusing agents is a legitimate choice, and we report it as
