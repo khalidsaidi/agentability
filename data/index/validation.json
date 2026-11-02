@@ -7,8 +7,8 @@
    "n": 53,
    "rate": 0.075,
    "ci95": [
-    0.03,
-    0.179
+    0.021,
+    0.182
    ],
    "how": "full census of every withdrawn domain; homepage fetched, title and description read by hand",
    "found": [
@@ -22,7 +22,8 @@
     "errors": 0,
     "n": 53,
     "note": "after overrides. The 4 raw errors are the measure of the model, not of what the site publishes."
-   }
+   },
+   "interval": "exact Clopper-Pearson, 2.1-18.2%. Wilson gives 3.0-17.9%; the exact upper edge is wider, so it is the one published."
   },
   "underExclusion": {
    "pool": "e15d222a8342 — 1,175 kept domains, the panel as published. Every figure below is measured on this one pool.",
@@ -111,7 +112,8 @@
       "mcdonalds.com",
       "netshoes.com.br",
       "zara.com"
-     ]
+     ],
+     "interval": "Wilson 3.7-10.8%, exact 3.3-10.8% — the same upper edge."
     },
     "whatItCost": "The scan had cleared netkeiba.com because nothing on it is in English. That is the finding: the kept-side figure was never limited by sample size, it was limited by the vocabulary. Japanese, Chinese, Korean, Thai, Vietnamese and Arabic gambling, adult and piracy terms are now in the scan, checked both ways — they fire on netkeiba.com and az24.vn and stay quiet on asahi.com and kakaku.com.",
     "limits": "A title and description are not the whole site. This census can only find what a site says about itself on its front door.",
@@ -124,7 +126,8 @@
      "runs": "data/index/evidence/probe-final-rule.txt, probe-live-1337.txt, probe-live-5150.txt, probe-withdrawn.txt",
      "archive": "data/index/evidence/kept-census-archive.tsv (36 rows: domain, snapshot title, snapshot URL)"
     },
-    "whyWallsAreNotHandRead": "11 domains remain that no live fetch and no archive snapshot could render. Those are not hand-read and cannot be: there is no retrievable page. They are counted as wrong keeps, which is why the far edge is 10.8% rather than the 0.6% measured. The previous 25.8% assumed 36 such domains; the archive pass showed 25 of them were my limit, not theirs."
+    "whyWallsAreNotHandRead": "11 domains remain that no live fetch and no archive snapshot could render. Those are not hand-read and cannot be: there is no retrievable page. They are counted as wrong keeps, which is why the far edge is 10.8% rather than the 0.6% measured. The previous 25.8% assumed 36 such domains; the archive pass showed 25 of them were my limit, not theirs.",
+    "interval": "Wilson 0.1-3.1%, exact 0.0-3.1% — the same upper edge to one decimal place."
    },
    "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
    "control": {
@@ -171,7 +174,8 @@
    ],
    "how": "seed 777, disjoint from seeds 42 and 99; 14 readable sites x 4 categories, judged by hand",
    "note": "measured after the clarin.com and grow.google fixes. Pre-fix on seed 99 the held-out rate was 10%.",
-   "checked": "mega.nz 0/20 and bankofamerica.com 5/20 looked like under-credits and were verified correct: mega.nz serves a one-word JS shell, bankofamerica.com links no privacy page from its homepage HTML."
+   "checked": "mega.nz 0/20 and bankofamerica.com 5/20 looked like under-credits and were verified correct: mega.nz serves a one-word JS shell, bankofamerica.com links no privacy page from its homepage HTML.",
+   "interval": "Wilson 0.0-6.4%, exact 0.0-6.4% — identical."
   }
  },
  "platform": {
@@ -208,5 +212,6 @@
   ],
   "boundary": "A shop is a site whose primary purpose is selling goods or services to the public and where a visitor can start a purchase. News, reference, social, government, sport, banking and free tools are not shops even when they sell a subscription. Whether to narrow this to retail only is a product decision, not a measurement one."
  },
- "_evidence": "Raw inputs for every figure here are committed under data/index/evidence/, with a README mapping each file to the numbers it produced: the 189-domain census, the wall cross-check, and the four probe runs."
+ "_evidence": "Raw inputs for every figure here are committed under data/index/evidence/, with a README mapping each file to the numbers it produced: the 189-domain census, the wall cross-check, and the four probe runs.",
+ "_intervals": "Wilson 95%, cross-checked against the exact Clopper-Pearson interval. The two upper edges agree to within 0.4 percentage points everywhere; where they differ, the published figure is the more conservative of the two, because every bound here faces upward."
 }

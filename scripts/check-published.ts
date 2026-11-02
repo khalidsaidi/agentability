@@ -34,6 +34,7 @@ async function main() {
     { what: "kept side, far edge", needle: `at most ${pct(hc.farEdge.ci95[1])}%` },
     { what: "kept side, unresolved count", needle: `the ${hc.farEdge.errors - hc.errors} that no fetch and no snapshot` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
+    { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },
     { what: "A6 held out", needle: `0 errors in ${v.a6.heldOutPostFix.n} decisions` },
     { what: "platform false positives", needle: `0 of ${v.platform.falsePositive.n} wrong labels` },
     { what: "shop membership", needle: `${v.shopMembership.errors} of ${v.shopMembership.n} wrong` },
