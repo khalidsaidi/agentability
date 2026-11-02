@@ -112,7 +112,14 @@
     },
     "whyWallsAreNotHandRead": "A wall cannot be hand-read; that is what makes it a wall. Three user agents, two hosts and two separate days returned nothing for each of the 36, and our own audit pipeline got nothing either. The far edge therefore counts all 36 as wrong keeps — the most conservative treatment available — rather than claiming a verdict on a page nobody could retrieve."
    },
-   "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones."
+   "supersededByCensus": "The screened figure was 0 of 174 with a 28.1% far edge, conditional on the scan, whose own miss rate was bounded at 14.9% by a 25-domain hand sample. The census makes that structure unnecessary and shows the scan did miss one, so the census numbers are the published ones.",
+   "control": {
+    "what": "Whether sites in the filtered categories are less readable than kept sites — the premise that made pursuing the unreadable domains worth doing rather than discarding them.",
+    "measured": "`POOL=withdrawn DRAW=999 npm run probe-filter` — a full census of all 357 removed domains, not a sample: 74 unreadable, 20.7%, 95% CI 16.8-25.2%. Against the kept side's 36 of 189, 19.0%, 95% CI 14.1-25.2%.",
+    "verdict": "NOT SUPPORTED. The difference is +1.7 percentage points, 95% CI -5.3 to +8.7, Fisher exact p = 0.737. Removed domains are no harder to read than kept ones. My original argument asserted the opposite and used it to justify the whole pass; the pass was still worth it — it cut the unmeasured share and found two gambling sites — but not for the reason given.",
+    "evidence": "data/index/evidence/probe-withdrawn-census357.txt (full census), probe-withdrawn-sample66.txt (the earlier 66-domain sample, 13.6%, superseded)",
+    "supersedes": "the 66-domain sample comparison, 13.6% vs 6.9%, p = 0.189, which compared a sample against a differently-defined kept-side figure."
+   }
   }
  },
  "a6": {

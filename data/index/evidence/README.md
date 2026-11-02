@@ -11,7 +11,8 @@ taken on description.
 | `probe-final-rule.txt` | `npm run probe-filter`, seed 2026, pool e15d222a8342. Prints the rule for "unreadable" at the top. |
 | `probe-live-1337.txt` | Same, seed 1337. |
 | `probe-live-5150.txt` | Same, seed 5150. |
-| `probe-withdrawn.txt` | `POOL=withdrawn npm run probe-filter` — the readability control over removed domains, which is what showed the premise "filtered sites wall bots more" to be unproven (13.6% vs 6.9%, Fisher p = 0.189). |
+| `probe-withdrawn-census357.txt` | `POOL=withdrawn DRAW=999 npm run probe-filter` — a full census of all 357 removed domains. The premise test: 74 unreadable (20.7%) against 36 of 189 (19.0%) on the kept side, +1.7pp, 95% CI -5.3 to +8.7, Fisher p = 0.737. The premise is not supported. |
+| `probe-withdrawn-sample66.txt` | The earlier 66-domain version of that control (13.6%). Superseded by the census above and kept so the change is visible. |
 
 A wall cannot be hand-read; that is what makes it a wall. The far edge therefore
 counts every corroborated wall as a wrong keep, which is the most conservative
