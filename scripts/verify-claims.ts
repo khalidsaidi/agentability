@@ -61,6 +61,17 @@ async function main() {
   claim("draw-seed-1337", "52 body, 7 machine, 7 nothing", lineOf("probe-live-1337.txt", "Evidence:"));
   claim("draw-seed-5150", "49 body, 13 machine, 4 nothing", lineOf("probe-live-5150.txt", "Evidence:"));
   claim("a6-held-out", `0 errors in ${v.a6.heldOutPostFix.n} decisions`, `${SITE}/data/validation.json`);
+  // The boundary rule for "unreadable" is code, and code moves. Resolve its
+  // location at run time rather than citing a line number that rots: three
+  // such citations went stale in one session.
+  const probeSrc = fs.readFileSync(path.join(ROOT, "scripts/probe-filter-sample.ts"), "utf8").split("\n");
+  const ruleLine = probeSrc.findIndex((l) => l.includes('Rule for "unreadable"')) + 1;
+  const readableLine = probeSrc.findIndex((l) => l.startsWith("async function readable")) + 1;
+  if (!ruleLine || !readableLine) missing += 1;
+  claim("boundary-rule-printed", "four surfaces, prose vs token thresholds", `scripts/probe-filter-sample.ts:${ruleLine} (prints it on every run)`);
+  claim("boundary-rule-applied", "the procedure the rule describes", `scripts/probe-filter-sample.ts:${readableLine}`);
+  claim("census-boundary-applied", `${walls.n} wall decisions, deciding text in each row`, `${walls.where} and data/index/evidence/kept-census-archive.tsv`);
+  claim("draw-method", "seeded Fisher-Yates over the whole sorted pool", `scripts/probe-filter-sample.ts:${probeSrc.findIndex((l) => l.startsWith("function sample")) + 1}`);
   claim("rules-regression-tested", "10 fixtures, 5 proven against the buggy code", "npm run validate");
   claim("page-matches-record", "11 figures compared", "npm run check-published");
 
