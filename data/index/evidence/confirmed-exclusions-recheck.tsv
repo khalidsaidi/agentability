@@ -7,7 +7,9 @@
 # Deliberately NOT done in a browser: several of these are adult sites and the
 # browser here is the user's own.
 #
-# Result: 3 confirmed by the independent surface, 9 unjudgeable through it, 2
+# Result, after adding a SECOND independent surface — the URL paths each site
+# publishes in its own robots.txt and sitemap, which is structural rather than
+# vocabulary-based: 5 confirmed, 7 unjudgeable on either surface, 2
 # where the exclusion OUTCOME stands but the recorded REASON is unsupported by
 # the evidence visible — both are parked domains labelled "gambling". 0
 # exclusions overturned.
@@ -19,11 +21,15 @@ sportybet.com	SportyBet	CONFIRMED gambling
 bpexch.live	bpexch.live - Registered at Namecheap.com	OUTCOME STANDS, REASON UNSUPPORTED — a parked domain, not gambling content
 dpbosssss.boston	dpbosssss.boston - Ressources et information concernant dpbosssss	OUTCOME STANDS, REASON UNSUPPORTED — a parked/ads page, not gambling content
 bet365.com	(capture has no title)	NOT JUDGEABLE on this surface
-caliente.mx	(capture has no title)	NOT JUDGEABLE on this surface
+caliente.mx	(capture has no title); sitemap paths contain /casino/	CONFIRMED gambling by machine paths
 hollywoodbets.net	(capture has no title)	NOT JUDGEABLE on this surface
-sattamatkadpboss.mobi	(capture has no title)	NOT JUDGEABLE on this surface
+sattamatkadpboss.mobi	(capture has no title); machine paths contain /satta/	CONFIRMED gambling by machine paths
 bet.ar	(no HTTP 200 html capture)	NOT JUDGEABLE on this surface
 novelix.vip	(no HTTP 200 html capture)	NOT JUDGEABLE on this surface
 txnhh.com	(no HTTP 200 html capture)	NOT JUDGEABLE on this surface
 xoso.com.vn	(no HTTP 200 html capture)	NOT JUDGEABLE on this surface
 zelvora.vip	(no HTTP 200 html capture)	NOT JUDGEABLE on this surface
+#
+# Combined: 0 exclusions overturned in 7 judgeable cases. Exact 95% upper bound
+# on the confirmed set's error rate from these two surfaces: 41.0%. Wide, and
+# said so — seven of the fourteen render nothing on either surface.
