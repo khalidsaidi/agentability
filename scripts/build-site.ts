@@ -1070,10 +1070,10 @@ they actually are for an agent.</p>
   <p class="thisweek-label">Today's answer · episode of ${prettyDate(latest.date)}</p>
   <div class="board">
     <div>
-      <div class="score">${latest.stats.completed}<i>/${latest.stats.tasks}</i></div>
-      <span class="caption">errands the agent actually finished</span>
+      <div class="score">${s ? s.pctClosed : 0}<i>%</i></div>
+      <span class="caption">of the ${s ? s.audited : ""} most-visited sites are closed to AI agents by policy</span>
     </div>
-    <p class="runline"><b>${latest.stats.wallsHit}</b> bot walls · <b>${latest.stats.pageVisits}</b> pages read · <b>${latest.stats.domainsVisited}</b> sites visited</p>
+    <p class="runline"><b>${s ? s.pctBlockingSomeAI : 0}%</b> block at least one AI crawler · <b>${s ? s.averageScore : 0}/100</b> average · today the agent finished <b>${latest.stats.completed}/${latest.stats.tasks}</b> errands and hit <b>${latest.stats.wallsHit}</b> bot walls</p>
   </div>
   <div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
 </div>
