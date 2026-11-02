@@ -36,7 +36,12 @@ async function main() {
     // two coincide and the page says so rather than quoting a second figure.
     // Matches the stable clause, not the count or the hedge wording, both of
     // which have moved three times today.
-    { what: "kept side, far edge", needle: "anyway gives 1.1%, 95% CI 0.3" },
+    {
+      what: "kept side, archive-declined bound",
+      needle: hc.farEdge?.ifArchiveRejected?.rate
+        ? `the bound becomes ${pct(hc.farEdge.ifArchiveRejected.rate)}%`
+        : "__RECORD_MISSING_ifArchiveRejected__",
+    },
     { what: "kept side, prose tier", needle: `All 189 were judged from prose` },
     { what: "removed side", needle: `${cf.overExclusion.errors} of ${cf.overExclusion.n} removed wrongly` },
     { what: "removed side, interval", needle: `95% CI ${(cf.overExclusion.ci95[0] * 100).toFixed(1)}` },
