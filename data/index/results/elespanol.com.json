@@ -1,20 +1,20 @@
 {
  "domain": "elespanol.com",
- "checkedAt": "2026-11-02T18:51:21.808Z",
+ "checkedAt": "2026-11-03T16:43:30.750Z",
  "status": "complete",
- "elapsedMs": 3119,
- "score": 95,
- "grade": "A",
+ "elapsedMs": 7399,
+ "score": 80,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 6307 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~6197 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~6364 words of visible text."
   },
   {
    "id": "A4",
@@ -115,8 +115,9 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,

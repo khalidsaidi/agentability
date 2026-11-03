@@ -1,20 +1,20 @@
 {
  "domain": "classlink.com",
- "checkedAt": "2026-11-02T18:49:24.541Z",
+ "checkedAt": "2026-11-03T16:41:27.802Z",
  "status": "complete",
- "elapsedMs": 3622,
- "score": 90,
- "grade": "A",
+ "elapsedMs": 1346,
+ "score": 65,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 18400 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

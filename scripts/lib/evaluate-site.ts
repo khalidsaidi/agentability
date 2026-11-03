@@ -34,6 +34,11 @@ export type SiteEvaluation = {
   paradox: boolean;
   checks: SiteCheck[];
   robots: RobotsPolicy[];
+  // False when robots.txt could not be read: an error status, or a web page
+  // (often the same bot challenge as the homepage) where the file should be.
+  // The policy is then unknown, not "allows everything", and anything that
+  // counts what sites say in robots.txt must leave these out.
+  robotsReadable?: boolean;
   signals: {
     llmsTxt: boolean;
     mcp: boolean;
@@ -305,7 +310,11 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
     });
 
     // --- A2: AI-crawler policy — 15 pts
-    const { policies, sitemaps } = robots.ok ? parseRobots(robots.text) : { policies: AI_BOTS.map((bot) => ({ bot, policy: "allowed" as const })), sitemaps: [] };
+    // A challenge page served with 200 is not a robots.txt either.
+    const robotsReadable = robots.ok && !/^\s*(<!doctype|<html)/i.test(robots.text) && !looksLikeBotWall(robots.text);
+    // Unreadable is scored as no rules, as RFC 9309 treats an unavailable file,
+    // but reported as unknown below rather than as an open door.
+    const { policies, sitemaps } = robotsReadable ? parseRobots(robots.text) : { policies: AI_BOTS.map((bot) => ({ bot, policy: "allowed" as const })), sitemaps: [] };
     const blocked = policies.filter((p) => p.policy === "blocked");
     const posture: SiteEvaluation["posture"] =
       blocked.length >= CLOSED_AT ? "closed" : blocked.length >= 1 ? "selective" : "open";
@@ -316,7 +325,9 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       points: posture === "open" ? 15 : posture === "selective" ? 8 : 0,
       maxPoints: 15,
       detail:
-        posture === "open"
+        !robotsReadable
+          ? `robots.txt could not be read (${robots.ok ? "a web page was served in its place" : `HTTP ${robots.status || "no answer"}`}), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file.`
+          : posture === "open"
           ? "robots.txt allows the major AI crawlers and agents."
           : `robots.txt blocks: ${blocked.map((b) => b.bot).join(", ")}.`,
     });
@@ -804,6 +815,7 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
       paradox,
       checks,
       robots: policies,
+      robotsReadable,
       signals: { llmsTxt, mcp, openapi, ucp: Boolean(ucp), structuredData, sitemap, parseableText: parseable },
       ...(platform ? { platform } : {}),
     };

@@ -1,20 +1,20 @@
 {
  "domain": "publi24.ro",
- "checkedAt": "2026-11-02T18:59:39.695Z",
+ "checkedAt": "2026-11-03T16:52:12.102Z",
  "status": "complete",
- "elapsedMs": 1934,
- "score": 45,
- "grade": "D",
+ "elapsedMs": 3065,
+ "score": 70,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 5467 chars and links."
   },
   {
    "id": "A2",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -104,7 +104,7 @@
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
@@ -112,16 +112,17 @@
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

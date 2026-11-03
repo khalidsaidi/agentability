@@ -1,20 +1,20 @@
 {
  "domain": "roku.com",
- "checkedAt": "2026-11-02T19:00:14.454Z",
+ "checkedAt": "2026-11-03T16:52:51.437Z",
  "status": "complete",
- "elapsedMs": 5824,
- "score": 65,
- "grade": "C",
+ "elapsedMs": 2975,
+ "score": 80,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 15673 chars and links."
   },
   {
    "id": "A2",
@@ -84,39 +84,40 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": false,
   "openapi": false,
   "ucp": false,

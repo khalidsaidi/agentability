@@ -1,10 +1,10 @@
 {
  "domain": "pluto.tv",
- "checkedAt": "2026-11-02T18:59:20.582Z",
+ "checkedAt": "2026-11-03T16:51:44.299Z",
  "status": "complete",
- "elapsedMs": 12985,
- "score": 75,
- "grade": "B",
+ "elapsedMs": 9557,
+ "score": 65,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~730 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~725 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

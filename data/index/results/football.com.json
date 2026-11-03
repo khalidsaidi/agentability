@@ -1,10 +1,10 @@
 {
  "domain": "football.com",
- "checkedAt": "2026-11-02T18:52:31.724Z",
+ "checkedAt": "2026-11-03T16:44:37.326Z",
  "status": "complete",
- "elapsedMs": 6488,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 4705,
+ "score": 55,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~9 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2225 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 0,
+   "points": 5,
    "maxPoints": 20,
-   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "Reached from homepage: legal/privacy."
   },
   {
    "id": "B1",
@@ -115,6 +115,7 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
@@ -122,6 +123,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

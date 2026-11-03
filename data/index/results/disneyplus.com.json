@@ -1,10 +1,10 @@
 {
  "domain": "disneyplus.com",
- "checkedAt": "2026-11-02T19:08:12.202Z",
+ "checkedAt": "2026-11-03T16:42:43.410Z",
  "status": "complete",
- "elapsedMs": 1391,
- "score": 50,
- "grade": "D",
+ "elapsedMs": 2491,
+ "score": 60,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3721 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~3726 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

@@ -1,9 +1,9 @@
 {
  "domain": "google.co.uk",
- "checkedAt": "2026-11-02T18:53:18.383Z",
+ "checkedAt": "2026-11-03T16:45:25.982Z",
  "status": "complete",
- "elapsedMs": 669,
- "score": 20,
+ "elapsedMs": 446,
+ "score": 30,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": false
  }
 }

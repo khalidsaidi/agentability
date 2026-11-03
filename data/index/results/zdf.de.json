@@ -1,10 +1,10 @@
 {
  "domain": "zdf.de",
- "checkedAt": "2026-11-02T19:06:02.851Z",
+ "checkedAt": "2026-11-03T16:58:24.973Z",
  "status": "complete",
- "elapsedMs": 4910,
- "score": 65,
- "grade": "C",
+ "elapsedMs": 2780,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~882 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~933 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -84,7 +84,7 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
@@ -96,11 +96,11 @@
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
@@ -108,20 +108,21 @@
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
    "policy": "allowed"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

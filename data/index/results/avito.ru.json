@@ -1,10 +1,10 @@
 {
  "domain": "avito.ru",
- "checkedAt": "2026-11-02T18:47:53.718Z",
+ "checkedAt": "2026-11-03T16:39:58.048Z",
  "status": "complete",
- "elapsedMs": 6539,
- "score": 55,
- "grade": "C",
+ "elapsedMs": 7026,
+ "score": 25,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~589 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy (/legal/). Link found but not confirmed: support/contact (support.avito.ru)."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing. Link found but not confirmed: support/contact (/request/720)."
   },
   {
    "id": "B1",
@@ -115,6 +115,7 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
@@ -122,6 +123,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

@@ -1,20 +1,20 @@
 {
  "domain": "cloudflare.com",
- "checkedAt": "2026-11-02T18:49:28.163Z",
+ "checkedAt": "2026-11-03T16:41:31.247Z",
  "status": "complete",
- "elapsedMs": 2120,
- "score": 100,
- "grade": "A",
+ "elapsedMs": 2426,
+ "score": 80,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 17168 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -59,10 +59,10 @@
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "skip",
-   "points": 0,
+   "status": "pass",
+   "points": 5,
    "maxPoints": 5,
-   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+   "detail": "Serves /.well-known/mcp.json."
   },
   {
    "id": "B2",
@@ -115,13 +115,14 @@
    "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
-  "llmsTxt": true,
-  "mcp": false,
+  "llmsTxt": false,
+  "mcp": true,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

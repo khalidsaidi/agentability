@@ -1,10 +1,10 @@
 {
  "domain": "coingecko.com",
- "checkedAt": "2026-11-02T18:49:33.352Z",
+ "checkedAt": "2026-11-03T16:41:36.403Z",
  "status": "complete",
- "elapsedMs": 3728,
- "score": 85,
- "grade": "A",
+ "elapsedMs": 2201,
+ "score": 80,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~16267 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~16159 words of visible text."
   },
   {
    "id": "A4",
@@ -59,10 +59,10 @@
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "pass",
-   "points": 5,
+   "status": "skip",
+   "points": 0,
    "maxPoints": 5,
-   "detail": "Serves /.well-known/mcp/server-card.json."
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
   },
   {
    "id": "B2",
@@ -115,9 +115,10 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
-  "mcp": true,
+  "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,

@@ -1,11 +1,11 @@
 {
  "domain": "allrecipes.com",
- "checkedAt": "2026-11-02T19:07:21.988Z",
+ "checkedAt": "2026-11-03T16:59:34.521Z",
  "status": "complete",
- "elapsedMs": 564,
- "score": 60,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 827,
+ "score": 25,
+ "grade": "F",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,26 +19,26 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, Perplexity-User."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1283 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact, legal/privacy."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
+  "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

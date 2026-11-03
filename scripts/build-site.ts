@@ -1007,16 +1007,23 @@ async function main() {
     // barely overlap. So the headline counts both, and shows the split, over
     // exactly the rows published.
     const n = summary.leaderboard.length;
-    let walled = 0, sayClosed = 0, both = 0, refusing = 0, wallSilent = 0;
+    let walled = 0, sayClosed = 0, both = 0, refusing = 0, wallSilent = 0, walledReadable = 0, robotsUnknown = 0;
     for (const r of summary.leaderboard) {
       const file = path.join(RESULTS_DIR, `${r.domain}.json`);
-      const w = fs.existsSync(file) ? isWalled(JSON.parse(fs.readFileSync(file, "utf8"))) : false;
+      const res = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : null;
+      const w = res ? isWalled(res) : false;
+      // Only a robots.txt that was actually read can say anything. Walled sites
+      // often wall the file too; counting those as "raises no objection" made
+      // the homepage claim 76% when half of them had never been read at all.
+      const readable = res?.robotsReadable === true;
       const c = r.posture === "closed";
       if (w) walled += 1;
       if (c) sayClosed += 1;
       if (w && c) both += 1;
       if (w || c) refusing += 1;
-      if (w && r.posture === "open") wallSilent += 1;
+      if (res?.robotsReadable === false) robotsUnknown += 1;
+      if (w && readable) walledReadable += 1;
+      if (w && readable && r.posture === "open") wallSilent += 1;
     }
     const pct = (k: number) => (n ? Math.round((100 * k) / n) : 0);
     summary.stats.pctClosed = pct(sayClosed);
@@ -1025,8 +1032,10 @@ async function main() {
     summary.stats.pctRefusing = pct(refusing);
     // Of the sites that wall, the share whose robots.txt raises no objection at
     // all: the wall is not the site saying no, it is the door being shut.
-    summary.stats.pctWallSilent = walled ? Math.round((100 * wallSilent) / walled) : 0;
-    console.log(`Refusals: ${refusing}/${n} (${pct(refusing)}%) — say closed ${sayClosed}, wall ${walled}, both ${both}`);
+    summary.stats.pctWallSilent = walledReadable ? Math.round((100 * wallSilent) / walledReadable) : 0;
+    summary.stats.walledReadable = walledReadable;
+    summary.stats.pctRobotsUnknown = pct(robotsUnknown);
+    console.log(`Refusals: ${refusing}/${n} (${pct(refusing)}%) — say closed ${sayClosed}, wall ${walled}, both ${both}; walls with a readable robots.txt ${walledReadable}, of which no objection ${wallSilent}`);
   }
 
   const history: Array<{ date: string } & Record<string, number>> = [];
@@ -1113,7 +1122,7 @@ they actually are for an agent.</p>
       <div class="score">${s ? s.pctWalled : 0}%</div>
       <span class="caption">of the ${s ? s.audited : ""} most-visited sites block an AI agent at the door</span>
     </div>
-    <p class="runline"><b>${s ? s.pctWallSilent : 0}%</b> of those never say so in robots.txt · <b>${s ? s.pctClosed : 0}%</b> say no in robots.txt · only <b>${s ? s.pctSayAndWall : 0}%</b> do both · <b>${s ? s.averageScore : 0}/100</b> average · today the agent finished <b>${latest.stats.completed}/${latest.stats.tasks}</b> errands and hit <b>${latest.stats.wallsHit}</b> bot walls</p>
+    <p class="runline"><b>${s ? s.pctClosed : 0}%</b> say no in robots.txt · <b>${s ? s.pctWallSilent : 0}%</b> of the walls we could check come with no objection to AI · <b>${s ? s.averageScore : 0}/100</b> average · today the agent finished <b>${latest.stats.completed}/${latest.stats.tasks}</b> errands and hit <b>${latest.stats.wallsHit}</b> bot walls</p>
   </div>
   <div class="stripwrap">${resultStrip(latest, `/fieldtest/${latest.date}/`)}</div>
 </div>
@@ -1588,7 +1597,7 @@ answer the question this site asks, because it was not the web people actually u
 <thead><tr><th>Check</th><th>What &amp; why</th><th class="num">Points</th></tr></thead>
 <tbody>
 <tr><td><span class="chip">A1</span></td><td><b>llms.txt</b> — the llmstxt.org convention: a curated, plain-text entry point for AI readers. Substantive file with links required.</td><td class="num">15</td></tr>
-<tr><td><span class="chip">A2</span></td><td><b>AI-crawler policy</b> — robots.txt rules for five crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot) and three fetchers that run when a person asks an assistant something (Claude-User, ChatGPT-User, Perplexity-User). Open access scores full points; blocking at least two-thirds of them scores zero and is labeled “closed by policy”. That is the site&rsquo;s stated policy, not enforcement: robots.txt is a request, and some person-triggered fetchers say they do not honour it. Whether a site actually keeps a plain fetch out is A3, and that is the headline: it is what an agent meets. The two are shown side by side and never added together, because a robots.txt refusal is a choice and a wall is often a default the site never chose, and because the sites that do one are almost never the sites that do the other.</td><td class="num">15</td></tr>
+<tr><td><span class="chip">A2</span></td><td><b>AI-crawler policy</b> — robots.txt rules for five crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot) and three fetchers that run when a person asks an assistant something (Claude-User, ChatGPT-User, Perplexity-User). Open access scores full points; blocking at least two-thirds of them scores zero and is labeled “closed by policy”. That is the site&rsquo;s stated policy, not enforcement: robots.txt is a request, and some person-triggered fetchers say they do not honour it. Whether a site actually keeps a plain fetch out is A3, and that is the headline: it is what an agent meets. The two are shown side by side and never added together, because a robots.txt refusal is a choice and a wall is often a default the site never chose, and because the sites that do one are rarely the sites that do the other. One limit on the policy side: ${s ? s.pctRobotsUnknown : 0}% of these sites serve a robots.txt that cannot be read &mdash; an error, or the same bot challenge as the homepage &mdash; so their policy is unknown and the robots.txt figures are a floor, not a total. The comparison between policy and walls only counts sites whose robots.txt was actually read.</td><td class="num">15</td></tr>
 <tr><td><span class="chip">A3</span></td><td><b>Content readable without a browser</b> — a plain fetch of the homepage must yield real text, not a JavaScript wall or a bot challenge. Agents don't run your SPA.</td><td class="num">25</td></tr>
 <tr><td><span class="chip">A4</span></td><td><b>Structured data</b> — valid schema.org JSON-LD so machines learn what the entity is.</td><td class="num">15</td></tr>
 <tr><td><span class="chip">A5</span></td><td><b>Sitemap</b> — advertised in robots.txt or served at /sitemap.xml.</td><td class="num">10</td></tr>

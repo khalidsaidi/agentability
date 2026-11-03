@@ -1,11 +1,11 @@
 {
  "domain": "zeit.de",
- "checkedAt": "2026-11-02T19:06:04.849Z",
+ "checkedAt": "2026-11-03T16:58:25.509Z",
  "status": "complete",
- "elapsedMs": 6777,
- "score": 15,
- "grade": "Closed by policy",
- "posture": "closed",
+ "elapsedMs": 11791,
+ "score": 20,
+ "grade": "F",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Perplexity-User."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "blocked"
+   "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }

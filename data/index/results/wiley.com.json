@@ -1,10 +1,10 @@
 {
  "domain": "wiley.com",
- "checkedAt": "2026-11-02T19:11:40.663Z",
+ "checkedAt": "2026-11-03T16:57:47.280Z",
  "status": "complete",
- "elapsedMs": 1001,
- "score": 60,
- "grade": "C",
+ "elapsedMs": 7724,
+ "score": 50,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (a web page was served in its place), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

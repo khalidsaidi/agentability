@@ -1,10 +1,10 @@
 {
  "domain": "uscis.gov",
- "checkedAt": "2026-11-02T19:03:58.094Z",
+ "checkedAt": "2026-11-03T16:56:28.266Z",
  "status": "complete",
- "elapsedMs": 1096,
- "score": 50,
- "grade": "D",
+ "elapsedMs": 1073,
+ "score": 60,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~950 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~952 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

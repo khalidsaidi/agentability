@@ -1,10 +1,10 @@
 {
  "domain": "ecosia.org",
- "checkedAt": "2026-11-02T18:51:13.433Z",
+ "checkedAt": "2026-11-03T16:43:19.710Z",
  "status": "complete",
- "elapsedMs": 683,
- "score": 15,
- "grade": "F",
+ "elapsedMs": 1561,
+ "score": 70,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,23 +22,23 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~333 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "Reached from homepage: pricing (/pricing), support/contact (support.ecosia.org), legal/privacy (/privacy)."
   },
   {
    "id": "B1",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": false,
-  "parseableText": false
+  "parseableText": true
  }
 }

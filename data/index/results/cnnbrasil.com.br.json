@@ -1,10 +1,10 @@
 {
  "domain": "cnnbrasil.com.br",
- "checkedAt": "2026-11-02T18:49:31.744Z",
+ "checkedAt": "2026-11-03T17:00:16.861Z",
  "status": "complete",
- "elapsedMs": 13135,
- "score": 65,
- "grade": "C",
+ "elapsedMs": 1509,
+ "score": 70,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2351 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2316 words of visible text."
   },
   {
    "id": "A4",
@@ -43,18 +43,18 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 5,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact, legal/privacy (/privacidade/)."
+   "detail": "Reached from homepage: legal/privacy (/privacidade/)."
   },
   {
    "id": "B1",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

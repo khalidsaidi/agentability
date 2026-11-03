@@ -1,9 +1,9 @@
 {
  "domain": "google.de",
- "checkedAt": "2026-11-02T18:53:19.564Z",
+ "checkedAt": "2026-11-03T16:45:26.428Z",
  "status": "complete",
- "elapsedMs": 700,
- "score": 30,
+ "elapsedMs": 714,
+ "score": 20,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }

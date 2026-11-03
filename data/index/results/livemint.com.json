@@ -1,9 +1,9 @@
 {
  "domain": "livemint.com",
- "checkedAt": "2026-11-02T18:56:23.711Z",
+ "checkedAt": "2026-11-03T16:48:38.197Z",
  "status": "complete",
- "elapsedMs": 2227,
- "score": 95,
+ "elapsedMs": 1506,
+ "score": 85,
  "grade": "A",
  "posture": "open",
  "paradox": false,
@@ -11,10 +11,10 @@
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 11366 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2806 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2650 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "pass",
-   "points": 15,
+   "points": 20,
    "maxPoints": 20,
-   "detail": "Reached from homepage: pricing (/gold-prices), support/contact (/contact-us), legal/privacy (/privacy-policy)."
+   "detail": "Reached from homepage: pricing (/gold-prices), support/contact (/contact-us), docs/api, legal/privacy (/privacy-policy)."
   },
   {
    "id": "B1",
@@ -115,8 +115,9 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,

@@ -1,11 +1,11 @@
 {
  "domain": "theglobeandmail.com",
- "checkedAt": "2026-11-02T19:02:43.478Z",
+ "checkedAt": "2026-11-03T16:55:14.790Z",
  "status": "complete",
- "elapsedMs": 6404,
- "score": 70,
- "grade": "B",
- "posture": "open",
+ "elapsedMs": 2764,
+ "score": 65,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~12374 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~13800 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -84,44 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

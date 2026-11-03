@@ -1,10 +1,10 @@
 {
  "domain": "eatingwell.com",
- "checkedAt": "2026-11-02T18:51:02.444Z",
+ "checkedAt": "2026-11-03T16:43:10.136Z",
  "status": "complete",
- "elapsedMs": 1188,
- "score": 15,
- "grade": "F",
+ "elapsedMs": 932,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,39 +22,39 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~1084 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact, legal/privacy."
   },
   {
    "id": "B1",
@@ -115,13 +115,14 @@
    "policy": "allowed"
   }
  ],
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
-  "sitemap": false,
-  "parseableText": false
+  "structuredData": true,
+  "sitemap": true,
+  "parseableText": true
  }
 }

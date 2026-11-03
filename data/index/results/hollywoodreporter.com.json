@@ -1,9 +1,9 @@
 {
  "domain": "hollywoodreporter.com",
- "checkedAt": "2026-11-02T18:53:39.132Z",
+ "checkedAt": "2026-11-03T16:45:49.280Z",
  "status": "complete",
- "elapsedMs": 4945,
- "score": 60,
+ "elapsedMs": 5087,
+ "score": 50,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2579 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2571 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": true,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": true
  }
 }

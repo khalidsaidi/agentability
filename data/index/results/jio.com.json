@@ -1,20 +1,20 @@
 {
  "domain": "jio.com",
- "checkedAt": "2026-11-02T18:54:54.294Z",
+ "checkedAt": "2026-11-03T16:47:08.861Z",
  "status": "complete",
- "elapsedMs": 8464,
- "score": 78,
- "grade": "B",
+ "elapsedMs": 8326,
+ "score": 63,
+ "grade": "C",
  "posture": "selective",
  "paradox": false,
  "checks": [
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Present with 7800 chars and links."
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
   },
   {
    "id": "A2",
@@ -115,8 +115,9 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
-  "llmsTxt": true,
+  "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,

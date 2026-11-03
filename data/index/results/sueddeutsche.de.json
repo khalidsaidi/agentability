@@ -1,10 +1,10 @@
 {
  "domain": "sueddeutsche.de",
- "checkedAt": "2026-11-02T19:02:04.629Z",
+ "checkedAt": "2026-11-03T16:54:35.383Z",
  "status": "complete",
- "elapsedMs": 8474,
- "score": 38,
- "grade": "F",
+ "elapsedMs": 8980,
+ "score": 48,
+ "grade": "D",
  "posture": "selective",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3990 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~4117 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -115,13 +115,14 @@
    "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

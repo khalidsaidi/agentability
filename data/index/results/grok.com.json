@@ -1,11 +1,11 @@
 {
  "domain": "grok.com",
- "checkedAt": "2026-11-02T18:53:23.354Z",
+ "checkedAt": "2026-11-03T16:45:31.731Z",
  "status": "complete",
- "elapsedMs": 1912,
- "score": 45,
- "grade": "D",
- "posture": "open",
+ "elapsedMs": 892,
+ "score": 38,
+ "grade": "F",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, ChatGPT-User."
   },
   {
    "id": "A3",
@@ -84,37 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,

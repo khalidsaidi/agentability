@@ -1,11 +1,11 @@
 {
  "domain": "tagesschau.de",
- "checkedAt": "2026-11-02T19:02:21.510Z",
+ "checkedAt": "2026-11-03T16:54:49.271Z",
  "status": "complete",
- "elapsedMs": 2367,
- "score": 65,
+ "elapsedMs": 2799,
+ "score": 58,
  "grade": "C",
- "posture": "open",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~2251 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2096 words of visible text."
   },
   {
    "id": "A4",
@@ -84,37 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
