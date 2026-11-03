@@ -390,7 +390,12 @@ export async function evaluateSite(domain: string): Promise<SiteEvaluation> {
         name: "pricing",
         words: ["pricing", "prices", "price", "plans", "tarif", "tarifs", "tarife", "preise", "preis",
           "precios", "precio", "prezzi", "prezzo", "priser", "prijzen", "cennik", "abonnements",
-          "abonnemang", "hinnasto", "hinnat", "priser", "precos"],
+          "abonnemang", "hinnasto", "hinnat", "priser", "precos",
+          // A bank's price list is its rates and fees. Without these, Wells
+          // Fargo linking /mortgage/rates/ from its homepage scored as having
+          // no pricing at all — raised by a reader asking why banks hide
+          // public mortgage rates.
+          "rates", "fees", "taxas", "tarifas", "tasas", "taux", "tassi"],
       },
       {
         name: "support/contact",

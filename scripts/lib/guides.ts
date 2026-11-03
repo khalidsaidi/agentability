@@ -61,7 +61,9 @@ ${curl("curl -s https://yourdomain.com/llms.txt | head -20")}
 all of them is a legitimate stance — we label it "closed by policy" and report it as one — but do it knowingly. Two
 things to know: <b>Claude-User</b> and similar agents fetch on behalf of a person who asked, which is different from a
 training crawler; and publishing <code>llms.txt</code> while blocking two or more of them is a contradiction we flag as
-the <b>paradox</b>. ${ctx.pctBlockingSomeAI}% of the panel blocks at least one crawler; ${ctx.pctClosed}% blocks at least two-thirds of them, which is what we call closed.</p>
+the <b>paradox</b>. One that catches people out: blocking <b>Google-Extended</b> stops Google using your pages
+for Gemini, but it does not take you out of Google's AI Overviews, which are built from ordinary Googlebot. The
+New York Times blocks the first and allows the second, which is why Google can still summarise its articles. ${ctx.pctBlockingSomeAI}% of the panel blocks at least one crawler; ${ctx.pctClosed}% blocks at least two-thirds of them, which is what we call closed.</p>
 ${curl("curl -s https://yourdomain.com/robots.txt | grep -iA2 'gptbot\\|claudebot\\|claude-user\\|perplexitybot\\|google-extended\\|ccbot'")}
 
 <h3>A3 · Make the homepage readable without a browser <span class="pts">25 points</span></h3>

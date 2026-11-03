@@ -21,7 +21,7 @@
 // before each fix (git show <commit>^:scripts/lib/evaluate-site.ts):
 //
 //   proven  marksandspencer.com, iltalehti.fi, biblegateway.com, ups.com,
-//           morningstar.com, battle.net — these fail on the old code, so they
+//           morningstar.com, battle.net, wellsfargo.com — these fail on the old code, so they
 //           would have caught the bug they encode.
 //   guard   fortune.com, lemonde.fr, stripe.com, gymshark.com, apify.com — these
 //           pass on the old code too. Not because the bug was absent, but because
@@ -117,6 +117,18 @@ const FIXTURES: Fixture[] = [
     what: "an MCP server card on the current spec path must be credited",
     caught: "2026-10-25: B1 probed only /.well-known/mcp.json and told Apify they had no MCP server",
     assert: (r) => (r.signals.mcp ? null : "MCP server card not detected"),
+  },
+  {
+    domain: "wellsfargo.com",
+    what: "a bank's rates page is its pricing",
+    caught: "2026-11-03: linked /mortgage/rates/ and /help/rates/ from its homepage and scored as having no pricing; a Reddit reader asked why banks hide public rates",
+    assert: (r) => (/pricing \(/.test(detail(r)) ? null : "rates page not credited as pricing"),
+  },
+  {
+    domain: "bloomberg.com",
+    what: "a finance news site's markets section is not a price list",
+    caught: "2026-11-03: guard added with the bank words, so 'rates' cannot start crediting news coverage of interest rates",
+    assert: (r) => (/pricing \(/.test(detail(r)) ? "a news section credited as pricing" : null),
   },
 ];
 
