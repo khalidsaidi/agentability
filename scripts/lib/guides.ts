@@ -30,7 +30,7 @@ export const GUIDES: Guide[] = [
     title: "AI SEO Checklist: 9 Checks AI Agents Run on Your Site",
     description:
       "An AI readiness audit checklist you can run yourself in an hour: the nine checks that decide whether AI agents can read, understand and act on your site — llms.txt, crawler policy, readable HTML, structured data, sitemap, reachable pricing and support, MCP, OpenAPI and UCP — each with a 60-second curl test and the exact fix.",
-    updated: "2026-09-14",
+    updated: "2026-11-03",
     body: (ctx) => `
 <p class="lede">AI agents are the web's newest audience, and most sites fail them in the same handful of ways. This is the
 checklist we score the ${ctx.audited} most-visited sites on the web against every week — the same nine checks, in the same order, with a

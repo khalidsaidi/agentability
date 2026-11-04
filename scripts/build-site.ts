@@ -48,7 +48,7 @@ const SITE = "https://agentability.org";
 const ISSUE_NEW = "https://github.com/khalidsaidi/agentability/issues/new?template=audit-request.yml";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
 // Bump when evergreen copy (methodology, docs, support, privacy) changes; it feeds sitemap lastmod.
-const SITE_CONTENT_UPDATED = "2026-09-14";
+const SITE_CONTENT_UPDATED = "2026-11-03";
 // A daily feed that carries every episode ever grows without bound and readers
 // re-download it on every poll. Thirty is roughly a month of the show.
 const FEED_ITEMS = 30;
@@ -1185,7 +1185,7 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
     shell({
       title: "Agentability — can AI agents actually use the web?",
       description: latest
-        ? `An open experiment, run weekly in public: a real AI agent attempts ten everyday web errands and every transcript is published verbatim. This week it finished ${latest.stats.completed} of ${latest.stats.tasks} and hit ${latest.stats.wallsHit} bot walls. Plus the ${s ? s.audited : ""} most-visited sites on the web scored for AI-agent readiness.`
+        ? `${s ? s.pctWalled : 0}% of the ${s ? s.audited : ""} most-visited sites block AI agents at the door. A real AI agent also runs everyday web errands each day, every transcript published: ${latest.stats.completed} of ${latest.stats.tasks} finished in the latest episode. Free AI visibility scores for every site.`
         : "An open experiment: a real AI agent attempts everyday web errands each week with every transcript published verbatim, alongside an index of well-known sites scored for AI-agent readiness.",
       canonicalPath: "/",
       body: landingBody,
@@ -1658,7 +1658,7 @@ transcript? Open an issue — everything is versioned in public.</p>`;
     path.join(OUT, "methodology/index.html"),
     shell({
       title: "Methodology — Agentability",
-      description: "How the AI-Readiness Index scores sites: eight reproducible checks against real 2026 conventions.",
+      description: "How the AI-Readiness Index scores sites: nine reproducible checks against real 2026 conventions.",
       canonicalPath: "/methodology/",
       body: methodologyBody,
     }),
@@ -1794,10 +1794,9 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
 <p class="lede">Attribution: link to <a href="/ai-index/">the Index</a> or the per-site report you're citing.</p>`;
   const supportBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
-<h1>Check your site&rsquo;s AI-agent readiness</h1>
-<p class="lede">Ask us to audit any site against the same nine checks as the <a href="/ai-index/">Index</a> &mdash; free, no
-signup, and the report is published in public like everyone else&rsquo;s. You can also dispute a score or have it re-run
-after a fix.</p>
+<h1>Free AI SEO audit: can AI agents read your site?</h1>
+<p class="lede">Ask us to audit any site against the same nine checks as the <a href="/ai-index/">Index</a>. It&rsquo;s free,
+and the report is published in public like everyone else&rsquo;s. You can also dispute a score or have it re-run after a fix.</p>
 <p class="lede"><b>Request an audit</b> — open an
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&amp;labels=audit-request">audit
 request issue</a> and we add your domain to <code>data/index/submitted.txt</code>, which the weekly run merges &mdash; so it joins the next one. You can also PR the line yourself into either that file or <code>data/index/domains.txt</code> and skip the wait on us. Submissions go through the same porn, piracy and gambling filter as everything else; a submission buys an audit, not a place past the rules.</p>
@@ -1822,15 +1821,14 @@ and publish only what those public files say. To remove a domain from the Index,
 <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
   const smallPages: Array<{ dir: string; title: string; description: string; body: string }> = [
     { dir: "docs", title: "Data docs — Agentability", description: "How to use the AI-Readiness Index open data: JSON endpoints, history snapshots, and raw per-site results.", body: docsBody },
-    // Titled for what people search, not for what the page is filed under. It
-    // was "Support — Agentability", which no one searches: the queries landing
-    // near this site are "ai readiness checker", "ai agent readiness test",
-    // "ai crawlability audit checklist". The URL is unchanged.
+    // Same rule as the guides (913f3169): the title leads with the terms Trends
+    // shows people search, ai seo and ai agents. "Agent readiness" measured 0x.
+    // Not "no signup": a request is a GitHub issue, which takes an account.
     {
       dir: "support",
-      title: "Check your site's AI-agent readiness — free audit, no signup",
+      title: "Free AI SEO Audit: Can AI Agents Read Your Site?",
       description:
-        "Ask us to audit any site for AI-agent readiness: llms.txt, AI-crawler policy, readable content, structured data, MCP. Free, no signup, every check reproducible. Also: dispute a score or get it re-run after a fix.",
+        "Request a free AI SEO audit of any site: can AI agents read it? We check llms.txt, AI crawler access, readable HTML and structured data, then publish its AI visibility score. Dispute a score or get a re-run here too.",
       body: supportBody,
     },
     { dir: "privacy", title: "Privacy — Agentability", description: "No analytics, no cookies, no accounts. Audits use only public surfaces.", body: privacyBody },
