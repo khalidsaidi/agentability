@@ -784,6 +784,26 @@ function renderReport(raw: string): string {
   return out.join("") || `<p>${inline(safe)}</p>`;
 }
 
+// Domains whose homepage turned a plain fetch away in the latest run; filled in
+// main() before any page renders. The wall finding is the site's headline, and
+// report pages are the pages that rank, so they have to carry it too.
+const walledDomains = new Set<string>();
+
+// The model's verdict per domain with the hand corrections applied. Read once for
+// /shops/ and once for the report pages, which link to it.
+function readCommerceVerdicts(): Record<string, string> {
+  if (!fs.existsSync(COMMERCE_PATH)) return {};
+  const verdicts: Record<string, string> = JSON.parse(fs.readFileSync(COMMERCE_PATH, "utf8"));
+  if (fs.existsSync(COMMERCE_OVERRIDES_PATH)) {
+    const ov = JSON.parse(fs.readFileSync(COMMERCE_OVERRIDES_PATH, "utf8")) as Record<string, unknown>;
+    for (const [domain, v] of Object.entries(ov)) {
+      if (domain.startsWith("_")) continue;
+      verdicts[domain] = typeof v === "string" ? v : ((v as { verdict?: string }).verdict ?? verdicts[domain]);
+    }
+  }
+  return verdicts;
+}
+
 const FIELD_FAQ: Array<{ q: string; a: string }> = [
   {
     q: "Can AI agents actually use websites in 2026?",
@@ -791,7 +811,7 @@ const FIELD_FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Is the Agent Field Test edited or scripted?",
-    a: "No. An AI producer invents the tasks (grounded in that week's news), a separate AI agent attempts them with read-only web access, and the transcripts are published exactly as they happened — failures included. No human writes, selects, or edits an episode.",
+    a: "No. An AI producer invents the tasks (grounded in that day's news), a separate AI agent attempts them with read-only web access, and the transcripts are published exactly as they happened — failures included. No human writes, selects, or edits an episode.",
   },
   {
     q: "Which websites block AI agents?",
@@ -1012,6 +1032,7 @@ async function main() {
       const file = path.join(RESULTS_DIR, `${r.domain}.json`);
       const res = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : null;
       const w = res ? isWalled(res) : false;
+      if (w) walledDomains.add(r.domain);
       // Only a robots.txt that was actually read can say anything. Walled sites
       // often wall the file too; counting those as "raises no objection" made
       // the homepage claim 76% when half of them had never been read at all.
@@ -1035,6 +1056,11 @@ async function main() {
     summary.stats.pctWallSilent = walledReadable ? Math.round((100 * wallSilent) / walledReadable) : 0;
     summary.stats.walledReadable = walledReadable;
     summary.stats.pctRobotsUnknown = pct(robotsUnknown);
+    const blockFaq = FIELD_FAQ.find((f) => f.q === "Which websites block AI agents?");
+    if (blockFaq) {
+      const named = ["etsy.com", "expedia.com", "hilton.com", "quora.com", "apnews.com", "fiverr.com"].filter((d) => walledDomains.has(d));
+      blockFaq.a = `In our latest audit of the ${n} most-visited sites, ${pct(walled)}% block a plain AI agent at the door with a bot challenge or a refusal${named.length ? `, including ${named.slice(0, 4).join(", ")}` : ""}. Separately, ${pct(sayClosed)}% block most AI bots in robots.txt. They are rarely the same sites. Look up any site on the <a href="/ai-index/">AI-Readiness Index</a>.`;
+    }
     console.log(`Refusals: ${refusing}/${n} (${pct(refusing)}%) — say closed ${sayClosed}, wall ${walled}, both ${both}; walls with a readable robots.txt ${walledReadable}, of which no objection ${wallSilent}`);
   }
 
@@ -1129,18 +1155,18 @@ they actually are for an agent.</p>
 <div class="hero-actions rise d4">
   <a class="hero-cta" href="/fieldtest/${latest.date}/">Read today's transcripts →</a>
   <a class="hero-alt" href="/ai-index/">See all ${s ? s.audited : ""} site scores</a>
-  ${shareBtn(SITE, "Can AI agents actually use the web? Agentability tests it in public, every week.")}
+  ${shareBtn(SITE, "Can AI agents actually use the web? Agentability tests it in public, every day.")}
 </div>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
-<a href="/support/">get yours audited, free</a> · <a href="/docs/">take the raw data</a></p>
+<a href="/shops/">see if AI can shop these stores</a> · <a href="/support/">get yours audited, free</a> · <a href="/docs/">take the raw data</a></p>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
 <h2>Where it got interesting</h2>
 ${segCards(latest)}`
     : `
 <p class="eyebrow"><span class="live"></span>Agentability · an open experiment on the agentic web</p>
 <h1>Can AI agents <span class="hl">actually</span> use the web?</h1>
-<p class="lede"><b>We find out in public, every week.</b> An AI producer invents ten everyday errands, a real AI agent
+<p class="lede"><b>We find out in public, every day.</b> An AI producer invents ten everyday errands, a real AI agent
 attempts them with read-only web access, and every transcript is published verbatim — wins and failures alike. The
 first episode is in production.</p>`;
   // Only worth splitting the table when the two halves can't overlap.
@@ -1177,7 +1203,7 @@ of any site — it's free and takes one issue.</div>`
     : ""}
 <h2>Why this exists</h2>
 <p class="lede">Agents are the web's newest audience: assistants that read pages, cite sources, and run errands for
-people. Whether the web actually works for them is an empirical question — so we test it, in public, every week,
+people. Whether the web actually works for them is an empirical question — so we test it, in public, every day,
 with verbatim transcripts, reproducible checks, and open data. History accrues weekly${history.length > 1 ? ` (${history.length} snapshots so far)` : ""}.</p>`;
 
   await fsp.writeFile(
@@ -1185,8 +1211,8 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
     shell({
       title: "Agentability — can AI agents actually use the web?",
       description: latest
-        ? `${s ? s.pctWalled : 0}% of the ${s ? s.audited : ""} most-visited sites block AI agents at the door. A real AI agent also runs everyday web errands each day, every transcript published: ${latest.stats.completed} of ${latest.stats.tasks} finished in the latest episode. Free AI visibility scores for every site.`
-        : "An open experiment: a real AI agent attempts everyday web errands each week with every transcript published verbatim, alongside an index of well-known sites scored for AI-agent readiness.",
+        ? `${s ? s.pctWalled : 0}% of the ${s ? s.audited : ""} most-visited sites block AI agents at the door. A real AI agent also runs web errands every day, every transcript published: ${latest.stats.completed} of ${latest.stats.tasks} finished in the latest episode. Free AI visibility scores for every site.`
+        : "An open experiment: a real AI agent attempts everyday web errands each day with every transcript published verbatim, alongside an index of well-known sites scored for AI-agent readiness.",
       canonicalPath: "/",
       body: landingBody,
       jsonLd: {
@@ -1212,13 +1238,13 @@ with verbatim transcripts, reproducible checks, and open data. History accrues w
         // Search Console says the demand is "ai agent readiness checker / checklist /
         // assessment" — queries this page answers but never said the words for.
         title: "AI Agent Readiness Checker — look up any site's score",
-        description: `Check how ready any site is for AI agents: llms.txt, AI-crawler policy, readable content, structured data, MCP. ${s.audited} sites scored, ${failShare}% under 55/100. Free, updated ${generated}.`,
+        description: `Check how ready any site is for AI agents: llms.txt, AI-crawler policy, readable content, structured data, MCP. ${s.audited} sites scored, ${s.pctWalled}% block AI agents at the door. Free, updated ${generated}.`,
         canonicalPath: "/ai-index/",
         body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · AI-Readiness Index · updated ${generated}</p>
 <h1>AI agent readiness checker</h1>
 <p class="lede">The AI-Readiness Index: the ${s.audited} most-visited sites on the web — plus any site someone asked us to score —
-each measured on how usable it actually is for an AI agent. Average ${s.averageScore}/100. Checks: llms.txt, AI-crawler policy,
+each measured on how usable it actually is for an AI agent. ${s.pctWalled}% block an AI agent at the door and ${s.pctClosed}% say no in robots.txt. Average ${s.averageScore}/100. Checks: llms.txt, AI-crawler policy,
 content parseability, structured data, sitemap, task reachability, plus MCP/OpenAPI bonuses — <a href="/methodology/">methodology</a>.</p>
 <div class="lookup">
   <input id="sitefind" type="search" placeholder="Type a domain — cursor.com, bbc.co.uk, shopify.com…" autocomplete="off" spellcheck="false" aria-label="Find a site in the index">
@@ -1309,6 +1335,7 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
     // page. janitorai.com was judged "porn" and was still served at
     // /ai-index/site/janitorai.com/ until this check existed.
     const contentVerdicts = readVerdicts();
+    const commerceVerdicts = readCommerceVerdicts();
     const files = (await fsp.readdir(RESULTS_DIR)).filter((f) => f.endsWith(".json"));
     const filteredDomains: string[] = [];
     for (const file of files) {
@@ -1332,7 +1359,9 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
 </tr>`
         )
         .join("\n");
-      const robotsRow = r.robots.length
+      const robotsRow = r.robotsReadable === false
+        ? `<p style="margin-top:8px"><span class="chip" title="robots.txt policy">robots.txt: could not be read, policy unknown</span></p>`
+        : r.robots.length
         ? `<p style="margin-top:8px">${r.robots
             .map((p: any) => `<span class="chip" title="robots.txt policy">${esc(p.bot)}: ${esc(p.policy)}</span>`)
             .join(" ")}</p>`
@@ -1354,13 +1383,15 @@ ${summary.unreachable.length ? `<p style="margin-top:14px;color:#667085;font-siz
           // page: lead with the question someone would actually ask about a site,
           // and put the score where it reads as an answer.
           title: `Is ${r.domain} ready for AI agents? ${r.score}/100`,
-          description: `${r.domain} scores ${r.score}/100 (${r.grade}) for AI-agent readiness — ${
+          description: `${isWalled(r) ? `${r.domain} blocks AI agents at the door: a plain fetch gets a wall, not the page. ` : ""}${r.domain} scores ${r.score}/100 (${r.grade}) for AI-agent readiness — ${
             r.checks.filter((c: any) => c.status === "pass").length
           } of ${r.checks.length} checks passed${r.paradox ? ", and it publishes llms.txt while blocking AI crawlers" : ""}. Can an agent read it, and what would it take to fix? Free check-by-check report.`,
           canonicalPath: `/ai-index/site/${r.domain}/`,
           body: `
 <p class="eyebrow"><a href="/ai-index/" style="text-decoration:none;color:inherit">← AI-Readiness Index</a></p>
 <h1>${esc(r.domain)}</h1>
+${isWalled(r) ? `<p class="lede"><b>${esc(r.domain)} blocks AI agents at the door.</b> In our latest audit, a plain fetch of its homepage got a bot challenge or a refusal, not the page. ${r.robotsReadable === false ? "Its robots.txt could not be read either, so its stated AI policy is unknown." : r.posture === "open" ? "Its robots.txt raises no objection to AI, so this wall is not a stated policy." : "Its robots.txt also restricts AI bots."}</p>` : ""}
+${commerceVerdicts[r.domain] === "shop" ? `<p class="lede">It is one of the <a href="/shops/">online shops we score for AI shopping agents</a>.</p>` : ""}
 <p><span class="scorebig" style="color:${scoreColor(r.score)}">${r.score}</span><span style="color:#667085">/100</span>
 &nbsp; <span class="chip">${esc(r.grade)}</span>${rank ? ` <span class="chip">#${rank} of ${s.audited}</span>` : ""}
 ${r.paradox ? ' <span class="chip paradox">the paradox: courts AI, blocks AI</span>' : ""}</p>
@@ -1493,53 +1524,45 @@ free, updated weekly.</div>`,
   // has — no new per-site URLs, because moving or duplicating those has cost
   // this site its search traffic once before.
   if (summary && s && fs.existsSync(COMMERCE_PATH)) {
-    const verdicts: Record<string, string> = JSON.parse(await fsp.readFile(COMMERCE_PATH, "utf8"));
-    if (fs.existsSync(COMMERCE_OVERRIDES_PATH)) {
-      const ov = JSON.parse(await fsp.readFile(COMMERCE_OVERRIDES_PATH, "utf8")) as Record<string, unknown>;
-      let applied = 0;
-      for (const [domain, v] of Object.entries(ov)) {
-        if (domain.startsWith("_")) continue;
-        verdicts[domain] = typeof v === "string" ? v : ((v as { verdict?: string }).verdict ?? verdicts[domain]);
-        applied += 1;
-      }
-      console.log(`Commerce overrides applied: ${applied}`);
-    }
+    const verdicts = readCommerceVerdicts();
     const shops = summary.leaderboard.filter((r) => verdicts[r.domain] === "shop");
     if (shops.length) {
       const withUcp = shops.filter((r) => r.ucp);
       const shopify = shops.filter((r) => r.platform === "Shopify");
       const ucpNotShopify = withUcp.filter((r) => r.platform !== "Shopify");
       const shopsClosed = shops.filter((r) => r.posture === "closed");
+      const shopsWalled = shops.filter((r) => walledDomains.has(r.domain));
       const avg = Math.round(shops.reduce((acc, r) => acc + r.score, 0) / shops.length);
       await fsp.mkdir(path.join(OUT, "shops"), { recursive: true });
       await fsp.writeFile(
         path.join(OUT, "shops/index.html"),
         shell({
-          title: "Agentic commerce readiness — can an AI agent buy from these shops?",
-          description: `${shops.length} online shops scored on whether an AI agent can read them and check out. ${withUcp.length} publish a UCP profile. Average ${avg}/100. Free, updated ${generated}.`,
+          title: `AI Shopping Agents: Can They Buy From These ${shops.length} Shops?`,
+          description: `Agentic commerce readiness of ${shops.length} online shops: ${Math.round((100 * shopsWalled.length) / shops.length)}% block AI agents at the door and ${withUcp.length} publish a Universal Commerce Protocol (UCP) profile. Free, updated ${generated}.`,
           canonicalPath: "/shops/",
           body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Agentic commerce · updated ${generated}</p>
-<h1>Can an AI agent buy from these shops?</h1>
-<p class="lede">${shops.length} of the ${s.audited} sites we have audited sell something. These are their scores, plus whether
-they publish a <a href="https://ucp.dev/" rel="nofollow">UCP</a> profile — the one agentic-commerce standard that can be
-verified from outside. Average ${avg}/100.</p>
+<h1>Can AI shopping agents buy from these shops?</h1>
+<p class="lede">${shops.length} of the ${s.audited} sites we have audited sell something. ${Math.round((100 * shopsWalled.length) / shops.length)}% of them block an AI agent at the door, before it sees a single product. These are their scores, plus whether
+they publish a <a href="https://ucp.dev/" rel="nofollow">Universal Commerce Protocol (UCP)</a> profile — the one agentic-commerce standard that can be
+verified from outside. We read these sites and do not attempt a purchase, so a good score means an agent can get in and read, not that it can check out. Average ${avg}/100.</p>
 
 <div class="meter2">
   <div><b>${shops.length}</b><span>shops audited</span></div>
   <div><b>${withUcp.length}</b><span>publish a UCP profile</span></div>
+  <div><b>${shopsWalled.length}</b><span>block AI agents at the door</span></div>
   <div><b>${shopsClosed.length}</b><span>closed to AI agents by policy</span></div>
   <div><b>${avg}/100</b><span>average score</span></div>
 </div>
 
-<p class="lede" style="margin-top:26px"><b>${ucpNotShopify.length === withUcp.length ? "Every UCP profile here was published deliberately." : "Read the UCP column with care."}</b>
+<p class="lede" style="margin-top:26px"><b>Read the UCP column with care.</b>
 Shopify publishes a UCP profile on behalf of its merchants, so on a panel of Shopify stores this column would mostly be
 reporting who uses Shopify. ${shopify.length
   ? `${shopify.length} shop${shopify.length === 1 ? " here is" : "s here are"} on Shopify, so read ${shopify.length === 1 ? "that row" : "those rows"} as the platform's decision, not the merchant's.`
-  : `We detect no Shopify storefront on this panel at all — these are the web's most-visited sites, and at that size shops run their own checkout — so ${withUcp.length ? `the ${withUcp.length} that publish UCP did it themselves` : "nothing here is a platform default"}.`}
+  : `We detect no Shopify storefront among these shops, so ${withUcp.length ? `the ${withUcp.length} that publish UCP do not look like a Shopify default` : "nothing here looks like a Shopify default"}.`}
 The rest of the score is the same nine checks as the main <a href="/ai-index/">index</a>, which measure things no platform
-hands you: whether your prices survive a fetch without JavaScript, whether an agent can reach your basket, whether your
-products carry structured data.</p>
+hands you: whether your homepage survives a fetch without JavaScript, whether an agent can reach your pricing and support, whether your
+site carries structured data.</p>
 
 <p class="lede"><b>What is deliberately not scored here.</b> ACP, the OpenAI and Stripe protocol, is approval-gated and
 delivered as a product feed, so there is no endpoint to test and no way for anyone outside to confirm a merchant supports
@@ -1637,7 +1660,7 @@ what it kept, and A6 for links credited that an agent cannot use and real pages 
 </tbody>
 </table>
 <h2>The Agent Field Test</h2>
-<p class="lede">The weekly <a href="/fieldtest/">Field Test</a> is the empirical companion to the Index: instead of
+<p class="lede">The daily <a href="/fieldtest/">Field Test</a> is the empirical companion to the Index: instead of
 checking plumbing, it watches a real agent try real errands. The rules:</p>
 <table>
 <tbody>
@@ -1705,11 +1728,11 @@ transcript? Open an issue — everything is versioned in public.</p>`;
       body: `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · The Agent Field Test</p>
 <h1>The Agent Field Test</h1>
-<p class="lede">The web's newest users are AI agents — so every week we make one run real errands: find the true
+<p class="lede">The web's newest users are AI agents — so every day we make one run real errands: find the true
 price, cancel the thing, reach a human, pick a product. Read-only access, hard step limits, transcripts published
 verbatim. The producer inventing the tasks is an AI too: no human touches an episode from cron to publish.</p>
 ${episodes.length ? archiveRows : `<p class="lede">First episode is in production — the daily run publishes it here automatically.</p>`}
-<div class="cta"><b>Want your site in an episode?</b> Everyday tasks on real brands are invented weekly by the producer
+<div class="cta"><b>Want your site in an episode?</b> Everyday tasks on real brands are invented daily by the producer
 from <a href="/ai-index/">the audited panel</a>. <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&labels=audit-request">Get on the panel</a>.</div>
 <h2>Questions people ask</h2>
 ${FIELD_FAQ.map((f) => `<h3 style="font-size:.98rem;margin:18px 0 4px">${esc(f.q)}</h3><p class="lede" style="font-size:.92rem">${f.a}</p>`).join("\n")}`,
@@ -1739,7 +1762,7 @@ ${FIELD_FAQ.map((f) => `<h3 style="font-size:.98rem;margin:18px 0 4px">${esc(f.q
         body: `
 <p class="eyebrow"><a href="/fieldtest/" style="text-decoration:none;color:inherit">← All episodes</a> · ${prettyDate(ep.date)} · agent: ${esc(ep.model)}</p>
 <h1>Episode of ${prettyDate(ep.date)}</h1>
-<p class="lede">${ep.stats.tasks} errands, ${ep.producedBy === "seed" ? "from the standing task list (the AI producer was offline this week)" : `invented by the AI producer (${esc(ep.producerModel ?? LEGACY_PRODUCER_MODEL)})`} and attempted by ${esc(ep.model)} with read-only
+<p class="lede">${ep.stats.tasks} errands, ${ep.producedBy === "seed" ? "from the standing task list (the AI producer was offline that day)" : `invented by the AI producer (${esc(ep.producerModel ?? LEGACY_PRODUCER_MODEL)})`} and attempted by ${esc(ep.model)} with read-only
 web access. Each block below is named for the site it ran against, and coloured by how it ended.</p>
 <div class="board">
   <div>
@@ -1788,7 +1811,7 @@ no rate-limit games. Cite it, chart it, build on it.</p>
 </table>
 <p class="lede">Raw per-site check results live in the repository under
 <a href="https://github.com/khalidsaidi/agentability/tree/main/data/index/results">data/index/results/</a>, one JSON
-file per domain, refreshed by the same public CI run. The evaluator itself is
+file per domain, refreshed by the same public CI run. <code>robotsReadable: false</code> means the robots.txt could not be read, so that site's <code>robots</code> values are not a stated policy. The evaluator itself is
 <a href="https://github.com/khalidsaidi/agentability/blob/main/scripts/lib/evaluate-site.ts">one dependency-free
 TypeScript file</a> — reproduce any number on this site with plain HTTP requests.</p>
 <p class="lede">Attribution: link to <a href="/ai-index/">the Index</a> or the per-site report you're citing.</p>`;
@@ -1831,7 +1854,7 @@ and publish only what those public files say. To remove a domain from the Index,
         "Request a free AI SEO audit of any site: can AI agents read it? We check llms.txt, AI crawler access, readable HTML and structured data, then publish its AI visibility score. Dispute a score or get a re-run here too.",
       body: supportBody,
     },
-    { dir: "privacy", title: "Privacy — Agentability", description: "No analytics, no cookies, no accounts. Audits use only public surfaces.", body: privacyBody },
+    { dir: "privacy", title: "Privacy — Agentability", description: "No accounts, no ads, nothing sold. Google Analytics counts visits in aggregate. Audits use only public surfaces.", body: privacyBody },
   ];
   for (const p of smallPages) {
     await fsp.mkdir(path.join(OUT, p.dir), { recursive: true });
@@ -1849,6 +1872,7 @@ and publish only what those public files say. To remove a domain from the Index,
     pctLlmsTxt: s?.pctLlmsTxt ?? 0,
     pctBlockingSomeAI: s?.pctBlockingSomeAI ?? 0,
     pctClosed: s?.pctClosed ?? 0,
+    pctWalled: s?.pctWalled ?? 0,
     latestEpisode: latest
       ? { date: latest.date, completed: latest.stats.completed, tasks: latest.stats.tasks, wallsHit: latest.stats.wallsHit, pageVisits: latest.stats.pageVisits }
       : null,
@@ -1864,7 +1888,7 @@ and publish only what those public files say. To remove a domain from the Index,
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Guides</p>
 <h1>Make your site work for AI agents</h1>
 <p class="lede">Three guides, built on the same nine checks the <a href="/ai-index/">Index</a> scores ${s?.audited ?? "the panel's"} sites on every
-week — and on what we watch a real agent run into every week on the <a href="/fieldtest/">Field Test</a>. Nothing invented,
+week — and on what we watch a real agent run into every day on the <a href="/fieldtest/">Field Test</a>. Nothing invented,
 nothing you can't test with curl.</p>
 <div class="guides-list">${GUIDES.map((g) => `<a href="/guides/${g.slug}/"><span class="t">${esc(g.title)}</span><span class="d">${esc(g.description)}</span></a>`).join("")}</div>`,
       jsonLd: {
@@ -1927,13 +1951,15 @@ nothing you can't test with curl.</p>
       "Open-source observatory measuring AI-agent readiness of the web. Weekly",
       "audits of well-known sites against real 2026 conventions (llms.txt, AI",
       "crawler policy, parseable content, structured data, MCP, OpenAPI).",
+      ...(summary ? ["", `Latest finding: ${summary.stats.pctWalled}% of the ${summary.stats.audited} most-visited sites block a plain AI agent at the door; ${summary.stats.pctClosed}% say no in robots.txt.`] : []),
       "",
       "## Key pages",
-      `- The Agent Field Test (weekly episodes, verbatim agent transcripts): ${SITE}/fieldtest/`,
+      `- The Agent Field Test (daily episodes, verbatim agent transcripts): ${SITE}/fieldtest/`,
       `- The AI-Readiness Index (full rankings): ${SITE}/ai-index/`,
       `- Methodology (checks and scoring): ${SITE}/methodology/`,
       `- Raw data (JSON): ${SITE}/data/summary.json`,
       `- Data docs (endpoints and attribution): ${SITE}/docs/`,
+      `- AI shopping agents: which online shops they can read (agentic commerce, UCP): ${SITE}/shops/`,
       `- Support (audit requests, disputes): ${SITE}/support/`,
       "",
       "## Guides",

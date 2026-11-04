@@ -11,6 +11,7 @@ export type GuideContext = {
   pctLlmsTxt: number;
   pctBlockingSomeAI: number;
   pctClosed: number;
+  pctWalled: number;
   latestEpisode: { date: string; completed: number; tasks: number; wallsHit: number; pageVisits: number } | null;
 };
 
@@ -69,7 +70,7 @@ ${curl("curl -s https://yourdomain.com/robots.txt | grep -iA2 'gptbot\\|claudebo
 <h3>A3 · Make the homepage readable without a browser <span class="pts">25 points</span></h3>
 <p class="lede">The heaviest-weighted check, because it is the one that ends the most errands. A plain fetch of your homepage should
 return the actual content as HTML text. A JavaScript shell with an empty <code>&lt;div id="root"&gt;</code> fails.
-A Cloudflare "checking your browser" interstitial fails. Server-render or pre-render the pages that carry answers.</p>
+A Cloudflare "checking your browser" interstitial fails. Server-render or pre-render the pages that carry answers. ${ctx.pctWalled}% of the panel blocks AI agents at the door this way, often through bot protection nobody decided to aim at AI, so check yours.</p>
 ${curl("curl -sL https://yourdomain.com/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' | wc -w\n# under ~150 words of visible text, or a page titled 'Just a moment', is a fail")}
 
 <h3>A4 · Add schema.org JSON-LD <span class="pts">15 points</span></h3>
@@ -104,7 +105,7 @@ publishes one on behalf of its merchants, so on a Shopify store this arrives wit
 is a decision. How the shops we audit are doing is on the <a href="/shops/">commerce page</a>.</p>
 
 <h2>What fails most, in practice</h2>
-<p class="lede">Every week a real agent attempts ten errands on real sites and we publish the transcript. The recurring killers, in
+<p class="lede">Every day a real agent attempts ten errands on real sites and we publish the transcript. The recurring killers, in
 order: pricing pages that render only in JavaScript; help centers behind a bot challenge; cancellation flows that
 require a login to even describe; and "contact us" pages with no contact on them.
 ${ctx.latestEpisode ? `In the <a href="/fieldtest/${ctx.latestEpisode.date}/">latest episode</a> the agent finished ${ctx.latestEpisode.completed} of ${ctx.latestEpisode.tasks} errands across ${ctx.latestEpisode.pageVisits} page reads and hit ${ctx.latestEpisode.wallsHit} bot walls.` : ""}</p>

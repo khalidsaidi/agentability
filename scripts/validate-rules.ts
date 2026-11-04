@@ -119,6 +119,12 @@ const FIXTURES: Fixture[] = [
     assert: (r) => (r.signals.mcp ? null : "MCP server card not detected"),
   },
   {
+    domain: "santander.com.br",
+    what: "a robots.txt behind a wall is an unknown policy, not an open one",
+    caught: "2026-11-03: the homepage claimed 76% of walled sites never object in robots.txt when 119 of those 208 had never been read",
+    assert: (r) => (r.robotsReadable === false ? null : "unreadable robots.txt reported as readable"),
+  },
+  {
     domain: "wellsfargo.com",
     what: "a bank's rates page is its pricing",
     caught: "2026-11-03: linked /mortgage/rates/ and /help/rates/ from its homepage and scored as having no pricing; a Reddit reader asked why banks hide public rates",
