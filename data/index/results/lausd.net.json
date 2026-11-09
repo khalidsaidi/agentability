@@ -1,9 +1,9 @@
 {
  "domain": "lausd.net",
- "checkedAt": "2026-11-03T16:48:09.338Z",
+ "checkedAt": "2026-11-09T16:48:22.543Z",
  "status": "complete",
- "elapsedMs": 2506,
- "score": 25,
+ "elapsedMs": 1386,
+ "score": 15,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (a web page was served in its place), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt could not be read (HTTP 403), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
@@ -122,7 +122,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
+  "sitemap": false,
   "parseableText": false
  }
 }

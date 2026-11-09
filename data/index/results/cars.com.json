@@ -1,9 +1,9 @@
 {
  "domain": "cars.com",
- "checkedAt": "2026-11-03T16:41:05.051Z",
+ "checkedAt": "2026-11-09T16:43:03.853Z",
  "status": "complete",
- "elapsedMs": 1329,
- "score": 20,
+ "elapsedMs": 285,
+ "score": 15,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt could not be read (HTTP 403), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",

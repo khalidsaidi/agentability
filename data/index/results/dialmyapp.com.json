@@ -1,10 +1,10 @@
 {
  "domain": "dialmyapp.com",
- "checkedAt": "2026-11-03T16:42:26.326Z",
+ "checkedAt": "2026-11-09T16:43:57.041Z",
  "status": "complete",
- "elapsedMs": 3918,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 3957,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,23 +22,23 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (a web page was served in its place), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~714 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 0,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "The homepage answered 202, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact (/contact/), legal/privacy (/privacy-policy-2/)."
   },
   {
    "id": "B1",
@@ -115,14 +115,14 @@
    "policy": "allowed"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

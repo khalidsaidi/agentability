@@ -1,11 +1,11 @@
 {
  "domain": "yr.no",
- "checkedAt": "2026-11-03T16:58:23.967Z",
+ "checkedAt": "2026-11-09T16:55:54.878Z",
  "status": "complete",
- "elapsedMs": 1542,
- "score": 50,
- "grade": "D",
- "posture": "open",
+ "elapsedMs": 1189,
+ "score": 35,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, ChatGPT-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~446 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~469 words of visible text."
   },
   {
    "id": "A4",
@@ -84,38 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,

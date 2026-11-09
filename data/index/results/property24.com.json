@@ -1,10 +1,10 @@
 {
  "domain": "property24.com",
- "checkedAt": "2026-11-03T16:52:06.432Z",
+ "checkedAt": "2026-11-09T16:51:26.154Z",
  "status": "complete",
- "elapsedMs": 10713,
- "score": 65,
- "grade": "C",
+ "elapsedMs": 9848,
+ "score": 20,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,15 +22,15 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP 503), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~1177 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -43,18 +43,18 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "pass",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 10,
-   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+   "detail": "No sitemap found."
   },
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 5,
    "maxPoints": 20,
-   "detail": "Reached from homepage: pricing, support/contact (/contact-us), legal/privacy (/privacy-policy)."
+   "detail": "Reached from homepage: support/contact (/contact-us)."
   },
   {
    "id": "B1",
@@ -84,45 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
- "robotsReadable": true,
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": true,
-  "parseableText": true
+  "sitemap": false,
+  "parseableText": false
  }
 }

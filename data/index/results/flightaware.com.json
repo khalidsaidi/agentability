@@ -1,11 +1,11 @@
 {
  "domain": "flightaware.com",
- "checkedAt": "2026-11-03T16:44:30.797Z",
+ "checkedAt": "2026-11-09T16:45:32.320Z",
  "status": "complete",
- "elapsedMs": 1183,
- "score": 50,
+ "elapsedMs": 1165,
+ "score": 43,
  "grade": "D",
- "posture": "open",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt blocks: GPTBot."
   },
   {
    "id": "A3",
@@ -84,38 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,

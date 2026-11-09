@@ -1,11 +1,11 @@
 {
  "domain": "amazon.co.uk",
- "checkedAt": "2026-11-03T16:39:07.885Z",
+ "checkedAt": "2026-11-09T16:41:44.768Z",
  "status": "complete",
- "elapsedMs": 2903,
- "score": 45,
- "grade": "D",
- "posture": "open",
+ "elapsedMs": 2295,
+ "score": 25,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~823 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~1730 words of visible text."
   },
   {
    "id": "A4",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 5,
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
   },
   {
    "id": "B1",
@@ -84,38 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,

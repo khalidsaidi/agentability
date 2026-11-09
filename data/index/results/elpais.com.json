@@ -1,11 +1,11 @@
 {
  "domain": "elpais.com",
- "checkedAt": "2026-11-03T16:43:37.237Z",
+ "checkedAt": "2026-11-09T16:44:53.486Z",
  "status": "complete",
- "elapsedMs": 644,
- "score": 15,
- "grade": "F",
- "posture": "open",
+ "elapsedMs": 1386,
+ "score": 48,
+ "grade": "D",
+ "posture": "selective",
  "paradox": false,
  "checks": [
   {
@@ -19,26 +19,26 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 8,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt blocks: ClaudeBot, PerplexityBot, CCBot, Claude-User, Perplexity-User."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~5089 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
   },
   {
    "id": "B1",
@@ -84,45 +84,45 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "blocked"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": false,
-  "parseableText": false
+  "parseableText": true
  }
 }

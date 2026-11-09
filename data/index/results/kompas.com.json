@@ -1,9 +1,9 @@
 {
  "domain": "kompas.com",
- "checkedAt": "2026-11-03T16:47:48.529Z",
+ "checkedAt": "2026-11-09T16:48:08.704Z",
  "status": "complete",
- "elapsedMs": 1888,
- "score": 10,
+ "elapsedMs": 7079,
+ "score": 55,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~2740 words of visible text."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No machine-readable entity markup on the homepage."
+   "detail": "Valid JSON-LD found on the homepage."
   },
   {
    "id": "A5",
@@ -52,9 +52,9 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "fail",
-   "points": 0,
+   "points": 5,
    "maxPoints": 20,
-   "detail": "The homepage answered 202, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "Reached from homepage: support/contact (play.kompas.com). Link found but not confirmed: docs/api (apis.kompas.com)."
   },
   {
    "id": "B1",
@@ -121,8 +121,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": false,
+  "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

@@ -1,10 +1,10 @@
 {
  "domain": "substack.com",
- "checkedAt": "2026-11-03T16:54:34.996Z",
+ "checkedAt": "2026-11-09T16:53:16.212Z",
  "status": "complete",
- "elapsedMs": 954,
- "score": 40,
- "grade": "D",
+ "elapsedMs": 285,
+ "score": 15,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,15 +22,15 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt could not be read (HTTP 403), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~188 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -123,6 +123,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": false,
-  "parseableText": true
+  "parseableText": false
  }
 }

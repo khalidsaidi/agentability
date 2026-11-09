@@ -1,9 +1,9 @@
 {
  "domain": "aternos.org",
- "checkedAt": "2026-11-03T16:39:45.966Z",
+ "checkedAt": "2026-11-09T16:42:10.516Z",
  "status": "complete",
- "elapsedMs": 3509,
- "score": 60,
+ "elapsedMs": 601,
+ "score": 10,
  "grade": "Closed by policy",
  "posture": "closed",
  "paradox": false,
@@ -27,18 +27,18 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~686 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (support.aternos.org), legal/privacy (/terms)."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -121,8 +121,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
+  "structuredData": false,
   "sitemap": true,
-  "parseableText": true
+  "parseableText": false
  }
 }

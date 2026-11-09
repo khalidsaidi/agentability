@@ -1,11 +1,11 @@
 {
  "domain": "genius.com",
- "checkedAt": "2026-11-03T16:45:03.482Z",
+ "checkedAt": "2026-11-09T16:45:55.413Z",
  "status": "complete",
- "elapsedMs": 4584,
- "score": 48,
- "grade": "D",
- "posture": "selective",
+ "elapsedMs": 1754,
+ "score": 15,
+ "grade": "F",
+ "posture": "open",
  "paradox": false,
  "checks": [
   {
@@ -19,18 +19,18 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot, ChatGPT-User."
+   "detail": "robots.txt could not be read (HTTP 403), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~634 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/static/dsa_contact_information), docs/api (/developers), legal/privacy (/static/terms)."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -84,38 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "Google-Extended",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "CCBot",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "allowed"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "blocked"
+   "policy": "allowed"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "partial"
+   "policy": "allowed"
   }
  ],
- "robotsReadable": true,
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
@@ -123,6 +123,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": false,
-  "parseableText": true
+  "parseableText": false
  }
 }

@@ -1,10 +1,10 @@
 {
  "domain": "yandex.kz",
- "checkedAt": "2026-11-03T16:58:15.257Z",
+ "checkedAt": "2026-11-09T16:55:51.023Z",
  "status": "complete",
- "elapsedMs": 2818,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 2640,
+ "score": 50,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~40 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~201 words of visible text."
   },
   {
    "id": "A4",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing. Link found but not confirmed: support/contact (/support/smart-captcha/problems.html)."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage."
   },
   {
    "id": "B1",
@@ -123,6 +123,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

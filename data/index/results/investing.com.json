@@ -1,10 +1,10 @@
 {
  "domain": "investing.com",
- "checkedAt": "2026-11-03T16:46:47.868Z",
+ "checkedAt": "2026-11-09T16:47:21.641Z",
  "status": "complete",
- "elapsedMs": 4758,
- "score": 70,
- "grade": "B",
+ "elapsedMs": 925,
+ "score": 15,
+ "grade": "F",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,23 +22,23 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt could not be read (HTTP 403), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "pass",
-   "points": 25,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3290 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
    "title": "Structured data (schema.org JSON-LD)",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "Valid JSON-LD found on the homepage."
+   "detail": "No machine-readable entity markup on the homepage."
   },
   {
    "id": "A5",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 15,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: pricing (/pro/pricing), support/contact (/about-us/contact-us), legal/privacy (/about-us/privacy-policy)."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -121,8 +121,8 @@
   "mcp": false,
   "openapi": false,
   "ucp": false,
-  "structuredData": true,
+  "structuredData": false,
   "sitemap": false,
-  "parseableText": true
+  "parseableText": false
  }
 }

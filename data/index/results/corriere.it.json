@@ -1,11 +1,11 @@
 {
  "domain": "corriere.it",
- "checkedAt": "2026-11-03T16:41:42.099Z",
+ "checkedAt": "2026-11-09T16:43:21.987Z",
  "status": "complete",
- "elapsedMs": 5119,
- "score": 63,
- "grade": "C",
- "posture": "selective",
+ "elapsedMs": 6172,
+ "score": 60,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot, ChatGPT-User."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~6890 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~6709 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy (/privacy.shtml)."
+   "detail": "Reached from homepage: pricing, legal/privacy (/privacy.shtml)."
   },
   {
    "id": "B1",
@@ -92,7 +92,7 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
@@ -104,7 +104,7 @@
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "ChatGPT-User",
@@ -112,7 +112,7 @@
   },
   {
    "bot": "Perplexity-User",
-   "policy": "partial"
+   "policy": "blocked"
   }
  ],
  "robotsReadable": true,

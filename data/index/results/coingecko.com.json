@@ -1,10 +1,10 @@
 {
  "domain": "coingecko.com",
- "checkedAt": "2026-11-03T16:41:36.403Z",
+ "checkedAt": "2026-11-09T16:43:19.002Z",
  "status": "complete",
- "elapsedMs": 2201,
- "score": 80,
- "grade": "B",
+ "elapsedMs": 2794,
+ "score": 90,
+ "grade": "A",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~16159 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~16286 words of visible text."
   },
   {
    "id": "A4",
@@ -52,17 +52,17 @@
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
    "status": "pass",
-   "points": 15,
+   "points": 20,
    "maxPoints": 20,
-   "detail": "Reached from homepage: pricing (/en/api/pricing), docs/api (docs.coingecko.com), legal/privacy (/en/terms). Link found but not confirmed: support/contact (support.coingecko.com)."
+   "detail": "Reached from homepage: pricing (/en/api/pricing), support/contact (support.coingecko.com), docs/api (docs.coingecko.com), legal/privacy (/en/terms)."
   },
   {
    "id": "B1",
    "title": "MCP server advertised",
-   "status": "skip",
-   "points": 0,
+   "status": "pass",
+   "points": 5,
    "maxPoints": 5,
-   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+   "detail": "Serves /.well-known/mcp/server-card.json."
   },
   {
    "id": "B2",
@@ -118,7 +118,7 @@
  "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
-  "mcp": false,
+  "mcp": true,
   "openapi": false,
   "ucp": false,
   "structuredData": true,

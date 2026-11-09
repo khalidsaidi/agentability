@@ -1,9 +1,9 @@
 {
  "domain": "hostinger.com",
- "checkedAt": "2026-11-03T16:45:51.905Z",
+ "checkedAt": "2026-11-09T16:46:38.423Z",
  "status": "complete",
- "elapsedMs": 2046,
- "score": 90,
+ "elapsedMs": 3094,
+ "score": 100,
  "grade": "A",
  "posture": "open",
  "paradox": false,
@@ -11,10 +11,10 @@
   {
    "id": "A1",
    "title": "llms.txt for AI readers",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 15,
    "maxPoints": 15,
-   "detail": "No /llms.txt found — AI readers get no curated entry point."
+   "detail": "Present with 14270 chars and links."
   },
   {
    "id": "A2",
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~3778 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~3748 words of visible text."
   },
   {
    "id": "A4",
@@ -67,10 +67,10 @@
   {
    "id": "B2",
    "title": "OpenAPI description published",
-   "status": "skip",
-   "points": 0,
+   "status": "pass",
+   "points": 5,
    "maxPoints": 5,
-   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+   "detail": "Valid OpenAPI document found."
   },
   {
    "id": "B3",
@@ -84,42 +84,42 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
-  "llmsTxt": false,
+  "llmsTxt": true,
   "mcp": true,
-  "openapi": false,
+  "openapi": true,
   "ucp": false,
   "structuredData": true,
   "sitemap": true,
