@@ -49,6 +49,22 @@ async function diagnose(domainsVisited: string[]): Promise<Diagnosis[]> {
   return out;
 }
 
+// What the DeepSeek account actually holds, in USD; null if it cannot be read.
+// The token estimate in CostBudget came out at $0.10 for the 2026-11-10 episode
+// while the balance fell by $0.53, so the episode's recorded cost and its spend
+// ceiling are both taken from the balance, and the estimate is kept beside it.
+async function readBalance(apiKey: string): Promise<number | null> {
+  try {
+    const r = await fetch("https://api.deepseek.com/user/balance", { headers: { Authorization: `Bearer ${apiKey}` } });
+    if (!r.ok) return null;
+    const j = (await r.json()) as { balance_infos?: Array<{ currency: string; total_balance: string }> };
+    const usd = j.balance_infos?.find((b) => b.currency === "USD");
+    return usd ? Number(usd.total_balance) : null;
+  } catch {
+    return null;
+  }
+}
+
 // One cheap call before anything runs. A rejected key, an empty credit balance,
 // or an outage must stop the episode here — not surface later as ten "failed"
 // tasks that the site would publish as if the agent had actually tried.
@@ -131,6 +147,8 @@ async function main() {
   }
   const client = new Anthropic({ apiKey, baseURL: DEEPSEEK_BASE_URL });
   await preflight(client);
+  const balanceBefore = await readBalance(apiKey);
+  console.log(`DeepSeek balance before the episode: ${balanceBefore === null ? "unreadable" : `$${balanceBefore.toFixed(2)}`}`);
   await fsp.mkdir(EPISODES_DIR, { recursive: true });
 
   // Fully autonomous: an AI producer invents this episode's tasks from the
@@ -178,6 +196,15 @@ async function main() {
       console.log(`Budget exhausted — skipping remaining tasks from ${task.id} on.`);
       break;
     }
+    // The estimate under-counts, so the ceiling is also checked against money
+    // that actually left the account.
+    if (balanceBefore !== null) {
+      const now = await readBalance(apiKey);
+      if (now !== null && balanceBefore - now >= EPISODE_BUDGET_USD) {
+        console.log(`Spent $${(balanceBefore - now).toFixed(2)} by the balance — skipping remaining tasks from ${task.id} on.`);
+        break;
+      }
+    }
     console.log(`\n=== ${task.id}: ${task.title}`);
     const run = await runFieldTask(client, task, budget);
     const diagnosis = await diagnose(run.domainsVisited);
@@ -212,8 +239,15 @@ async function main() {
 
   const inputTokens = runs.reduce((acc, r) => acc + r.inputTokens, 0);
   const outputTokens = runs.reduce((acc, r) => acc + r.outputTokens, 0);
-  // Real spend for the whole episode, producer included.
-  const costUsd = budget.spent;
+  // Real spend for the whole episode, producer included: what left the account,
+  // when the balance can be read; the token estimate only as a fallback. The
+  // balance belongs to the whole account, so this assumes nothing else spends on
+  // it, which was checked on 2026-11-10 (no other repo calls DeepSeek).
+  const balanceAfter = balanceBefore === null ? null : await readBalance(apiKey);
+  const measured = balanceBefore !== null && balanceAfter !== null ? Math.round((balanceBefore - balanceAfter) * 100) / 100 : null;
+  const costUsd = measured ?? budget.spent;
+  console.log(`Cost: $${costUsd} (${measured === null ? "token estimate" : `balance $${balanceBefore!.toFixed(2)} -> $${balanceAfter!.toFixed(2)}`}; token estimate $${budget.spent})`);
+  if (balanceAfter !== null && balanceAfter < 3) console.log(`::warning::DeepSeek balance is down to $${balanceAfter.toFixed(2)}, about ${Math.floor(balanceAfter / Math.max(costUsd, 0.01))} more episodes.`);
 
   const date = new Date().toISOString().slice(0, 10);
   const episode = {
@@ -233,6 +267,8 @@ async function main() {
       inputTokens,
       outputTokens,
       costUsd,
+      costSource: measured === null ? "token-estimate" : "balance",
+      costEstimateUsd: budget.spent,
     },
     runs,
   };
@@ -241,7 +277,7 @@ async function main() {
   await fsp.writeFile(file, JSON.stringify(episode, null, 1), "utf8");
   console.log(
     `\nEpisode ${date}: ${episode.stats.completed}/${episode.stats.tasks} completed · ` +
-      `${episode.stats.wallsHit} bot walls · ${episode.stats.pageVisits} page visits · ~$${costUsd} in tokens → ${file}`
+      `${episode.stats.wallsHit} bot walls · ${episode.stats.pageVisits} page visits · $${costUsd} spent → ${file}`
   );
 }
 
