@@ -1,0 +1,128 @@
+{
+ "domain": "kdvr.com",
+ "checkedAt": "2026-11-10T01:46:18.910Z",
+ "status": "complete",
+ "elapsedMs": 3247,
+ "score": 65,
+ "grade": "Closed by policy",
+ "posture": "closed",
+ "paradox": false,
+ "checks": [
+  {
+   "id": "A1",
+   "title": "llms.txt for AI readers",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "No /llms.txt found — AI readers get no curated entry point."
+  },
+  {
+   "id": "A2",
+   "title": "AI crawler access policy",
+   "status": "fail",
+   "points": 0,
+   "maxPoints": 15,
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, ChatGPT-User."
+  },
+  {
+   "id": "A3",
+   "title": "Content readable without a browser",
+   "status": "pass",
+   "points": 25,
+   "maxPoints": 25,
+   "detail": "Plain fetch of the homepage yields ~2104 words of visible text."
+  },
+  {
+   "id": "A4",
+   "title": "Structured data (schema.org JSON-LD)",
+   "status": "pass",
+   "points": 15,
+   "maxPoints": 15,
+   "detail": "Valid JSON-LD found on the homepage."
+  },
+  {
+   "id": "A5",
+   "title": "Sitemap discoverable",
+   "status": "pass",
+   "points": 10,
+   "maxPoints": 10,
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
+  },
+  {
+   "id": "A6",
+   "title": "Everyday agent tasks reachable from the homepage",
+   "status": "pass",
+   "points": 15,
+   "maxPoints": 20,
+   "detail": "Reached from homepage: pricing (/denver-gas-prices/), support/contact (/contact/), legal/privacy."
+  },
+  {
+   "id": "B1",
+   "title": "MCP server advertised",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No MCP advertisement (bonus check — most sites skip this)."
+  },
+  {
+   "id": "B2",
+   "title": "OpenAPI description published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No OpenAPI document (bonus check — only relevant for APIs)."
+  },
+  {
+   "id": "B3",
+   "title": "UCP commerce profile published",
+   "status": "skip",
+   "points": 0,
+   "maxPoints": 5,
+   "detail": "No UCP profile (bonus check — agentic commerce, relevant to shops)."
+  }
+ ],
+ "robots": [
+  {
+   "bot": "GPTBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "ClaudeBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "PerplexityBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Google-Extended",
+   "policy": "blocked"
+  },
+  {
+   "bot": "CCBot",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Claude-User",
+   "policy": "partial"
+  },
+  {
+   "bot": "ChatGPT-User",
+   "policy": "blocked"
+  },
+  {
+   "bot": "Perplexity-User",
+   "policy": "partial"
+  }
+ ],
+ "robotsReadable": true,
+ "signals": {
+  "llmsTxt": false,
+  "mcp": false,
+  "openapi": false,
+  "ucp": false,
+  "structuredData": true,
+  "sitemap": true,
+  "parseableText": true
+ }
+}
