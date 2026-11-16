@@ -1,11 +1,11 @@
 {
  "domain": "gazzetta.it",
- "checkedAt": "2026-11-09T16:45:54.063Z",
+ "checkedAt": "2026-11-16T16:14:35.412Z",
  "status": "complete",
- "elapsedMs": 8173,
- "score": 73,
- "grade": "B",
- "posture": "selective",
+ "elapsedMs": 11413,
+ "score": 65,
+ "grade": "Closed by policy",
+ "posture": "closed",
  "paradox": false,
  "checks": [
   {
@@ -19,10 +19,10 @@
   {
    "id": "A2",
    "title": "AI crawler access policy",
-   "status": "warn",
-   "points": 8,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 15,
-   "detail": "robots.txt blocks: GPTBot, ClaudeBot, Google-Extended, CCBot."
+   "detail": "robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Claude-User, ChatGPT-User, Perplexity-User."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~4735 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~4242 words of visible text."
   },
   {
    "id": "A4",
@@ -92,7 +92,7 @@
   },
   {
    "bot": "PerplexityBot",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Google-Extended",
@@ -104,15 +104,15 @@
   },
   {
    "bot": "Claude-User",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "partial"
+   "policy": "blocked"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "partial"
+   "policy": "blocked"
   }
  ],
  "robotsReadable": true,

@@ -1,8 +1,8 @@
 {
  "domain": "eltiempo.es",
- "checkedAt": "2026-11-09T16:44:53.743Z",
+ "checkedAt": "2026-11-16T16:13:43.346Z",
  "status": "complete",
- "elapsedMs": 1409,
+ "elapsedMs": 1304,
  "score": 15,
  "grade": "F",
  "posture": "open",
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt allows the major AI crawlers and agents."
+   "detail": "robots.txt could not be read (HTTP 403), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~0 words of visible text."
+   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
   },
   {
    "id": "A4",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "The homepage answered 202, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
+   "detail": "The homepage itself returned 403 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
   },
   {
    "id": "B1",
@@ -115,7 +115,7 @@
    "policy": "allowed"
   }
  ],
- "robotsReadable": true,
+ "robotsReadable": false,
  "signals": {
   "llmsTxt": false,
   "mcp": false,

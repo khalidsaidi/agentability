@@ -1,10 +1,10 @@
 {
  "domain": "kinopoisk.ru",
- "checkedAt": "2026-11-09T16:48:01.064Z",
+ "checkedAt": "2026-11-16T16:16:42.912Z",
  "status": "complete",
- "elapsedMs": 5440,
- "score": 25,
- "grade": "F",
+ "elapsedMs": 16226,
+ "score": 50,
+ "grade": "D",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~1133 words of visible text."
   },
   {
    "id": "A4",
@@ -54,7 +54,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 20,
-   "detail": "The homepage itself returned 429 to a plain fetch, so nothing could be reached from it. An agent hits the same wall, which is why this scores zero — but it is not evidence the pages are missing."
+   "detail": "None of pricing, support, docs, or legal are reachable from the homepage. Link found but not confirmed: docs/api (/docs/usage/)."
   },
   {
    "id": "B1",
@@ -123,6 +123,6 @@
   "ucp": false,
   "structuredData": false,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }

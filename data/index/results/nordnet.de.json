@@ -1,10 +1,10 @@
 {
  "domain": "nordnet.de",
- "checkedAt": "2026-11-09T16:50:06.359Z",
+ "checkedAt": "2026-11-16T16:18:38.855Z",
  "status": "complete",
- "elapsedMs": 4800,
- "score": 57,
- "grade": "C",
+ "elapsedMs": 3968,
+ "score": 75,
+ "grade": "B",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -27,10 +27,10 @@
   {
    "id": "A3",
    "title": "Content readable without a browser",
-   "status": "warn",
-   "points": 12,
+   "status": "pass",
+   "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~137 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~347 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "fail",
-   "points": 5,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Reached from homepage: legal/privacy (/info/impressum)."
+   "detail": "Reached from homepage: support/contact (/kundenservice/kontakt), legal/privacy (/info/impressum)."
   },
   {
    "id": "B1",
@@ -84,35 +84,35 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
  "robotsReadable": true,
@@ -123,6 +123,6 @@
   "ucp": false,
   "structuredData": true,
   "sitemap": true,
-  "parseableText": false
+  "parseableText": true
  }
 }
