@@ -1,9 +1,9 @@
 {
  "domain": "hilton.com",
- "checkedAt": "2026-11-16T16:15:09.549Z",
+ "checkedAt": "2026-11-23T18:36:26.753Z",
  "status": "complete",
- "elapsedMs": 22104,
- "score": 35,
+ "elapsedMs": 471,
+ "score": 25,
  "grade": "F",
  "posture": "open",
  "paradox": false,
@@ -30,7 +30,7 @@
    "status": "fail",
    "points": 0,
    "maxPoints": 25,
-   "detail": "A bot challenge page blocks plain fetches — agents see a wall, not your content."
+   "detail": "Plain fetch of the homepage yields ~1 words of visible text."
   },
   {
    "id": "A4",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "warn",
-   "points": 10,
+   "status": "fail",
+   "points": 0,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/s/), legal/privacy (/en/p/global-privacy-statement/)."
+   "detail": "The homepage answered 200, but a plain fetch of it yields no readable page (see A3), so there were no links to follow. This scores zero because an agent reads what you sent, not what renders in a browser; it is not evidence the pages are missing."
   },
   {
    "id": "B1",

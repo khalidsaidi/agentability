@@ -1,10 +1,10 @@
 {
  "domain": "osym.gov.tr",
- "checkedAt": "2026-11-16T16:19:15.202Z",
+ "checkedAt": "2026-11-23T18:53:53.798Z",
  "status": "complete",
- "elapsedMs": 15998,
- "score": 45,
- "grade": "D",
+ "elapsedMs": 12061,
+ "score": 55,
+ "grade": "C",
  "posture": "open",
  "paradox": false,
  "checks": [
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt could not be read (a web page was served in its place), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
   },
   {
    "id": "A3",
@@ -30,7 +30,7 @@
    "status": "pass",
    "points": 25,
    "maxPoints": 25,
-   "detail": "Plain fetch of the homepage yields ~7938 words of visible text."
+   "detail": "Plain fetch of the homepage yields ~7921 words of visible text."
   },
   {
    "id": "A4",
@@ -43,10 +43,10 @@
   {
    "id": "A5",
    "title": "Sitemap discoverable",
-   "status": "fail",
-   "points": 0,
+   "status": "pass",
+   "points": 10,
    "maxPoints": 10,
-   "detail": "No sitemap found."
+   "detail": "Sitemap advertised in robots.txt or served at /sitemap.xml."
   },
   {
    "id": "A6",
@@ -122,7 +122,7 @@
   "openapi": false,
   "ucp": false,
   "structuredData": false,
-  "sitemap": false,
+  "sitemap": true,
   "parseableText": true
  }
 }

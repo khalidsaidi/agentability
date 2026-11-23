@@ -1,9 +1,9 @@
 {
  "domain": "screener.in",
- "checkedAt": "2026-11-16T16:20:58.499Z",
+ "checkedAt": "2026-11-23T18:41:45.835Z",
  "status": "complete",
- "elapsedMs": 4833,
- "score": 65,
+ "elapsedMs": 4357,
+ "score": 60,
  "grade": "C",
  "posture": "open",
  "paradox": false,
@@ -22,7 +22,7 @@
    "status": "pass",
    "points": 15,
    "maxPoints": 15,
-   "detail": "robots.txt could not be read (HTTP no answer), so the site's AI policy is unknown. Scored as no rules, as RFC 9309 treats an unavailable file."
+   "detail": "robots.txt allows the major AI crawlers and agents."
   },
   {
    "id": "A3",
@@ -51,10 +51,10 @@
   {
    "id": "A6",
    "title": "Everyday agent tasks reachable from the homepage",
-   "status": "pass",
-   "points": 15,
+   "status": "warn",
+   "points": 10,
    "maxPoints": 20,
-   "detail": "Reached from homepage: support/contact (/support/), docs/api (/docs/changelog/), legal/privacy (/guides/terms/)."
+   "detail": "Reached from homepage: support/contact (/support/), legal/privacy (/guides/terms/). Link found but not confirmed: docs/api (/docs/changelog/)."
   },
   {
    "id": "B1",
@@ -84,38 +84,38 @@
  "robots": [
   {
    "bot": "GPTBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ClaudeBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "PerplexityBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Google-Extended",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "CCBot",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Claude-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "ChatGPT-User",
-   "policy": "allowed"
+   "policy": "partial"
   },
   {
    "bot": "Perplexity-User",
-   "policy": "allowed"
+   "policy": "partial"
   }
  ],
- "robotsReadable": false,
+ "robotsReadable": true,
  "signals": {
   "llmsTxt": false,
   "mcp": false,
