@@ -1,0 +1,1067 @@
+{
+ "date": "2026-11-26",
+ "generatedAt": "2026-11-26T01:05:29.587Z",
+ "model": "deepseek-flash",
+ "producedBy": "producer",
+ "producerModel": "deepseek-v4-pro",
+ "stats": {
+  "tasks": 10,
+  "completed": 4,
+  "partial": 1,
+  "failed": 5,
+  "wallsHit": 1,
+  "pageVisits": 53,
+  "domainsVisited": 19,
+  "inputTokens": 210708,
+  "outputTokens": 27389,
+  "costUsd": 0.3,
+  "costSource": "balance",
+  "costEstimateUsd": 0.07
+ },
+ "runs": [
+  {
+   "taskId": "jolie-pitt-winery-settlement",
+   "kind": "find",
+   "title": "Jolie–Pitt winery case settled: the details",
+   "prompt": "On 25 November 2026, Angelina Jolie and Brad Pitt reportedly settled their long-running legal fight over the Château Miraval French winery, a case that had aired abuse allegations. Find out the actual substance of the settlement: what was the dispute about, did a settlement get announced, and are there any terms or statements? Prefer a source that is NOT paywalled. Good starting points are the AP News article and The Guardian, both of which covered the story.",
+   "startUrls": [
+    "https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a",
+    "https://www.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "Yes — a settlement was announced on 25 Nov 2026, but with no disclosed terms: in a joint statement their representatives said \"We have settled out of court in the best interests of our family and will not be commenting further,\" and added that any quotes in media stories attributed to \"sources\" were not coming from either of them or anyone close to them. Both sides moved to dismiss their claims against each other, and the terms of the agreement were not made public. The dispute: the couple bought a controlling interest in Château Miraval in 2008 and married there in 2014; after Jolie filed for divorce in 2016 (they were declared legally single in 2019, divorce finalized in 2024), she sold her stake in the winery to the Stoli Group, a spirits maker controlled by Yuri Shefler, for $164m in 2021. Pitt sued her in February 2022, saying she broke their agreement not to sell their interests without the other's consent. In her October 2022 counter-suit Jolie alleged abusive behavior leading to the divorce, saying talks to sell her share to Pitt collapsed over his demand that she sign an NDA barring her from speaking about \"Pitt's physical and emotional abuse of her and their children\"; Pi",
+   "chosenSite": "theguardian.com",
+   "obstacles": [
+    "AP News article returned HTTP 403 with a 'Just a moment...' bot challenge, so AP's text could not be read",
+    "r.jina.ai text proxy refused anonymous requests (IP reputation block)",
+    "DuckDuckGo HTML search returned HTTP 202 bot block and Bing results were irrelevant, so no additional corroborating source was reached"
+   ],
+   "sources": [
+    "https://www.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start with the two provided sources to get the core facts of the settlement.",
+     "url": "https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a",
+     "finalUrl": "https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a",
+     "status": 403,
+     "ok": false,
+     "botWall": true,
+     "pageTitle": "Just a moment...",
+     "note": "hit a bot challenge wall"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://www.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit",
+     "finalUrl": "https://www.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Brad Pitt and Angelina Jolie settle years-long legal battle over joint French winery | Brad Pitt | The Guardian",
+     "note": "read ~4732 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "The Guardian has the full story; AP is behind a bot challenge. Let me try one independent non-paywalled source to corroborate the terms and check for details the Guardian omitted.",
+     "url": "https://duckduckgo.com/html/?q=Brad+Pitt+Angelina+Jolie+settle+Miraval+winery+settlement+statement",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=Brad+Pitt+Angelina+Jolie+settle+Miraval+winery+settlement+statement",
+     "status": 202,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "DuckDuckGo",
+     "note": "read ~288 chars, 2 links"
+    },
+    {
+     "step": 4,
+     "narration": "DuckDuckGo is blocking bots. I'll try Bing to find another free source like BBC or Reuters.",
+     "url": "https://www.bing.com/search?q=Pitt+Jolie+settle+Miraval+winery+%22out+of+court%22+statement",
+     "finalUrl": "https://www.bing.com/search?q=Pitt+Jolie+settle+Miraval+winery+%22out+of+court%22+statement",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Pitt Jolie settle Miraval winery out of court statement - Search",
+     "note": "read ~2556 chars, 3 links"
+    },
+    {
+     "step": 5,
+     "narration": "Bing misread \"Pitt\" as the university. The Guardian text was pruned from my context, so I need it again — I'll try the AP article through a text-extraction proxy to actually read its content.",
+     "url": "https://r.jina.ai/https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a",
+     "finalUrl": "https://r.jina.ai/https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~343 chars, 0 links"
+    },
+    {
+     "step": 6,
+     "narration": "Guardian AMP version to get the article text back into view.",
+     "url": "https://amp.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit",
+     "finalUrl": "https://www.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Brad Pitt and Angelina Jolie settle years-long legal battle over joint French winery | Brad Pitt | The Guardian",
+     "note": "read ~4732 chars, 40 links"
+    },
+    {
+     "step": 7,
+     "narration": "The Guardian's full text is now in hand; the AP article stays behind an Akamai \"Just a moment...\" challenge and text proxies are IP-blocked. I have enough to answer.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 1,
+   "domainsVisited": [
+    "apnews.com",
+    "bing.com",
+    "html.duckduckgo.com",
+    "r.jina.ai",
+    "theguardian.com"
+   ],
+   "inputTokens": 8040,
+   "outputTokens": 2109,
+   "elapsedMs": 17761,
+   "diagnosis": [
+    {
+     "domain": "apnews.com",
+     "posture": "closed",
+     "parseable": false,
+     "scoreLink": true
+    },
+    {
+     "domain": "bing.com",
+     "posture": "open",
+     "parseable": false,
+     "scoreLink": true
+    },
+    {
+     "domain": "theguardian.com",
+     "posture": "selective",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "hera-asteroid-crater-size",
+   "kind": "find",
+   "title": "Hera's asteroid-crater photos: the numbers",
+   "prompt": "The European Space Agency's Hera spacecraft has returned close-up images of the stadium-sized crater left on the asteroid Dimorphos after NASA's DART spacecraft deliberately slammed into it. Find out the key facts: how big is the crater, where exactly is it, and which asteroid was struck? Give figures where you can, from an accessible source such as ESA's news page or the BBC.",
+   "startUrls": [
+    "https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+    "https://www.bbc.co.uk/news/articles/cw1561435gwo"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "partial",
+   "answer": "Partial result: NASA's DART struck Dimorphos, the small moon of the near-Earth asteroid Didymos (65803), on 26 September 2022, and ESA's Hera — which reached the binary system in November 2026 — imaged the resulting crater, described as \"stadium-sized\" and \"almost as large as the body itself,\" i.e. comparable to Dimorphos's ~150 m mean diameter (177 × 174 × 116 m). Dimorphos's orbit around Didymos was shortened by about 33 minutes by the impact. I could not verify an exact crater diameter/depth figure or its precise position on Dimorphos: the supplied BBC URL (bbc.co.uk/news/articles/cw1561435gwo) returns a hard 404, and ESA's long article was truncated on every route I tried (direct, Wayback Machine, text proxy which returned 401), with search engines bot-walled or returning no usable snippet.",
+   "chosenSite": null,
+   "obstacles": [
+    "The provided BBC URL returns HTTP 404; the correct BBC piece (found via BBC search) is at https://www.bbc.co.uk/news/articles/cw8dv112r5gmo but gives only qualitative comparisons, no crater dimensions",
+    "ESA article text was repeatedly truncated at the same point (media embed mid-article), so the crater size/location paragraphs were never rendered",
+    "r.jina.ai text proxy returned HTTP 401; DuckDuckGo HTML search returned a 202 bot challenge; Bing results gave no usable snippet; Space.com listing/asteroid pages 404 or cluttered",
+    "Wikipedia raw wikitext also truncated before the crater specifics"
+   ],
+   "sources": [
+    "https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+    "https://www.bbc.co.uk/news/articles/cw8dv112r5gmo",
+    "https://en.wikipedia.org/wiki/Dimorphos",
+    "https://en.wikipedia.org/wiki/Hera_(space_mission)"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start by fetching the ESA page about Hera's crater findings.",
+     "url": "https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+     "finalUrl": "https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Hera reveals stadium-sized asteroid crater from spacecraft impact",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "The ESA page loaded but the article body was truncated. Let me check the BBC article for the specific crater dimensions.",
+     "url": "https://www.bbc.co.uk/news/articles/cw1561435gwo",
+     "finalUrl": "https://www.bbc.co.uk/news/articles/cw1561435gwo",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "BBC - 404: Not Found",
+     "note": "read ~421 chars, 15 links"
+    },
+    {
+     "step": 3,
+     "narration": "The BBC link is dead (404). I'll try ESA's Hera news hub and a BBC search for the story.",
+     "url": "https://www.esa.int/Space_Safety/Hera",
+     "finalUrl": "https://www.esa.int/Space_Safety/Hera",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "You ve lost your orbit, captain!",
+     "note": "read ~4847 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "",
+     "url": "https://www.bbc.co.uk/search?q=Hera+Dimorphos+crater",
+     "finalUrl": "https://www.bbc.co.uk/search?q=Hera+Dimorphos+crater&edgeauth=eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJrZXkiOiAiZmFzdGx5LXVyaS10b2tlbi0xIiwiZXhwIjogMTc5NTY1NTIxOSwibmJmIjogMTc5NTY1NDg1OSwicmVxdWVzdHVyaSI6ICIlMkZzZWFyY2glM0ZxJTNESGVyYSUyQkRpbW9ycGhvcyUyQmNyYXRlciJ9.XJNDLXtiCzTUbrJMHOZQqHcMZO33w5kZImNoMIClgEI",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~3110 chars, 35 links"
+    },
+    {
+     "step": 5,
+     "narration": "BBC search found the correct article URL. Fetching it now for the crater figures.",
+     "url": "https://www.bbc.co.uk/news/articles/cw8dv112r5gmo",
+     "finalUrl": "https://www.bbc.co.uk/news/articles/cw8dv112r5gmo",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Hera mission images from asteroid crash show stadium-sized crater - BBC News",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 6,
+     "narration": "The BBC piece describes it as \"almost as large as the body itself\" but doesn't give exact crater figures or its position. I'll re-pull the ESA article through a text-rendering proxy since the direct read was truncated.",
+     "url": "https://r.jina.ai/https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+     "finalUrl": "https://r.jina.ai/https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+     "status": 401,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~343 chars, 0 links"
+    },
+    {
+     "step": 7,
+     "narration": "Blocked by that proxy. I'll try the Wayback Machine copy of the ESA article, plus Wikipedia's Dimorphos page as a cross-check.",
+     "url": "https://web.archive.org/web/2026/https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+     "finalUrl": "https://web.archive.org/web/20261125233200/https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Hera reveals stadium-sized asteroid crater from spacecraft impact",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 8,
+     "narration": "",
+     "url": "https://en.wikipedia.org/wiki/Dimorphos",
+     "finalUrl": "https://en.wikipedia.org/wiki/Dimorphos",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Dimorphos - Wikipedia",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 9,
+     "narration": "The Wayback copy is also truncated mid-article. Let me search for the specific crater measurements via DuckDuckGo's plain-HTML endpoint.",
+     "url": "https://html.duckduckgo.com/html/?q=Hera+Dimorphos+crater+%22stadium-sized%22+metres+across+deep",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=Hera+Dimorphos+crater+%22stadium-sized%22+metres+across+deep",
+     "status": 202,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "DuckDuckGo",
+     "note": "read ~288 chars, 2 links"
+    },
+    {
+     "step": 10,
+     "narration": "DuckDuckGo threw a bot challenge. I'll try Bing to locate a secondary article with the exact crater dimensions.",
+     "url": "https://www.bing.com/search?q=Hera+Dimorphos+crater+stadium-sized+across+deep+ESA",
+     "finalUrl": "https://www.bing.com/search?q=Hera+Dimorphos+crater+stadium-sized+across+deep+ESA",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Hera Dimorphos crater stadium-sized across deep ESA - Search",
+     "note": "read ~2750 chars, 3 links"
+    },
+    {
+     "step": 11,
+     "narration": "Bing surfaced CNN and Space.com coverage. I'll open Space.com's asteroid section to find the article with the numbers.",
+     "url": "https://www.space.com/astronomy/asteroids",
+     "finalUrl": "https://www.space.com/astronomy/asteroids",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~3388 chars, 40 links"
+    },
+    {
+     "step": 12,
+     "narration": "Empty listing. I'll check Space.com's asteroid-and-comet missions page for the Hera story link.",
+     "url": "https://www.space.com/space-exploration/missions/asteroid-comet-missions",
+     "finalUrl": "https://www.space.com/space-exploration/missions/asteroid-comet-missions",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Asteroid & Comet Missions Coverage | Space",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 13,
+     "narration": "Space.com's listing buries the story. I'll try Wikipedia's DART article, which should summarise Hera's crater findings with figures.",
+     "url": "https://en.wikipedia.org/wiki/Double_Asteroid_Redirection_Test",
+     "finalUrl": "https://en.wikipedia.org/wiki/Double_Asteroid_Redirection_Test",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Double Asteroid Redirection Test - Wikipedia",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 14,
+     "narration": "Wikipedia's rendered page is mostly chrome. I'll pull the raw wikitext of the Dimorphos and Hera articles instead — much denser.",
+     "url": "https://en.wikipedia.org/w/index.php?title=Dimorphos&action=raw",
+     "finalUrl": "https://en.wikipedia.org/w/index.php?title=Dimorphos&action=raw",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 15,
+     "narration": "",
+     "url": "https://en.wikipedia.org/w/index.php?title=Hera_(space_mission)&action=raw",
+     "finalUrl": "https://en.wikipedia.org/w/index.php?title=Hera_(space_mission)&action=raw",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 16,
+     "narration": "One more targeted pull: the \"Mission goals\" section of the Hera article in raw wikitext, which was cut off right at the crater description.",
+     "url": "https://en.wikipedia.org/w/index.php?title=Hera_(space_mission)&action=raw&section=1",
+     "finalUrl": "https://en.wikipedia.org/w/index.php?title=Hera_(space_mission)&action=raw&section=1",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 17,
+     "narration": "I'm out of page budget, so here's what I could and couldn't confirm.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "bbc.co.uk",
+    "bing.com",
+    "en.wikipedia.org",
+    "esa.int",
+    "html.duckduckgo.com",
+    "r.jina.ai",
+    "space.com",
+    "web.archive.org"
+   ],
+   "inputTokens": 61935,
+   "outputTokens": 5873,
+   "elapsedMs": 52468,
+   "diagnosis": [
+    {
+     "domain": "bbc.co.uk",
+     "posture": "closed",
+     "parseable": true,
+     "scoreLink": true
+    },
+    {
+     "domain": "bing.com",
+     "posture": "open",
+     "parseable": false,
+     "scoreLink": true
+    },
+    {
+     "domain": "esa.int",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "tesla-eu-fsd-vote-delay",
+   "kind": "find",
+   "title": "Tesla's EU self-driving vote: why postponed",
+   "prompt": "The European Union has postponed a planned discussion or vote on approving Tesla's 'Full Self-Driving' (FSD) self-driving technology. Find out what happened: to what new date was the vote pushed, and why was it postponed? Cite specifics and a readable source such as Electrek or CNBC (not a paywall).",
+   "startUrls": [
+    "https://electrek.co/2026/11/25/eu-delays-tesla-fsd-vote-december-15-tcmv/",
+    "https://www.cnbc.com/2026/11/25/eu-postpones-discussion-to-approve-teslas-self-driving-tech.html"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "The EU's Technical Committee on Motor Vehicles (TCMV) meeting to consider — and potentially vote on — bloc-wide approval of Tesla's system (now sold in Europe as \"Tesla Assisted Driving,\" renamed from Full Self-Driving) was pushed from its originally scheduled December 1, 2026 date to December 15, 2026, per a European Commission spokesperson who confirmed the new date to Reuters. No official reason was given: Electrek states plainly that \"nobody has given a reason for the change,\" and both outlets frame the slip as the latest in a long series of missed European dates rather than a Tesla-specific problem — the committee had already discussed the file twice without voting, and the Dec. 15 meeting is still only a discussion that could be deferred into 2027. Note that Belgium's Flanders transport ministry initially said the meeting moved to December 7 before the Commission clarified December 15. Context: EU-wide approval needs at least 15 of 27 member states representing 65% of the population; 12 countries have recognized the Dutch (RDW) April 10 approval, and a rejection at EU level would invalidate those national approvals.",
+   "chosenSite": "electrek.co",
+   "obstacles": [
+    "No official explanation for the postponement was published by either outlet — both only report the new date and the prior pattern of delays",
+    "Initial reporting conflict on the new date (Dec 7 per Flanders ministry vs. Dec 15 per European Commission)"
+   ],
+   "sources": [
+    "https://electrek.co/2026/11/25/eu-delays-tesla-fsd-vote-december-15-tcmv/",
+    "https://www.cnbc.com/2026/11/25/eu-postpones-discussion-to-approve-teslas-self-driving-tech.html"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll check the Electrek article first, then the CNBC one as backup.",
+     "url": "https://electrek.co/2026/11/25/eu-delays-tesla-fsd-vote-december-15-tcmv/",
+     "finalUrl": "https://electrek.co/2026/11/25/eu-delays-tesla-fsd-vote-december-15-tcmv/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "EU pushes back Tesla Full Self-Driving vote meeting again, now set for December 15 | Electrek",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://www.cnbc.com/2026/11/25/eu-postpones-discussion-to-approve-teslas-self-driving-tech.html",
+     "finalUrl": "https://www.cnbc.com/2026/11/25/eu-postpones-discussion-to-approve-teslas-self-driving-tech.html",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "EU postpones discussion to approve Tesla&#x27;s self-driving tech",
+     "note": "read ~3886 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "Both sources loaded cleanly. Here's what they say.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "cnbc.com",
+    "electrek.co"
+   ],
+   "inputTokens": 3973,
+   "outputTokens": 716,
+   "elapsedMs": 5786,
+   "diagnosis": [
+    {
+     "domain": "cnbc.com",
+     "posture": "closed",
+     "parseable": true,
+     "scoreLink": true
+    },
+    {
+     "domain": "electrek.co",
+     "posture": "selective",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "big-ten-volleyball-final-four",
+   "kind": "find",
+   "title": "Big Ten volleyball: who's left for the title?",
+   "prompt": "The inaugural Big Ten volleyball tournament is down to four teams, with Nebraska, Penn State, Wisconsin and Purdue reportedly still in contention. Find out which four teams remain, when the next matches (semifinal or final) are played, and what channel or platform is showing them. Start with the Big Ten's own news pages.",
+   "startUrls": [
+    "https://bigten.org/news/2026/11/23/volleyball-four-left-in-pursuit-for-inaugural-tournament-title.aspx",
+    "https://bigten.org/news/2026/11/18/2026-allstate-big-ten-volleyball-tournament-bracket-announced.aspx"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "The four semifinalists at the inaugural Allstate Big Ten Volleyball Tournament were No. 1 Nebraska, No. 2 Penn State, No. 3 Wisconsin and No. 5 Purdue. The semifinals were played Tuesday, Nov. 24 at Fishers Event Center in Fishers, Ind. — Nebraska vs. Purdue at 6 p.m. ET and Penn State vs. Wisconsin at 8 p.m. ET — both televised on Big Ten Network (also streamable on FOX One). Nebraska beat Purdue 3-1 and Wisconsin beat Penn State 3-1, so the championship match is Wednesday, Nov. 25 at 8 p.m. ET, Nebraska vs. Wisconsin, airing live on FOX (the first broadcast network to carry a women's college volleyball conference tournament final).",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [
+    "https://bigten.org/news/2026/11/23/volleyball-four-left-in-pursuit-for-inaugural-tournament-title.aspx",
+    "https://bigten.org/news/2026/11/18/2026-allstate-big-ten-volleyball-tournament-bracket-announced.aspx",
+    "https://bigten.org/sports/2026/10/1/VBT.aspx"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start with the Big Ten's own news page about the semifinal field.",
+     "url": "https://bigten.org/news/2026/11/23/volleyball-four-left-in-pursuit-for-inaugural-tournament-title.aspx",
+     "finalUrl": "https://bigten.org/news/2026/11/23/volleyball-four-left-in-pursuit-for-inaugural-tournament-title.aspx",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Four Left in Pursuit for Inaugural Tournament Title - Big Ten Conference",
+     "note": "read ~5000 chars, 15 links"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://bigten.org/news/2026/11/18/2026-allstate-big-ten-volleyball-tournament-bracket-announced.aspx",
+     "finalUrl": "https://bigten.org/news/2026/11/18/2026-allstate-big-ten-volleyball-tournament-bracket-announced.aspx",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "2026 Allstate Big Ten Volleyball Tournament Bracket Announced - Big Ten Conference",
+     "note": "read ~4952 chars, 11 links"
+    },
+    {
+     "step": 3,
+     "narration": "Both pages loaded cleanly and give the full picture. Let me confirm the schedule/channel details on the tournament central page.",
+     "url": "https://bigten.org/news/2026/11/20/2026-big-ten-volleyball-tournament-central.aspx",
+     "finalUrl": "https://bigten.org/sports/2026/10/1/VBT.aspx",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "2026 Big Ten Volleyball Tournament Central - Big Ten Conference",
+     "note": "read ~4995 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "I have everything from the Big Ten's own bracket announcement and tournament central page.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "bigten.org"
+   ],
+   "inputTokens": 6935,
+   "outputTokens": 1256,
+   "elapsedMs": 9455,
+   "diagnosis": [
+    {
+     "domain": "bigten.org",
+     "posture": "selective",
+     "parseable": false,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "kyren-williams-turf-toe-status",
+   "kind": "find",
+   "title": "Kyren Williams' turf toe: is he playing?",
+   "prompt": "Los Angeles Rams running back Kyren Williams is reportedly dealing with turf toe, and there is confusion about whether he will play in Week 12 against the Green Bay Packers. Find the latest factual status: is he on or off the injury report, and is he expected to play? Cite a source that is readable without a paywall.",
+   "startUrls": [
+    "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-kyren-williams-toe-injury-report-update/92965551007/",
+    "https://www.nbcsports.com/fantasy/football/player-news/2026-11-25/pelissero-kyren-williams-dealing-with-turf-toe"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "completed",
+   "answer": "Kyren Williams carries no game-status designation for the Rams' Week 12 game against the Packers, so he is expected to play Wednesday night. He does appear on the Week 12 injury report with a toe injury — limited Sunday, full practice Monday and Tuesday — but the \"Game Status\" column shows no designation (not questionable/doubtful/out), which is why outlets headlined him as \"off the injury report, set to play.\" The turf-toe report from Tom Pelissero did not change his availability. The official Rams injury report is free to read.",
+   "chosenSite": "therams.com",
+   "obstacles": [
+    "NBC player-news pages returned only navigation/404 to the plain fetcher",
+    "Bing and DuckDuckGo results were unusable; Google News RSS headlines supplied corroboration"
+   ],
+   "sources": [
+    "https://www.therams.com/team/injury-report/",
+    "https://www.nbcsports.com/fantasy/football/player-news/2026-11-25/pelissero-kyren-williams-dealing-with-turf-toe",
+    "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-kyren-williams-toe-injury-report-update/92965551007/"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start with the two provided sources to see what they report about Kyren Williams' status.",
+     "url": "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-kyren-williams-toe-injury-report-update/92965551007/",
+     "finalUrl": "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-kyren-williams-toe-injury-report-update/92965551007/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Rams RB Kyren Williams has dealt with turf toe for past month",
+     "note": "read ~2959 chars, 5 links"
+    },
+    {
+     "step": 2,
+     "narration": "",
+     "url": "https://www.nbcsports.com/fantasy/football/player-news/2026-11-25/pelissero-kyren-williams-dealing-with-turf-toe",
+     "finalUrl": "https://www.nbcsports.com/fantasy/football/player-news/2026-11-25/pelissero-kyren-williams-dealing-with-turf-toe",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Pelissero: Kyren Williams dealing with turf toe - NBC Sports",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "The Rams Wire piece confirms the turf toe report but doesn't say whether he's on the injury report. I'll search for the official Week 12 injury report status.",
+     "url": "https://www.bing.com/search?q=Kyren+Williams+turf+toe+injury+report+Week+12+Packers+status",
+     "finalUrl": "https://www.bing.com/search?q=Kyren+Williams+turf+toe+injury+report+Week+12+Packers+status",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Kyren Williams turf toe injury report Week 12 Packers status - Search",
+     "note": "read ~2676 chars, 3 links"
+    },
+    {
+     "step": 4,
+     "narration": "",
+     "url": "https://www.nbcsports.com/fantasy/football/player-news?player=Kyren%20Williams",
+     "finalUrl": "https://www.nbcsports.com/fantasy/football/player-news?player=Kyren%20Williams",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "NFL Player News: Latest Reports, Injuries, Transactions - Rotoworld - NBC Sports - NBC Sports",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 5,
+     "narration": "Bing gave junk. I'll go to the Rams' official injury report page and a sharper search for the Week 12 game status.",
+     "url": "https://www.therams.com/team/injury-report/",
+     "finalUrl": "https://www.therams.com/team/injury-report/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Rams Injury Report | Los Angeles Rams - therams.com",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 6,
+     "narration": "",
+     "url": "https://duckduckgo.com/html/?q=Kyren+Williams+Week+12+Packers+injury+report+expected+to+play",
+     "finalUrl": "https://html.duckduckgo.com/html/?q=Kyren+Williams+Week+12+Packers+injury+report+expected+to+play",
+     "status": 202,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "DuckDuckGo",
+     "note": "read ~288 chars, 2 links"
+    },
+    {
+     "step": 7,
+     "narration": "The Rams' official injury report lists Kyren Williams (toe) as LP/FP/FP with no game status, plus Packers opponent data — clearly the Week 12 report. I'll confirm the week designation directly if the page supports a week parameter.",
+     "url": "https://www.therams.com/team/injury-report?week=12",
+     "finalUrl": "https://www.therams.com/team/injury-report/?week=12",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Rams Injury Report | Los Angeles Rams - therams.com",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 8,
+     "narration": "The official table is unambiguous on the listing, but I want a second readable confirmation of the \"expected to play\" interpretation, so I'll try the Rams Wire article in AMP form.",
+     "url": "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-kyren-williams-toe-injury-report-update/92965551007/?outputType=amp",
+     "finalUrl": "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-kyren-williams-toe-injury-report-update/92965551007/?outputType=amp",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Rams RB Kyren Williams has dealt with turf toe for past month",
+     "note": "read ~2959 chars, 5 links"
+    },
+    {
+     "step": 9,
+     "narration": "The Rams Wire article only confirms the turf-toe report and that he remained starter; it doesn't address game status. I'll check one more independent headline source to corroborate the \"no designation/expected to play\" reading.",
+     "url": "https://news.google.com/rss/search?q=Kyren+Williams+turf+toe+injury+report&hl=en-US&gl=US&ceid=US:en",
+     "finalUrl": "https://news.google.com/rss/search?q=Kyren+Williams+turf+toe+injury+report&hl=en-US&gl=US&ceid=US:en",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "\"Kyren Williams turf toe injury report\" - Google News",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 10,
+     "narration": "Headlines confirm the key point: \"Kyren Williams off injury report, set to play Wednesday vs. Packers.\" I'll pull that article to quote its exact wording.",
+     "url": "https://news.google.com/rss/search?q=%22Kyren+Williams+off+injury+report%22&hl=en-US&gl=US&ceid=US:en",
+     "finalUrl": "https://news.google.com/rss/search?q=%22Kyren+Williams+off+injury+report%22&hl=en-US&gl=US&ceid=US:en",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "\"\"Kyren Williams off injury report\"\" - Google News",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 11,
+     "narration": "I'll open the RotoBaller piece (Nov 24) that says he's off the injury report for the Packers game, to capture exact wording.",
+     "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNZmRVRW0teEJTQ3VNcjNHS0UybjREdkx1Q1F2VENsZkdEaTVHSkdiSHRfZHRzZV9GVC1MUnQzNjFNNkx2eEg3V0VjTHc1aUNVSWNOaEJWYnpNYTRYLV9xX2pQcmVqRWNaaDJxTkxiT1FfcGFGWGw5MndMWlR3Mm9UMUFvb0s4alJRbmVLOWF6MlJWa0tyS3lHa3R3?oc=5",
+     "finalUrl": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNZmRVRW0teEJTQ3VNcjNHS0UybjREdkx1Q1F2VENsZkdEaTVHSkdiSHRfZHRzZV9GVC1MUnQzNjFNNkx2eEg3V0VjTHc1aUNVSWNOaEJWYnpNYTRYLV9xX2pQcmVqRWNaaDJxTkxiT1FfcGFGWGw5MndMWlR3Mm9UMUFvb0s4alJRbmVLOWF6MlJWa0tyS3lHa3R3?oc=5&hl=en-US&gl=US&ceid=US:en",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Google News",
+     "note": "read ~11 chars, 0 links"
+    },
+    {
+     "step": 12,
+     "narration": "The Google redirect didn't render an article. I'll query specifically for the Sports Illustrated \"Is Kyren Williams playing tonight?\" piece, which should state his game status plainly.",
+     "url": "https://news.google.com/rss/search?q=%22Is+Kyren+Williams+Playing+Tonight%22+Packers+Rams&hl=en-US&gl=US&ceid=US:en",
+     "finalUrl": "https://news.google.com/rss/search?q=%22Is+Kyren+Williams+Playing+Tonight%22+Packers+Rams&hl=en-US&gl=US&ceid=US:en",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "\"\"Is Kyren Williams Playing Tonight\" Packers Rams\" - Google News",
+     "note": "read ~5000 chars, 0 links"
+    },
+    {
+     "step": 13,
+     "narration": "Headlines corroborate, but I'd like the exact NBC wording. I'll guess the direct NBC player-news URL for the \"off injury report\" item.",
+     "url": "https://www.nbcsports.com/fantasy/football/player-news/2026-11-25/kyren-williams-off-injury-report-set-to-play-wednesday-vs-packers",
+     "finalUrl": "https://www.nbcsports.com/fantasy/football/player-news/2026-11-25/kyren-williams-off-injury-report-set-to-play-wednesday-vs-packers",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Page Not Found - NBC Sports",
+     "note": "read ~4835 chars, 40 links"
+    },
+    {
+     "step": 14,
+     "narration": "I have what I need: the official Rams injury report plus corroborating headlines. Final answer below.",
+     "url": "",
+     "finalUrl": "",
+     "status": 0,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "",
+     "note": "wrapped up"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "bing.com",
+    "html.duckduckgo.com",
+    "nbcsports.com",
+    "news.google.com",
+    "therams.com",
+    "theramswire.usatoday.com"
+   ],
+   "inputTokens": 69113,
+   "outputTokens": 9649,
+   "elapsedMs": 76837,
+   "diagnosis": [
+    {
+     "domain": "bing.com",
+     "posture": "open",
+     "parseable": false,
+     "scoreLink": true
+    },
+    {
+     "domain": "nbcsports.com",
+     "posture": "open",
+     "parseable": true,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "hornets-bulls-game-time",
+   "kind": "find",
+   "title": "Hornets vs Bulls tonight: time and TV",
+   "prompt": "The Charlotte Hornets host the Chicago Bulls today, 26 November 2026, as part of a homestand. Find out what time the game tips off (Eastern time) and which channel or streaming service is showing it, plus any notable injury news. Start with the Hornets' or NBA's official game preview pages.",
+   "startUrls": [
+    "https://www.nba.com/hornets",
+    "https://www.espn.com/nba/team/_/name/cha/charlotte-hornets"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "failed",
+   "answer": "",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [],
+   "steps": [
+    {
+     "step": 1,
+     "narration": "I'll start with the Hornets' official NBA team page to find today's game details.",
+     "url": "https://www.nba.com/hornets",
+     "finalUrl": "https://www.nba.com/hornets/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Charlotte Hornets - Get the Latest Hornets Scores, Schedule & News",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 2,
+     "narration": "The Hornets page shows the Bulls game as a Cup Night but didn't display its tip time clearly. Let me check ESPN's team page for schedule and broadcast info.",
+     "url": "https://www.espn.com/nba/team/_/name/cha/charlotte-hornets",
+     "finalUrl": "https://www.espn.com/nba/team/_/name/cha/charlotte-hornets",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Charlotte Hornets Scores, Stats and Highlights - ESPN",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 3,
+     "narration": "ESPN's team page confirms the Bulls game is live now and lists three Hornets injuries (Kalkbrenner, Allen, Schroder — all Out). Now I'll check ESPN's schedule page for tip time and TV channel.",
+     "url": "https://www.espn.com/nba/team/schedule/_/name/cha/charlotte-hornets",
+     "finalUrl": "https://www.espn.com/nba/team/schedule/_/name/cha/charlotte-hornets",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Charlotte Hornets 2026-27 Regular Season NBA Schedule - ESPN",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 4,
+     "narration": "ESPN's schedule shows \"Wed, Nov 25 vs Chicago — LIVE\" with no time or TV listed. I'll check ESPN's NBA scoreboard for the game's tip time and broadcast.",
+     "url": "https://www.espn.com/nba/scoreboard",
+     "finalUrl": "https://www.espn.com/nba/scoreboard",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "NBA Scores, 2026-27 Season - ESPN",
+     "note": "read ~4665 chars, 40 links"
+    },
+    {
+     "step": 5,
+     "narration": "ESPN's scoreboard is dated Wednesday, Nov 25, 2026, and the Bulls–Hornets game is already in the 2nd quarter. I'll open the game page to get the scheduled tip time and broadcast info.",
+     "url": "https://www.espn.com/nba/game/_/gameId/401909318",
+     "finalUrl": "https://www.espn.com/nba/game/_/gameId/401909318",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Bulls vs. Hornets (Nov 25, 2026) Live Score - ESPN",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 6,
+     "narration": "ESPN's game info page lists \"12:00 AM, November 26, 2026\" at Spectrum Center — likely a placeholder. I need the official NBA preview for tip time and broadcast; let me try the NBA schedule.",
+     "url": "https://www.nba.com/schedule?date=11/26/2026",
+     "finalUrl": "https://www.nba.com/schedule?date=11/26/2026",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "NBA Schedule - NBA Games & Events | NBA.com",
+     "note": "read ~3220 chars, 40 links"
+    },
+    {
+     "step": 7,
+     "narration": "The NBA schedule page is JavaScript-driven and gave no game list. I'll check the Hornets' news section for a game preview or \"how to watch\" article.",
+     "url": "https://www.nba.com/hornets/news",
+     "finalUrl": "https://www.nba.com/hornets/news",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "News & Media | Charlotte Hornets",
+     "note": "read ~3788 chars, 40 links"
+    },
+    {
+     "step": 8,
+     "narration": "The Hornets site has a \"How To Watch\" page — that should give the broadcast details. I'll open it along with the team schedule list.",
+     "url": "https://www.nba.com/hornets/how-to-watch",
+     "finalUrl": "https://www.nba.com/hornets/how-to-watch",
+     "status": 404,
+     "ok": false,
+     "botWall": false,
+     "pageTitle": "Content Unavailable",
+     "note": "read ~117 chars, 2 links"
+    },
+    {
+     "step": 9,
+     "narration": "",
+     "url": "https://www.nba.com/hornets/schedule",
+     "finalUrl": "https://www.nba.com/hornets/schedule",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Schedule | Charlotte Hornets",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 10,
+     "narration": "The team schedule shows Bulls at home, Wed Nov 25, \"7:00 PM\" (the column header says PDT but other rows like Wizards/Pistons 7:00 and Suns 9:00 read as Eastern). The TV column was blank there, so I'll check the Bulls' official site for the broadcast listing.",
+     "url": "https://www.nba.com/bulls",
+     "finalUrl": "https://www.nba.com/bulls/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Chicago Bulls - Get the Latest Bulls Scores, Schedule & News",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 11,
+     "narration": "The Bulls site confirms tonight's game is live and that Chicago's feed is CHSN/CHSN App. I still need Charlotte's broadcast and injury details, so I'll re-open the Hornets homepage to read it properly this time.",
+     "url": "https://www.nba.com/hornets",
+     "finalUrl": "https://www.nba.com/hornets/",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "Charlotte Hornets - Get the Latest Hornets Scores, Schedule & News",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 12,
+     "narration": "The Hornets' own listing gives the broadcast: \"TV 64 / DAZN-CHA\" (radio WFNZ 92.7 FM). Now I'll pull ESPN's NBA injury page for details on both teams' unavailable players.",
+     "url": "https://www.espn.com/nba/injuries",
+     "finalUrl": "https://www.espn.com/nba/injuries",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "NBA Injury Status - 2026-27 Season - ESPN",
+     "note": "read ~5000 chars, 40 links"
+    },
+    {
+     "step": 13,
+     "narration": "ESPN's injury page confirms both teams' statuses for Wednesday's game against each other. Let me make one last attempt at the Hornets' \"How To Watch\" page for streaming specifics.",
+     "url": "https://www.nba.com/hornets/watch",
+     "finalUrl": "https://www.nba.com/hornets/watch",
+     "status": 200,
+     "ok": true,
+     "botWall": false,
+     "pageTitle": "How to Watch | Charlotte Hornets",
+     "note": "read ~5000 chars, 4 links"
+    }
+   ],
+   "wallsHit": 0,
+   "domainsVisited": [
+    "espn.com",
+    "nba.com"
+   ],
+   "inputTokens": 60712,
+   "outputTokens": 7786,
+   "elapsedMs": 61333,
+   "error": "402 {\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"Insufficient Balance (request_id: 594643b4-8fd2-4271-be03-694102d4c273)\"}}",
+   "diagnosis": [
+    {
+     "domain": "espn.com",
+     "posture": "selective",
+     "parseable": false,
+     "scoreLink": true
+    },
+    {
+     "domain": "nba.com",
+     "posture": "closed",
+     "parseable": false,
+     "scoreLink": true
+    }
+   ]
+  },
+  {
+   "taskId": "myles-garrett-knee-admission",
+   "kind": "find",
+   "title": "Myles Garrett on his knee: what he actually said",
+   "prompt": "Rams defensive lineman Myles Garrett reportedly admitted his surgically repaired knee 'probably won't be even 90% this season'. Find out what he actually said, the context of his recovery, and his current playing status. Use a readable source such as Rams Wire (USA Today) rather than a paywall.",
+   "startUrls": [
+    "https://theramswire.usatoday.com/story/sports/nfl/rams/2026/11/25/rams-myles-garrett-knee-injury-swelling-update/92965688007/",
+    "https://heavy.com/sports/nfl/cleveland-browns/myles-garrett-knee-injury-concern-rams/"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "failed",
+   "answer": "",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [],
+   "steps": [],
+   "wallsHit": 0,
+   "domainsVisited": [],
+   "inputTokens": 0,
+   "outputTokens": 0,
+   "elapsedMs": 556,
+   "error": "402 {\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"Insufficient Balance (request_id: ed165f55-db87-4e52-98f3-8b5cd9673b33)\"}}",
+   "diagnosis": []
+  },
+  {
+   "taskId": "pick-clearest-jolie-pitt-source",
+   "kind": "choose",
+   "title": "Pick the clearest Jolie–Pitt settlement source",
+   "prompt": "Several news outlets have reported on the Angelina Jolie and Brad Pitt settlement of their winery (Château Miraval) lawsuit, some behind paywalls, some not. Visit these candidate pages and decide which single article gives a reader, without an account or paywall, the clearest and fullest account of what the settlement involves. Report which one you would recommend and why.",
+   "startUrls": [
+    "https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a"
+   ],
+   "candidates": [
+    "https://apnews.com/article/angelina-jolie-brad-pitt-winery-fight-75fa59db8ea75c943d6f2376731d031a",
+    "https://www.theguardian.com/film/2026/nov/25/brad-pitt-angelina-jolie-settle-french-winery-lawsuit",
+    "https://variety.com/2026/film/news/brad-pitt-angelina-jolie-settlement-chateau-miraval-1236958440/",
+    "https://www.nytimes.com/2026/11/25/movies/angelina-jolie-brad-pitt-settlement-winery-lawsuit.html"
+   ],
+   "model": "deepseek-flash",
+   "outcome": "failed",
+   "answer": "",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [],
+   "steps": [],
+   "wallsHit": 0,
+   "domainsVisited": [],
+   "inputTokens": 0,
+   "outputTokens": 0,
+   "elapsedMs": 555,
+   "error": "402 {\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"Insufficient Balance (request_id: 732c85a4-69db-482e-b66e-289171f6d1f5)\"}}",
+   "diagnosis": []
+  },
+  {
+   "taskId": "pick-clearest-hera-crater-source",
+   "kind": "choose",
+   "title": "Pick the clearest Hera crater article",
+   "prompt": "The ESA Hera mission's images of the stadium-sized crater on Dimorphos are covered by many outlets, including ESA itself, the BBC, The Guardian, and ABC News. Visit these and pick the single page that best lets a general reader, without paywalls or technical noise, understand what was photographed and its significance. Report your recommendation and the reasoning.",
+   "startUrls": [
+    "https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact"
+   ],
+   "candidates": [
+    "https://www.esa.int/articles/about-us/directorates/operations/space-safety/hera/hera-reveals-stadium-sized-asteroid-crater-left-after-spacecraft-impact",
+    "https://www.bbc.co.uk/news/articles/cw1561435gwo",
+    "https://www.theguardian.com/science/2026/nov/25/dimorphos-asteroid-spacecraft-crash-closeup-images",
+    "https://www.abc.net.au/news/2026-11-26/new-photos-of-struck-asteroid-dimorphos/107428078"
+   ],
+   "model": "deepseek-flash",
+   "outcome": "failed",
+   "answer": "",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [],
+   "steps": [],
+   "wallsHit": 0,
+   "domainsVisited": [],
+   "inputTokens": 0,
+   "outputTokens": 0,
+   "elapsedMs": 568,
+   "error": "402 {\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"Insufficient Balance (request_id: b1637629-178e-4a1b-af60-4ab9eb927e17)\"}}",
+   "diagnosis": []
+  },
+  {
+   "taskId": "stunt-tesla-eu-vote-bloomberg",
+   "kind": "stunt",
+   "title": "Stunt: pry the Tesla EU vote from Bloomberg",
+   "prompt": "Bloomberg is likely the most thorough source on the EU's postponement of its vote on Tesla's self-driving technology, including market reaction and what happens next. Try to retrieve the actual details of the story — the new date, the reason, and any market impact — starting from Bloomberg and its accessible mirrors (CNBC, Yahoo Finance, Electrek). Document exactly where you get blocked or hit a paywall, and what you could and could not confirm.",
+   "startUrls": [
+    "https://www.bloomberg.com/",
+    "https://www.cnbc.com/2026/11/25/eu-postpones-discussion-to-approve-teslas-self-driving-tech.html"
+   ],
+   "candidates": [],
+   "model": "deepseek-flash",
+   "outcome": "failed",
+   "answer": "",
+   "chosenSite": null,
+   "obstacles": [],
+   "sources": [],
+   "steps": [],
+   "wallsHit": 0,
+   "domainsVisited": [],
+   "inputTokens": 0,
+   "outputTokens": 0,
+   "elapsedMs": 576,
+   "error": "402 {\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"Insufficient Balance (request_id: ad181a96-5aa5-4f0f-8075-7e23fe1fb3d0)\"}}",
+   "diagnosis": []
+  }
+ ]
+}
