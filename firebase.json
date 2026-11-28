@@ -4,7 +4,8 @@
     "cleanUrls": true,
     "ignore": [
       "firebase.json",
-      "**/.*"
+      "**/.DS_Store",
+      "**/.git/**"
     ],
     "redirects": [
       {
@@ -87,6 +88,28 @@
             "value": "public, max-age=3600"
           }
         ]
+      },
+      {
+        "source": "/.well-known/mcp/server-card.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      {
+        "source": "/openapi.json",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
       }
     ],
     "rewrites": [
@@ -94,6 +117,13 @@
         "source": "/api/check",
         "function": {
           "functionId": "check",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/mcp",
+        "function": {
+          "functionId": "mcp",
           "region": "us-central1"
         }
       }

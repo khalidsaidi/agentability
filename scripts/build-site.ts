@@ -48,7 +48,7 @@ const SITE = "https://agentability.org";
 const ISSUE_NEW = "https://github.com/khalidsaidi/agentability/issues/new?template=audit-request.yml";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
 // Bump when evergreen copy (methodology, docs, support, privacy) changes; it feeds sitemap lastmod.
-const SITE_CONTENT_UPDATED = "2026-11-27";
+const SITE_CONTENT_UPDATED = "2026-11-28";
 // A daily feed that carries every episode ever grows without bound and readers
 // re-download it on every poll. Thirty is roughly a month of the show.
 const FEED_ITEMS = 30;
@@ -1882,6 +1882,8 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
 </form>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
 <script src="/check.js" defer></script>
+<p class="lede"><b>Contact us</b> through a <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>:
+questions, corrections and audit requests all go there, in public, and a person answers.</p>
 <p class="lede">The instant check isn&rsquo;t saved or published. If you want the site on the Index, with a public report
 page that is re-checked every week, ask below. You can also dispute a score or have it re-run after a fix.</p>
 <p class="lede"><b>Request an audit</b> — open an
@@ -2030,6 +2032,8 @@ nothing you can't test with curl.</p>
       `- AI shopping agents: which online shops they can read (agentic commerce, UCP): ${SITE}/shops/`,
       `- Support (audit requests, disputes): ${SITE}/support/`,
       `- Instant check of any site: POST ${SITE}/api/check with JSON {"domain":"example.com"} (rate limited)`,
+      `- MCP server (tools: check_site, lookup_index, get_findings): ${SITE}/mcp`,
+      `- OpenAPI description: ${SITE}/openapi.json`,
       "",
       "## Guides",
       ...GUIDES.map((g) => `- ${g.title}: ${SITE}/guides/${g.slug}/`),
@@ -2111,6 +2115,11 @@ ${episodes
   // Social card, rendered once by scripts/render-og.sh and committed.
   if (fs.existsSync(OG_IMAGE)) await fsp.copyFile(OG_IMAGE, path.join(OUT, "og.png"));
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/check.js"), path.join(OUT, "check.js"));
+  // The agent-facing surface: an MCP server card and an OpenAPI description.
+  // Agentability shipped both on 16 January 2026; the August rebuild dropped them.
+  await fsp.mkdir(path.join(OUT, ".well-known/mcp"), { recursive: true });
+  await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/mcp-server-card.json"), path.join(OUT, ".well-known/mcp/server-card.json"));
+  await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/openapi.json"), path.join(OUT, "openapi.json"));
 
   // Open data: publish summary + history + episodes verbatim.
   // Brand marks, committed by `npm run logos` — copied, never fetched at build time.

@@ -1,0 +1,89 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Agentability API",
+    "version": "1.0.0",
+    "description": "Check whether AI agents can use a website, and read the AI-Readiness Index of the web's most-visited sites. Agents can also use the MCP server at https://agentability.org/mcp.",
+    "license": { "name": "Apache-2.0", "identifier": "Apache-2.0" }
+  },
+  "servers": [{ "url": "https://agentability.org" }],
+  "paths": {
+    "/api/check": {
+      "post": {
+        "operationId": "checkSite",
+        "summary": "Check a website now",
+        "description": "Runs the same nine checks the weekly Index uses against a public website and returns a 0-100 score. Takes 2-10 seconds. Results are cached for 24 hours. Limited to 10 checks per hour per client and 1,000 per day overall. The check is not published.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["domain"],
+                "properties": { "domain": { "type": "string", "maxLength": 300, "examples": ["example.com"] } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The site was checked.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CheckResult" } } }
+          },
+          "400": { "description": "Not a public website address.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Called from another website's pages.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "422": { "description": "The address points to a private network.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit reached; see Retry-After.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "502": { "description": "The site could not be reached.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "503": { "description": "Checks are paused.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "504": { "description": "The site took too long to answer.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/data/summary.json": {
+      "get": {
+        "operationId": "getIndex",
+        "summary": "The AI-Readiness Index",
+        "description": "Every site in the weekly Index with its rank, score, grade and AI-crawler posture, plus headline statistics. Updated every Monday.",
+        "responses": { "200": { "description": "The current Index.", "content": { "application/json": { "schema": { "type": "object" } } } } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CheckResult": {
+        "type": "object",
+        "required": ["domain", "score", "grade", "checks"],
+        "properties": {
+          "domain": { "type": "string" },
+          "checkedAt": { "type": "string", "format": "date-time" },
+          "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "grade": { "type": "string" },
+          "posture": { "type": "string", "enum": ["open", "selective", "closed"] },
+          "paradox": { "type": "boolean" },
+          "robotsReadable": { "type": ["boolean", "null"] },
+          "cached": { "type": "boolean" },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "status": { "type": "string", "enum": ["pass", "warn", "fail", "skip"] },
+                "points": { "type": "integer" },
+                "maxPoints": { "type": "integer" },
+                "detail": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": { "error": { "type": "string" }, "message": { "type": "string" } }
+      }
+    }
+  }
+}

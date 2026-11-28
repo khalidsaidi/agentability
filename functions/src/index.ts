@@ -10,6 +10,9 @@ import { GoogleAuth } from "google-auth-library";
 import { createHash } from "node:crypto";
 import { evaluateSite, configureFetch } from "../../scripts/lib/evaluate-site";
 import { guardedFetch, normalizeDomain, requestContext } from "./guard";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { z } from "zod";
 
 initializeApp();
 const db = getFirestore();
@@ -83,7 +86,12 @@ async function handle(method: string, origin: string | undefined, rawDomain: unk
   // Other websites may not put this checker in their own pages and spend its
   // budget. Requests without an Origin (scripts, curl) are still rate limited.
   if (origin && origin !== SITE_ORIGIN) return { status: 403, body: { error: "origin_not_allowed" } };
+  return checkDomain(rawDomain, ip);
+}
 
+// One check, whoever asks: the website box, the HTTP API and the MCP tool all
+// come through here, so they share the guard, the limits and the cache.
+async function checkDomain(rawDomain: unknown, ip: string): Promise<Reply> {
   const config = await db.collection("config").doc("check").get();
   if (config.get("disabled") === true) {
     return { status: 503, body: { error: "paused", message: "Instant checks are paused. You can still ask us to add a site to the Index." } };
@@ -145,6 +153,139 @@ export const check = onRequest(
     } catch (error) {
       logger.error("check failed", error as Error);
       res.status(500).json({ error: "internal", message: "Something went wrong on our side. Try again in a minute." });
+    }
+  }
+);
+
+// ---------------------------------------------------------------------------
+// MCP server at https://agentability.org/mcp (Streamable HTTP, stateless).
+//
+// Agentability had one from its first day, 16 January 2026 (an evaluate_site
+// tool); the August rebuild to a static site dropped it. This one runs a live
+// check, the same one the website runs, and reads the weekly Index.
+
+type Summary = {
+  generatedAt: string;
+  stats: Record<string, number>;
+  leaderboard: Array<{ rank: number; domain: string; score: number; grade: string; posture: string }>;
+};
+let summaryCache: { at: number; data: Summary } | null = null;
+async function indexSummary(): Promise<Summary> {
+  if (summaryCache && Date.now() - summaryCache.at < 10 * 60_000) return summaryCache.data;
+  const r = await fetch(`${SITE_ORIGIN}/data/summary.json`, { headers: { "User-Agent": "agentability-mcp" } });
+  if (!r.ok) throw new Error(`summary.json answered ${r.status}`);
+  const data = (await r.json()) as Summary;
+  summaryCache = { at: Date.now(), data };
+  return data;
+}
+
+const text = (value: unknown) => ({ content: [{ type: "text" as const, text: typeof value === "string" ? value : JSON.stringify(value, null, 1) }] });
+
+function buildMcpServer(ip: string): McpServer {
+  const server = new McpServer(
+    { name: "org.agentability/agentability", title: "Agentability", version: "1.0.0" },
+    {
+      instructions:
+        "Agentability measures whether AI agents can use websites. check_site runs a live check of any public site now (nine checks, a 0-100 score). lookup_index returns a site's score from the weekly Index of the most-visited sites, with its public report. get_findings returns the Index's headline numbers. All tools are read-only.",
+    }
+  );
+
+  server.registerTool(
+    "check_site",
+    {
+      title: "Check a website now",
+      description:
+        "Run a live AI-agent readiness check of a public website: whether an agent can fetch and read it, what robots.txt allows, structured data, sitemap, reachable pricing/support/docs/legal, and MCP, OpenAPI and UCP. Returns a 0-100 score and each check's result. Takes 2-10 seconds; results are cached for 24 hours. Limited to 10 checks per hour per client.",
+      inputSchema: { domain: z.string().max(300).describe("The site to check, e.g. example.com") },
+      annotations: { readOnlyHint: true, openWorldHint: true },
+    },
+    async ({ domain }) => {
+      const reply = await checkDomain(domain, ip);
+      if (reply.status !== 200) return { ...text(reply.body), isError: true };
+      return text(reply.body);
+    }
+  );
+
+  server.registerTool(
+    "lookup_index",
+    {
+      title: "Look up a site in the weekly Index",
+      description:
+        "Return a site's score, grade, rank and AI-crawler posture from the AI-Readiness Index, which audits the web's most-visited sites every Monday, with a link to its public report. Says so if the site is not in the Index; use check_site for those.",
+      inputSchema: { domain: z.string().max(300).describe("The site to look up, e.g. nytimes.com") },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async ({ domain }) => {
+      const host = normalizeDomain(domain);
+      if (!host) return { ...text({ error: "invalid_domain" }), isError: true };
+      const s = await indexSummary();
+      const bare = host.replace(/^www\./, "");
+      const row = s.leaderboard.find((r) => r.domain === bare || r.domain === host);
+      if (!row) return text({ inIndex: false, domain: bare, message: "Not in the Index. Use check_site for a live check." });
+      return text({ inIndex: true, ...row, outOf: s.leaderboard.length, indexUpdated: s.generatedAt, report: `${SITE_ORIGIN}/ai-index/site/${row.domain}/` });
+    }
+  );
+
+  server.registerTool(
+    "get_findings",
+    {
+      title: "Headline findings of the Index",
+      description: "Return the Index's current headline numbers: how many of the most-visited sites block an AI agent at the door, how many say no in robots.txt, the average score, and when it was last updated.",
+      inputSchema: {},
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async () => {
+      const s = await indexSummary();
+      return text({
+        sitesAudited: s.leaderboard.length,
+        percentBlockingAnAgentAtTheDoor: s.stats.pctWalled,
+        percentSayingNoInRobotsTxt: s.stats.pctClosed,
+        averageScore: s.stats.averageScore,
+        updated: s.generatedAt,
+        methodology: `${SITE_ORIGIN}/methodology/`,
+        data: `${SITE_ORIGIN}/data/summary.json`,
+      });
+    }
+  );
+  return server;
+}
+
+export const mcp = onRequest(
+  {
+    region: REGION,
+    maxInstances: 3,
+    concurrency: 10,
+    memory: "512MiB",
+    timeoutSeconds: 60,
+    serviceAccount: `site-check@${PROJECT}.iam.gserviceaccount.com`,
+    invoker: "public",
+  },
+  async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    // Stateless Streamable HTTP: every request is a complete JSON-RPC exchange.
+    // GET (the server-to-client stream) and DELETE (ending a session) do not
+    // apply without sessions, which the spec answers with 405.
+    if (req.method !== "POST") {
+      res.status(405).set("Allow", "POST").json({
+        jsonrpc: "2.0",
+        error: { code: -32000, message: "Agentability's MCP server takes JSON-RPC over POST (Streamable HTTP, stateless). See https://agentability.org/.well-known/mcp/server-card.json" },
+        id: null,
+      });
+      return;
+    }
+    try {
+      const ip = clientIp(req.get("x-forwarded-for"), req.ip);
+      const server = buildMcpServer(ip);
+      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+      res.on("close", () => {
+        void transport.close();
+        void server.close();
+      });
+      await server.connect(transport);
+      await transport.handleRequest(req, res, req.body);
+    } catch (error) {
+      logger.error("mcp failed", error as Error);
+      if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "Internal error" }, id: null });
     }
   }
 );

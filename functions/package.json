@@ -3,17 +3,21 @@
   "private": true,
   "description": "The instant site check and the spend cap. Bundles the same auditor the weekly Index uses.",
   "main": "lib/index.js",
-  "engines": { "node": "22" },
+  "engines": {
+    "node": "22"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
-    "build": "npm run typecheck && esbuild src/index.ts --bundle --platform=node --target=node22 --format=cjs --outfile=lib/index.js --external:firebase-functions --external:firebase-admin --external:google-auth-library --external:undici --external:ipaddr.js"
+    "build": "npm run typecheck && esbuild src/index.ts --bundle --platform=node --target=node22 --format=cjs --outfile=lib/index.js --external:firebase-functions --external:firebase-admin --external:google-auth-library --external:undici --external:ipaddr.js --external:@modelcontextprotocol/sdk --external:zod"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "firebase-admin": "^13.0.0",
     "firebase-functions": "^6.1.0",
     "google-auth-library": "^9.15.0",
     "ipaddr.js": "^2.2.0",
-    "undici": "^6.21.0"
+    "undici": "^6.21.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

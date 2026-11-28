@@ -1,0 +1,24 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "name": "org.agentability/agentability",
+  "title": "Agentability",
+  "description": "Check whether AI agents can use any website, live: nine checks and a 0-100 score. Look up the weekly AI-Readiness Index of the web's most-visited sites and its headline findings. Read-only.",
+  "version": "1.0.0",
+  "websiteUrl": "https://agentability.org/",
+  "repository": {
+    "source": "github",
+    "url": "https://github.com/khalidsaidi/agentability"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://agentability.org/mcp",
+      "supportedProtocolVersions": ["2025-11-25", "2025-06-18", "2025-03-26"]
+    }
+  ],
+  "tools": [
+    { "name": "check_site", "description": "Run a live AI-agent readiness check of a public website and return its score and each check." },
+    { "name": "lookup_index", "description": "Return a site's score, rank and report link from the weekly AI-Readiness Index." },
+    { "name": "get_findings", "description": "Return the Index's headline numbers, such as how many top sites block AI agents." }
+  ]
+}
