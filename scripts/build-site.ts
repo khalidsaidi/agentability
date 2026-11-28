@@ -196,6 +196,10 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   nav.top { display: flex; gap: 4px; flex-wrap: wrap; }
   nav.top a { padding: 6px 12px; font-size: .85rem; font-weight: 600; color: var(--dim); text-decoration: none; border-radius: 999px; transition: color .15s, background .15s; }
   nav.top a:hover { color: var(--ink); background: var(--panel-2); }
+  nav.top a.nav-check { color: #111; background: var(--hazard); }
+  nav.top a.nav-check:hover { color: #111; background: var(--hazard); filter: brightness(1.08); }
+  .chk-home { margin-top: 26px; align-items: center; }
+  .chk-home label { flex: 1 0 100%; font-family: var(--display); font-weight: 700; font-size: 1.02rem; color: var(--ink); }
   h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2rem, 5.4vw, 3.6rem); line-height: 1.04; letter-spacing: -.02em; margin: 10px 0 18px; text-wrap: balance; max-width: 20ch; }
   h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.2rem, 2.6vw, 1.55rem); letter-spacing: -.01em; margin: 52px 0 14px; }
   a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 3px; }
@@ -474,7 +478,7 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 <body><div class="wrap">
 <header class="top">
   <a class="brand" href="/">agent<span>ability</span></a>
-  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/shops/">Shops</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a><a href="https://github.com/khalidsaidi/agentability">GitHub</a></nav>
+  <nav class="top"><a href="/fieldtest/">The Show</a><a href="/ai-index/">The Index</a><a href="/shops/">Shops</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a><a class="nav-check" href="/support/">Check your site</a></nav>
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
@@ -1178,9 +1182,16 @@ they actually are for an agent.</p>
   <a class="hero-alt" href="/ai-index/">See all ${s ? s.audited : ""} site scores</a>
   ${shareBtn(SITE, "Can AI agents actually use the web? Agentability tests it in public, every day.")}
 </div>
+<form id="check" class="chk-form chk-home rise d4" data-sitecheck="checkout" data-source="home">
+  <label for="chk-home-input">Is your site ready for AI agents? Check it free, in seconds:</label>
+  <input id="chk-home-input" type="text" name="domain" placeholder="yoursite.com" autocomplete="off" spellcheck="false" required>
+  <button type="submit">Check it now</button>
+</form>
+<div id="checkout" class="chk-out" aria-live="polite" hidden></div>
+<script src="/check.js" defer></script>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
-<a href="/shops/">see if AI can shop these stores</a> · <a href="/support/">check yours now, free</a> · <a href="/docs/">take the raw data</a></p>
+<a href="/shops/">see if AI can shop these stores</a> · <a href="#check">check yours now, free</a> · <a href="/docs/">take the raw data</a></p>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
 <h2>Where it got interesting</h2>
 ${segCards(latest)}`
