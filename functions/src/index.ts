@@ -10,6 +10,7 @@ import { GoogleAuth } from "google-auth-library";
 import { createHash } from "node:crypto";
 import { evaluateSite, configureFetch } from "../../scripts/lib/evaluate-site";
 import { guardedFetch, normalizeDomain, requestContext } from "./guard";
+import { fixFor, fixPrompt } from "../../scripts/lib/fixes";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
@@ -69,6 +70,17 @@ async function takeSlot(ip: string): Promise<Reply | null> {
 }
 
 function publicShape(r: Awaited<ReturnType<typeof evaluateSite>>) {
+  const checks = (r.checks ?? []).map((c) => ({
+    id: c.id,
+    title: c.title,
+    status: c.status,
+    points: c.points,
+    maxPoints: c.maxPoints,
+    detail: c.detail,
+    fix: fixFor(r.domain, c, r.robots ?? []),
+  }));
+  // The core checks first: bonus checks (B*) only matter once those pass.
+  const toFix = checks.filter((c) => c.fix && !c.id.startsWith("B")).map((c) => ({ id: c.id, title: c.title, fix: c.fix as string }));
   return {
     domain: r.domain,
     checkedAt: r.checkedAt,
@@ -77,8 +89,23 @@ function publicShape(r: Awaited<ReturnType<typeof evaluateSite>>) {
     posture: r.posture,
     paradox: r.paradox,
     robotsReadable: r.robotsReadable ?? null,
-    checks: (r.checks ?? []).map((c) => ({ id: c.id, title: c.title, status: c.status, points: c.points, maxPoints: c.maxPoints, detail: c.detail })),
+    checks,
+    fixPrompt: fixPrompt(r.domain, toFix),
   };
+}
+
+// Where a score sits against the web's most-visited sites. Only the Index can
+// say this; a one-off checker has nothing to compare against.
+async function comparedToIndex(score: number): Promise<{ betterThanPercent: number; sites: number } | null> {
+  try {
+    const s = await indexSummary();
+    const n = s.leaderboard.length;
+    if (!n) return null;
+    const below = s.leaderboard.filter((row) => row.score < score).length;
+    return { betterThanPercent: Math.round((100 * below) / n), sites: n };
+  } catch {
+    return null;
+  }
 }
 
 async function handle(method: string, origin: string | undefined, rawDomain: unknown, ip: string): Promise<Reply> {
@@ -125,7 +152,7 @@ async function checkDomain(rawDomain: unknown, ip: string): Promise<Reply> {
   if (result.status !== "complete") {
     return { status: 502, body: { error: "unreachable", domain, reason: result.failure ?? null, message: `We couldn't reach ${domain}. If it's up in your browser, it may be refusing automated visitors altogether.` } };
   }
-  const shaped = publicShape(result);
+  const shaped = { ...publicShape(result), comparedToIndex: await comparedToIndex(result.score) };
   await cacheRef.set({ at: Timestamp.now(), result: shaped, expiresAt: Timestamp.fromMillis(Date.now() + KEEP_DAYS * 86_400_000) });
   return { status: 200, body: { ...shaped, cached: false } };
 }

@@ -15,6 +15,30 @@
     return s >= 85 ? '#46e094' : s >= 70 ? '#9ad94f' : s >= 55 ? '#ffd23f' : s >= 40 ? '#ff9f43' : '#ff5c5c';
   }
 
+  // Text with `code` spans, built from nodes so nothing in it is parsed as HTML.
+  function withCode(node, text) {
+    String(text).split('`').forEach(function (part, i) {
+      if (!part) return;
+      node.appendChild(i % 2 ? el('code', null, part) : document.createTextNode(part));
+    });
+    return node;
+  }
+
+  function copyButton(label, value) {
+    var b = el('button', 'chk-copy', label);
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = label; }, 2000); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(done, function () { window.prompt('Copy this:', value); });
+      } else {
+        window.prompt('Copy this:', value);
+      }
+      if (window.gtag) gtag('event', 'site_check_copy', { what: /prompt/.test(label) ? 'fix_prompt' : 'link' });
+    });
+    return b;
+  }
+
   function askLink(domain) {
     var a = el('a', null, 'Ask us to add ' + domain + ' to the Index');
     a.href = ISSUE_NEW + '&title=' + encodeURIComponent('Audit request: ' + domain);
@@ -35,6 +59,15 @@
     head.appendChild(who);
     out.appendChild(head);
 
+    // Where this score sits among the web's most-visited sites.
+    if (data.comparedToIndex) {
+      var cmp = el('p', 'chk-cmp');
+      cmp.appendChild(document.createTextNode('Scores better than '));
+      cmp.appendChild(el('b', null, data.comparedToIndex.betterThanPercent + '%'));
+      cmp.appendChild(document.createTextNode(' of the ' + data.comparedToIndex.sites + ' most-visited sites on the web.'));
+      out.appendChild(cmp);
+    }
+
     var list = el('ul', 'chk-list');
     (data.checks || []).forEach(function (c) {
       var li = el('li', 'chk-' + c.status);
@@ -44,9 +77,17 @@
       top.appendChild(el('span', 'chk-pts', c.points + '/' + c.maxPoints));
       li.appendChild(top);
       li.appendChild(el('p', 'chk-detail', c.detail));
+      if (c.fix) li.appendChild(withCode(el('p', 'chk-fix'), 'Fix: ' + c.fix));
       list.appendChild(li);
     });
     out.appendChild(list);
+
+    var actions = el('div', 'chk-actions');
+    if (data.fixPrompt) {
+      actions.appendChild(copyButton('Copy a fix prompt for your coding AI', data.fixPrompt));
+    }
+    actions.appendChild(copyButton('Copy a link to this result', location.origin + '/support/?check=' + encodeURIComponent(data.domain)));
+    out.appendChild(actions);
 
     var when = new Date(data.checkedAt);
     var foot = el('p', 'chk-foot');
@@ -117,5 +158,13 @@
       e.preventDefault();
       run(input.value, out, button, form.getAttribute('data-source') || 'support');
     });
+    // A shared link (?check=example.com) opens with that result. Same check,
+    // same limits; a repeat within 24 hours comes from the cache.
+    var shared = new URLSearchParams(location.search).get('check');
+    if (shared && /^[a-z0-9.-]{3,253}$/i.test(shared) && !form.hasAttribute('data-ran')) {
+      form.setAttribute('data-ran', '1');
+      input.value = shared;
+      run(shared, out, button, 'shared_link');
+    }
   });
 })();

@@ -9,6 +9,7 @@ import path from "node:path";
 import { rootDomain, hostOf } from "./lib/domains";
 import { GUIDES, type GuideContext } from "./lib/guides";
 import { isWalled } from "./lib/evaluate-site";
+import { fixFor as sharedFixFor } from "./lib/fixes";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
@@ -66,42 +67,11 @@ function scoreColor(score: number): string {
   return "#ff6058";
 }
 
-// What this site specifically has to do about each check it did not pass.
-// Google's scaled-content policy turns on whether a page is worth reading, and a
-// report that names the score but not the remedy is not. Every string here is
-// built from this site's own measured result.
+// What this site has to do about each check it did not pass. The advice lives in
+// scripts/lib/fixes.ts, shared with the instant check; here it becomes HTML.
 function fixFor(domain: string, c: { id: string; title: string; status: string; detail: string }, robots: Array<{ bot: string; policy: string }>): string | null {
-  if (c.status === "pass") return null;
-  const blocked = robots.filter((p) => p.policy !== "allowed");
-  switch (c.id) {
-    case "A1":
-      return `Serve a plain-text file at <code>https://${esc(domain)}/llms.txt</code> listing the pages an agent most often needs — pricing, docs, support, account management — each as a one-line description and an absolute URL. It is read by an agent arriving cold with no idea of your structure. Fifteen points, and most teams ship it in an afternoon.`;
-    case "A2":
-      return blocked.length
-        ? `Your <code>robots.txt</code> currently refuses ${esc(blocked.map((p) => p.bot).join(", "))}. If that is deliberate, this score is the cost and the trade is yours to make. If it is inherited from an old rule or a security plugin — which is the commonest cause we see — those agents cannot read ${esc(domain)} on a user's behalf at all.`
-        : `Make the policy explicit in <code>robots.txt</code> rather than leaving it implied. An agent that cannot tell whether it is welcome usually treats silence as a wall.`;
-    case "A3":
-      return `${esc(c.detail)} An agent fetches the page and reads what comes back; it does not run your JavaScript. Server-render the main content, or serve the same text to a plain request. This is the heaviest check on the board at 25 points, and the one that most often decides whether an agent can use a site at all.`;
-    case "A4":
-      return `Add schema.org JSON-LD to the homepage — <code>Organization</code> at minimum, plus <code>Product</code> or <code>Article</code> where they apply. It is how an agent learns what ${esc(domain)} is without inferring it from prose.`;
-    case "A5":
-      return `Serve <code>https://${esc(domain)}/sitemap.xml</code> and point to it from <code>robots.txt</code>. Without it an agent has to guess your URL structure from whatever the homepage happens to link.`;
-    case "A6": {
-      // The check reports what it found; a remedy has to name what is missing.
-      const all = ["pricing", "support/contact", "docs/api", "legal/privacy"];
-      const found = c.detail.startsWith("Found from homepage:")
-        ? all.filter((t) => c.detail.includes(t))
-        : [];
-      const missing = all.filter((t) => !found.includes(t));
-      return `An agent could not reach ${esc(missing.join(", "))} from the ${esc(domain)} homepage${found.length ? `, though ${esc(found.join(" and "))} ${found.length === 1 ? "was" : "were"} fine` : ""}. These are what agents are sent to find most often. Each needs a plain link an agent can follow from the homepage in one hop — not behind a menu that only appears once JavaScript runs, and not solely in a logged-in view.`;
-    }
-    case "B1":
-      return `Optional, and rare — ${""}only a handful of the sites we track run one. An MCP server lets an agent act on ${esc(domain)} through a defined interface instead of scraping it. Advertise it at <code>/.well-known/mcp/server-card.json</code>.`;
-    case "B2":
-      return `Optional. If ${esc(domain)} has a public API, publishing an OpenAPI document at <code>/openapi.json</code> lets an agent call it correctly without a human reading your docs first.`;
-    default:
-      return null;
-  }
+  const text = sharedFixFor(domain, c, robots);
+  return text === null ? null : esc(text).replace(/`([^`]+)`/g, "<code>$1</code>");
 }
 
 // An embeddable badge per audited site. This is the only distribution channel
@@ -319,6 +289,12 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .chk-detail { margin: 3px 0 0 32px; color: var(--dim); font-size: .88rem; overflow-wrap: anywhere; }
   .chk-foot, .chk-wait, .chk-err { margin: 12px 0 0; font-size: .88rem; color: var(--dim); }
   .chk-err { color: var(--ink); }
+  .chk-cmp { margin: 10px 0 0; color: var(--dim); } .chk-cmp b { color: var(--ink); }
+  .chk-fix { margin: 6px 0 0 32px; font-size: .88rem; color: var(--ink); overflow-wrap: anywhere; }
+  .chk-fix code, .chk-detail code { font-family: var(--mono); font-size: .86em; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+  .chk-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .chk-copy { font-family: var(--display); font-weight: 700; font-size: .9rem; color: var(--ink); background: none; border: 1px solid #3a3d4d; border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+  .chk-copy:hover { border-color: var(--ink); }
   .askline a { color: var(--win); }
   /* The remedy for each failed check, and the score's own history. These are what
      make a report page worth opening; without them it is a number and a template. */
@@ -2034,6 +2010,7 @@ nothing you can't test with curl.</p>
       `- Instant check of any site: POST ${SITE}/api/check with JSON {"domain":"example.com"} (rate limited)`,
       `- MCP server (tools: check_site, lookup_index, get_findings): ${SITE}/mcp`,
       `- OpenAPI description: ${SITE}/openapi.json`,
+      `- Agent skill (how an AI agent should use Agentability): https://github.com/khalidsaidi/agentability/blob/main/skills/agentability/SKILL.md`,
       "",
       "## Guides",
       ...GUIDES.map((g) => `- ${g.title}: ${SITE}/guides/${g.slug}/`),
