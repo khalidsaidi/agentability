@@ -5,6 +5,7 @@
 import fsp from "node:fs/promises";
 import fs from "node:fs";
 import vm from "node:vm";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { rootDomain, hostOf } from "./lib/domains";
 import { GUIDES, type GuideContext } from "./lib/guides";
@@ -12,6 +13,9 @@ import { isWalled } from "./lib/evaluate-site";
 import { fixFor as sharedFixFor } from "./lib/fixes";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
+// Pages load /check.js?v=<content hash>, so a changed script reaches visitors at once instead of
+// after the hour the CDN and browsers cache it for.
+const CHECK_JS_SRC = `/check.js?v=${createHash("sha256").update(fs.readFileSync(path.join(REPO_ROOT, "scripts/site/check.js"))).digest("hex").slice(0, 10)}`;
 const SUMMARY_PATH = path.join(REPO_ROOT, "data/index/summary.json");
 const COMMERCE_PATH = path.join(REPO_ROOT, "data/index/commerce.json");
 // Hand review of those verdicts, kept separate so commerce.json stays exactly
@@ -1180,7 +1184,7 @@ they actually are for an agent.</p>
   <button type="submit">Check it now</button>
 </form>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
-<script src="/check.js" defer></script>
+<script src="${CHECK_JS_SRC}" defer></script>
 <div class="addai rise d4" id="add-to-ai">
   <p class="addai-h">Or check sites from inside your AI assistant</p>
   <div class="addai-url"><code>https://agentability.org/mcp</code><button class="chk-copy" type="button" data-copy="https://agentability.org/mcp" data-where="home">Copy</button></div>
@@ -1286,7 +1290,7 @@ content parseability, structured data, sitemap, task reachability, plus MCP/Open
 </div>
 <p class="askline" id="askline">Missing a site? Type it above and check it instantly, or <a id="asklink" href="${ISSUE_NEW}">ask us to add it to the Index</a>.</p>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
-<script src="/check.js" defer></script>
+<script src="${CHECK_JS_SRC}" defer></script>
 ${leaderboardTable(summary.leaderboard)}
 <script>
 (function () {
@@ -1880,7 +1884,7 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
   <button type="submit">Check it now</button>
 </form>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
-<script src="/check.js" defer></script>
+<script src="${CHECK_JS_SRC}" defer></script>
 <h2 id="use-in-your-ai">Use it inside your AI assistant</h2>
 <p class="lede">Agentability is also an MCP server, so Claude, ChatGPT, Cursor and other AI tools can check sites for you
 directly. Agentability has offered this since January 2026. The server is <code>https://agentability.org/mcp</code>; it needs no
