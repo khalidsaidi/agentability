@@ -295,6 +295,9 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .chip.dim { color: var(--dim); }
   /* "We audit anyone who asks" only counts if it is said where people look. */
   .askline { margin: 10px 0 0; font-size: .85rem; color: var(--dim); }
+  /* On a phone a score table is wider than the screen. Let the table scroll
+     sideways inside itself instead of making the whole page scroll. */
+  @media (max-width: 640px) { table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; } }
   /* instant check */
   .chk-form { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 6px; }
   .chk-form input { flex: 1 1 220px; min-width: 0; max-width: 420px; padding: 11px 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 1rem; }
@@ -482,7 +485,7 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 </header>
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
-<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. Weekly refresh via public CI. Open data, no signup, no cost.
+<a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. A new episode every day; every site re-scored every Monday. Open data, free.
 <br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Get audited</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a>
 <br />Sister project: <a href="https://rootfetch.com/">RootFetch, domain extension statistics</a></footer>
 </div>
