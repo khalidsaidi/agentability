@@ -1906,8 +1906,9 @@ and publish only what those public files say. To remove a domain from the Index,
 <p class="lede"><b>The instant check.</b> This covers checks run from this website, the API, the command-line tool and the MCP
 server. When you check a site, we keep the site&rsquo;s name and its result for up to two
 days so a repeat check is instant, and we count requests per visitor to stop abuse. That count is keyed to a scrambled
-form of your IP address that changes every day; we never store the address itself. Checked sites are not added to the
-Index or published. Questions about privacy: open a <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
+form of your IP address that changes every day; we never store the address itself. When an AI assistant such as
+ChatGPT or Claude uses the MCP server, it sends us only the name of the site to check; we never see your conversation
+or who you are. Checked sites are not added to the Index or published. Questions about privacy: open a <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
   const termsBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Terms</p>
 <h1>Terms of use</h1>
