@@ -1,0 +1,11 @@
+rules_version = '2';
+// Nothing in this database is read or written from a browser. The instant check
+// and the spend cap use the Admin SDK on the server, which these rules do not
+// govern. Denying everything here means a leaked config can't run up the bill.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

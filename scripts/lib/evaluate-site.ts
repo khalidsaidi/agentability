@@ -82,6 +82,41 @@ const CLOSED_AT = Math.ceil((AI_BOTS.length * 2) / 3);
 
 type FailureKind = "offline" | "timeout" | "tls" | "redirect-loop" | "refused";
 
+// The fetch every audit request goes through. The weekly run uses the global
+// one; the public instant check swaps in a fetch whose connections refuse
+// private and internal addresses, so a submitted domain cannot point the
+// auditor at the server's own network.
+let fetchImpl: typeof fetch = (...args) => fetch(...args);
+export function configureFetch(f: typeof fetch): void {
+  fetchImpl = f;
+}
+
+// Pages are read up to 2 MB and the rest is never downloaded. Buffering the
+// whole body first let one endless response exhaust memory.
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
+async function readCapped(response: Response): Promise<Uint8Array> {
+  if (!response.body) return new Uint8Array(0);
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (total < MAX_BODY_BYTES) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    total += value.length;
+  }
+  await reader.cancel().catch(() => undefined);
+  const out = new Uint8Array(Math.min(total, MAX_BODY_BYTES));
+  let at = 0;
+  for (const c of chunks) {
+    const take = Math.min(c.length, out.length - at);
+    out.set(c.subarray(0, take), at);
+    at += take;
+    if (at >= out.length) break;
+  }
+  return out;
+}
+
 async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: number; text: string; contentType: string; reason?: FailureKind }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -98,7 +133,7 @@ async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: 
     let response!: Response;
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
       const cookie = [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
-      response = await fetch(target, {
+      response = await fetchImpl(target, {
         headers: { "User-Agent": UA, Accept: accept, ...(cookie ? { Cookie: cookie } : {}) },
         redirect: "manual",
         signal: controller.signal,
@@ -116,9 +151,7 @@ async function get(url: string, accept = "*/*"): Promise<{ ok: boolean; status: 
       break;
     }
     const contentType = response.headers.get("content-type") || "";
-    // Cap reads at 2MB — enough for any page we care about.
-    const buf = await response.arrayBuffer();
-    const text = new TextDecoder("utf-8", { fatal: false }).decode(buf.slice(0, 2 * 1024 * 1024));
+    const text = new TextDecoder("utf-8", { fatal: false }).decode(await readCapped(response));
     return { ok: response.ok, status: response.status, text, contentType };
   } catch (error: any) {
     const cause = String(error?.cause?.code || error?.cause?.message || error?.name || "");

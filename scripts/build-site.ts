@@ -48,7 +48,7 @@ const SITE = "https://agentability.org";
 const ISSUE_NEW = "https://github.com/khalidsaidi/agentability/issues/new?template=audit-request.yml";
 const INDEXNOW_KEY = "4e1abda486c0a02493e7b6520d2ae99b";
 // Bump when evergreen copy (methodology, docs, support, privacy) changes; it feeds sitemap lastmod.
-const SITE_CONTENT_UPDATED = "2026-11-03";
+const SITE_CONTENT_UPDATED = "2026-11-27";
 // A daily feed that carries every episode ever grows without bound and readers
 // re-download it on every poll. Thirty is roughly a month of the show.
 const FEED_ITEMS = 30;
@@ -291,6 +291,27 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .chip.dim { color: var(--dim); }
   /* "We audit anyone who asks" only counts if it is said where people look. */
   .askline { margin: 10px 0 0; font-size: .85rem; color: var(--dim); }
+  /* instant check */
+  .chk-form { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 6px; }
+  .chk-form input { flex: 1 1 220px; min-width: 0; max-width: 420px; padding: 11px 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 1rem; }
+  .chk-form input:focus { outline: none; border-color: var(--win); }
+  .chk-form button, .chk-btn { font-family: var(--display); font-weight: 700; font-size: 1rem; background: var(--hazard); color: #111; border: 0; border-radius: 999px; padding: 11px 20px; cursor: pointer; }
+  .chk-form button[disabled], .chk-btn[disabled] { opacity: .55; cursor: wait; }
+  .chk-out { margin: 16px 0 8px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+  .chk-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .chk-score { font-family: var(--display); font-weight: 800; font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .chk-of { color: var(--dim); margin-right: 12px; }
+  .chk-who { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; overflow-wrap: anywhere; }
+  .chk-list { list-style: none; padding: 0; margin: 14px 0 0; }
+  .chk-list li { border-top: 1px solid var(--line); padding: 9px 0; }
+  .chk-row { display: flex; gap: 10px; align-items: baseline; }
+  .chk-id { font-family: var(--mono); font-size: .72rem; color: var(--dim); min-width: 22px; }
+  .chk-title { flex: 1; font-weight: 600; }
+  .chk-pts { font-family: var(--mono); font-size: .8rem; font-variant-numeric: tabular-nums; }
+  .chk-pass .chk-pts { color: var(--win); } .chk-warn .chk-pts { color: var(--hazard); } .chk-fail .chk-pts { color: var(--alert); }
+  .chk-detail { margin: 3px 0 0 32px; color: var(--dim); font-size: .88rem; overflow-wrap: anywhere; }
+  .chk-foot, .chk-wait, .chk-err { margin: 12px 0 0; font-size: .88rem; color: var(--dim); }
+  .chk-err { color: var(--ink); }
   .askline a { color: var(--win); }
   /* The remedy for each failed check, and the score's own history. These are what
      make a report page worth opening; without them it is a number and a template. */
@@ -1159,7 +1180,7 @@ they actually are for an agent.</p>
 </div>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
-<a href="/shops/">see if AI can shop these stores</a> · <a href="/support/">get yours audited, free</a> · <a href="/docs/">take the raw data</a></p>
+<a href="/shops/">see if AI can shop these stores</a> · <a href="/support/">check yours now, free</a> · <a href="/docs/">take the raw data</a></p>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
 <h2>Where it got interesting</h2>
 ${segCards(latest)}`
@@ -1250,8 +1271,9 @@ content parseability, structured data, sitemap, task reachability, plus MCP/Open
   <input id="sitefind" type="search" placeholder="Type a domain — cursor.com, bbc.co.uk, shopify.com…" autocomplete="off" spellcheck="false" aria-label="Find a site in the index">
   <span id="findcount" aria-live="polite"></span>
 </div>
-<p class="askline" id="askline">Missing a site? <a id="asklink" href="${ISSUE_NEW}">Ask us to audit it</a> — anyone can, it is free, and
-the score is whatever the checks find.</p>
+<p class="askline" id="askline">Missing a site? Type it above and check it instantly, or <a id="asklink" href="${ISSUE_NEW}">ask us to add it to the Index</a>.</p>
+<div id="checkout" class="chk-out" aria-live="polite" hidden></div>
+<script src="/check.js" defer></script>
 ${leaderboardTable(summary.leaderboard)}
 <script>
 (function () {
@@ -1273,20 +1295,40 @@ ${leaderboardTable(summary.leaderboard)}
     out.textContent = q ? n + ' of ' + total : '';
     // Nothing matched: the commonest reason is that the site simply is not on the
     // panel yet, so offer the request instead of an empty table.
+    // Built from nodes, never from innerHTML: q is whatever the visitor typed.
     var ask = document.getElementById('askline');
-    var link = document.getElementById('asklink');
-    if (ask && link) {
+    if (ask) {
       var looksLikeDomain = /^[a-z0-9.-]+\\.[a-z]{2,}$/.test(q);
-      if (q && n === 0) {
-        // Build the href as a string and use that string. Reading it back off the
-        // element returns a normalised URL, and interpolating that re-encodes the
-        // percent signs — the title arrived as "Audit%20request%253A".
-        var href = ASK_URL + (looksLikeDomain ? '&title=' + encodeURIComponent('Audit request: ' + q) : '');
-        ask.innerHTML = looksLikeDomain
-          ? 'No match for <b>' + q + '</b>. <a id="asklink" href="' + href + '">Ask us to audit ' + q + '</a> — free, and we audit anyone who asks.'
-          : 'No match. <a id="asklink" href="' + ASK_URL + '">Ask us to audit a site</a> — free, and we audit anyone who asks.';
-      } else if (!q) {
-        ask.innerHTML = 'Missing a site? <a id="asklink" href="' + ASK_URL + '">Ask us to audit it</a> — anyone can, it is free, and the score is whatever the checks find.';
+      ask.textContent = '';
+      var a = document.createElement('a');
+      if (q && n === 0 && looksLikeDomain) {
+        ask.appendChild(document.createTextNode(q + ' is not in the Index yet. '));
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chk-btn';
+        b.textContent = 'Check ' + q + ' now';
+        b.addEventListener('click', function () {
+          if (window.agentabilityCheck) window.agentabilityCheck(q, document.getElementById('checkout'), b, 'index');
+        });
+        ask.appendChild(b);
+        ask.appendChild(document.createTextNode(' or '));
+        // Build the href as a string: reading it back off the element re-encodes it.
+        a.href = ASK_URL + '&title=' + encodeURIComponent('Audit request: ' + q);
+        a.textContent = 'ask us to add it to the Index';
+        ask.appendChild(a);
+        ask.appendChild(document.createTextNode('.'));
+      } else if (q && n === 0) {
+        ask.appendChild(document.createTextNode('No match. Type a full domain like example.com to check it instantly, or '));
+        a.href = ASK_URL;
+        a.textContent = 'ask us to add a site';
+        ask.appendChild(a);
+        ask.appendChild(document.createTextNode('.'));
+      } else {
+        ask.appendChild(document.createTextNode('Missing a site? Type it above and check it instantly, or '));
+        a.href = ASK_URL;
+        a.textContent = 'ask us to add it to the Index';
+        ask.appendChild(a);
+        ask.appendChild(document.createTextNode('.'));
       }
     }
     return { q: q, n: n };
@@ -1818,8 +1860,16 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
   const supportBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Support</p>
 <h1>Free AI SEO audit: can AI agents read your site?</h1>
-<p class="lede">Ask us to audit any site against the same nine checks as the <a href="/ai-index/">Index</a>. It&rsquo;s free,
-and the report is published in public like everyone else&rsquo;s. You can also dispute a score or have it re-run after a fix.</p>
+<p class="lede">Type any website and see, in a few seconds, how an AI agent finds it: the same nine checks the
+<a href="/ai-index/">Index</a> runs on the web&rsquo;s most-visited sites. Free, and you don&rsquo;t need an account.</p>
+<form class="chk-form" data-sitecheck="checkout" data-source="support">
+  <input type="text" name="domain" placeholder="yoursite.com" autocomplete="off" spellcheck="false" aria-label="Website to check" required>
+  <button type="submit">Check it now</button>
+</form>
+<div id="checkout" class="chk-out" aria-live="polite" hidden></div>
+<script src="/check.js" defer></script>
+<p class="lede">The instant check isn&rsquo;t saved or published. If you want the site on the Index, with a public report
+page that is re-checked every week, ask below. You can also dispute a score or have it re-run after a fix.</p>
 <p class="lede"><b>Request an audit</b> — open an
 <a href="https://github.com/khalidsaidi/agentability/issues/new?title=Audit%20request:%20yourdomain.com&amp;labels=audit-request">audit
 request issue</a> and we add your domain to <code>data/index/submitted.txt</code>, which the weekly run merges &mdash; so it joins the next one. You can also PR the line yourself into either that file or <code>data/index/domains.txt</code> and skip the wait on us. Submissions go through the same porn, piracy and gambling filter as everything else; a submission buys an audit, not a place past the rules.</p>
@@ -1833,7 +1883,7 @@ is the front door; there is no ticket system because there is no company, just a
   const privacyBody = `
 <p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Privacy</p>
 <h1>Privacy</h1>
-<p class="lede">No accounts, no forms, no ads, nothing sold. Pages are static files served from a CDN. We use Google
+<p class="lede">No accounts, no ads, nothing sold. Pages are static files served from a CDN. We use Google
 Analytics only to count visits in aggregate (a first-party analytics cookie; all ad features disabled) — it tells us
 roughly how many people read which pages, and nothing about who they are. To opt out, block the
 <code>googletagmanager.com</code> script; the site works identically without it.</p>
@@ -1841,7 +1891,11 @@ roughly how many people read which pages, and nothing about who they are. To opt
 llms.txt, sitemaps, and well-known endpoints — the same requests any AI crawler makes. We fetch each site a handful
 of times per week with the user agent <code>AgentabilityBot/2.0</code>, honor what robots.txt tells us in scoring,
 and publish only what those public files say. To remove a domain from the Index, open a
-<a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
+<a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>
+<p class="lede"><b>The instant check.</b> When you check a site, we keep the site&rsquo;s name and its result for up to two
+days so a repeat check is instant, and we count requests per visitor to stop abuse. That count is keyed to a scrambled
+form of your IP address that changes every day; we never store the address itself. Checked sites are not added to the
+Index or published.</p>`;
   const smallPages: Array<{ dir: string; title: string; description: string; body: string }> = [
     { dir: "docs", title: "Data docs — Agentability", description: "How to use the AI-Readiness Index open data: JSON endpoints, history snapshots, and raw per-site results.", body: docsBody },
     // Same rule as the guides (913f3169): the title leads with the terms Trends
@@ -1851,7 +1905,7 @@ and publish only what those public files say. To remove a domain from the Index,
       dir: "support",
       title: "Free AI SEO Audit: Can AI Agents Read Your Site?",
       description:
-        "Request a free AI SEO audit of any site: can AI agents read it? We check llms.txt, AI crawler access, readable HTML and structured data, then publish its AI visibility score. Dispute a score or get a re-run here too.",
+        "Check any site free, in seconds: can AI agents read it? Nine checks, from llms.txt and AI crawler access to readable HTML and structured data, with an AI visibility score. No account needed.",
       body: supportBody,
     },
     { dir: "privacy", title: "Privacy — Agentability", description: "No accounts, no ads, nothing sold. Google Analytics counts visits in aggregate. Audits use only public surfaces.", body: privacyBody },
@@ -1961,6 +2015,7 @@ nothing you can't test with curl.</p>
       `- Data docs (endpoints and attribution): ${SITE}/docs/`,
       `- AI shopping agents: which online shops they can read (agentic commerce, UCP): ${SITE}/shops/`,
       `- Support (audit requests, disputes): ${SITE}/support/`,
+      `- Instant check of any site: POST ${SITE}/api/check with JSON {"domain":"example.com"} (rate limited)`,
       "",
       "## Guides",
       ...GUIDES.map((g) => `- ${g.title}: ${SITE}/guides/${g.slug}/`),
@@ -2041,6 +2096,7 @@ ${episodes
 
   // Social card, rendered once by scripts/render-og.sh and committed.
   if (fs.existsSync(OG_IMAGE)) await fsp.copyFile(OG_IMAGE, path.join(OUT, "og.png"));
+  await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/check.js"), path.join(OUT, "check.js"));
 
   // Open data: publish summary + history + episodes verbatim.
   // Brand marks, committed by `npm run logos` — copied, never fetched at build time.
@@ -2097,6 +2153,9 @@ ${episodes
       checked += 1;
     }
   }
+  // The instant check's script ships as a file; parse it the same way.
+  new vm.Script(await fsp.readFile(path.join(OUT, "check.js"), "utf8"));
+  checked += 1;
   console.log(`Inline scripts parsed: ${checked} OK`);
 
   console.log(`Built static site → ${OUT} (${summary ? summary.leaderboard.length : 0} site reports)`);

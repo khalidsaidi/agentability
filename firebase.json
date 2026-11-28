@@ -88,6 +88,35 @@
           }
         ]
       }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/check",
+        "function": {
+          "functionId": "check",
+          "region": "us-central1"
+        }
+      }
     ]
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        "src",
+        "test",
+        ".git",
+        "*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
