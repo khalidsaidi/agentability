@@ -234,7 +234,7 @@ function buildMcpServer(ip: string): McpServer {
       description:
         "Run a live AI-agent readiness check of a public website: whether an agent can fetch and read it, what robots.txt allows, structured data, sitemap, reachable pricing/support/docs/legal, and MCP, OpenAPI and UCP. Returns a 0-100 score and each check's result. Takes 2-10 seconds; results are cached for 24 hours. Limited to 10 checks per hour per client.",
       inputSchema: { domain: z.string().max(300).describe("The site to check, e.g. example.com") },
-      annotations: { title: "Check a website now", readOnlyHint: true, openWorldHint: true },
+      annotations: { title: "Check a website now", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
     },
     async ({ domain }) => {
       const reply = await checkDomain(domain, ip);
@@ -250,7 +250,7 @@ function buildMcpServer(ip: string): McpServer {
       description:
         "Return a site's score, grade, rank and AI-crawler posture from the AI-Readiness Index, which audits the web's most-visited sites every Monday, with a link to its public report. Returns inIndex: false for a site the Index does not cover.",
       inputSchema: { domain: z.string().max(300).describe("The site to look up, e.g. nytimes.com") },
-      annotations: { title: "Look up a site in the weekly Index", readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Look up a site in the weekly Index", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ domain }) => {
       const host = normalizeDomain(domain);
@@ -269,7 +269,7 @@ function buildMcpServer(ip: string): McpServer {
       title: "Headline findings of the Index",
       description: "Return the Index's current headline numbers: how many of the most-visited sites block an AI agent at the door, how many say no in robots.txt, the average score, and when it was last updated.",
       inputSchema: {},
-      annotations: { title: "Headline findings of the Index", readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Headline findings of the Index", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async () => {
       const s = await indexSummary();
