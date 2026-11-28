@@ -2148,6 +2148,9 @@ ${episodes
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/mcp-registry-auth"), path.join(OUT, ".well-known/mcp-registry-auth"));
   // OpenAI's plugin portal checks this token before listing the MCP server in ChatGPT.
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/openai-apps-challenge"), path.join(OUT, ".well-known/openai-apps-challenge"));
+  // Demo recording OpenAI's plugin review asks for: the plugin answering in ChatGPT.
+  await fsp.mkdir(path.join(OUT, "demo"), { recursive: true });
+  await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/demo/chatgpt.mp4"), path.join(OUT, "demo/chatgpt.mp4"));
 
   // Open data: publish summary + history + episodes verbatim.
   // Brand marks, committed by `npm run logos` — copied, never fetched at build time.
