@@ -1170,7 +1170,7 @@ they actually are for an agent.</p>
 <script src="/check.js" defer></script>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
-<a href="/shops/">see if AI can shop these stores</a> · <a href="#check">check yours now, free</a> · <a href="/docs/">take the raw data</a></p>
+<a href="/shops/">see if AI can shop these stores</a> · <a href="#check">check yours now, free</a> · <a href="/support/#use-in-your-ai">use it inside Claude or ChatGPT</a> · <a href="/docs/">take the raw data</a></p>
 <div class="ticker rise d4"><div class="ticker-track">${tickerSpans}${tickerSpans}</div></div>
 <h2>Where it got interesting</h2>
 ${segCards(latest)}`
@@ -1858,6 +1858,21 @@ TypeScript file</a> — reproduce any number on this site with plain HTTP reques
 </form>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
 <script src="/check.js" defer></script>
+<h2 id="use-in-your-ai">Use it inside your AI assistant</h2>
+<p class="lede">Agentability is also an MCP server, so Claude, ChatGPT, Cursor and other AI tools can check sites for you
+directly. Agentability has offered this since January 2026. The server is <code>https://agentability.org/mcp</code>; it needs no
+account or key, and it gives your assistant three tools: <b>check_site</b> (a live check),
+<b>lookup_index</b> (a site's score in the weekly Index) and <b>get_findings</b> (the headline numbers).</p>
+<ul class="lede">
+<li><b>Claude Code:</b> <code>claude mcp add --transport http agentability https://agentability.org/mcp</code></li>
+<li><b>Claude (web and desktop):</b> Settings &rarr; Connectors &rarr; Add custom connector, then paste the server address.</li>
+<li><b>ChatGPT:</b> turn on developer mode in Settings, then add a connector with the server address.</li>
+<li><b>Cursor:</b> <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=agentability&config=eyJ1cmwiOiJodHRwczovL2FnZW50YWJpbGl0eS5vcmcvbWNwIn0=">add to Cursor</a>. <b>VS Code:</b> <a href="vscode:mcp/install?%7B%22name%22%3A%22agentability%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//agentability.org/mcp%22%7D">add to VS Code</a>.</li>
+<li><b>Anything else:</b> <code>{"mcpServers": {"agentability": {"url": "https://agentability.org/mcp"}}}</code></li>
+</ul>
+<p class="lede">Then ask it something like &ldquo;check whether AI agents can use example.com and tell me what to fix.&rdquo;
+Coding assistants can also use the <a href="https://github.com/khalidsaidi/agentability/blob/main/skills/agentability/SKILL.md">Agentability skill</a>,
+and there is an <a href="/openapi.json">OpenAPI description</a> for plain HTTP.</p>
 <p class="lede"><b>Contact us</b> through a <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>:
 questions, corrections and audit requests all go there, in public, and a person answers.</p>
 <p class="lede">The instant check isn&rsquo;t saved or published. If you want the site on the Index, with a public report
@@ -2097,6 +2112,8 @@ ${episodes
   await fsp.mkdir(path.join(OUT, ".well-known/mcp"), { recursive: true });
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/mcp-server-card.json"), path.join(OUT, ".well-known/mcp/server-card.json"));
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/openapi.json"), path.join(OUT, "openapi.json"));
+  // Proves to the official MCP Registry that whoever publishes org.agentability/* controls this domain.
+  await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/mcp-registry-auth"), path.join(OUT, ".well-known/mcp-registry-auth"));
 
   // Open data: publish summary + history + episodes verbatim.
   // Brand marks, committed by `npm run logos` — copied, never fetched at build time.
