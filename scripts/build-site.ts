@@ -444,7 +444,7 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
   .addai { margin-top: 22px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); max-width: 640px; }
   .addai-h { margin: 0 0 10px; font-family: var(--display); font-weight: 700; font-size: 1.02rem; color: var(--ink); }
   .addai-url { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-  .addai-url code { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: .95rem; padding: 9px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 9px; color: var(--ink); }
+  .addai-url code { flex: 1 1 220px; min-width: 0; white-space: nowrap; overflow-x: auto; font-family: var(--mono); font-size: .92rem; padding: 9px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 9px; color: var(--ink); }
   .addai-steps { list-style: none; margin: 12px 0 0; padding: 0; font-size: .92rem; color: var(--dim); }
   .addai-steps li { padding: 6px 0; border-top: 1px solid var(--line); }
   .addai-steps b { color: var(--ink); margin-right: 6px; }
