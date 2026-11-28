@@ -111,6 +111,10 @@ function shell(opts: { title: string; description: string; canonicalPath: string
 <meta name="description" content="${esc(opts.description)}">
 ${opts.noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<link rel="canonical" href="${SITE}${opts.canonicalPath}">
 <link rel="alternate" type="application/rss+xml" title="The Agent Field Test — daily episodes" href="${SITE}/feed.xml">
+<link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
 <meta property="og:title" content="${esc(opts.title)}">
 <meta property="og:description" content="${esc(opts.description)}">
 <meta property="og:url" content="${SITE}${opts.canonicalPath}">
@@ -1899,10 +1903,11 @@ llms.txt, sitemaps, and well-known endpoints — the same requests any AI crawle
 of times per week with the user agent <code>AgentabilityBot/2.0</code>, honor what robots.txt tells us in scoring,
 and publish only what those public files say. To remove a domain from the Index, open a
 <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>
-<p class="lede"><b>The instant check.</b> When you check a site, we keep the site&rsquo;s name and its result for up to two
+<p class="lede"><b>The instant check.</b> This covers checks run from this website, the API, the command-line tool and the MCP
+server. When you check a site, we keep the site&rsquo;s name and its result for up to two
 days so a repeat check is instant, and we count requests per visitor to stop abuse. That count is keyed to a scrambled
 form of your IP address that changes every day; we never store the address itself. Checked sites are not added to the
-Index or published.</p>`;
+Index or published. Questions about privacy: open a <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
   const smallPages: Array<{ dir: string; title: string; description: string; body: string }> = [
     { dir: "docs", title: "Data docs — Agentability", description: "How to use the AI-Readiness Index open data: JSON endpoints, history snapshots, and raw per-site results.", body: docsBody },
     // Same rule as the guides (913f3169): the title leads with the terms Trends
@@ -2106,6 +2111,13 @@ ${episodes
 
   // Social card, rendered once by scripts/render-og.sh and committed.
   if (fs.existsSync(OG_IMAGE)) await fsp.copyFile(OG_IMAGE, path.join(OUT, "og.png"));
+  // Site icon at every size used (scripts/render-icons.sh). /favicon.ico is what
+  // browsers ask for when a page names no icon; a PNG there is read fine.
+  for (const size of [512, 192, 180, 48, 32]) {
+    const src = path.join(REPO_ROOT, `assets/icon-${size}.png`);
+    if (fs.existsSync(src)) await fsp.copyFile(src, path.join(OUT, `icon-${size}.png`));
+  }
+  if (fs.existsSync(path.join(REPO_ROOT, "assets/icon-48.png"))) await fsp.copyFile(path.join(REPO_ROOT, "assets/icon-48.png"), path.join(OUT, "favicon.ico"));
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/check.js"), path.join(OUT, "check.js"));
   // The agent-facing surface: an MCP server card and an OpenAPI description.
   // Agentability shipped both on 16 January 2026; the August rebuild dropped them.

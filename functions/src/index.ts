@@ -214,7 +214,13 @@ const text = (value: unknown) => ({ content: [{ type: "text" as const, text: typ
 
 function buildMcpServer(ip: string): McpServer {
   const server = new McpServer(
-    { name: "org.agentability/agentability", title: "Agentability", version: "1.0.0" },
+    {
+      name: "org.agentability/agentability",
+      title: "Agentability",
+      version: "1.0.0",
+      websiteUrl: "https://agentability.org/",
+      icons: [{ src: "https://agentability.org/icon-512.png", mimeType: "image/png", sizes: ["512x512"] }],
+    },
     {
       instructions:
         "Agentability measures whether AI agents can use websites. check_site runs a live check of any public site now (nine checks, a 0-100 score). lookup_index returns a site's score from the weekly Index of the most-visited sites, with its public report. get_findings returns the Index's headline numbers. All tools are read-only.",
@@ -242,7 +248,7 @@ function buildMcpServer(ip: string): McpServer {
     {
       title: "Look up a site in the weekly Index",
       description:
-        "Return a site's score, grade, rank and AI-crawler posture from the AI-Readiness Index, which audits the web's most-visited sites every Monday, with a link to its public report. Says so if the site is not in the Index; use check_site for those.",
+        "Return a site's score, grade, rank and AI-crawler posture from the AI-Readiness Index, which audits the web's most-visited sites every Monday, with a link to its public report. Returns inIndex: false for a site the Index does not cover.",
       inputSchema: { domain: z.string().max(300).describe("The site to look up, e.g. nytimes.com") },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
@@ -252,7 +258,7 @@ function buildMcpServer(ip: string): McpServer {
       const s = await indexSummary();
       const bare = host.replace(/^www\./, "");
       const row = s.leaderboard.find((r) => r.domain === bare || r.domain === host);
-      if (!row) return text({ inIndex: false, domain: bare, message: "Not in the Index. Use check_site for a live check." });
+      if (!row) return text({ inIndex: false, domain: bare, message: "This site is not in the Index. check_site can check it live." });
       return text({ inIndex: true, ...row, outOf: s.leaderboard.length, indexUpdated: s.generatedAt, report: `${SITE_ORIGIN}/ai-index/site/${row.domain}/` });
     }
   );
