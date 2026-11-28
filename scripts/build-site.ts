@@ -1172,6 +1172,10 @@ they actually are for an agent.</p>
 </form>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
 <script src="/check.js" defer></script>
+<p class="orient rise d4" id="add-to-ai"><b>Or check sites from inside your AI assistant.</b> Add <code>https://agentability.org/mcp</code> as a custom MCP server; no account, no key.
+<b>ChatGPT:</b> Plugins &rarr; Add &rarr; Add custom MCP server, paste the address, Authentication &ldquo;No authentication&rdquo;.
+<b>Claude:</b> <a href="https://claude.ai/directory/connectors/agentability">add it from Claude&rsquo;s directory</a>.
+<b>Cursor:</b> <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=agentability&config=eyJ1cmwiOiJodHRwczovL2FnZW50YWJpbGl0eS5vcmcvbWNwIn0=">add</a>. <b>VS Code:</b> <a href="vscode:mcp/install?%7B%22name%22%3A%22agentability%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//agentability.org/mcp%22%7D">add</a>. <a href="/support/#use-in-your-ai">All the ways</a>.</p>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
 <a href="/shops/">see if AI can shop these stores</a> · <a href="#check">check yours now, free</a> · <a href="/support/#use-in-your-ai">use it inside Claude or ChatGPT</a> · <a href="/docs/">take the raw data</a></p>
@@ -1869,8 +1873,8 @@ account or key, and it gives your assistant three tools: <b>check_site</b> (a li
 <b>lookup_index</b> (a site's score in the weekly Index) and <b>get_findings</b> (the headline numbers).</p>
 <ul class="lede">
 <li><b>Claude Code:</b> <code>claude mcp add --transport http agentability https://agentability.org/mcp</code></li>
-<li><b>Claude (web and desktop):</b> Settings &rarr; Connectors &rarr; Add custom connector, then paste the server address.</li>
-<li><b>ChatGPT:</b> turn on developer mode in Settings, then add a connector with the server address.</li>
+<li><b>Claude (web and desktop):</b> <a href="https://claude.ai/directory/connectors/agentability">add Agentability from Claude&rsquo;s connector directory</a>, or Settings &rarr; Connectors &rarr; Add custom connector and paste the server address.</li>
+<li><b>ChatGPT:</b> Plugins &rarr; Add &rarr; Add custom MCP server. Paste the server address, set Authentication to &ldquo;No authentication&rdquo;, tick the acknowledgement and create it. Then type <code>@Agentability</code> in a chat.</li>
 <li><b>Cursor:</b> <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=agentability&config=eyJ1cmwiOiJodHRwczovL2FnZW50YWJpbGl0eS5vcmcvbWNwIn0=">add to Cursor</a>. <b>VS Code:</b> <a href="vscode:mcp/install?%7B%22name%22%3A%22agentability%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//agentability.org/mcp%22%7D">add to VS Code</a>.</li>
 <li><b>Anything else:</b> <code>{"mcpServers": {"agentability": {"url": "https://agentability.org/mcp"}}}</code></li>
 </ul>
