@@ -149,6 +149,20 @@
 
   window.agentabilityCheck = run;
 
+  // Static copy buttons in the page: <button data-copy="text">.
+  document.querySelectorAll('button[data-copy]').forEach(function (b) {
+    var label = b.textContent, value = b.getAttribute('data-copy');
+    b.addEventListener('click', function () {
+      var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = label; }, 2000); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(done, function () { window.prompt('Copy this:', value); });
+      } else {
+        window.prompt('Copy this:', value);
+      }
+      if (window.gtag) gtag('event', 'mcp_url_copy', { where: b.getAttribute('data-where') || 'page' });
+    });
+  });
+
   // A plain form: <form data-sitecheck> with an input, a button and an output.
   document.querySelectorAll('form[data-sitecheck]').forEach(function (form) {
     var input = form.querySelector('input');

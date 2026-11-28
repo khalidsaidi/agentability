@@ -437,6 +437,15 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
     padding: 12px 20px; border: 1px dashed #3a3d4d; border-radius: 999px; transition: color .15s, border-color .15s, transform .15s; }
   .share:hover { color: var(--ink); border-color: var(--ink); transform: translateY(-2px); }
   .share.done { color: var(--win); border-color: var(--win); border-style: solid; }
+  .addai { margin-top: 22px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); max-width: 640px; }
+  .addai-h { margin: 0 0 10px; font-family: var(--display); font-weight: 700; font-size: 1.02rem; color: var(--ink); }
+  .addai-url { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .addai-url code { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: .95rem; padding: 9px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 9px; color: var(--ink); }
+  .addai-steps { list-style: none; margin: 12px 0 0; padding: 0; font-size: .92rem; color: var(--dim); }
+  .addai-steps li { padding: 6px 0; border-top: 1px solid var(--line); }
+  .addai-steps b { color: var(--ink); margin-right: 6px; }
+  .addai-steps a, .addai-note a { color: var(--link); }
+  .addai-note { margin: 8px 0 0; font-size: .82rem; color: var(--dim); }
   .orient { margin-top: 18px; font-size: .92rem; color: var(--dim); max-width: 72ch; }
   .orient a { color: var(--link); }
   /* guides */
@@ -1172,10 +1181,16 @@ they actually are for an agent.</p>
 </form>
 <div id="checkout" class="chk-out" aria-live="polite" hidden></div>
 <script src="/check.js" defer></script>
-<p class="orient rise d4" id="add-to-ai"><b>Or check sites from inside your AI assistant.</b> Add <code>https://agentability.org/mcp</code> as a custom MCP server; no account, no key.
-<b>ChatGPT:</b> Plugins &rarr; Add &rarr; Add custom MCP server, paste the address, Authentication &ldquo;No authentication&rdquo;.
-<b>Claude:</b> <a href="https://claude.ai/directory/connectors/agentability">add it from Claude&rsquo;s directory</a>.
-<b>Cursor:</b> <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=agentability&config=eyJ1cmwiOiJodHRwczovL2FnZW50YWJpbGl0eS5vcmcvbWNwIn0=">add</a>. <b>VS Code:</b> <a href="vscode:mcp/install?%7B%22name%22%3A%22agentability%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//agentability.org/mcp%22%7D">add</a>. <a href="/support/#use-in-your-ai">All the ways</a>.</p>
+<div class="addai rise d4" id="add-to-ai">
+  <p class="addai-h">Or check sites from inside your AI assistant</p>
+  <div class="addai-url"><code>https://agentability.org/mcp</code><button class="chk-copy" type="button" data-copy="https://agentability.org/mcp" data-where="home">Copy</button></div>
+  <ul class="addai-steps">
+    <li><b>ChatGPT</b> Plugins &rarr; Add &rarr; Add custom MCP server. Paste the address, Authentication &ldquo;No authentication&rdquo;.</li>
+    <li><b>Claude</b> <a href="https://claude.ai/directory/connectors/agentability">Add it from Claude&rsquo;s directory</a></li>
+    <li><b>Cursor</b> <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=agentability&config=eyJ1cmwiOiJodHRwczovL2FnZW50YWJpbGl0eS5vcmcvbWNwIn0=">Add</a> &middot; <b>VS Code</b> <a href="vscode:mcp/install?%7B%22name%22%3A%22agentability%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//agentability.org/mcp%22%7D">Add</a> &middot; <a href="/support/#use-in-your-ai">All the ways</a></li>
+  </ul>
+  <p class="addai-note">An MCP server: no account, no key. Then ask &ldquo;can AI agents use example.com?&rdquo;</p>
+</div>
 <p class="orient rise d4">New here? <a href="/fieldtest/${latest.date}/">Watch an agent try and fail</a> ·
 <a href="/ai-index/">look up a site's score</a> · <a href="/guides/ai-readiness-audit-checklist/">fix your own site</a> ·
 <a href="/shops/">see if AI can shop these stores</a> · <a href="#check">check yours now, free</a> · <a href="/support/#use-in-your-ai">use it inside Claude or ChatGPT</a> · <a href="/docs/">take the raw data</a></p>
