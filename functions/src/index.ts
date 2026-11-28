@@ -28,6 +28,10 @@ const SITE_ORIGIN = "https://agentability.org";
 const PER_IP_PER_HOUR = 10;
 const GLOBAL_PER_DAY = 1000;
 const CACHE_HOURS = 24;
+// Bump whenever the shape of a result changes, so a cached result from older
+// code is recomputed instead of served without the new fields. Version 1 had no
+// fixes and no comparison with the Index.
+const CACHE_VERSION = 2;
 const CHECK_TIMEOUT_MS = 45_000;
 // Firestore deletes counters and cached results after this (TTL on expiresAt).
 const KEEP_DAYS = 2;
@@ -133,7 +137,7 @@ async function checkDomain(rawDomain: unknown, ip: string): Promise<Reply> {
   const cacheRef = db.collection("checkCache").doc(domain);
   const cached = await cacheRef.get();
   const cachedAt = cached.get("at") as Timestamp | undefined;
-  if (cached.exists && cachedAt && Date.now() - cachedAt.toMillis() < CACHE_HOURS * 3_600_000) {
+  if (cached.exists && cached.get("v") === CACHE_VERSION && cachedAt && Date.now() - cachedAt.toMillis() < CACHE_HOURS * 3_600_000) {
     return { status: 200, body: { ...(cached.get("result") as object), cached: true } };
   }
 
@@ -153,7 +157,7 @@ async function checkDomain(rawDomain: unknown, ip: string): Promise<Reply> {
     return { status: 502, body: { error: "unreachable", domain, reason: result.failure ?? null, message: `We couldn't reach ${domain}. If it's up in your browser, it may be refusing automated visitors altogether.` } };
   }
   const shaped = { ...publicShape(result), comparedToIndex: await comparedToIndex(result.score) };
-  await cacheRef.set({ at: Timestamp.now(), result: shaped, expiresAt: Timestamp.fromMillis(Date.now() + KEEP_DAYS * 86_400_000) });
+  await cacheRef.set({ v: CACHE_VERSION, at: Timestamp.now(), result: shaped, expiresAt: Timestamp.fromMillis(Date.now() + KEEP_DAYS * 86_400_000) });
   return { status: 200, body: { ...shaped, cached: false } };
 }
 
