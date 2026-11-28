@@ -2146,6 +2146,8 @@ ${episodes
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/openapi.json"), path.join(OUT, "openapi.json"));
   // Proves to the official MCP Registry that whoever publishes org.agentability/* controls this domain.
   await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/mcp-registry-auth"), path.join(OUT, ".well-known/mcp-registry-auth"));
+  // OpenAI's plugin portal checks this token before listing the MCP server in ChatGPT.
+  await fsp.copyFile(path.join(REPO_ROOT, "scripts/site/openai-apps-challenge"), path.join(OUT, ".well-known/openai-apps-challenge"));
 
   // Open data: publish summary + history + episodes verbatim.
   // Brand marks, committed by `npm run logos` — copied, never fetched at build time.
