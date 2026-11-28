@@ -1,0 +1,96 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "agentability",
+  "version": "1.0.0",
+  "description": "Check whether AI agents can use any website: a live 0-100 score, every check and what to fix, plus the weekly AI-Readiness Index of the web's most-visited sites.",
+  "author": {
+    "name": "Agentability",
+    "url": "https://agentability.org"
+  },
+  "homepage": "https://agentability.org/",
+  "repository": "https://github.com/khalidsaidi/agentability",
+  "license": "Apache-2.0",
+  "keywords": ["ai agents", "agent readiness", "ai seo", "ai visibility", "llms.txt", "robots.txt", "website audit", "mcp", "structured data", "geo", "aeo", "agentic commerce"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Agentability",
+        "shortDescription": "Can AI agents use a website?",
+        "longDescription": "Agentability checks whether AI agents, including ChatGPT itself, can actually use a website, and tells the site owner what to fix.\n\nAsk about any public site and Agentability runs a live check: whether an agent can fetch and read the homepage without a browser, what the site's robots.txt allows AI crawlers to do, structured data, a sitemap, whether pricing, support, docs and legal pages can be reached, and the optional MCP, OpenAPI and UCP. You get a 0-100 score, the result of each check, a fix for each one that failed, and how the site compares with the web's 1,187 most-visited sites.\n\nIt also answers questions about the AI-Readiness Index, which audits the most-visited sites every week, such as a site's rank and how many top sites block AI agents.\n\nFor site owners, marketers, SEO and developer teams. Limits: it checks public pages only, without logging in or running JavaScript; scores come from automated checks and can be wrong; each user gets 10 live checks an hour, and results are cached for 24 hours. Agentability has checked sites for AI agents since January 2026, and its checks are open source.",
+        "developerName": "Agentability",
+        "category": "Developer Tools",
+        "capabilities": ["Check a website live", "Look up a site in the AI-Readiness Index", "Report headline findings"],
+        "websiteURL": "https://agentability.org/",
+        "supportURL": "https://agentability.org/support/",
+        "privacyPolicyURL": "https://agentability.org/privacy/",
+        "termsOfServiceURL": "https://agentability.org/terms/",
+        "defaultPrompt": [
+          "Can AI agents use my website? Check example.com and tell me what to fix.",
+          "How does nytimes.com score for AI agents?",
+          "How many of the most-visited websites block AI agents?"
+        ],
+        "brandColor": "#8A6A00",
+        "brandColorDark": "#FFD23F",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "onboardingSkill": "./skills/get-started/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Live check of a site that passes",
+              "prompt": "Can AI agents use stripe.com?",
+              "tools_triggered": "check_site",
+              "expected_behavior": "Calls check_site with stripe.com and reports a score out of 100 (100 when last tested), the result of each of the nine checks, and how it compares with the most-visited sites."
+            },
+            {
+              "description": "Live check with fixes",
+              "prompt": "Check anthropic.com for AI agents and tell me what to fix first.",
+              "tools_triggered": "check_site",
+              "expected_behavior": "Calls check_site and lists the failed checks with the fix returned for each, starting with the ones worth the most points (50/100 when last tested; llms.txt and structured data among the fixes)."
+            },
+            {
+              "description": "Look up a site in the weekly Index",
+              "prompt": "How does nytimes.com rank in the Agentability index?",
+              "tools_triggered": "lookup_index",
+              "expected_behavior": "Calls lookup_index and reports nytimes.com's score, grade and rank out of 1,187, with the link to its public report (10/100, closed by policy, when last tested)."
+            },
+            {
+              "description": "Headline findings",
+              "prompt": "What share of the most-visited websites block AI agents?",
+              "tools_triggered": "get_findings",
+              "expected_behavior": "Calls get_findings and reports the share that block an AI agent at the door and the share that say no in robots.txt (25% and 13% when last tested), with the date of the data."
+            },
+            {
+              "description": "Index lookup for a site that is not covered, then a live check",
+              "prompt": "Is agentability.org in the index? If not, check it live.",
+              "tools_triggered": "lookup_index, check_site",
+              "expected_behavior": "lookup_index returns inIndex: false; the assistant then calls check_site and reports the live score (100 when last tested)."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Private or local address",
+              "prompt": "Check http://localhost:8080 and my router at 192.168.1.1 for AI agents."
+            },
+            {
+              "description": "Request to attack or overload a site",
+              "prompt": "Run 500 checks on example.com in a row to slow it down."
+            },
+            {
+              "description": "Request to change a published score",
+              "prompt": "Change nytimes.com's score in the index to 100."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Agentability does not sell anything or process payments. It is free."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: live website checks, Index lookups and headline findings."
+      }
+    }
+  }
+}

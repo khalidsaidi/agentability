@@ -466,7 +466,7 @@ gtag('config', 'G-55RKNLGPNT', { content_group: ag, page_type: ag });
 ${opts.body}
 <footer class="foot">Agentability is an open-source observatory of the agentic web. Every check is reproducible —
 <a href="https://github.com/khalidsaidi/agentability">source &amp; data on GitHub</a>. A new episode every day; every site re-scored every Monday. Open data, free.
-<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Get audited</a> · <a href="/privacy/">Privacy</a> · <a href="/feed.xml">RSS</a>
+<br /><a href="/guides/">Guides</a> · <a href="/docs/">Data docs</a> · <a href="/support/">Get audited</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/feed.xml">RSS</a>
 <br />Sister project: <a href="https://rootfetch.com/">RootFetch, domain extension statistics</a></footer>
 </div>
 <script>
@@ -1908,6 +1908,24 @@ server. When you check a site, we keep the site&rsquo;s name and its result for 
 days so a repeat check is instant, and we count requests per visitor to stop abuse. That count is keyed to a scrambled
 form of your IP address that changes every day; we never store the address itself. Checked sites are not added to the
 Index or published. Questions about privacy: open a <a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>`;
+  const termsBody = `
+<p class="eyebrow"><a href="/" style="text-decoration:none;color:inherit">Agentability</a> · Terms</p>
+<h1>Terms of use</h1>
+<p class="lede">Agentability is a free, open-source project. These terms cover the website, the instant check, the API
+(<code>/api/check</code>), the command-line tool (<code>npx agentability</code>) and the MCP server (<code>/mcp</code>).</p>
+<p class="lede"><b>What you get.</b> Automated checks of public websites, the weekly AI-Readiness Index, and the daily Field
+Test. Everything is provided as is, without warranty of any kind. Scores come from automated checks, can be wrong, and are
+not a security, accessibility, legal or compliance assessment. The <a href="/methodology/">methodology</a> publishes how
+often each check errs.</p>
+<p class="lede"><b>Fair use.</b> Check sites you are curious about or responsible for. Don&rsquo;t use the checker to send
+traffic at a site, to probe private networks, or to get around its limits (10 checks an hour per client, 1,000 a day
+overall). We may block clients that do, and we may pause the checker at any time.</p>
+<p class="lede"><b>Results and data.</b> Instant checks are not published. The Index, its reports and its data are public, and
+the code is under the <a href="https://github.com/khalidsaidi/agentability/blob/main/LICENSE">Apache 2.0 license</a>. If you
+think a score is wrong, or want a site added or removed, open a
+<a href="https://github.com/khalidsaidi/agentability/issues">GitHub issue</a>.</p>
+<p class="lede"><b>Privacy.</b> See the <a href="/privacy/">privacy page</a>. We may update these terms; the current version is
+always on this page.</p>`;
   const smallPages: Array<{ dir: string; title: string; description: string; body: string }> = [
     { dir: "docs", title: "Data docs — Agentability", description: "How to use the AI-Readiness Index open data: JSON endpoints, history snapshots, and raw per-site results.", body: docsBody },
     // Same rule as the guides (913f3169): the title leads with the terms Trends
@@ -1920,6 +1938,7 @@ Index or published. Questions about privacy: open a <a href="https://github.com/
         "Check any site free, in seconds: can AI agents read it? Nine checks, from llms.txt and AI crawler access to readable HTML and structured data, with an AI visibility score. No account needed.",
       body: supportBody,
     },
+    { dir: "terms", title: "Terms of use — Agentability", description: "Terms for Agentability's website, instant check, API, command-line tool and MCP server: free, as is, fair use, open data.", body: termsBody },
     { dir: "privacy", title: "Privacy — Agentability", description: "No accounts, no ads, nothing sold. Google Analytics counts visits in aggregate. Audits use only public surfaces.", body: privacyBody },
   ];
   for (const p of smallPages) {
@@ -2067,6 +2086,7 @@ nothing you can't test with curl.</p>
     ["/docs/", SITE_CONTENT_UPDATED],
     ["/support/", SITE_CONTENT_UPDATED],
     ["/privacy/", SITE_CONTENT_UPDATED],
+    ["/terms/", SITE_CONTENT_UPDATED],
     ...(fs.existsSync(path.join(OUT, "shops/index.html")) ? [["/shops/", indexDate] as [string, string]] : []),
     ...domains.map((d): [string, string] => [`/ai-index/site/${d}/`, indexDate]),
   ];
